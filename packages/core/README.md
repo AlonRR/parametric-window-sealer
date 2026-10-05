@@ -94,7 +94,7 @@ and `SETTINGS` (settings in the library's shape, possibly partial, and what each
 shapes (`plainPanel`, `portPanel`, `stripSolid`, `crossSolid`, `edgeStripSolid`), the hose
 port's rules (`checkPort`, `parsePorts`, `formatPorts`), the tape's (`tapeFit`, `tapedCollar`,
 and `edgeTapeSolid` and `portTapeSolid`, the tape itself for a preview), the pattern framework
-(`pieceOpenings`, `patternedPanel`, `patternBorderMm`, and a `PatternTile` passed to
+(`pieceOpenings`, `patternedPanel`, `patternBorderMm`, and a tile of openings passed to
 `buildPieces`) and the file writers
 (`toStl`, `to3mf`, `packageDownload`), with `planFiles`, which names the files without
 building them. The types are in the package.
