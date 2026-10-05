@@ -14,6 +14,7 @@ import type { GridLayout } from './layout.js';
 import { buildPieces } from './panel-geometry.js';
 import { describePlan, planParts, planWall, readParams, toFormValues } from './params.js';
 import { tapeFit } from './tape.js';
+import { fillPattern } from './fill.js';
 import type { FieldErrors, Params, PlanText } from './params.js';
 
 // Every piece in its cell, and one strip, cross piece or edge strip per shape, lying as it
@@ -23,7 +24,8 @@ export function buildExport(
   params: Params,
 ): { pieces: ExportPiece[]; parts: ExportPart[] } {
   const plan = planWall(params);
-  const built = buildPieces(engine, plan, params.thicknessMm, params.ports, params.collar, tapeFit(params.seal));
+  const pattern = fillPattern(params.fill, params.joint);
+  const built = buildPieces(engine, plan, params.thicknessMm, params.ports, params.collar, tapeFit(params.seal), pattern);
   let pieces: ExportPiece[];
   try {
     pieces = built.map((b, i) => {

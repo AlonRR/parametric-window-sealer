@@ -19,6 +19,7 @@ import { EXAMPLE_TRACK, WINDOW_PRESETS } from '../src/edge.js';
 import { DEFAULT_JOINT } from '../src/joint.js';
 import { DEFAULT_COLLAR } from '../src/port.js';
 import { NO_SEAL } from '../src/tape.js';
+import { SEALED } from '../src/fill.js';
 
 const example = toFormValues(EXAMPLE_PARAMS);
 const read = (over: FormValues) => readParams({ ...example, ...over });
@@ -38,6 +39,7 @@ describe('the starting values', () => {
       ports: [],
       collar: DEFAULT_COLLAR,
       seal: NO_SEAL, // Q122
+      fill: SEALED, // Q141
     });
   });
 
@@ -271,6 +273,7 @@ describe('describePlan', () => {
       leftovers: [],
       ports: [],
       seal: 'Seal: none.',
+      fill: 'Fill: sealed.',
     });
   });
 

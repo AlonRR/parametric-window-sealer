@@ -17,4 +17,5 @@ export * from './printer.js';
 export * from './printers.js';
 export * from './settings.js';
 export * from './tape.js';
+export * from './fill.js';
 export * from './wall.js';

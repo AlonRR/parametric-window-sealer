@@ -9,6 +9,7 @@ import { WINDOW_PRESETS } from './edge.js';
 import type { WindowType } from './edge.js';
 import { EXAMPLE_PARAMS, readParams, toFormValues } from './params.js';
 import { PRINTER_IDS } from './printers.js';
+import { FILL_KINDS, PATTERN_STYLES } from './fill.js';
 import type { FieldName, FormValues, Params } from './params.js';
 
 export interface Setting {
@@ -151,6 +152,21 @@ export const SETTINGS: readonly Setting[] = [
     values: YES_NO,
     onOff: true,
   },
+  {
+    field: 'fill',
+    path: 'fill.kind',
+    help: 'The panel fill: sealed, or a pattern (the grid for now).',
+    values: FILL_KINDS,
+  },
+  {
+    field: 'fillStyle',
+    path: 'fill.style',
+    help: "A pattern's style: relief, cut into the room side, or cut through, letting air through.",
+    values: PATTERN_STYLES,
+  },
+  { field: 'reliefPct', path: 'fill.reliefPct', help: "A relief's depth, as a percentage of the panel's thickness." },
+  { field: 'gridOpeningMm', path: 'fill.grid.openingMm', help: "The grid's square openings: each side." },
+  { field: 'gridBarMm', path: 'fill.grid.barMm', help: 'The bars between the grid’s openings; at least 0.8 mm.' },
 ];
 
 // The value at a dotted path, such as `edges.track.widthMm`; undefined if it is not there.
@@ -248,6 +264,8 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
   }
   const seal = input['seal'];
   if (isObject(seal) && !('kind' in seal) && 'tape' in seal) params.seal = { ...params.seal, kind: 'tape' };
+  const fill = input['fill'];
+  if (isObject(fill) && !('kind' in fill) && 'grid' in fill) params.fill = { ...params.fill, kind: 'grid' };
 
   const values: FormValues = toFormValues(params);
   const presetWindow = overrides.window;
@@ -262,6 +280,8 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
   if (overrides.printer === undefined && overrides.printerModel !== undefined) values.printer = 'model';
   const tapeOverride = SETTINGS.some((s) => s.path.startsWith('seal.tape.') && overrides[s.field] !== undefined);
   if (overrides.seal === undefined && tapeOverride) values.seal = 'tape';
+  const gridOverride = SETTINGS.some((s) => s.path.startsWith('fill.grid.') && overrides[s.field] !== undefined);
+  if (overrides.fill === undefined && gridOverride) values.fill = 'grid';
   Object.assign(values, overrides);
 
   const problems: SettingProblem[] = [];

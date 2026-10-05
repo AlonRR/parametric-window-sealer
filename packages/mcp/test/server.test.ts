@@ -140,6 +140,17 @@ describe('window_sealer_plan_wall', () => {
     expect(yes.isError).toBe(true);
   });
 
+  it('a grid fill in the library’s shape: grid settings alone mean the grid, in relief to start with (Q141, Q142)', async () => {
+    const { call } = await connect();
+    const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { grid: { barMm: 2 } } } });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['settings'].fill).toEqual({ kind: 'grid', style: 'relief', reliefPct: 50, grid: { openingMm: 15, barMm: 2 } });
+    expect(r.data['summary'].fill).toBe('Fill: a grid of 15 mm square openings and 2 mm bars, cut 1.5 mm into the room side.');
+    const thin = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { grid: { barMm: 0.5 } } } });
+    expect(thin.isError).toBe(true);
+    expect(thin.text).toContain('- fill.grid.barMm: Make it at least 0.8 mm: two lines from a 0.4 mm nozzle.');
+  });
+
   it('settings the page refuses are an error with the page’s message for each', async () => {
     const { call } = await connect();
     const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, thicknessMm: 0, joint: { slideMm: 8 } } });

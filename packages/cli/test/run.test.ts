@@ -378,3 +378,42 @@ describe('a tape seal (seal-tape #15; Q119 to Q132)', () => {
     );
   });
 });
+
+describe('the panel fill (pattern-grid #16; Q139 to Q143)', () => {
+  const params = async (args: string[]) => {
+    const r = await cli([...args, '--dry-run', '--json']);
+    return json(r.out).params as typeof EXAMPLE_PARAMS;
+  };
+
+  it('sealed to start with, and the summary says so (Q141)', async () => {
+    const r = await cli([...OPENING, '--dry-run']);
+    expect(r.out).toContain('Fill: sealed.');
+  });
+
+  it('--fill grid: in relief to start with; --fill-style through cuts it through (Q142)', async () => {
+    const r = await cli([...OPENING, '--fill', 'grid', '--dry-run']);
+    expect(r.code).toBe(0);
+    expect(r.out).toContain('Fill: a grid of 15 mm square openings and 3 mm bars, cut 1.5 mm into the room side.');
+    const through = await cli([...OPENING, '--fill', 'grid', '--fill-style', 'through', '--dry-run']);
+    expect(through.out).toContain('cut through: air passes through the wall.');
+  });
+
+  it('a --grid-* flag without --fill means the grid; a bar under 0.8 mm is refused (Q140, Q143)', async () => {
+    expect((await params([...OPENING, '--grid-opening', '12', '--grid-bar', '2'])).fill).toEqual({
+      kind: 'grid',
+      style: 'relief',
+      reliefPct: 50,
+      grid: { openingMm: 12, barMm: 2 },
+    });
+    const thin = await cli([...OPENING, '--grid-bar', '0.5']);
+    expect(thin.code).toBe(2);
+    expect(thin.err).toContain('--grid-bar: Make it at least 0.8 mm: two lines from a 0.4 mm nozzle.');
+  });
+
+  it('--help shows a percentage as <%>, not <mm>', async () => {
+    const r = await cli(['--help']);
+    expect(r.out).toMatch(/--relief-depth <%> +/);
+    expect(r.out).toMatch(/--tape-squeeze <%> +/);
+    expect(r.out).toMatch(/--grid-bar <mm> +/);
+  });
+});

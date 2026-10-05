@@ -54,6 +54,11 @@ const FLAG_NAMES: Record<FieldName, string> = {
   tapeSqueezePct: 'tape-squeeze',
   tapeSides: 'tape-sides',
   tapePort: 'tape-port',
+  fill: 'fill', // sealed or a pattern (Q141)
+  fillStyle: 'fill-style',
+  reliefPct: 'relief-depth',
+  gridOpeningMm: 'grid-opening', // a --grid-* flag without --fill means the grid
+  gridBarMm: 'grid-bar',
 };
 
 export const SETTING_FLAGS: readonly SettingFlag[] = SETTINGS.map((s) => ({ ...s, flag: FLAG_NAMES[s.field] }));

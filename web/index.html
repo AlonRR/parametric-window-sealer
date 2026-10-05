@@ -338,6 +338,27 @@
           <span class="error" data-testid="error-thicknessMm"></span>
         </fieldset>
 
+        <!-- The panel fill (pattern-grid, #16): sealed to start with, or a pattern from the
+          list, in relief to start with or cut through (Q141, Q142). -->
+        <fieldset>
+          <legend>Panel fill</legend>
+          <label>
+            Fill
+            <select name="fill">
+              <option value="sealed">Sealed</option>
+              <optgroup label="Patterns">
+                <option value="grid">Grid</option>
+              </optgroup>
+            </select>
+          </label>
+          <div data-testid="fill-style" hidden>
+            <label><input type="radio" name="fillStyle" value="relief" /> Relief</label>
+            <p class="note">Cut into the face you see from the room; the wall stays sealed.</p>
+            <label><input type="radio" name="fillStyle" value="through" /> Cut through</label>
+            <p class="note">Air passes through the wall.</p>
+          </div>
+        </fieldset>
+
         <details>
           <summary>Advanced: the printer</summary>
           <label>
@@ -441,6 +462,28 @@
         </details>
 
         <details>
+          <summary>Advanced: the pattern</summary>
+          <p class="note">Used when the fill is a pattern. It stays 2 mm further in than the strips reach.</p>
+          <label>
+            Relief depth (% of the panel's thickness)
+            <input name="reliefPct" inputmode="decimal" autocomplete="off" />
+          </label>
+          <span class="error" data-testid="error-reliefPct"></span>
+          <label>
+            Grid opening (mm)
+            <input name="gridOpeningMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">Each square opening's side.</p>
+          <span class="error" data-testid="error-gridOpeningMm"></span>
+          <label>
+            Grid bar (mm)
+            <input name="gridBarMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">The solid between two openings: at least 0.8 mm.</p>
+          <span class="error" data-testid="error-gridBarMm"></span>
+        </details>
+
+        <details>
           <summary>Advanced: the tape</summary>
           <p class="note">
             Used when the seal is foam tape. These are starting values: a test print shows
@@ -504,6 +547,7 @@
         <p data-testid="plan-edges"></p>
         <ul data-testid="plan-ports"></ul>
         <p data-testid="plan-seal"></p>
+        <p data-testid="plan-fill"></p>
         <ul data-testid="plan-warnings"></ul>
         <p><button type="button" id="download-open">Download the pieces...</button></p>
       </section>

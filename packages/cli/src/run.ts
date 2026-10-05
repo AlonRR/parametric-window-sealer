@@ -78,7 +78,8 @@ function help(): string {
   const settings: [string, string][] = SETTING_FLAGS.map((f) => {
     // A long list of choices (the printers) is named after the hint, so the table stays narrow.
     const long = (f.values?.length ?? 0) > 8;
-    const value = f.list ? '<mm[@column,row]>' : f.values === undefined ? '<mm>' : long ? '<id>' : `<${f.values.join('|')}>`;
+    const unit = f.field.endsWith('Pct') ? '<%>' : '<mm>'; // a percentage, such as the tape's squeeze
+    const value = f.list ? '<mm[@column,row]>' : f.values === undefined ? unit : long ? '<id>' : `<${f.values.join('|')}>`;
     const start = f.flag === 'width' || f.flag === 'height' ? '' : starting[f.field];
     const help = f.list
       ? `${f.help} Give --${f.flag} again for each port.`
@@ -113,7 +114,7 @@ function help(): string {
 
 function summaryLines(summary: PlanText): string[] {
   const lines = [summary.headline, summary.columns, summary.rows, summary.span, summary.joints, summary.edges];
-  lines.push(...summary.ports, summary.seal);
+  lines.push(...summary.ports, summary.seal, summary.fill);
   for (const warning of summary.warnings) lines.push(`Warning: ${warning}`);
   for (const leftover of summary.leftovers) {
     lines.push(leftover.message, `  Change it with --${leftover.axis}-leftover:`);

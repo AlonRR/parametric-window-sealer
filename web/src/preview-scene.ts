@@ -3,7 +3,8 @@
 // thin outline so the joints between pieces show. The strips and cross pieces
 // (connector-strip, #10) and the edge strips (track-edge, #11) are drawn in place around
 // the panels, in a darker grey. With a tape seal (seal-tape, #15) the tape is drawn too, in
-// its own colour, though it is bought, not printed, and so not in the download (Q132).
+// its own colour, though it is bought, not printed, and so not in the download (Q132). A
+// patterned fill (pattern-grid, #16) is drawn as it is printed.
 //
 // Measured in spikes/viewer-benchmark/: what slows a preview is the number of triangles,
 // not the library. Plain pieces have 12 each; when patterns arrive, drawing them in full
@@ -28,6 +29,7 @@ import { stripWidthMm } from 'parametric-window-sealer';
 import { crossSolid, stripSolid } from 'parametric-window-sealer';
 import { buildPieces, portTapeSolid } from 'parametric-window-sealer';
 import { tapeFit, tapedCollar } from 'parametric-window-sealer';
+import { fillPattern } from 'parametric-window-sealer';
 import { planParts } from 'parametric-window-sealer';
 import type { Params } from 'parametric-window-sealer';
 
@@ -64,7 +66,8 @@ export function buildWallScene(engine: Engine, params: Params): Group {
   const { joint, thicknessMm } = params;
   const wall = new Group();
   const tape = tapeFit(params.seal);
-  const built = buildPieces(engine, plan, thicknessMm, params.ports, params.collar, tape);
+  const pattern = fillPattern(params.fill, joint);
+  const built = buildPieces(engine, plan, thicknessMm, params.ports, params.collar, tape, pattern);
   try {
     built.forEach((piece, i) => {
       const cell = plan.pieces[i];

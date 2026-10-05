@@ -52,6 +52,11 @@ const FIELDS: readonly FieldName[] = [
   'tapeSqueezePct',
   'tapeSides',
   'tapePort',
+  'fill',
+  'fillStyle',
+  'reliefPct',
+  'gridOpeningMm',
+  'gridBarMm',
 ];
 
 type Control = HTMLInputElement | HTMLSelectElement | RadioNodeList;
@@ -283,6 +288,9 @@ export function mountPanel(
     if (tapeChoice) tapeToForm(form, tapeChoice);
     const tapeOwn = form.querySelector<HTMLElement>('[data-part="tape-own"]');
     if (tapeOwn) tapeOwn.hidden = tapeChoice?.value !== 'own';
+    // A pattern's style shows once a pattern is chosen (Q141).
+    const fillStyle = form.querySelector<HTMLElement>('[data-testid="fill-style"]');
+    if (fillStyle) fillStyle.hidden = control(form, 'fill')?.value === 'sealed';
     const ports = portsText(form);
     const portsField = control(form, 'ports');
     if (portsField instanceof HTMLInputElement) portsField.value = ports.text;
@@ -337,7 +345,7 @@ export function mountPanel(
     warnings?.replaceChildren();
     if (!result.ok) {
       setText(plan, 'plan-headline', 'Fix the marked fields to see the plan.');
-      for (const id of ['plan-columns', 'plan-rows', 'plan-span', 'plan-joints', 'plan-edges', 'plan-seal']) {
+      for (const id of ['plan-columns', 'plan-rows', 'plan-span', 'plan-joints', 'plan-edges', 'plan-seal', 'plan-fill']) {
         setText(plan, id, '');
       }
       plan.querySelector('[data-testid="plan-ports"]')?.replaceChildren();
@@ -351,6 +359,7 @@ export function mountPanel(
     setText(plan, 'plan-joints', text.joints);
     setText(plan, 'plan-edges', text.edges);
     setText(plan, 'plan-seal', text.seal);
+    setText(plan, 'plan-fill', text.fill);
     plan.querySelector('[data-testid="plan-ports"]')?.replaceChildren(
       ...text.ports.map((line) => {
         const li = document.createElement('li');

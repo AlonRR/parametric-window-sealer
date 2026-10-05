@@ -25,6 +25,9 @@ import { PRINTER_IDS } from './printers.js';
 import { DEFAULT_COLLAR, checkPort, collarInnerMm, defaultPortPiece, formatPorts, parsePorts, portHoleMm } from './port.js';
 import type { CollarParams, PortSetting } from './port.js';
 import { DEFAULT_TAPE, NO_SEAL, TAPE_GROOVE_WALL_MM, tapeFit, tapedCollar } from './tape.js';
+import { DEFAULT_GRID, FILL_KINDS, MIN_BAR_MM, PATTERN_STYLES, SEALED } from './fill.js';
+import type { FillParams } from './fill.js';
+import { reliefDepthMm } from './pattern.js';
 import type { SealKind, SealParams } from './tape.js';
 
 export interface AxisChoice {
@@ -46,6 +49,7 @@ export interface Params {
   ports: Required<PortSetting>[]; // none for a plain wall (Q112); column and row from 1
   collar: CollarParams;
   seal: SealParams; // none to start with (Q122)
+  fill: FillParams; // sealed to start with (Q141)
 }
 
 // The page starts here: an example opening (Q42, labelled as an example, Q18), the default
@@ -65,6 +69,7 @@ export const EXAMPLE_PARAMS: Params = {
   ports: [],
   collar: DEFAULT_COLLAR,
   seal: NO_SEAL,
+  fill: SEALED,
 };
 
 export type FieldName =
@@ -109,7 +114,12 @@ export type FieldName =
   | 'tapeGrooveMm'
   | 'tapeSqueezePct'
   | 'tapeSides'
-  | 'tapePort';
+  | 'tapePort'
+  | 'fill'
+  | 'fillStyle'
+  | 'reliefPct'
+  | 'gridOpeningMm'
+  | 'gridBarMm';
 
 export type FormValues = Partial<Record<FieldName, string>>;
 export type FieldErrors = Partial<Record<FieldName, string>>;
@@ -167,6 +177,11 @@ export function toFormValues(p: Params): FormValues {
     tapeSqueezePct: String(p.seal.tape.squeezePct),
     tapeSides: p.seal.tape.sides ? 'yes' : 'no',
     tapePort: p.seal.tape.port ? 'yes' : 'no',
+    fill: p.fill.kind,
+    fillStyle: p.fill.style,
+    reliefPct: String(p.fill.reliefPct),
+    gridOpeningMm: String(p.fill.grid.openingMm),
+    gridBarMm: String(p.fill.grid.barMm),
   };
 }
 
@@ -364,7 +379,37 @@ export function readParams(values: FormValues): ReadResult {
     if (span.heightMm <= 0) errors.openingHeightMm = 'Too small for the edge strips.';
   }
 
-  const base = { openingWidthMm, openingHeightMm, printer, bedMarginMm, width, height, thicknessMm, joint, edges, collar, seal };
+  // The panel fill (Q141): a pattern's fields are read only with a pattern, as the tape's are.
+  const fillKind = oneOf('fill', FILL_KINDS);
+  const patterned = fillKind !== 'sealed';
+  const fillNumber = (field: FieldName, fallback: number, fits: (n: number) => boolean, message: string): number => {
+    const n = number(field);
+    if (fits(n)) return n;
+    if (!patterned) return fallback;
+    errors[field] = message;
+    return Number.NaN;
+  };
+  const fill: FillParams = {
+    kind: fillKind,
+    style: patterned ? oneOf('fillStyle', PATTERN_STYLES) : PATTERN_STYLES.find((v) => v === values.fillStyle) ?? SEALED.style,
+    reliefPct: fillNumber(
+      'reliefPct',
+      SEALED.reliefPct,
+      (n) => n > 0 && n < 100,
+      'Enter a percentage greater than 0 and less than 100.',
+    ),
+    grid: {
+      openingMm: fillNumber('gridOpeningMm', DEFAULT_GRID.openingMm, (n) => n > 0, 'Enter a size in mm, greater than 0.'),
+      barMm: fillNumber(
+        'gridBarMm',
+        DEFAULT_GRID.barMm,
+        (n) => n >= MIN_BAR_MM - 1e-9,
+        `Make it at least ${mm(MIN_BAR_MM)} mm: two lines from a 0.4 mm nozzle.`,
+      ),
+    },
+  };
+
+  const base = { openingWidthMm, openingHeightMm, printer, bedMarginMm, width, height, thicknessMm, joint, edges, collar, seal, fill };
   const ports: Required<PortSetting>[] = [];
   if (Object.keys(errors).length === 0 && given.ok && given.ports.length > 0) {
     errors.ports = placePorts({ ...base, ports: [] }, given.ports, ports);
@@ -465,6 +510,7 @@ export interface PlanText {
   leftovers: LeftoverText[];
   ports: string[]; // one line for each hose port
   seal: string;
+  fill: string;
 }
 
 function mm(n: number): string {
@@ -538,6 +584,16 @@ function describeJoints(joints: JointPlan, joint: JointParams): string {
 
 // The tape (Q119, Q127, Q129): its size, where it goes, and how much the wall takes, along each
 // edge strip, twice more along those in a track for the sides, and round each collar's groove.
+// The fill (Q141): sealed, or the pattern, its sizes and how it is cut.
+function describeFill(params: Params): string {
+  const { fill } = params;
+  if (fill.kind === 'sealed') return 'Fill: sealed.';
+  const pattern = `a grid of ${mm(fill.grid.openingMm)} mm square openings and ${mm(fill.grid.barMm)} mm bars`;
+  return fill.style === 'through'
+    ? `Fill: ${pattern}, cut through: air passes through the wall.`
+    : `Fill: ${pattern}, cut ${mm(reliefDepthMm(params.thicknessMm, fill.reliefPct))} mm into the room side.`;
+}
+
 function describeSeal(params: Params, parts: WallParts): string {
   const fit = tapeFit(params.seal);
   if (fit === undefined) return 'Seal: none.';
@@ -577,5 +633,6 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     ),
     ports: params.ports.map((p) => `Hose port: a ${mm(p.hoseMm)} mm hose end, in column ${p.column}, row ${p.row}.`),
     seal: describeSeal(params, parts),
+    fill: describeFill(params),
   };
 }

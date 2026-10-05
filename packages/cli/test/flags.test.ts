@@ -48,6 +48,8 @@ describe('the setting flags (Q90)', () => {
       'seal',
       'tape-sides',
       'tape-port',
+      'fill',
+      'fill-style',
     ]);
   });
 
@@ -59,6 +61,7 @@ describe('the setting flags (Q90)', () => {
       printerModel: 'prusa-mk4s',
       ...(f.field === 'printerModel' ? { printer: 'model' } : {}),
       ...(f.path.startsWith('seal.tape.') ? { seal: 'tape' } : {}), // read only with tape
+      ...(f.path.startsWith('fill.') && f.path !== 'fill.kind' ? { fill: 'grid' } : {}), // and with a pattern
     };
     for (const value of f.values ?? []) {
       expect(readParams({ ...base, [f.field]: value })).toMatchObject({ ok: true });
