@@ -12,6 +12,11 @@ under Unreleased.
 
 ### Added
 
+- A brick pattern: choose "Brick" under "Panel fill" for brick-shaped openings in a running
+  bond, 30 × 12 mm with 3 mm bars to start with, all three under Advanced. The command takes
+  `--fill brick`, `--brick-width`, `--brick-height` and `--brick-bar`, the MCP server
+  `fill.brick`.
+
 - A hexagon pattern: choose "Hexagon" under "Panel fill" for a honeycomb of hexagonal openings,
   15 mm across the flats with 3 mm bars to start with, both under Advanced. The command takes
   `--fill hexagon`, `--hex-opening` and `--hex-bar`, the MCP server `fill.hexagon`.

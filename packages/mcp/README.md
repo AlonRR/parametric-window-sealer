@@ -71,7 +71,8 @@ as `{ "kind": "tape" }`, or with its size and places, such as `{ "tape": { "widt
 "thicknessMm": 4.8, "sides": true } }`; tape settings without a `kind` mean tape. A grid pattern goes in `fill`, as `{ "kind": "grid" }`
 or with its sizes, such as `{ "grid": { "openingMm": 12, "barMm": 2 }, "style": "through" }`;
 grid settings without a `kind` mean the grid. A honeycomb is `"kind": "hexagon"`, its sizes in
-`fill.hexagon` (`openingMm` across the flats, `barMm`).
+`fill.hexagon` (`openingMm` across the flats, `barMm`); bricks are `"kind": "brick"`, sized in
+`fill.brick` (`widthMm`, `heightMm`, `barMm`).
 
 `window_sealer_make_files` also takes:
 

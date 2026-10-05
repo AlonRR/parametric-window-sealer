@@ -88,7 +88,9 @@ window-sealer --width 600 --height 1000 --printer-model prusa-mk4s
   (`--relief-depth`, 50 % of the thickness to start with) or, with `--fill-style through`,
   right through. `--grid-opening` (15 mm) and `--grid-bar` (3 mm, at least 0.8) set its sizes;
   either alone means the grid. `--fill hexagon` gives a honeycomb instead, sized with
-  `--hex-opening` (15 mm across the flats) and `--hex-bar` (3 mm).
+  `--hex-opening` (15 mm across the flats) and `--hex-bar` (3 mm), and `--fill brick` bricks in
+  a running bond, sized with `--brick-width` (30 mm), `--brick-height` (12 mm) and `--brick-bar`
+  (3 mm).
 
 ### Settings in a file
 

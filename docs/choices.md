@@ -27,3 +27,7 @@ The first entries are choices made before Q144 in work the owner had not been as
 | C15 | `pattern-hexagon` (#17) | The hexagon has **sizes of its own**, kept when another pattern is chosen, and read only when it is the pattern chosen | One opening size and one bar width shared by every pattern |
 | C16 | `pattern-hexagon` (#17) | The command's flags are **`--hex-opening` and `--hex-bar`**, either alone meaning the hexagon; the MCP server's `fill.hexagon` | `--hexagon-opening`; a shared `--opening` and `--bar` for whichever pattern |
 | C17 | `pattern-hexagon` (#17) | Under "Advanced: the pattern", **only the chosen pattern's sizes show** | Every pattern's sizes at once |
+| C18 | `pattern-brick` (#18) | **Brick-shaped openings in a running bond**, every other row shifted half a brick | A stack bond (rows not shifted); a herringbone |
+| C19 | `pattern-brick` (#18) | **30 × 12 mm openings with 3 mm bars** to start with | Real brick proportions, about 3.3 : 1 (33 × 10 mm); 40 × 20 mm |
+| C20 | `pattern-brick` (#18) | The bricks have **a width, a height and a bar of their own**, read only when they are chosen | A width and a bar, the height fixed at half the width |
+| C21 | `pattern-brick` (#18) | The command's flags are **`--brick-width`, `--brick-height` and `--brick-bar`**, any alone meaning the bricks; the MCP server's `fill.brick` | A shared set of size flags for whichever pattern |
