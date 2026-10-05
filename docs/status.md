@@ -120,6 +120,15 @@ is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | Q99 | An agent gives the settings **in the library's shape**, as a `--params` file (Q85): anything left out starts where the page starts, the opening is required, and what one tool returns can be passed to another | 5 Oct 2026 |
 | Q100 | A wall's subfolder is **named after the wall** (`window-sealer-600x1000`, as Q86) **or a plain name the agent gives**, such as `kitchen`, never a path outside the folder | 5 Oct 2026 |
 | Q101 | The three API forms that need no server (#45 to #47) are **released as `v0.2.0`**, a minor version, with the library, the command and the MCP server at **0.2.0** too. The tag and the GitHub release are the owner's step (a cloud session cannot push tags) | 5 Oct 2026 |
+| Q102 | The hose port takes **the hose's round end**, sized to its outside diameter, so it does not depend on a brand's window adapter | 5 Oct 2026 |
+| Q104 | The hose is held by a **push-fit collar with a stop**: a short tube the hose end slides into, snug, stopping against a lip; it works whichever way the hose's thread turns | 5 Oct 2026 |
+| Q105 | The port is **centred in one piece the user picks** (column and row); it starts in the bottom row's middle piece, near where the AC usually stands | 5 Oct 2026 |
+| Q106 | The collar is on **the room side**; the outside face stays flat. The plan's frame is seen from the room: column 1 is at the left, row 1 at the bottom, and the collar points towards the viewer. The piece prints flat with the collar up, its stop lip being the panel itself, so it needs no supports | 5 Oct 2026 |
+| Q107 | The collar's sizes are **starting values, adjustable under Advanced**, which a test print confirms: depth 20 mm, wall 2.4 mm, clearance 0.5 mm per side, a stop lip 5 mm wide | 5 Oct 2026 |
+| Q108 | The port stays clear of the strips along each edge (the slot depth, 8 mm, plus 2 mm). **If the chosen piece is too small, no port is made**: the page says what size the port needs and what gets there, such as full-size pieces plus a filler or a larger printer size | 5 Oct 2026 |
+| Q109 | **No cap** for the port for now; one can be a later backlog item | 5 Oct 2026 |
+| Q110 | With an even number of columns the port starts in **the middle piece left of centre**, seen from the room | 5 Oct 2026 |
+| Q111 | **One port per wall** on the main form, and **several under Advanced**, each in its own piece. How the main form shows it is Q112 | 5 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
 | Q32 | The **hosted web API is parked** (`api-hosted`, #48, moved to P3): "I don't have the funding to run a server" | 5 Oct 2026 |
@@ -134,7 +143,13 @@ The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-None at the moment.
+- **Q103.** Which hose sizes the page lists. The port must fit the hose end's outside diameter, but hoses
+  are usually sold by their inside diameter, and sellers' figures disagree (100, 125, 130 and 150 mm).
+  The owner asked for outside diameters from makers' own manuals and part listings, with a source
+  for each, to approve before they go in; the page also takes the user's own measurement.
+- **Q112.** How the main form offers the one port (Q111): as an appliance choice ("None" or
+  "Portable AC hose", with the window AC and the fan added later, as Q15 lists them), or as a
+  tick box.
 
 ## Repository follow-ups
 
