@@ -59,6 +59,8 @@ const FLAG_NAMES: Record<FieldName, string> = {
   reliefPct: 'relief-depth',
   gridOpeningMm: 'grid-opening', // a --grid-* flag without --fill means the grid
   gridBarMm: 'grid-bar',
+  hexOpeningMm: 'hex-opening', // a --hex-* flag without --fill means the hexagon (C16)
+  hexBarMm: 'hex-bar',
 };
 
 export const SETTING_FLAGS: readonly SettingFlag[] = SETTINGS.map((s) => ({ ...s, flag: FLAG_NAMES[s.field] }));

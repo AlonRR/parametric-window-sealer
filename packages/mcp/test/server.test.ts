@@ -144,11 +144,27 @@ describe('window_sealer_plan_wall', () => {
     const { call } = await connect();
     const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { grid: { barMm: 2 } } } });
     expect(r.isError).toBeFalsy();
-    expect(r.data['settings'].fill).toEqual({ kind: 'grid', style: 'relief', reliefPct: 50, grid: { openingMm: 15, barMm: 2 } });
+    expect(r.data['settings'].fill).toEqual({
+      kind: 'grid',
+      style: 'relief',
+      reliefPct: 50,
+      grid: { openingMm: 15, barMm: 2 },
+      hexagon: { openingMm: 15, barMm: 3 },
+    });
     expect(r.data['summary'].fill).toBe('Fill: a grid of 15 mm square openings and 2 mm bars, cut 1.5 mm into the room side.');
     const thin = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { grid: { barMm: 0.5 } } } });
     expect(thin.isError).toBe(true);
     expect(thin.text).toContain('- fill.grid.barMm: Make it at least 0.8 mm: two lines from a 0.4 mm nozzle.');
+  });
+
+  it('a hexagon fill: its settings alone mean the hexagon (C15)', async () => {
+    const { call } = await connect();
+    const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { hexagon: { openingMm: 10 }, style: 'through' } } });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['settings'].fill).toMatchObject({ kind: 'hexagon', style: 'through', hexagon: { openingMm: 10, barMm: 3 } });
+    expect(r.data['summary'].fill).toBe(
+      'Fill: a honeycomb of hexagonal openings 10 mm across the flats and 3 mm bars, cut through: air passes through the wall.',
+    );
   });
 
   it('settings the page refuses are an error with the page’s message for each', async () => {

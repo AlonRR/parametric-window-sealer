@@ -404,6 +404,7 @@ describe('the panel fill (pattern-grid #16; Q139 to Q143)', () => {
       style: 'relief',
       reliefPct: 50,
       grid: { openingMm: 12, barMm: 2 },
+      hexagon: { openingMm: 15, barMm: 3 },
     });
     const thin = await cli([...OPENING, '--grid-bar', '0.5']);
     expect(thin.code).toBe(2);
@@ -415,5 +416,23 @@ describe('the panel fill (pattern-grid #16; Q139 to Q143)', () => {
     expect(r.out).toMatch(/--relief-depth <%> +/);
     expect(r.out).toMatch(/--tape-squeeze <%> +/);
     expect(r.out).toMatch(/--grid-bar <mm> +/);
+  });
+});
+
+describe('the hexagon pattern (pattern-hexagon #17; C13 to C16)', () => {
+  it('--fill hexagon: a honeycomb, in relief to start with', async () => {
+    const r = await cli([...OPENING, '--fill', 'hexagon', '--dry-run']);
+    expect(r.code).toBe(0);
+    expect(r.out).toContain(
+      'Fill: a honeycomb of hexagonal openings 15 mm across the flats and 3 mm bars, cut 1.5 mm into the room side.',
+    );
+  });
+
+  it('a --hex-* flag without --fill means the hexagon; its bar is no thinner than 0.8 mm', async () => {
+    const r = await cli([...OPENING, '--hex-opening', '10', '--dry-run', '--json']);
+    expect(json(r.out).params.fill).toMatchObject({ kind: 'hexagon', hexagon: { openingMm: 10, barMm: 3 } });
+    const thin = await cli([...OPENING, '--hex-bar', '0.5']);
+    expect(thin.code).toBe(2);
+    expect(thin.err).toContain('--hex-bar: Make it at least 0.8 mm: two lines from a 0.4 mm nozzle.');
   });
 });

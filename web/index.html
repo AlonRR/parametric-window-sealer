@@ -348,6 +348,7 @@
               <option value="sealed">Sealed</option>
               <optgroup label="Patterns">
                 <option value="grid">Grid</option>
+                <option value="hexagon">Hexagon</option>
               </optgroup>
             </select>
           </label>
@@ -469,18 +470,34 @@
             <input name="reliefPct" inputmode="decimal" autocomplete="off" />
           </label>
           <span class="error" data-testid="error-reliefPct"></span>
-          <label>
-            Grid opening (mm)
-            <input name="gridOpeningMm" inputmode="decimal" autocomplete="off" />
-          </label>
-          <p class="note">Each square opening's side.</p>
-          <span class="error" data-testid="error-gridOpeningMm"></span>
-          <label>
-            Grid bar (mm)
-            <input name="gridBarMm" inputmode="decimal" autocomplete="off" />
-          </label>
-          <p class="note">The solid between two openings: at least 0.8 mm.</p>
-          <span class="error" data-testid="error-gridBarMm"></span>
+          <!-- Only the chosen pattern's sizes show (C17). -->
+          <div data-pattern="grid">
+            <label>
+              Grid opening (mm)
+              <input name="gridOpeningMm" inputmode="decimal" autocomplete="off" />
+            </label>
+            <p class="note">Each square opening's side.</p>
+            <span class="error" data-testid="error-gridOpeningMm"></span>
+            <label>
+              Grid bar (mm)
+              <input name="gridBarMm" inputmode="decimal" autocomplete="off" />
+            </label>
+            <p class="note">The solid between two openings: at least 0.8 mm.</p>
+            <span class="error" data-testid="error-gridBarMm"></span>
+          </div>
+          <div data-pattern="hexagon">
+            <label>
+              Hexagon opening, across the flats (mm)
+              <input name="hexOpeningMm" inputmode="decimal" autocomplete="off" />
+            </label>
+            <span class="error" data-testid="error-hexOpeningMm"></span>
+            <label>
+              Hexagon bar (mm)
+              <input name="hexBarMm" inputmode="decimal" autocomplete="off" />
+            </label>
+            <p class="note">The solid between two openings: at least 0.8 mm.</p>
+            <span class="error" data-testid="error-hexBarMm"></span>
+          </div>
         </details>
 
         <details>

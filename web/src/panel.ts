@@ -57,6 +57,8 @@ const FIELDS: readonly FieldName[] = [
   'reliefPct',
   'gridOpeningMm',
   'gridBarMm',
+  'hexOpeningMm',
+  'hexBarMm',
 ];
 
 type Control = HTMLInputElement | HTMLSelectElement | RadioNodeList;
@@ -291,6 +293,10 @@ export function mountPanel(
     // A pattern's style shows once a pattern is chosen (Q141).
     const fillStyle = form.querySelector<HTMLElement>('[data-testid="fill-style"]');
     if (fillStyle) fillStyle.hidden = control(form, 'fill')?.value === 'sealed';
+    // Under Advanced, only the chosen pattern's sizes (C17).
+    for (const sizes of form.querySelectorAll<HTMLElement>('[data-pattern]')) {
+      sizes.hidden = sizes.dataset.pattern !== control(form, 'fill')?.value;
+    }
     const ports = portsText(form);
     const portsField = control(form, 'ports');
     if (portsField instanceof HTMLInputElement) portsField.value = ports.text;

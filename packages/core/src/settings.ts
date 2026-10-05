@@ -155,7 +155,7 @@ export const SETTINGS: readonly Setting[] = [
   {
     field: 'fill',
     path: 'fill.kind',
-    help: 'The panel fill: sealed, or a pattern (the grid for now).',
+    help: 'The panel fill: sealed, or a pattern: a grid or a hexagon honeycomb.',
     values: FILL_KINDS,
   },
   {
@@ -167,6 +167,12 @@ export const SETTINGS: readonly Setting[] = [
   { field: 'reliefPct', path: 'fill.reliefPct', help: "A relief's depth, as a percentage of the panel's thickness." },
   { field: 'gridOpeningMm', path: 'fill.grid.openingMm', help: "The grid's square openings: each side." },
   { field: 'gridBarMm', path: 'fill.grid.barMm', help: 'The bars between the grid’s openings; at least 0.8 mm.' },
+  {
+    field: 'hexOpeningMm',
+    path: 'fill.hexagon.openingMm',
+    help: "The honeycomb's hexagonal openings: across the flats.",
+  },
+  { field: 'hexBarMm', path: 'fill.hexagon.barMm', help: 'The bars between the hexagons; at least 0.8 mm.' },
 ];
 
 // The value at a dotted path, such as `edges.track.widthMm`; undefined if it is not there.
@@ -266,6 +272,7 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
   if (isObject(seal) && !('kind' in seal) && 'tape' in seal) params.seal = { ...params.seal, kind: 'tape' };
   const fill = input['fill'];
   if (isObject(fill) && !('kind' in fill) && 'grid' in fill) params.fill = { ...params.fill, kind: 'grid' };
+  if (isObject(fill) && !('kind' in fill) && 'hexagon' in fill) params.fill = { ...params.fill, kind: 'hexagon' };
 
   const values: FormValues = toFormValues(params);
   const presetWindow = overrides.window;
@@ -282,6 +289,8 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
   if (overrides.seal === undefined && tapeOverride) values.seal = 'tape';
   const gridOverride = SETTINGS.some((s) => s.path.startsWith('fill.grid.') && overrides[s.field] !== undefined);
   if (overrides.fill === undefined && gridOverride) values.fill = 'grid';
+  const hexOverride = SETTINGS.some((s) => s.path.startsWith('fill.hexagon.') && overrides[s.field] !== undefined);
+  if (overrides.fill === undefined && hexOverride) values.fill = 'hexagon';
   Object.assign(values, overrides);
 
   const problems: SettingProblem[] = [];

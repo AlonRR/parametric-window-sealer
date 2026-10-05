@@ -68,3 +68,19 @@ test('the downloaded pieces carry the openings, named as before', async ({ page 
   expect(sealed[piece]?.length).toBe(684);
   expect(grid[piece]?.length ?? 0).toBeGreaterThan(10 * 684);
 });
+
+test('the hexagon: a honeycomb; under Advanced only its sizes show (C13 to C17)', async ({ page }) => {
+  await fill(page).selectOption('hexagon');
+  await expect(page.getByRole('radio', { name: 'Relief' })).toBeChecked();
+  await expect(line(page)).toHaveText(
+    'Fill: a honeycomb of hexagonal openings 15 mm across the flats and 3 mm bars, cut 1.5 mm into the room side.',
+  );
+  await page.getByText('Advanced: the pattern').click();
+  await expect(page.getByLabel('Hexagon opening, across the flats (mm)')).toHaveValue('15');
+  await expect(page.getByLabel('Grid opening (mm)')).toBeHidden();
+  await page.getByLabel('Hexagon bar (mm)').fill('2');
+  await expect(line(page)).toContainText('and 2 mm bars');
+  await fill(page).selectOption('grid');
+  await expect(page.getByLabel('Grid opening (mm)')).toBeVisible();
+  await expect(page.getByLabel('Hexagon opening, across the flats (mm)')).toBeHidden();
+});

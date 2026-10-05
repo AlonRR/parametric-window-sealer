@@ -25,7 +25,7 @@ import { PRINTER_IDS } from './printers.js';
 import { DEFAULT_COLLAR, checkPort, collarInnerMm, defaultPortPiece, formatPorts, parsePorts, portHoleMm } from './port.js';
 import type { CollarParams, PortSetting } from './port.js';
 import { DEFAULT_TAPE, NO_SEAL, TAPE_GROOVE_WALL_MM, tapeFit, tapedCollar } from './tape.js';
-import { DEFAULT_GRID, FILL_KINDS, MIN_BAR_MM, PATTERN_STYLES, SEALED } from './fill.js';
+import { DEFAULT_GRID, DEFAULT_HEXAGON, FILL_KINDS, MIN_BAR_MM, PATTERN_STYLES, SEALED } from './fill.js';
 import type { FillParams } from './fill.js';
 import { reliefDepthMm } from './pattern.js';
 import type { SealKind, SealParams } from './tape.js';
@@ -119,7 +119,9 @@ export type FieldName =
   | 'fillStyle'
   | 'reliefPct'
   | 'gridOpeningMm'
-  | 'gridBarMm';
+  | 'gridBarMm'
+  | 'hexOpeningMm'
+  | 'hexBarMm';
 
 export type FormValues = Partial<Record<FieldName, string>>;
 export type FieldErrors = Partial<Record<FieldName, string>>;
@@ -182,6 +184,8 @@ export function toFormValues(p: Params): FormValues {
     reliefPct: String(p.fill.reliefPct),
     gridOpeningMm: String(p.fill.grid.openingMm),
     gridBarMm: String(p.fill.grid.barMm),
+    hexOpeningMm: String(p.fill.hexagon.openingMm),
+    hexBarMm: String(p.fill.hexagon.barMm),
   };
 }
 
@@ -382,13 +386,22 @@ export function readParams(values: FormValues): ReadResult {
   // The panel fill (Q141): a pattern's fields are read only with a pattern, as the tape's are.
   const fillKind = oneOf('fill', FILL_KINDS);
   const patterned = fillKind !== 'sealed';
-  const fillNumber = (field: FieldName, fallback: number, fits: (n: number) => boolean, message: string): number => {
+  // Each pattern's own sizes are read only when it is the one chosen (C15).
+  const fillNumber = (
+    field: FieldName,
+    fallback: number,
+    fits: (n: number) => boolean,
+    message: string,
+    readFor: boolean = patterned,
+  ): number => {
     const n = number(field);
     if (fits(n)) return n;
-    if (!patterned) return fallback;
+    if (!readFor) return fallback;
     errors[field] = message;
     return Number.NaN;
   };
+  const barMessage = `Make it at least ${mm(MIN_BAR_MM)} mm: two lines from a 0.4 mm nozzle.`;
+  const bar = (n: number) => n >= MIN_BAR_MM - 1e-9;
   const fill: FillParams = {
     kind: fillKind,
     style: patterned ? oneOf('fillStyle', PATTERN_STYLES) : PATTERN_STYLES.find((v) => v === values.fillStyle) ?? SEALED.style,
@@ -399,13 +412,18 @@ export function readParams(values: FormValues): ReadResult {
       'Enter a percentage greater than 0 and less than 100.',
     ),
     grid: {
-      openingMm: fillNumber('gridOpeningMm', DEFAULT_GRID.openingMm, (n) => n > 0, 'Enter a size in mm, greater than 0.'),
-      barMm: fillNumber(
-        'gridBarMm',
-        DEFAULT_GRID.barMm,
-        (n) => n >= MIN_BAR_MM - 1e-9,
-        `Make it at least ${mm(MIN_BAR_MM)} mm: two lines from a 0.4 mm nozzle.`,
+      openingMm: fillNumber('gridOpeningMm', DEFAULT_GRID.openingMm, positive, 'Enter a size in mm, greater than 0.', fillKind === 'grid'),
+      barMm: fillNumber('gridBarMm', DEFAULT_GRID.barMm, bar, barMessage, fillKind === 'grid'),
+    },
+    hexagon: {
+      openingMm: fillNumber(
+        'hexOpeningMm',
+        DEFAULT_HEXAGON.openingMm,
+        positive,
+        'Enter a size in mm, greater than 0.',
+        fillKind === 'hexagon',
       ),
+      barMm: fillNumber('hexBarMm', DEFAULT_HEXAGON.barMm, bar, barMessage, fillKind === 'hexagon'),
     },
   };
 
@@ -588,7 +606,10 @@ function describeJoints(joints: JointPlan, joint: JointParams): string {
 function describeFill(params: Params): string {
   const { fill } = params;
   if (fill.kind === 'sealed') return 'Fill: sealed.';
-  const pattern = `a grid of ${mm(fill.grid.openingMm)} mm square openings and ${mm(fill.grid.barMm)} mm bars`;
+  const pattern =
+    fill.kind === 'grid'
+      ? `a grid of ${mm(fill.grid.openingMm)} mm square openings and ${mm(fill.grid.barMm)} mm bars`
+      : `a honeycomb of hexagonal openings ${mm(fill.hexagon.openingMm)} mm across the flats and ${mm(fill.hexagon.barMm)} mm bars`;
   return fill.style === 'through'
     ? `Fill: ${pattern}, cut through: air passes through the wall.`
     : `Fill: ${pattern}, cut ${mm(reliefDepthMm(params.thicknessMm, fill.reliefPct))} mm into the room side.`;
