@@ -76,9 +76,15 @@ function help(): string {
     ...OUTPUT_OPTIONS.map((o): [string, string] => [`--${o.flag}${o.value ? ` ${o.value}` : ''}`, o.help]),
   ];
   const settings: [string, string][] = SETTING_FLAGS.map((f) => {
-    const value = f.list ? '<mm[@column,row]>' : f.values === undefined ? '<mm>' : `<${f.values.join('|')}>`;
+    // A long list of choices (the printers) is named after the hint, so the table stays narrow.
+    const long = (f.values?.length ?? 0) > 8;
+    const value = f.list ? '<mm[@column,row]>' : f.values === undefined ? '<mm>' : long ? '<id>' : `<${f.values.join('|')}>`;
     const start = f.flag === 'width' || f.flag === 'height' ? '' : starting[f.field];
-    const help = f.list ? `${f.help} Give --${f.flag} again for each port.` : f.help;
+    const help = f.list
+      ? `${f.help} Give --${f.flag} again for each port.`
+      : long
+        ? `${f.help} One of: ${f.values?.join(', ')}.`
+        : f.help;
     return [`--${f.flag} ${value}`, start ? `${help} (${start})` : help];
   });
   const pad = Math.max(...[...rows, ...settings].map(([left]) => left.length)) + 2;

@@ -19,7 +19,9 @@ import type { JointParams, JointPlan } from './joint.js';
 import { layoutGrid } from './layout.js';
 import type { Axis, AxisMode, FillerPosition, GridLayout, Leftover } from './layout.js';
 import { DEFAULT_MAX_PIECE, maxPieceSize } from './printer.js';
-import type { PrinterChoice } from './printer.js';
+import type { PieceSize, PrinterChoice } from './printer.js';
+import { DEFAULT_BED_MARGIN_MM } from './printer.js';
+import { PRINTER_IDS } from './printers.js';
 import { DEFAULT_COLLAR, checkPort, defaultPortPiece, formatPorts, parsePorts, portHoleMm } from './port.js';
 import type { CollarParams, PortSetting } from './port.js';
 
@@ -33,6 +35,7 @@ export interface Params {
   openingWidthMm: number;
   openingHeightMm: number;
   printer: PrinterChoice;
+  bedMarginMm: number; // a listed printer's bed less this, each way (Q117)
   width: AxisChoice;
   height: AxisChoice;
   thicknessMm: number;
@@ -50,6 +53,7 @@ export const EXAMPLE_PARAMS: Params = {
   openingWidthMm: 600,
   openingHeightMm: 1000,
   printer: { kind: 'default' },
+  bedMarginMm: DEFAULT_BED_MARGIN_MM,
   width: { mode: 'equal', filler: 'end', leftover: 'spread' },
   height: { mode: 'equal', filler: 'end', leftover: 'spread' },
   thicknessMm: 3,
@@ -63,6 +67,8 @@ export type FieldName =
   | 'openingWidthMm'
   | 'openingHeightMm'
   | 'printer'
+  | 'printerModel'
+  | 'bedMarginMm'
   | 'customWidthMm'
   | 'customHeightMm'
   | 'widthMode'
@@ -111,6 +117,8 @@ export function toFormValues(p: Params): FormValues {
     printer: p.printer.kind,
     customWidthMm: p.printer.kind === 'custom' ? String(p.printer.widthMm) : '',
     customHeightMm: p.printer.kind === 'custom' ? String(p.printer.heightMm) : '',
+    printerModel: p.printer.kind === 'model' ? p.printer.id : '',
+    bedMarginMm: String(p.bedMarginMm),
     widthMode: p.width.mode,
     widthFiller: p.width.filler,
     heightMode: p.height.mode,
@@ -181,11 +189,14 @@ export function readParams(values: FormValues): ReadResult {
 
   const openingWidthMm = size('openingWidthMm');
   const openingHeightMm = size('openingHeightMm');
-  const kind = oneOf('printer', ['default', 'custom'] as const);
+  const kind = oneOf('printer', ['default', 'custom', 'model'] as const);
   const printer: PrinterChoice =
     kind === 'custom'
       ? { kind, widthMm: size('customWidthMm'), heightMm: size('customHeightMm') }
-      : { kind };
+      : kind === 'model'
+        ? { kind, id: oneOf('printerModel', PRINTER_IDS) }
+        : { kind };
+  const bedMarginMm = sizeOrZero('bedMarginMm');
   const width = {
     mode: oneOf('widthMode', MODES),
     filler: oneOf('widthFiller', FILLERS),
@@ -241,6 +252,12 @@ export function readParams(values: FormValues): ReadResult {
     ] as const) {
       if (value <= jointMm) errors[field] = `Make it more than a joint’s ${mm(jointMm)} mm.`;
     }
+  } else if (printer.kind === 'model' && Number.isFinite(jointMm) && errors.printerModel === undefined) {
+    const max = maxPieceSize(printer, bedMarginMm);
+    const smallest = Math.min(max.widthMm, max.heightMm);
+    if (Number.isFinite(smallest) && smallest <= jointMm) {
+      errors.bedMarginMm = `Leaves pieces of ${mm(smallest)} mm on this printer, no more than a joint’s ${mm(jointMm)} mm; make it smaller.`;
+    }
   } else if (printer.kind === 'default') {
     const smallest = Math.min(DEFAULT_MAX_PIECE.widthMm, DEFAULT_MAX_PIECE.heightMm);
     if (jointMm >= smallest) {
@@ -265,7 +282,7 @@ export function readParams(values: FormValues): ReadResult {
     if (span.heightMm <= 0) errors.openingHeightMm = 'Too small for the edge strips.';
   }
 
-  const base = { openingWidthMm, openingHeightMm, printer, width, height, thicknessMm, joint, edges, collar };
+  const base = { openingWidthMm, openingHeightMm, printer, bedMarginMm, width, height, thicknessMm, joint, edges, collar };
   const ports: Required<PortSetting>[] = [];
   if (Object.keys(errors).length === 0 && given.ok && given.ports.length > 0) {
     errors.ports = placePorts({ ...base, ports: [] }, given.ports, ports);
@@ -298,8 +315,7 @@ function placePorts(params: Params, given: PortSetting[], placed: Required<PortS
   return undefined;
 }
 
-export function planWall(p: Params): GridLayout {
-  const max = maxPieceSize(p.printer);
+function layoutFor(p: Params, max: PieceSize): GridLayout {
   const span = panelSpan(p.openingWidthMm, p.openingHeightMm, p.edges, p.joint);
   return layoutGrid({
     widthMm: span.widthMm,
@@ -314,6 +330,19 @@ export function planWall(p: Params): GridLayout {
   });
 }
 
+// The largest piece the plan uses. A listed printer's bed is turned where that needs fewer
+// pieces, as a piece can be turned on the bed; on a tie it stays as listed (Q116).
+export function pieceLimit(p: Params): PieceSize {
+  const listed = maxPieceSize(p.printer, p.bedMarginMm);
+  if (p.printer.kind !== 'model' || listed.widthMm === listed.heightMm) return listed;
+  const turned = { widthMm: listed.heightMm, heightMm: listed.widthMm };
+  return layoutFor(p, turned).pieces.length < layoutFor(p, listed).pieces.length ? turned : listed;
+}
+
+export function planWall(p: Params): GridLayout {
+  return layoutFor(p, pieceLimit(p));
+}
+
 export interface WallParts {
   plan: GridLayout;
   joints: JointPlan;
@@ -324,7 +353,7 @@ export interface WallParts {
 // cross pieces, and the edge strips. The preview, the download and the plan text all
 // start here, so they cannot disagree.
 export function planParts(p: Params, plan: GridLayout = planWall(p)): WallParts {
-  const max = maxPieceSize(p.printer);
+  const max = pieceLimit(p);
   const span = panelSpan(p.openingWidthMm, p.openingHeightMm, p.edges, p.joint);
   return {
     plan,
@@ -422,7 +451,7 @@ function describeJoints(joints: JointPlan, joint: JointParams): string {
 
 export function describePlan(plan: GridLayout, params: Params): PlanText {
   const count = plan.pieces.length;
-  const max = maxPieceSize(params.printer);
+  const max = pieceLimit(params);
   const parts = planParts(params, plan);
   const span = panelSpan(params.openingWidthMm, params.openingHeightMm, params.edges, params.joint);
   const shapes = edgeShapes(parts.edges).length;

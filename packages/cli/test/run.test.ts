@@ -316,3 +316,30 @@ describe('hose ports (hose-port #12; Q114: --port, repeatable)', () => {
     expect(r.out.replace(/\s+/g, ' ')).toContain('Give --port again for each port.');
   });
 });
+
+describe('a printer from the list (printer-presets #13; Q115 to Q117)', () => {
+  const params = async (args: string[]) => json((await cli([...args, '--dry-run', '--json'])).out).params as typeof EXAMPLE_PARAMS;
+
+  it('--printer-model alone makes the printer a listed one; --bed-margin changes the margin', async () => {
+    const p = await params([...OPENING, '--printer-model', 'prusa-mk4s', '--bed-margin', '15']);
+    expect(p.printer).toEqual({ kind: 'model', id: 'prusa-mk4s' });
+    expect(p.bedMarginMm).toBe(15);
+  });
+
+  it('plans with the bed less the margin: 3 across, 5 up on a Prusa MK4S', async () => {
+    const r = await cli([...OPENING, '--printer-model', 'prusa-mk4s', '--dry-run']);
+    expect(r.out).toContain('15 pieces: 3 across, 5 up, 3 mm thick');
+  });
+
+  it('refuses a printer not on the list, naming the flag', async () => {
+    const r = await cli([...OPENING, '--printer-model', 'no-such-printer']);
+    expect(r.code).toBe(2);
+    expect(r.err).toContain('--printer-model: Choose one of the listed options.');
+  });
+
+  it('--help lists the printers by id', async () => {
+    const r = await cli(['--help']);
+    expect(r.out).toMatch(/--printer-model <id> +Your printer, from the list/);
+    expect(r.out.replace(/\s+/g, ' ')).toContain('prusa-mk4s, prusa-mini-plus');
+  });
+});

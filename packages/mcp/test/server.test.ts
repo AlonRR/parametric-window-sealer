@@ -301,3 +301,19 @@ describe('hose ports (hose-port #12; Q114: ports as a list)', () => {
     expect(r.text).toContain('- ports: Port 1: There is no column 4, row 1: the wall has 3 columns and 5 rows.');
   });
 });
+
+describe('a printer from the list (printer-presets #13)', () => {
+  it('the schema lists the 29 printers; a wall plans on one, by id alone', async () => {
+    const { client, call } = await connect();
+    const plan = (await client.listTools()).tools.find((t) => t.name === 'window_sealer_plan_wall');
+    const printer = (plan?.inputSchema.properties as Record<string, any>)['settings'].properties.printer;
+    expect(printer.properties.id.enum).toHaveLength(29);
+    expect(printer.properties.kind.enum).toEqual(['default', 'custom', 'model']);
+    const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, printer: { id: 'bambu-lab-a1-mini' } } });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['settings'].printer).toEqual({ kind: 'model', id: 'bambu-lab-a1-mini' });
+    // 170 mm pieces, 5 mm joints, a 603 × 1013 mm span: 4 across (4 × 170 + 3 × 5 = 695 ≥ 603;
+    // 3 reach 520) and 6 up (6 × 170 + 5 × 5 = 1045 ≥ 1013; 5 reach 870).
+    expect(r.data['summary'].headline).toBe('24 pieces: 4 across, 6 up, 3 mm thick');
+  });
+});

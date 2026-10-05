@@ -15,6 +15,8 @@ const FLAG_NAMES: Record<FieldName, string> = {
   openingWidthMm: 'width',
   openingHeightMm: 'height',
   printer: 'printer',
+  printerModel: 'printer-model', // makes the printer a listed one (Q115)
+  bedMarginMm: 'bed-margin',
   customWidthMm: 'printer-width',
   customHeightMm: 'printer-height',
   widthMode: 'width-mode',

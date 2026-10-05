@@ -5,6 +5,7 @@ import { EXAMPLE_PARAMS, readParams, toFormValues } from 'parametric-window-seal
 import type { Params } from 'parametric-window-sealer';
 import { SETTING_FLAGS, settingAt } from '../src/flags.js';
 
+const LISTED_PRINTER: Params = { ...EXAMPLE_PARAMS, printer: { kind: 'model', id: 'prusa-mk4s' } };
 const CUSTOM_PRINTER: Params = { ...EXAMPLE_PARAMS, printer: { kind: 'custom', widthMm: 250, heightMm: 210 } };
 
 describe('the setting flags (Q90)', () => {
@@ -21,7 +22,7 @@ describe('the setting flags (Q90)', () => {
   it.each(SETTING_FLAGS.map((f) => [f.flag, f] as const))(
     '--%s: its place in a --params file holds the value the page shows',
     (_flag, f) => {
-      const params = f.field.startsWith('custom') ? CUSTOM_PRINTER : EXAMPLE_PARAMS;
+      const params = f.field.startsWith('custom') ? CUSTOM_PRINTER : f.field === 'printerModel' ? LISTED_PRINTER : EXAMPLE_PARAMS;
       expect(String(settingAt(params, f.path))).toBe(toFormValues(params)[f.field]);
     },
   );
@@ -30,6 +31,7 @@ describe('the setting flags (Q90)', () => {
   it('the choices are the ones the page offers', () => {
     expect(choices.map((f) => f.flag)).toEqual([
       'printer',
+      'printer-model',
       'width-mode',
       'width-filler',
       'width-leftover',
@@ -45,11 +47,17 @@ describe('the setting flags (Q90)', () => {
   });
 
   it.each(choices.map((f) => [f.flag, f] as const))('--%s: every listed value is accepted', (_flag, f) => {
+    // A listed printer's id is read only for a listed printer: the starting values hold one,
+    // and --printer-model's own test picks the list.
+    const base = {
+      ...toFormValues(CUSTOM_PRINTER),
+      printerModel: 'prusa-mk4s',
+      ...(f.field === 'printerModel' ? { printer: 'model' } : {}),
+    };
     for (const value of f.values ?? []) {
-      const values = { ...toFormValues(CUSTOM_PRINTER), [f.field]: value };
-      expect(readParams(values)).toMatchObject({ ok: true });
+      expect(readParams({ ...base, [f.field]: value })).toMatchObject({ ok: true });
     }
-    const wrong = readParams({ ...toFormValues(CUSTOM_PRINTER), [f.field]: 'not-a-choice' });
+    const wrong = readParams({ ...base, [f.field]: 'not-a-choice' });
     expect(wrong.ok).toBe(false);
   });
 });

@@ -236,11 +236,17 @@
 
         <fieldset>
           <legend>The largest piece your printer can make</legend>
+          <!-- The printer list (printer-presets, #13; Q115): filled from the library's list,
+            grouped by maker, and written into the hidden printer and printerModel fields. -->
           <label>
-            <input type="radio" name="printer" value="default" />
-            Default: <span data-default-size></span> (fits most printers)
+            Your printer
+            <select data-part="printer-choice"></select>
           </label>
-          <label><input type="radio" name="printer" value="custom" /> Custom</label>
+          <p class="note">
+            A listed printer's bed, less the margin under Advanced, is the largest piece; a piece
+            can be turned on the bed. Not listed: the default fits most printers.
+          </p>
+          <span class="error" data-testid="error-printerModel"></span>
           <label>
             Custom width (mm)
             <input name="customWidthMm" inputmode="decimal" autocomplete="off" />
@@ -301,6 +307,19 @@
           </label>
           <span class="error" data-testid="error-thicknessMm"></span>
         </fieldset>
+
+        <details>
+          <summary>Advanced: the printer</summary>
+          <label>
+            Bed margin (mm)
+            <input name="bedMarginMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">
+            How much smaller than a listed printer's bed the largest piece is, each way: room for a
+            brim or a purge line.
+          </p>
+          <span class="error" data-testid="error-bedMarginMm"></span>
+        </details>
 
         <details>
           <summary>Advanced: the joint between pieces</summary>
@@ -395,6 +414,9 @@
           from the choice shown in the plan's warning. -->
         <input type="hidden" name="widthLeftover" />
         <input type="hidden" name="heightLeftover" />
+        <!-- The printer, as chosen in "Your printer" (Q115). -->
+        <input type="hidden" name="printer" />
+        <input type="hidden" name="printerModel" />
         <!-- Every port, written as the command's --port takes them (Q114). -->
         <input type="hidden" name="ports" />
       </form>

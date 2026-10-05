@@ -28,6 +28,7 @@ describe('the starting values', () => {
       openingWidthMm: 600,
       openingHeightMm: 1000,
       printer: { kind: 'default' },
+      bedMarginMm: 10,
       width: { mode: 'equal', filler: 'end', leftover: 'spread' },
       height: { mode: 'equal', filler: 'end', leftover: 'spread' },
       thicknessMm: 3,

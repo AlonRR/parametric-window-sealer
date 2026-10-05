@@ -62,7 +62,8 @@ anything left out starts where the project's page starts:
 
 Every tool that takes settings returns them complete, and they can be passed to the next tool
 as they are. Setting the window type sets the four edges as the page does; a printer width or
-height makes the printer custom. A port for a portable air conditioner's hose goes in `ports`, as
+height makes the printer custom, and a printer `id` from the list, such as `"printer": { "id":
+"prusa-mk4s" }`, a listed one (`window_sealer_list_settings` names them all). A port for a portable air conditioner's hose goes in `ports`, as
 `[{ "hoseMm": 150 }]`: the hose end's outside diameter (150 and 130 mm are common; measure the
 end that goes in), and optionally its piece as `column` and `row`, from 1 at the bottom left seen
 from the room; without them it goes in the bottom row's middle piece.

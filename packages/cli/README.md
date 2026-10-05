@@ -58,6 +58,7 @@ window-sealer --width 600 --height 1000 --window hung --thickness 4
 window-sealer --width 600 --height 1000 --format 3mf --packaging single
 window-sealer --width 600 --height 1000 --dry-run
 window-sealer --width 600 --height 1000 --port 150
+window-sealer --width 600 --height 1000 --printer-model prusa-mk4s
 ```
 
 - `--format stl` or `3mf`, and `--packaging separate` (one file per panel or shape), `zip` (those
@@ -68,6 +69,9 @@ window-sealer --width 600 --height 1000 --port 150
 - `--window slider` or `hung` sets the four edges as the page does; an edge flag such as
   `--top-edge track` then changes one. A `--printer-width` or `--printer-height` makes the
   printer custom.
+- `--printer-model prusa-mk4s` picks your printer from the list (`--help` names them all): its
+  bed less `--bed-margin` (10 mm to start with) is the largest piece, turned whichever way needs
+  fewer pieces.
 - When full pieces leave too little room for a joint, it says so, the way the page does, and
   lists what `--width-leftover` or `--height-leftover` can do instead.
 - `--port 150` adds a round port for a portable air conditioner's hose, sized to the hose end's

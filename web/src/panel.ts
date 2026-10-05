@@ -6,12 +6,14 @@ import { EXAMPLE_PARAMS, describePlan, planWall, readParams, toFormValues } from
 import type { FieldName, FormValues, LeftoverText, Params } from 'parametric-window-sealer';
 import { EDGES, WINDOW_PRESETS } from 'parametric-window-sealer';
 import type { WindowType } from 'parametric-window-sealer';
-import { DEFAULT_MAX_PIECE } from 'parametric-window-sealer';
+import { DEFAULT_MAX_PIECE, PRINTERS } from 'parametric-window-sealer';
 
 const FIELDS: readonly FieldName[] = [
   'openingWidthMm',
   'openingHeightMm',
   'printer',
+  'printerModel',
+  'bedMarginMm',
   'customWidthMm',
   'customHeightMm',
   'widthMode',
@@ -131,6 +133,45 @@ function numberPortRows(form: HTMLFormElement): void {
   });
 }
 
+// "Your printer" (Q115): the default, the listed printers grouped by maker, and a custom size.
+// A listed printer's option is model:<id>; the choice is written into the hidden printer and
+// printerModel fields, and read back from them.
+function fillPrinters(choice: HTMLSelectElement): void {
+  const option = (value: string, text: string) => {
+    const o = document.createElement('option');
+    o.value = value;
+    o.textContent = text;
+    return o;
+  };
+  choice.replaceChildren(option('default', `Not listed: ${DEFAULT_MAX_PIECE.widthMm} × ${DEFAULT_MAX_PIECE.heightMm} mm`));
+  const groups = new Map<string, HTMLOptGroupElement>();
+  for (const p of PRINTERS) {
+    let group = groups.get(p.maker);
+    if (!group) {
+      group = document.createElement('optgroup');
+      group.label = p.maker;
+      groups.set(p.maker, group);
+      choice.append(group);
+    }
+    group.append(option(`model:${p.id}`, `${p.model} (bed ${p.bedXMm} × ${p.bedYMm} mm)`));
+  }
+  choice.append(option('custom', 'Custom size'));
+}
+
+function printerToForm(form: HTMLFormElement, choice: HTMLSelectElement): void {
+  const [kind, id] = choice.value.startsWith('model:') ? ['model', choice.value.slice(6)] : [choice.value, ''];
+  const printer = control(form, 'printer');
+  const model = control(form, 'printerModel');
+  if (printer instanceof HTMLInputElement) printer.value = kind;
+  if (model instanceof HTMLInputElement) model.value = id;
+}
+
+function printerFromForm(form: HTMLFormElement, choice: HTMLSelectElement): void {
+  const kind = control(form, 'printer')?.value;
+  const id = control(form, 'printerModel')?.value;
+  choice.value = kind === 'model' ? `model:${id}` : (kind ?? 'default');
+}
+
 function setText(root: ParentNode, testId: string, text: string): void {
   const el = root.querySelector(`[data-testid="${testId}"]`);
   if (el) el.textContent = text;
@@ -169,15 +210,16 @@ export function mountPanel(
   plan: HTMLElement,
   onChange: (params: Params | null) => void = () => {},
 ): void {
-  for (const el of form.querySelectorAll('[data-default-size]')) {
-    el.textContent = `${DEFAULT_MAX_PIECE.widthMm} × ${DEFAULT_MAX_PIECE.heightMm} mm`;
-  }
+  const printerChoice = form.querySelector<HTMLSelectElement>('[data-part="printer-choice"]');
+  if (printerChoice) fillPrinters(printerChoice);
   writeForm(form, toFormValues(EXAMPLE_PARAMS));
+  if (printerChoice) printerFromForm(form, printerChoice);
 
   const extras = form.querySelector<HTMLElement>('[data-testid="extra-ports"]');
   const addPort = form.querySelector<HTMLButtonElement>('#add-port');
 
   const update = (): void => {
+    if (printerChoice) printerToForm(form, printerChoice);
     const hose = (form.elements.namedItem('appliance') as RadioNodeList | null)?.value === 'hose';
     for (const row of portRows(form)) {
       row.hidden = !hose;

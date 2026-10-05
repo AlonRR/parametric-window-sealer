@@ -15,6 +15,7 @@ import {
 import type { Params } from '../src/index.js';
 
 const CUSTOM_PRINTER: Params = { ...EXAMPLE_PARAMS, printer: { kind: 'custom', widthMm: 250, heightMm: 210 } };
+const LISTED_PRINTER: Params = { ...EXAMPLE_PARAMS, printer: { kind: 'model', id: 'prusa-mk4s' } };
 const WITH_PORTS: Params = { ...EXAMPLE_PARAMS, ports: [{ hoseMm: 150, column: 2, row: 1 }] };
 const OPENING = { openingWidthMm: 600, openingHeightMm: 1000 };
 const ok = (input: unknown, overrides = {}) => {
@@ -33,7 +34,13 @@ describe('SETTINGS: every setting on the page', () => {
   });
 
   it.each(SETTINGS.map((s) => [s.path, s] as const))('%s holds the value the page shows', (_path, s) => {
-    const params = s.field.startsWith('custom') ? CUSTOM_PRINTER : s.list ? WITH_PORTS : EXAMPLE_PARAMS;
+    const params = s.field.startsWith('custom')
+      ? CUSTOM_PRINTER
+      : s.field === 'printerModel'
+        ? LISTED_PRINTER
+        : s.list
+          ? WITH_PORTS
+          : EXAMPLE_PARAMS;
     const value = settingAt(params, s.path);
     expect(s.list ? formatPorts(value as []) : String(value)).toBe(toFormValues(params)[s.field]);
   });
@@ -41,10 +48,17 @@ describe('SETTINGS: every setting on the page', () => {
   it.each(SETTINGS.filter((s) => s.values).map((s) => [s.path, s] as const))(
     '%s: every listed choice is accepted, and nothing else',
     (_path, s) => {
+      // A listed printer's id is read only for a listed printer, as the custom sizes are only
+      // for a custom one: the starting values hold both, and the id's own test picks the list.
+      const base = {
+        ...toFormValues(CUSTOM_PRINTER),
+        printerModel: 'prusa-mk4s',
+        ...(s.field === 'printerModel' ? { printer: 'model' } : {}),
+      };
       for (const value of s.values ?? []) {
-        expect(readParams({ ...toFormValues(CUSTOM_PRINTER), [s.field]: value })).toMatchObject({ ok: true });
+        expect(readParams({ ...base, [s.field]: value })).toMatchObject({ ok: true });
       }
-      expect(readParams({ ...toFormValues(CUSTOM_PRINTER), [s.field]: 'not-a-choice' }).ok).toBe(false);
+      expect(readParams({ ...base, [s.field]: 'not-a-choice' }).ok).toBe(false);
     },
   );
 
@@ -147,6 +161,12 @@ describe('readSettings', () => {
         message: 'Port 1: There is no column 4, row 1: the wall has 3 columns and 5 rows.',
       },
     ]);
+  });
+
+  it('a printer from the list: by id alone, or as an override (Q115)', () => {
+    expect(ok({ ...OPENING, printer: { id: 'prusa-mk4s' } }).printer).toEqual({ kind: 'model', id: 'prusa-mk4s' });
+    expect(ok(OPENING, { printerModel: 'bambu-lab-a1' }).printer).toEqual({ kind: 'model', id: 'bambu-lab-a1' });
+    expect(ok({ ...OPENING, bedMarginMm: 15 }).bedMarginMm).toBe(15);
   });
 
   it('does not change what it is given', () => {

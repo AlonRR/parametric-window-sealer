@@ -53,7 +53,8 @@ Start from `EXAMPLE_PARAMS` and change what differs. Every length is in mm.
 | Field                                  | What it is                                                                                                                                                                                                              |
 | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `openingWidthMm`, `openingHeightMm`    | The visible opening to close                                                                                                                                                                                            |
-| `printer`                              | `{ kind: 'default' }` for 200 × 200 mm pieces, or `{ kind: 'custom', widthMm, heightMm }`                                                                                                                               |
+| `printer`                              | `{ kind: 'default' }` for 200 × 200 mm pieces, `{ kind: 'custom', widthMm, heightMm }`, or `{ kind: 'model', id }` for a printer in `PRINTERS`, its bed turned whichever way needs fewer pieces |
+| `bedMarginMm`                          | How much smaller than a listed printer's bed the largest piece is, each way (`DEFAULT_BED_MARGIN_MM`, 10)                                                                                                                 |
 | `width`, `height`                      | How each direction is divided: `mode` `'equal'` or `'full-plus-filler'`; `filler` `'start'`, `'end'`, `'middle'` or `'split'`; `leftover` `'spread'`, `'equal'` or `'shorten'` for when full pieces leave less than a joint |
 | `thicknessMm`                          | The panels' thickness                                                                                                                                                                                                   |
 | `joint`                                | The strips' `slotMm`, `slideMm`, `webMm`, `flangeMm` and `fitMm` (`DEFAULT_JOINT`)                                                                                                                                      |
@@ -86,7 +87,8 @@ start it with `loadEngine(wasmUrl)` and pass it as `{ engine }`.
 
 Everything `makeWall` uses is exported too: `planWall` and `planParts` (the layout, joints
 and edges), `describePlan`, `readParams` and `toFormValues` (the page's form values), `readSettings`
-and `SETTINGS` (settings in the library's shape, possibly partial, and what each one is), the
+and `SETTINGS` (settings in the library's shape, possibly partial, and what each one is),
+`pieceLimit` (the largest piece a wall's printer allows), the
 shapes (`plainPanel`, `portPanel`, `stripSolid`, `crossSolid`, `edgeStripSolid`), the hose
 port's rules (`checkPort`, `parsePorts`, `formatPorts`) and the file writers
 (`toStl`, `to3mf`, `packageDownload`), with `planFiles`, which names the files without

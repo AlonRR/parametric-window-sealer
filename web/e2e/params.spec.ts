@@ -19,7 +19,7 @@ test('opens with the example opening, labelled as one, and its plan', async ({ p
   await expect(page.getByText('Example sizes: measure the opening')).toBeVisible();
   await expect(page.getByText('Example sizes: measure your own tracks')).toBeVisible();
   await expect(page.getByLabel('Panel thickness (mm)')).toHaveValue('3');
-  await expect(page.getByText('Default: 200 × 200 mm')).toBeVisible();
+  await expect(page.getByLabel('Your printer').locator('option:checked')).toHaveText('Not listed: 200 × 200 mm');
   await expect(headline(page)).toHaveText('15 pieces: 3 across, 5 up, 3 mm thick');
   await expect(page.getByTestId('plan-span')).toHaveText(
     'Pieces and joints: 603 × 1013 mm, for a 600 × 1000 mm opening.',
@@ -50,7 +50,7 @@ test('the filler position applies only to full pieces plus a filler', async ({ p
 });
 
 test('a custom piece size changes the plan', async ({ page }) => {
-  await page.getByLabel('Custom', { exact: true }).check();
+  await page.getByLabel('Your printer').selectOption('custom');
   await page.getByLabel('Custom width (mm)').fill('170');
   await page.getByLabel('Custom height (mm)').fill('165');
   await expect(headline(page)).toHaveText('24 pieces: 4 across, 6 up, 3 mm thick');

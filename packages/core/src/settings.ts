@@ -8,6 +8,7 @@
 import { WINDOW_PRESETS } from './edge.js';
 import type { WindowType } from './edge.js';
 import { EXAMPLE_PARAMS, readParams, toFormValues } from './params.js';
+import { PRINTER_IDS } from './printers.js';
 import type { FieldName, FormValues, Params } from './params.js';
 
 export interface Setting {
@@ -63,8 +64,19 @@ export const SETTINGS: readonly Setting[] = [
   {
     field: 'printer',
     path: 'printer.kind',
-    help: 'The largest piece to print: default (200 × 200 mm) or custom.',
-    values: ['default', 'custom'],
+    help: 'The largest piece to print: default (200 × 200 mm), custom, or a listed printer (model).',
+    values: ['default', 'custom', 'model'],
+  },
+  {
+    field: 'printerModel',
+    path: 'printer.id',
+    help: 'Your printer, from the list: its bed less the bed margin is the largest piece. Makes the printer a listed one.',
+    values: PRINTER_IDS,
+  },
+  {
+    field: 'bedMarginMm',
+    path: 'bedMarginMm',
+    help: "How much smaller than a listed printer's bed the largest piece is, each way.",
   },
   { field: 'customWidthMm', path: 'printer.widthMm', help: "A custom printer's largest piece: its width." },
   { field: 'customHeightMm', path: 'printer.heightMm', help: "A custom printer's largest piece: its height." },
@@ -132,7 +144,7 @@ const isObject = (value: unknown): value is Json =>
 
 // The shape an input may have: the library's own, with a custom printer's two sizes, and
 // each port as PORT_SHAPE.
-const SHAPE: Json = { ...EXAMPLE_PARAMS, printer: { kind: 'custom', widthMm: 0, heightMm: 0 } };
+const SHAPE: Json = { ...EXAMPLE_PARAMS, printer: { kind: 'custom', widthMm: 0, heightMm: 0, id: '' } };
 const PORT_SHAPE: Json = { hoseMm: 0, column: 0, row: 0 };
 
 function checkShape(value: unknown, shape: unknown, path: string, problems: SettingProblem[]): void {
@@ -192,9 +204,13 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
     const roles = settingAt(input, 'edges.roles');
     params.edges.roles = { ...WINDOW_PRESETS[window], ...(isObject(roles) ? roles : {}) };
   }
+  // A printer size without a kind means a custom printer; a printer id, a listed one.
   const printer = input['printer'];
   if (isObject(printer) && !('kind' in printer) && ('widthMm' in printer || 'heightMm' in printer)) {
     params.printer = { ...params.printer, kind: 'custom' } as Params['printer'];
+  }
+  if (isObject(printer) && !('kind' in printer) && 'id' in printer) {
+    params.printer = { ...params.printer, kind: 'model' } as Params['printer'];
   }
 
   const values: FormValues = toFormValues(params);
@@ -207,6 +223,7 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
   if (overrides.printer === undefined && (overrides.customWidthMm ?? overrides.customHeightMm) !== undefined) {
     values.printer = 'custom';
   }
+  if (overrides.printer === undefined && overrides.printerModel !== undefined) values.printer = 'model';
   Object.assign(values, overrides);
 
   const problems: SettingProblem[] = [];
