@@ -3,8 +3,8 @@
 Every piece of work the decisions in [`status.md`](status.md) call for, ordered by priority and
 then by how easy it is expected to be. Written 5 Oct 2026 at the owner's request (Q27).
 
-**Priorities and ease are estimates (inferred), not measurements.** The MVP line is a proposal
-for the owner to confirm (Q28). Each row names the decision it comes from, so a change of
+**Priorities and ease are estimates (inferred), not measurements.** The MVP was confirmed
+by the owner as proposed (Q28). Each row names the decision it comes from, so a change of
 decision shows which rows move.
 
 ## The proposed MVP
@@ -15,8 +15,8 @@ decision shows which rows move.
 
 What the MVP leaves out on purpose: patterns and organisers, appliance fittings, seals, the
 printer-presets list, per-piece overrides, the offline file and mesh import. Each is a later
-row below, and none needs the MVP rebuilt to add it. **Open for Q28**: whether one appliance
-fitting (`hose-port`, the round port for a portable AC's exhaust hose) belongs in the MVP.
+row below, and none needs the MVP rebuilt to add it. **Confirmed by the owner as proposed
+(Q28, 5 Oct 2026)**; the round hose port (`hose-port`) stays first in line after it.
 
 ## How to read the table
 
@@ -46,7 +46,7 @@ fitting (`hose-port`, the round port for a portable AC's exhaust hose) belongs i
 | `preview-3d` | 3D preview of the assembled wall, updating as parameters change | P0 | M | `plain-panel` | Q24 | Library choice for the viewer |
 | `connector-strip` | Default joint: a tongue on each edge, an H-profile strip between pieces, a cross piece where four meet, a clearance parameter, a few mm of slide | P0 | M | `plain-panel`, `layout` | Q13 | Test print: the clearance that slides yet holds depends on printer and material |
 | `track-edge` | The edges that sit in the window track and take the sash's clamp; track width and depth as parameters | P0 | M | `plain-panel` | Q14 | Test print; example track sizes only (Q18) |
-| `hose-port` | A round port for a portable AC's exhaust hose, in one piece, from a list of sizes | P1, or P0 if Q28 says so | S | `plain-panel` | Q15, Q16 | Spec to verify: hose end sizes |
+| `hose-port` | A round port for a portable AC's exhaust hose, in one piece, from a list of sizes | P1 | S | `plain-panel` | Q15, Q16 | Spec to verify: hose end sizes |
 | `printer-presets` | Printer list that sets the maximum piece size | P1 | S | `printer-default` | Q5 | Spec to verify for every printer listed |
 | `user-guide` | How to measure the window, the gap and the appliance | P1 | S | | Q18 | |
 | `seal-tape` | Optional tape seal: a groove or land sized to the tape | P1 | S | `track-edge`, `connector-strip` | Q6, Q17 | Groove or flat land is still open (Q17 left it) |

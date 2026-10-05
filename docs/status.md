@@ -54,18 +54,13 @@ engine is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | Q18 | No personal measurements: design and test against **example sizes**, labelled as examples wherever they appear | 5 Oct 2026 |
 | Q22 | Engine: **TypeScript on the Manifold geometry library** (`manifold-3d`), in a custom web page. Chosen from measurements in [`spikes/engine-benchmark/`](../spikes/engine-benchmark/README.md): on the same panel, ready about 5x sooner, re-renders about 2x faster and a download about 15x smaller than OpenSCAD's WebAssembly build. No `.scad` model files | 5 Oct 2026 |
 | Q27 | Before building: **work out the MVP** and keep **a file listing every item by priority and estimated ease** of implementation: [`backlog.md`](backlog.md) | 5 Oct 2026 |
+| Q28 | The **MVP is confirmed as proposed** in [`backlog.md`](backlog.md): a plain sealed wall of joined pieces held in the window track, previewed and downloaded in the browser. The round hose port is first in line after it | 5 Oct 2026 |
 
 The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
 No design question is open.
-
-### Next step
-
-- **Q28.** Confirm the MVP proposed in [`backlog.md`](backlog.md): a plain sealed wall of
-  joined pieces held in the window track, previewed and downloaded in the browser. Does one
-  appliance fitting, the round hose port, belong in it?
 
 ## Repository follow-ups
 
