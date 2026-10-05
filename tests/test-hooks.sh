@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Positive and negative controls for the two house hooks in .githooks/.
+# Positive and negative controls for the two house hooks in .githooks/, and for
+# scripts/check-history-identity.sh, which CI runs in place of the identity hook.
 #
 # Every rule is tested from both sides: a message or identity that MUST pass and one
 # that MUST be refused. A hook that only ever saw passing input cannot be told apart
@@ -11,18 +12,22 @@ set -uo pipefail
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 COMMIT_MSG="$ROOT/.githooks/commit-msg"
 PRE_COMMIT="$ROOT/.githooks/pre-commit"
+HISTORY_IDENTITY="$ROOT/scripts/check-history-identity.sh"
 
 ran=0
 failed=0
 
 # expect <pass|refuse> <label> <exit code>
+#
+# A refusal must be exit 1 EXACTLY. "Any non-zero" would also accept 127 (script not
+# found) or 126 (not executable), so a missing check would pass every refuse case.
 expect() {
   want=$1
   label=$2
   code=$3
   ran=$((ran + 1))
   if { [ "$want" = pass ] && [ "$code" -eq 0 ]; } ||
-    { [ "$want" = refuse ] && [ "$code" -ne 0 ]; }; then
+    { [ "$want" = refuse ] && [ "$code" -eq 1 ]; }; then
     printf 'ok    %-7s %s\n' "$want" "$label"
   else
     printf 'FAIL  %-7s %s (exit %s)\n' "$want" "$label" "$code"
@@ -99,6 +104,43 @@ expect refuse "identity: wrong address, output piped to head -1" "${PIPESTATUS[0
 git config --unset hooks.expectEmail
 bash "$PRE_COMMIT" 2> /dev/null
 expect refuse "identity: nothing configured to compare against" $?
+
+# --- history identity (what CI checks) -----------------------------------------
+
+git init -q "$WORK/hist"
+cd "$WORK/hist" || exit 1
+
+# commit_as <author name> <author email> <committer name> <committer email>
+commit_as() {
+  GIT_AUTHOR_NAME=$1 GIT_AUTHOR_EMAIL=$2 GIT_COMMITTER_NAME=$3 GIT_COMMITTER_EMAIL=$4 \
+    git commit -q --allow-empty --no-verify -m "test(history): commit $ran"
+}
+history() {
+  bash "$HISTORY_IDENTITY" "$GOOD_NAME" "$GOOD_EMAIL" "$@" > /dev/null 2>&1
+}
+
+commit_as "$GOOD_NAME" "$GOOD_EMAIL" "$GOOD_NAME" "$GOOD_EMAIL"
+commit_as "$GOOD_NAME" "EXPECTED@EXAMPLE.COM" "$GOOD_NAME" "$GOOD_EMAIL"
+history HEAD
+expect pass "history: every commit is the expected identity (address case aside)" $?
+
+history HEAD..HEAD
+expect refuse "history: an empty range checks nothing" $?
+
+bash "$HISTORY_IDENTITY" > /dev/null 2>&1
+expect refuse "history: no expected identity given" $?
+
+commit_as "$GOOD_NAME" "other@example.com" "$GOOD_NAME" "$GOOD_EMAIL"
+history HEAD
+expect refuse "history: one commit with a wrong author address" $?
+
+history HEAD~1
+expect pass "history: a range that stops before the bad commit" $?
+
+git reset -q --hard HEAD~1
+commit_as "$GOOD_NAME" "$GOOD_EMAIL" "Other Name" "$GOOD_EMAIL"
+history HEAD
+expect refuse "history: one commit with a wrong committer name" $?
 
 # --- summary -------------------------------------------------------------------
 

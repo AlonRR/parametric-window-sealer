@@ -31,9 +31,21 @@ jobs:
         with:
           python-version: "3.13"
       - name: Run every hook against every file
+        env:
+          # house-identity checks the identity CONFIGURED on the machine making a commit.
+          # A runner makes none: unconfigured, the hook refuses (run 1 of this workflow,
+          # 5 Oct 2026); configured to match, it compares the runner with itself and can
+          # never fail. The pushed history is checked in the next step instead.
+          SKIP: house-identity
         run: |
           python -m pip install --upgrade pre-commit
           pre-commit run --all-files --show-diff-on-failure
+      - name: Every commit carries the expected identity
+        run: |
+          bash scripts/check-history-identity.sh \
+            "Alon A. Rabinowitz" "45129051+AlonRR@users.noreply.github.com"
+      - name: Hook and history-check tests
+        run: bash tests/test-hooks.sh
 
   secrets-history:
     # The pre-commit secret hook only sees staged content. This is the history gate, and it is
@@ -44,8 +56,18 @@ jobs:
         with:
           fetch-depth: 0
       - name: Scan full history for secrets
+        # Pinned to the version .pre-commit-config.yaml uses. The archive name carries
+        # the version (betterleaks' .goreleaser.yml: <project>_<version>_<os>_<arch>),
+        # so the kit's unversioned `latest/download/betterleaks_linux_x64.tar.gz` was a
+        # 404. Without -f, curl saved that 404 page and tar failed on it ("not in gzip
+        # format", run 1, 5 Oct 2026). -f makes a missing asset fail at the download.
+        env:
+          BL_VERSION: "1.8.1"
         run: |
-          curl -sSL -o bl.tar.gz \
-            https://github.com/betterleaks/betterleaks/releases/latest/download/betterleaks_linux_x64.tar.gz
-          tar xzf bl.tar.gz betterleaks
+          base="https://github.com/betterleaks/betterleaks/releases/download/v${BL_VERSION}"
+          archive="betterleaks_${BL_VERSION}_linux_x64.tar.gz"
+          curl -fsSLO "${base}/${archive}"
+          curl -fsSLO "${base}/checksums.txt"
+          sha256sum --check --ignore-missing checksums.txt
+          tar xzf "${archive}" betterleaks
           ./betterleaks git --no-banner --redact --exit-code 1 .

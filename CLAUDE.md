@@ -131,7 +131,12 @@ list.
 ## Checks to run
 
 ```bash
-bash tests/test-hooks.sh          # positive and negative controls for both house hooks
-pre-commit run --all-files        # everything CI runs
+bash tests/test-hooks.sh          # positive and negative controls: both hooks, history check
+pre-commit run --all-files        # the hooks CI runs
 reuse lint                        # every file has a licence and a copyright notice
+bash scripts/check-history-identity.sh "Alon A. Rabinowitz" \
+  "45129051+AlonRR@users.noreply.github.com"   # every commit's identity, as CI checks it
 ```
+
+CI (`.github/workflows/checks.yml`) skips the `house-identity` hook, which checks the
+machine making a commit, and runs the history check instead.

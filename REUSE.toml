@@ -17,6 +17,7 @@ SPDX-License-Identifier = "CERN-OHL-S-2.0"
 path = [
   ".githooks/**",
   ".github/**",
+  "scripts/**",
   "tests/**",
   ".editorconfig",
   ".gitattributes",
