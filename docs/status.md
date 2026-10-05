@@ -113,11 +113,5 @@ None at the moment.
 
 ## Repository follow-ups
 
-- **Tag `v0.1.0` and its GitHub release: pending, the owner's step.** Every MVP issue is closed
-  and the release commit is `cd5c49d` (`chore(release): v0.1.0, the MVP`). The agent is to tag
-  releases (Q30), but this session's GitHub access refused the tag push (HTTP 403 on
-  `refs/tags/v0.1.0`; branch pushes work). The tag is annotated, on `cd5c49d`, by the owner's
-  identity; the release notes are the 0.1.0 section of [`CHANGELOG.md`](../CHANGELOG.md).
-  Stays pending until the owner says it is done.
 - The kit also has a `gitleaks.toml` template that is not in its file table. Not adopted; ask
   for it if the secret scanner needs custom rules.
