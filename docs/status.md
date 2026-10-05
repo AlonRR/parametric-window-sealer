@@ -3,8 +3,8 @@
 Working document: the brief, every decision so far, and every open question. Keep it current;
 a fresh session resumes from here.
 
-Last updated: 5 Oct 2026. Phase: **requirements**. No model has been written yet, and the CAD
-engine is deliberately undecided until the design questions below are settled.
+Last updated: 5 Oct 2026. Phase: **requirements settled**. No model has been written yet; the
+engine is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 
 ## The brief (the owner's request, 5 Oct 2026)
 
@@ -26,7 +26,7 @@ engine is deliberately undecided until the design questions below are settled.
 | (none) | Fabrication: **FDM 3D printing** | 5 Oct 2026 |
 | (none) | Windows: **horizontal sliders** and **single/double-hung** first; other types maybe later, so the design must not rule them out | 5 Oct 2026 |
 | (none) | Users run it from a **web page on GitHub Pages** | 5 Oct 2026 |
-| (none) | CAD engine: **decided later**, once the design is workshopped (now asked as Q22) | 5 Oct 2026 |
+| (none) | CAD engine: **decided later**, once the design is workshopped (decided as Q22) | 5 Oct 2026 |
 | Q1 | Licence: **CERN-OHL-S-2.0** for the design and docs, **MPL-2.0** for code | 5 Oct 2026 |
 | Q2 | Branch: commit to **`main`** | 5 Oct 2026 |
 | Q3 | Build the Pages site now; **the owner publishes it later** (the repo is private, and making it public is his action) | 5 Oct 2026 |
@@ -52,52 +52,18 @@ engine is deliberately undecided until the design questions below are settled.
 | Q25 | Users can add their own **STL (or similar) meshes**: organiser or accessory tiles placed on a panel, 3D pattern tiles, a model of their appliance to cut around, a whole custom piece the tool trims and fits connectors to, and **any other shape** | 5 Oct 2026 |
 | Q26 | The startup hook **stays synchronous** and keeps pre-building the check environments: a slow first start (about 72 s), with everything ready before work begins | 5 Oct 2026 |
 | Q18 | No personal measurements: design and test against **example sizes**, labelled as examples wherever they appear | 5 Oct 2026 |
+| Q22 | Engine: **TypeScript on the Manifold geometry library** (`manifold-3d`), in a custom web page. Chosen from measurements in [`spikes/engine-benchmark/`](../spikes/engine-benchmark/README.md): on the same panel, ready about 5x sooner, re-renders about 2x faster and a download about 15x smaller than OpenSCAD's WebAssembly build. No `.scad` model files | 5 Oct 2026 |
 
 The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-### Engine
+No design question is open.
 
-- **Q22.** Which engine builds the geometry? The owner's answer (5 Oct 2026): "my thinking was
-  that the page would run locally and users would add stl or other similar files", now settled
-  as Q24 and Q25. What that asks of the engine:
-  - run in the browser, hosted and offline. A page opened from a file usually cannot fetch its
-    WebAssembly module, so the offline build has to be one self-contained file or an installable
-    page (inferred);
-  - import user meshes (STL and similar) and cut, trim and join them with the generated parts.
-    User meshes are often not watertight, and solid booleans on those fail in any engine, so the
-    page needs a repair step and a clear refusal when a file cannot be used (inferred).
+### Next step
 
-  The candidates:
-  - a custom web page with the model in OpenSCAD files, rendered in the browser by OpenSCAD's
-    WebAssembly build (GPL, so the deployed page would be GPL-licensed as a whole (inferred));
-  - a custom web page with the model in TypeScript on the Manifold geometry library
-    (`manifold-3d`, Apache-2.0, verified on npm 5 Oct 2026), with no OpenSCAD files;
-  - the OpenSCAD Customizer page alone (one piece at a time).
-
-  The owner then asked which is friendlier for a basic user, licence aside. The user never sees
-  the engine; buttons, uploads, preview, the all-pieces download and the offline file are the
-  same page either way. What differs is load time and preview speed. The `manifold-3d` package
-  unpacks to 2.8 MB and `openscad-wasm` to 13.9 MB (verified: npm registry, 5 Oct 2026;
-  download sizes after compression differ). The OpenSCAD Playground itself uses Manifold for
-  speed (relayed: its README), so calling Manifold directly should be at least as fast
-  (inferred, not measured). The recommendation is TypeScript + Manifold, confirmed by a small
-  speed prototype before building on it.
-
-  The owner chose to prototype both and decide from the numbers. Measured 5 Oct 2026 in
-  [`spikes/engine-benchmark/`](../spikes/engine-benchmark/README.md), on one example panel
-  (200 x 200 x 3 mm, 247 hexagonal holes) proven to be the same solid from both engines
-  (0 mm³ difference; a deliberately different panel fails the same check):
-
-  | Chromium, cold cache, gzip, median of 3 loads | Manifold | OpenSCAD |
-  |---|---|---|
-  | Ready to render, local | 95 ms | 640 ms |
-  | Ready to render, example 20 Mbit/s link | 366 ms | 2 021 ms |
-  | Later renders | 127–136 ms | 281–285 ms |
-  | Downloaded | 0.23 MB | 3.35 MB |
-
-  Waiting for the owner's choice.
+- **Q27.** What gets built first: a written design spec for review, the layout calculator
+  (dividing the opening into pieces, test-first), or a first clickable page?
 
 ## Repository follow-ups
 

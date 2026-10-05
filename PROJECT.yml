@@ -5,6 +5,6 @@ projects:
   - name:     Parametric window sealer
     kind:     build
     state:    not-designed
-    next:     "settle the open design questions in docs/status.md"
+    next:     "agree with the owner what to build first (Q27 in docs/status.md)"
     trackers: [docs/status.md]
     review:   2026-10-05

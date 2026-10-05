@@ -8,8 +8,10 @@ panel style, and get a set of printable pieces that join together and fit the ga
 
 ## Status
 
-**Design phase. There is no model yet.** The requirements are being settled first; see
-[`docs/status.md`](docs/status.md) for the decisions made so far and the open questions.
+**Requirements settled; there is no model yet.** Every decision so far is in
+[`docs/status.md`](docs/status.md). The geometry will be built in TypeScript on the
+[Manifold](https://github.com/elalish/manifold) library, chosen by measurement
+([`spikes/engine-benchmark/`](spikes/engine-benchmark/README.md)).
 
 Planned:
 
