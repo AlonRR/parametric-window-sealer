@@ -50,6 +50,8 @@ engine is deliberately undecided until the design questions below are settled.
 | Q23 | The startup hook is **verified in a real cloud session**: a fresh session opened on this repo alone ran it on its own, ending with the owner's identity, all three git hooks wired and the tools installed. Its first reply came about 72 s after start, mostly building the hook environments. In a session holding several repositories it does not fire; run it by hand there (CLAUDE.md) | 5 Oct 2026 |
 | Q24 | The page **runs in the browser with nothing sent to a server**, both **hosted on GitHub Pages** and as a **download that works offline** | 5 Oct 2026 |
 | Q25 | Users can add their own **STL (or similar) meshes**: organiser or accessory tiles placed on a panel, 3D pattern tiles, a model of their appliance to cut around, a whole custom piece the tool trims and fits connectors to, and **any other shape** | 5 Oct 2026 |
+| Q26 | The startup hook **stays synchronous** and keeps pre-building the check environments: a slow first start (about 72 s), with everything ready before work begins | 5 Oct 2026 |
+| Q18 | No personal measurements: design and test against **example sizes**, labelled as examples wherever they appear | 5 Oct 2026 |
 
 The first four rows were answered before questions carried IDs.
 
@@ -74,10 +76,14 @@ The first four rows were answered before questions carried IDs.
     (`manifold-3d`, Apache-2.0, verified on npm 5 Oct 2026), with no OpenSCAD files;
   - the OpenSCAD Customizer page alone (one piece at a time).
 
-### A real case to design against
-
-- **Q18.** The dimensions of your window's open area and of the appliance in it, so the first
-  model is tested against a real fit.
+  The owner then asked which is friendlier for a basic user, licence aside. The user never sees
+  the engine; buttons, uploads, preview, the all-pieces download and the offline file are the
+  same page either way. What differs is load time and preview speed. The `manifold-3d` package
+  unpacks to 2.8 MB and `openscad-wasm` to 13.9 MB (verified: npm registry, 5 Oct 2026;
+  download sizes after compression differ). The OpenSCAD Playground itself uses Manifold for
+  speed (relayed: its README), so calling Manifold directly should be at least as fast
+  (inferred, not measured). The recommendation is TypeScript + Manifold, confirmed by a small
+  speed prototype before building on it.
 
 ## Repository follow-ups
 
