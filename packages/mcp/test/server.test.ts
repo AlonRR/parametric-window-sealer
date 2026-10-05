@@ -174,6 +174,13 @@ describe('window_sealer_plan_wall', () => {
     expect(r.data['summary'].fill).toBe('Fill: bricks of 30 × 10 mm openings and 3 mm bars, cut 1.5 mm into the room side.');
   });
 
+  it('a diamond fill: its settings alone mean the diamonds (C24)', async () => {
+    const { call } = await connect();
+    const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { diamond: { barMm: 2 } } } });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['summary'].fill).toBe('Fill: diamonds 20 mm wide and 30 mm tall and 2 mm bars, cut 1.5 mm into the room side.');
+  });
+
   it('settings the page refuses are an error with the page’s message for each', async () => {
     const { call } = await connect();
     const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, thicknessMm: 0, joint: { slideMm: 8 } } });

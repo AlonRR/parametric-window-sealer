@@ -25,7 +25,16 @@ import { PRINTER_IDS } from './printers.js';
 import { DEFAULT_COLLAR, checkPort, collarInnerMm, defaultPortPiece, formatPorts, parsePorts, portHoleMm } from './port.js';
 import type { CollarParams, PortSetting } from './port.js';
 import { DEFAULT_TAPE, NO_SEAL, TAPE_GROOVE_WALL_MM, tapeFit, tapedCollar } from './tape.js';
-import { DEFAULT_BRICK, DEFAULT_GRID, DEFAULT_HEXAGON, FILL_KINDS, MIN_BAR_MM, PATTERN_STYLES, SEALED } from './fill.js';
+import {
+  DEFAULT_BRICK,
+  DEFAULT_DIAMOND,
+  DEFAULT_GRID,
+  DEFAULT_HEXAGON,
+  FILL_KINDS,
+  MIN_BAR_MM,
+  PATTERN_STYLES,
+  SEALED,
+} from './fill.js';
 import type { FillParams } from './fill.js';
 import { reliefDepthMm } from './pattern.js';
 import type { SealKind, SealParams } from './tape.js';
@@ -124,7 +133,10 @@ export type FieldName =
   | 'hexBarMm'
   | 'brickWidthMm'
   | 'brickHeightMm'
-  | 'brickBarMm';
+  | 'brickBarMm'
+  | 'diamondWidthMm'
+  | 'diamondHeightMm'
+  | 'diamondBarMm';
 
 export type FormValues = Partial<Record<FieldName, string>>;
 export type FieldErrors = Partial<Record<FieldName, string>>;
@@ -192,6 +204,9 @@ export function toFormValues(p: Params): FormValues {
     brickWidthMm: String(p.fill.brick.widthMm),
     brickHeightMm: String(p.fill.brick.heightMm),
     brickBarMm: String(p.fill.brick.barMm),
+    diamondWidthMm: String(p.fill.diamond.widthMm),
+    diamondHeightMm: String(p.fill.diamond.heightMm),
+    diamondBarMm: String(p.fill.diamond.barMm),
   };
 }
 
@@ -437,6 +452,11 @@ export function readParams(values: FormValues): ReadResult {
       heightMm: fillNumber('brickHeightMm', DEFAULT_BRICK.heightMm, positive, sizeMessage, fillKind === 'brick'),
       barMm: fillNumber('brickBarMm', DEFAULT_BRICK.barMm, bar, barMessage, fillKind === 'brick'),
     },
+    diamond: {
+      widthMm: fillNumber('diamondWidthMm', DEFAULT_DIAMOND.widthMm, positive, sizeMessage, fillKind === 'diamond'),
+      heightMm: fillNumber('diamondHeightMm', DEFAULT_DIAMOND.heightMm, positive, sizeMessage, fillKind === 'diamond'),
+      barMm: fillNumber('diamondBarMm', DEFAULT_DIAMOND.barMm, bar, barMessage, fillKind === 'diamond'),
+    },
   };
 
   const base = { openingWidthMm, openingHeightMm, printer, bedMarginMm, width, height, thicknessMm, joint, edges, collar, seal, fill };
@@ -618,13 +638,14 @@ function describeJoints(joints: JointPlan, joint: JointParams): string {
 function describeFill(params: Params): string {
   const { fill } = params;
   if (fill.kind === 'sealed') return 'Fill: sealed.';
-  const { grid, hexagon, brick } = fill;
-  const pattern =
-    fill.kind === 'grid'
-      ? `a grid of ${mm(grid.openingMm)} mm square openings and ${mm(grid.barMm)} mm bars`
-      : fill.kind === 'hexagon'
-        ? `a honeycomb of hexagonal openings ${mm(hexagon.openingMm)} mm across the flats and ${mm(hexagon.barMm)} mm bars`
-        : `bricks of ${mm(brick.widthMm)} × ${mm(brick.heightMm)} mm openings and ${mm(brick.barMm)} mm bars`;
+  const { grid, hexagon, brick, diamond } = fill;
+  const names: Record<Exclude<FillParams['kind'], 'sealed'>, string> = {
+    grid: `a grid of ${mm(grid.openingMm)} mm square openings and ${mm(grid.barMm)} mm bars`,
+    hexagon: `a honeycomb of hexagonal openings ${mm(hexagon.openingMm)} mm across the flats and ${mm(hexagon.barMm)} mm bars`,
+    brick: `bricks of ${mm(brick.widthMm)} × ${mm(brick.heightMm)} mm openings and ${mm(brick.barMm)} mm bars`,
+    diamond: `diamonds ${mm(diamond.widthMm)} mm wide and ${mm(diamond.heightMm)} mm tall and ${mm(diamond.barMm)} mm bars`,
+  };
+  const pattern = names[fill.kind];
   return fill.style === 'through'
     ? `Fill: ${pattern}, cut through: air passes through the wall.`
     : `Fill: ${pattern}, cut ${mm(reliefDepthMm(params.thicknessMm, fill.reliefPct))} mm into the room side.`;

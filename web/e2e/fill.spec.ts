@@ -93,3 +93,12 @@ test('bricks: a running bond, sized by width, height and bar (C18 to C21)', asyn
   await page.getByLabel('Brick height (mm)').fill('10');
   await expect(line(page)).toHaveText('Fill: bricks of 30 × 10 mm openings and 3 mm bars, cut 1.5 mm into the room side.');
 });
+
+test('diamonds: point-up, sized by width, height and bar (C22 to C25)', async ({ page }) => {
+  await fill(page).selectOption('diamond');
+  await expect(line(page)).toHaveText('Fill: diamonds 20 mm wide and 30 mm tall and 3 mm bars, cut 1.5 mm into the room side.');
+  await page.getByText('Advanced: the pattern').click();
+  await expect(page.getByLabel('Brick width (mm)')).toBeHidden();
+  await page.getByLabel('Diamond height, corner to corner (mm)').fill('20');
+  await expect(line(page)).toContainText('20 mm wide and 20 mm tall');
+});

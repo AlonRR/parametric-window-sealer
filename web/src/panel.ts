@@ -62,6 +62,9 @@ const FIELDS: readonly FieldName[] = [
   'brickWidthMm',
   'brickHeightMm',
   'brickBarMm',
+  'diamondWidthMm',
+  'diamondHeightMm',
+  'diamondBarMm',
 ];
 
 type Control = HTMLInputElement | HTMLSelectElement | RadioNodeList;

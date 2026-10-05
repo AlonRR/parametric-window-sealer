@@ -350,6 +350,7 @@
                 <option value="grid">Grid</option>
                 <option value="hexagon">Hexagon</option>
                 <option value="brick">Brick</option>
+                <option value="diamond">Diamond</option>
               </optgroup>
             </select>
           </label>
@@ -516,6 +517,24 @@
             </label>
             <p class="note">The solid between two bricks, as mortar: at least 0.8 mm.</p>
             <span class="error" data-testid="error-brickBarMm"></span>
+          </div>
+          <div data-pattern="diamond">
+            <label>
+              Diamond width, corner to corner (mm)
+              <input name="diamondWidthMm" inputmode="decimal" autocomplete="off" />
+            </label>
+            <span class="error" data-testid="error-diamondWidthMm"></span>
+            <label>
+              Diamond height, corner to corner (mm)
+              <input name="diamondHeightMm" inputmode="decimal" autocomplete="off" />
+            </label>
+            <span class="error" data-testid="error-diamondHeightMm"></span>
+            <label>
+              Diamond bar (mm)
+              <input name="diamondBarMm" inputmode="decimal" autocomplete="off" />
+            </label>
+            <p class="note">The solid between two diamonds: at least 0.8 mm.</p>
+            <span class="error" data-testid="error-diamondBarMm"></span>
           </div>
         </details>
 

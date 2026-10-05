@@ -448,3 +448,12 @@ describe('the brick pattern (pattern-brick #18; C18 to C21)', () => {
     expect(json(r.out).params.fill).toMatchObject({ kind: 'brick', brick: { widthMm: 40, heightMm: 12, barMm: 3 } });
   });
 });
+
+describe('the diamond pattern (pattern-diamond #19; C22 to C25)', () => {
+  it('--fill diamond, and a --diamond-* flag alone means the diamonds', async () => {
+    const r = await cli([...OPENING, '--fill', 'diamond', '--dry-run']);
+    expect(r.out).toContain('Fill: diamonds 20 mm wide and 30 mm tall and 3 mm bars, cut 1.5 mm into the room side.');
+    const alone = await cli([...OPENING, '--diamond-height', '20', '--dry-run', '--json']);
+    expect(json(alone.out).params.fill).toMatchObject({ kind: 'diamond', diamond: { widthMm: 20, heightMm: 20, barMm: 3 } });
+  });
+});

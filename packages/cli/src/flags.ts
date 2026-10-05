@@ -64,6 +64,9 @@ const FLAG_NAMES: Record<FieldName, string> = {
   brickWidthMm: 'brick-width', // a --brick-* flag without --fill means the bricks (C21)
   brickHeightMm: 'brick-height',
   brickBarMm: 'brick-bar',
+  diamondWidthMm: 'diamond-width', // a --diamond-* flag without --fill means the diamonds (C25)
+  diamondHeightMm: 'diamond-height',
+  diamondBarMm: 'diamond-bar',
 };
 
 export const SETTING_FLAGS: readonly SettingFlag[] = SETTINGS.map((s) => ({ ...s, flag: FLAG_NAMES[s.field] }));

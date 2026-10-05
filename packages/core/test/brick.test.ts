@@ -24,7 +24,7 @@ const brick = (over: Partial<FillParams> = {}): FillParams => ({ ...SEALED, kind
 
 describe('the brick tile', () => {
   it('is a choice after the hexagon: 30 × 12 mm openings, 3 mm bars (C19)', () => {
-    expect(FILL_KINDS).toEqual(['sealed', 'grid', 'hexagon', 'brick']);
+    expect(FILL_KINDS.slice(0, 4)).toEqual(['sealed', 'grid', 'hexagon', 'brick']);
     expect(DEFAULT_BRICK).toEqual({ widthMm: 30, heightMm: 12, barMm: 3 });
     expect(SEALED.brick).toEqual(DEFAULT_BRICK);
   });
