@@ -85,6 +85,20 @@ The first four rows were answered before questions carried IDs.
   (inferred, not measured). The recommendation is TypeScript + Manifold, confirmed by a small
   speed prototype before building on it.
 
+  The owner chose to prototype both and decide from the numbers. Measured 5 Oct 2026 in
+  [`spikes/engine-benchmark/`](../spikes/engine-benchmark/README.md), on one example panel
+  (200 x 200 x 3 mm, 247 hexagonal holes) proven to be the same solid from both engines
+  (0 mm³ difference; a deliberately different panel fails the same check):
+
+  | Chromium, cold cache, gzip, median of 3 loads | Manifold | OpenSCAD |
+  |---|---|---|
+  | Ready to render, local | 95 ms | 640 ms |
+  | Ready to render, example 20 Mbit/s link | 366 ms | 2 021 ms |
+  | Later renders | 127–136 ms | 281–285 ms |
+  | Downloaded | 0.23 MB | 3.35 MB |
+
+  Waiting for the owner's choice.
+
 ## Repository follow-ups
 
 - The kit also has a `gitleaks.toml` template that is not in its file table. Not adopted; ask
