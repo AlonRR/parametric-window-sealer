@@ -31,22 +31,22 @@ engine is deliberately undecided until the design questions below are settled.
 | Q2 | Branch: commit to **`main`** | 5 Oct 2026 |
 | Q3 | Build the Pages site now; **the owner publishes it later** (the repo is private, and making it public is his action) | 5 Oct 2026 |
 | Q4 | `.repo-status`: **`publish: not-yet`** | 5 Oct 2026 |
+| Q5 | Printed on **users' own printers**: the maximum piece size is a plain parameter, not tied to one printer. Its default value is still open (Q5 below) | 5 Oct 2026 |
+| Q6 | **Material-agnostic**: the parts must print well in PLA, PETG and ASA/ABS ("it shouldn't really matter if it's well designed for printing"). Sealing is an option: **printed TPU**, **tape** (its size a parameter), or **none**, because some users do not need a perfect seal | 5 Oct 2026 |
+| Q7 | Patterns are **cut through or relief, chosen per piece** | 5 Oct 2026 |
+| Q8 | **"Open" means a cut-through pattern**, not a separate fill type. So the fills are: sealed (solid), a pattern (through or relief), or an organiser | 5 Oct 2026 |
 
-The first four were answered before questions carried IDs.
+The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
 ### Printing
 
-- **Q5.** Which printer(s)? The bed size sets the default maximum piece size.
-- **Q6.** Which material(s)? The panel sits in a sunny window beside an AC or exhaust air, and
-  PLA softens at the lowest temperature of the usual choices.
+- **Q5.** (Partly answered.) What default should the maximum piece size have, given that users
+  print on their own printers?
 
 ### Panels and patterns
 
-- **Q7.** Decorative and structural patterns (honeycomb, brick, diamond, grid): cut through so air
-  and light pass, raised or engraved on a sealed panel, or a per-piece choice?
-- **Q8.** What does "open" mean: a frame with nothing in it, a vent grille, an insect mesh?
 - **Q9.** Which organiser systems: Skådis, and which others?
 - **Q10.** One fill type for the whole wall, or a different fill per piece?
 
@@ -69,7 +69,9 @@ The first four were answered before questions carried IDs.
   exhaust hose, an exhaust fan (which kind)?
 - **Q16.** How does it attach to the appliance, and how is that adjustable: slotted holes, a
   sliding insert, an adjustable clamp, a compressible gasket?
-- **Q17.** How sealed must it be: against air, rain, insects, heat?
+- **Q17.** How sealed must it be: against air, rain, insects, heat? And where do the optional seals
+  (Q6) sit: panel to window, panel to panel, panel to appliance? For tape, a groove or a flat
+  strip of edge?
 
 ### A real case to design against
 
@@ -78,12 +80,8 @@ The first four were answered before questions carried IDs.
 
 ## Repository follow-ups
 
-- Two lint profiles from the convention kit are not adopted yet, each for a missing config:
-  - `docs` (markdownlint) needs the kit's `markdownlint-cli2.yaml` template, which has not been
-    received.
-  - `yaml` (yamllint `--strict`) refuses the kit's own files on yamllint's default rules
-    (80-column lines, no `---`, aligned colons in `PROJECT.yml`). It needs the kit's
-    `.yamllint`, if there is one.
-- `tests/test-hooks.sh` here was written in this repo. The kit's own hook tests (in
-  repo-secret-scan) have not been received; they are the stronger check and should replace or
-  extend this one.
+- The kit's `yaml` lint profile is not adopted. On yamllint's default rules `--strict` refuses
+  the kit's own files (80-column lines, no `---`, aligned colons in `PROJECT.yml`), and the kit
+  has no yamllint config. Adopting it means writing that policy first; the owner has been told.
+- The kit also has a `gitleaks.toml` template that is not in its file table. Not adopted; ask
+  for it if the secret scanner needs custom rules.
