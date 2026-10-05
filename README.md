@@ -8,10 +8,13 @@ panel style, and get a set of printable pieces that join together and fit the ga
 
 ## Status
 
-**Version 0.2.0: a plain sealed wall, as a page and as an API; not yet test printed.** The
-page in `web/` takes the opening you can see and your window type, divides the opening into
-pieces your printer can make, joins them with connector strips and cross pieces, fits edge
-strips into the window's tracks, shows the wall in 3D and downloads every part as STL or 3MF.
+**Version 0.3.0: the wall with its fittings, seals and patterns, as a page and as an API; not
+yet test printed.** The page in `web/` takes the opening you can see and your window type,
+divides the opening into pieces your printer can make, joins them with connector strips and
+cross pieces, fits edge strips into the window's tracks, shows the wall in 3D and downloads
+every part as STL or 3MF. It fits a hose port, a measured cutout or a window air conditioner,
+seals the edges with foam tape or printed TPU, fills the pieces with a pattern, and has a
+measuring guide; it can also be saved as one file that works offline.
 The same geometry is a library for Node.js and browsers, the `window-sealer` command and the
 `window-sealer-mcp` server for LLM agents (see [Developing](#developing)). The joint's fit and the
 example track sizes are starting values that a test print still has to confirm. The site is

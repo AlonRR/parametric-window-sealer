@@ -181,6 +181,9 @@ None.
 
 ## Repository follow-ups
 
+- **Pending (C48, Q123):** the `v0.3.0` tag on the release commit `chore(release): v0.3.0, every
+  P1 item` and its GitHub release, asked of the session on the owner's machine once the commit is
+  on `main`; checked on GitHub afterwards.
 - **Done (Q101, Q123):** the `v0.2.0` tag on the release commit `chore(release): v0.2.0, the
   API` (`983dc0f`) and its GitHub release, made by the session on the owner's machine on
   5 Oct 2026 (verified: GitHub lists the annotated tag on `983dc0f` and the release).
