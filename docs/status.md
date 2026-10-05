@@ -68,6 +68,12 @@ is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | Q41 | Both width and height **start as "all pieces the same size"**; the user can change each | 5 Oct 2026 |
 | Q42 | The page **starts with a 600 × 1000 mm example opening**, labelled as an example (Q18) | 5 Oct 2026 |
 | Q43 | The site is **built on every push**; it is **published only when the owner sets the repository variable `PAGES_PUBLISH` to `true`** (after setting the Pages source to GitHub Actions). Until then the deploy job is skipped. The steps are in the README | 5 Oct 2026 |
+| Q32 | The **hosted web API is parked** (`api-hosted`, #48, moved to P3): "I don't have the funding to run a server" | 5 Oct 2026 |
+| Q48 | The three API forms that need no server, the **npm library, the command-line tool and the local MCP server** (#45, #46, #47), **stay at P1** right after the MVP | 5 Oct 2026 |
+| Q44 | The **user chooses the download format**, STL or 3MF | 5 Oct 2026 |
+| Q45 | Clicking Download **opens a dialog with the options**; "a zip is an option, not a default" | 5 Oct 2026 |
+| Q46 | The dialog offers **STL as separate files, STL in one zip, 3MF as one file holding every piece, and 3MF one file per piece** | 5 Oct 2026 |
+| Q47 | Nothing is selected the first time; after that the dialog **remembers the user's last choice** in their own browser | 5 Oct 2026 |
 | Q36 | The code that defines the pieces' shapes is **MPL-2.0**, like the rest of the code; CERN-OHL-S-2.0 stays for the documentation (Q1). **Files the tool generates are the user's**: "people can do what they want with the STL output". The README and the page say so in one sentence, checked by a test. Prusa's Open Community License was considered and not chosen: it restricts commercial use and automated use, against this decision and issue #1 | 5 Oct 2026 |
 
 The first four rows were answered before questions carried IDs.
@@ -76,10 +82,6 @@ The first four rows were answered before questions carried IDs.
 
 ### API
 
-- **Q32.** The hosted web API (Q31) needs a server, which GitHub Pages is not. Where should it
-  run, who pays for and maintains it, and is a service that receives the user's sizes acceptable
-  next to Q24's "nothing sent to a server" for the page? Until this is answered, `api-hosted`
-  (#48) cannot start; the other three forms do not depend on it.
 - **Q33.** Within P1, the round hose port was first in line after the MVP (Q28), and the API was
   put "right after the MVP" (Q31). The backlog keeps `hose-port` first and the API rows next.
   Should the API rows come before `hose-port` instead?

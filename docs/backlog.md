@@ -23,10 +23,11 @@ row below, and none needs the MVP rebuilt to add it. **Confirmed by the owner as
 - **Issue**: the GitHub issue that holds the work and the discussion (Q29). This file stays the
   ranked overview; when a priority or estimate changes, change both.
 - **Priority**: P0 is the MVP, P1 comes next, P2 is planned, P3 is "maybe later". Rows are
-  sorted by priority, then by ease, with one exception: the four API rows (`api-*`, the forms
-  the owner chose for issue #1) come right after `hose-port`, because the owner put them right
-  after the MVP (Q31) and `hose-port` was already first in line (Q28). Whether they should come
-  before `hose-port` is open (Q33).
+  sorted by priority, then by ease, with one exception: the three API rows that need no server
+  (`api-library`, `api-cli`, `api-mcp-local`, forms the owner chose for issue #1) come right
+  after `hose-port`, because the owner put them right after the MVP (Q31, Q48) and `hose-port`
+  was already first in line (Q28). Whether they should come before `hose-port` is open (Q33).
+  The fourth, `api-hosted`, is parked at P3: there is no funding to run a server (Q32).
 - **Ease**, a relative estimate:
   - **S**: one self-contained piece of code or data with its tests; no test print needed.
   - **M**: several parts, a new area of the page, or a shape that needs a test print to tune.
@@ -47,7 +48,7 @@ row below, and none needs the MVP rebuilt to add it. **Confirmed by the owner as
 | `printer-default` | #4 | Maximum piece size: one safe default plus "custom" | P0 | S | `layout` | Q5, Q38 | Verified: 29 build volumes from the makers' sites, in [`printer-beds.md`](printer-beds.md) |
 | `params-basic` | #5 | The basic parameter panel: opening size, maximum piece size, per-axis modes, thickness | P0 | S | `layout` | Q10, Q11 | |
 | `plain-panel` | #6 | A plain sealed piece of any size and thickness | P0 | S | `page-skeleton` | Q8 | |
-| `download-zip` | #7 | Download every piece in one zip, named by grid position | P0 | S | `plain-panel` | Q24 | STL or 3MF: Manifold's own README advises 3MF over STL (relayed) |
+| `download-zip` | #7 | A download dialog: the user chooses STL or 3MF, as separate files or one zip, or every piece in one 3MF; nothing pre-selected the first time, then the last choice is remembered; files named by grid position | P0 | M | `plain-panel` | Q24, Q44, Q45, Q46, Q47 | Writing 3MF correctly (units, several objects); browsers ask once to allow several downloads (inferred) |
 | `pages-deploy` | #8 | Workflow that builds the page for GitHub Pages; it goes live only when the owner publishes | P0 | S | `page-skeleton` | Q3, Q43 | The repo is private: the site can be built, not served, until the owner acts |
 | `min-piece-from-joint` | #53 | Replace the 30 mm placeholder minimum piece width (Q40) with the width the joint needs, from the joint's own dimensions (Q37); drop the "placeholder" wording | P0 | S | `connector-strip`, `params-basic` | Q37, Q40 | None significant once the joint's dimensions exist. P0 so `v0.1.0` cannot ship the placeholder |
 | `preview-3d` | #9 | 3D preview of the assembled wall, updating as parameters change | P0 | M | `plain-panel` | Q24 | Library choice for the viewer |
@@ -57,7 +58,6 @@ row below, and none needs the MVP rebuilt to add it. **Confirmed by the owner as
 | `api-library` | #45 | The geometry code as an importable npm package; the other three API forms call it (part of #1) | P1 | M | `layout`, `plain-panel`, `connector-strip`, `track-edge` | Q31 | How cleanly the geometry separates from the page. Publishing to the npm registry is public, so it is the owner's step (as Q3) |
 | `api-cli` | #46 | A command-line tool that writes the pieces from parameters given as flags or a file (part of #1) | P1 | S | `api-library` | Q31 | None significant: the engine benchmark already runs Manifold under Node.js |
 | `api-mcp-local` | #47 | A local MCP server on the user's own machine, with tools for LLM agents such as "plan the layout" and "generate the pieces" (part of #1) | P1 | M | `api-library` | Q31 | Spec to verify: the MCP specification and SDK version; which tools to offer |
-| `api-hosted` | #48 | A hosted web API, an HTTP service anyone can call (part of #1) | P1 | L | `api-library` | Q31 | Where it runs and who pays for and maintains it, against Q24's nothing sent to a server (Q32) |
 | `printer-presets` | #13 | Printer list that sets the maximum piece size | P1 | S | `printer-default` | Q5 | Spec to verify for every printer listed |
 | `user-guide` | #14 | How to measure the window, the gap and the appliance | P1 | S | | Q18 | |
 | `seal-tape` | #15 | Optional tape seal: a groove or land sized to the tape | P1 | S | `track-edge`, `connector-strip` | Q6, Q17 | Groove or flat land is still open (Q17 left it) |
@@ -89,6 +89,7 @@ row below, and none needs the MVP rebuilt to add it. **Confirmed by the owner as
 | `mesh-custom-piece` | #41 | A whole imported piece, trimmed to size, with connector edges added | P2 | L | `mesh-import`, `connector-strip` | Q25 | Inherits `mesh-import`'s risk |
 | `mesh-import` | #42 | Import STL and similar meshes: repair, and refuse clearly when a mesh cannot be used | P2 | XL | `page-skeleton` | Q25 | Arbitrary user meshes; often not watertight |
 | `other-windows` | #43 | Window types beyond sliders and hung windows | P3 | L | `track-edge` | (none) | Not specified yet |
+| `api-hosted` | #48 | A hosted web API, an HTTP service anyone can call (part of #1). **Parked**: no funding to run a server (Q32) | P3 | L | `api-library` | Q31, Q32 | Where it would run and who pays for it; against Q24's nothing sent to a server |
 
 Issue #1, the owner's request for "an API and MCP for use by users and LLM agents", is the
 parent of the four `api-*` rows (#45 to #48); it closes when they do.
