@@ -37,6 +37,8 @@ complete. Until then every change is listed under Unreleased.
 
 - A workflow that builds the site for GitHub Pages on every push and keeps it as a
   downloadable artifact; it publishes only once the repository owner switches it on.
+- The first piece shape: a plain sealed panel of any size and thickness, built for every cell
+  of the plan (`web/src/panel-geometry.ts`), lying flat as it is printed.
 
 ### Changed
 
