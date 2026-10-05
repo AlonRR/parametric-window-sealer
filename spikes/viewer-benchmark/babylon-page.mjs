@@ -15,7 +15,7 @@ import { Vector3 } from '@babylonjs/core/Maths/math.vector.js';
 import { Mesh } from '@babylonjs/core/Meshes/mesh.js';
 import { VertexData } from '@babylonjs/core/Meshes/mesh.vertexData.js';
 import { Scene } from '@babylonjs/core/scene.js';
-import { layout, loadMesh, publish, shown } from './scene.mjs';
+import { layout, loadMesh, orbitWith, publish, shown } from './scene.mjs';
 
 const canvas = document.getElementById('c');
 const engine = new Engine(canvas, true);
@@ -55,9 +55,16 @@ async function build(n) {
 
 await build(15);
 await shown();
-publish(performance.now(), async (n) => {
-  const start = performance.now();
-  await build(n);
-  await shown();
-  return performance.now() - start;
-});
+publish(
+  performance.now(),
+  async (n) => {
+    const start = performance.now();
+    await build(n);
+    await shown();
+    return performance.now() - start;
+  },
+  orbitWith(() => {
+    camera.alpha += 0.02;
+    scene.render();
+  }),
+);

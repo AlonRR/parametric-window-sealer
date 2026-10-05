@@ -1,6 +1,9 @@
-// Q49 spike: write the two test meshes the pages draw, built by Manifold as the real page
+// Q49 spike: write the test meshes the pages draw, built by Manifold as the real page
 // builds pieces. "plain" is a 200 x 200 x 3 mm panel (12 triangles); "pattern" is the
-// engine benchmark's honeycomb panel (6 928 triangles), the heaviest piece measured so far.
+// engine benchmark's honeycomb panel (10 mm holes, 2 mm walls: 6 928 triangles). The owner
+// asked how the libraries cope as the model grows more complex, so "dense" (5 mm holes,
+// 1 mm walls: 28 100 triangles) and "heavy" (3 mm holes, 1 mm walls: 63 572 triangles)
+// are the same panel with finer honeycombs. These are example sizes (Q18).
 // File layout: uint32 vertex count, uint32 triangle count, float32 x y z per vertex,
 // uint32 three indices per triangle; little-endian.
 import { writeFileSync } from 'node:fs';
@@ -31,3 +34,5 @@ function write(name, solid) {
 
 write('plain', wasm.Manifold.cube([200, 200, 3]));
 write('pattern', buildWithManifold(wasm, PANEL));
+write('dense', buildWithManifold(wasm, { ...PANEL, hexAF: 5, wall: 1 }));
+write('heavy', buildWithManifold(wasm, { ...PANEL, hexAF: 3, wall: 1 }));

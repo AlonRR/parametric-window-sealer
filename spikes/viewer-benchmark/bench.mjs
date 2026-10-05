@@ -1,7 +1,8 @@
 // Q49 spike: open each built page in Chromium, each load in a FRESH browser context (empty
 // cache), and record what a visitor gets: bytes transferred (gzip, as a static host
-// serves them), time from navigation to the first drawn frame, and time to redraw the
-// wall after a change (15 pieces to 25 and back).
+// serves them), time from navigation to the first drawn frame, time to redraw the wall
+// after a change (15 pieces to 25 and back), and frames drawn per second while the wall
+// turns, as when the user drags it. Four walls, from 180 to 953 580 triangles (15 pieces).
 //
 //   node bench.mjs [loads] [updates]   (default 5 cold loads, 5 update pairs per load)
 //
@@ -20,7 +21,7 @@ const LOADS = Number(process.argv[2] ?? 5);
 const UPDATES = Number(process.argv[3] ?? 5);
 const OUT = fileURLToPath(new URL('./out/', import.meta.url));
 const PAGES = { three: 'three/three.html', babylon: 'babylon/babylon.html', 'model-viewer': 'model-viewer/index.html' };
-const SCENES = ['plain', 'pattern'];
+const SCENES = (process.env.SCENES ?? 'plain,pattern,dense,heavy').split(',');
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.bin': 'application/octet-stream' };
 const median = (xs) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)];
 
@@ -62,7 +63,7 @@ async function load(page, scene) {
     responses.push({ url: req.url(), bytes: sizes.responseBodySize });
   });
   await tab.goto(`${base}/${PAGES[page]}?scene=${scene}`);
-  await tab.waitForFunction(() => window.bench?.firstFrameMs > 0, null, { timeout: 60_000 });
+  await tab.waitForFunction(() => window.bench?.firstFrameMs > 0, null, { timeout: 120_000 });
   const firstFrameMs = await tab.evaluate(() => window.bench.firstFrameMs);
   const up = [];
   const down = [];
@@ -70,6 +71,7 @@ async function load(page, scene) {
     up.push(await tab.evaluate(() => window.bench.update(25)));
     down.push(await tab.evaluate(() => window.bench.update(15)));
   }
+  const orbitFps = await tab.evaluate(() => window.bench.orbit(2000));
   await tab.waitForTimeout(200);
   const js = responses.filter((r) => r.url.endsWith('.js'));
   await context.close();
@@ -78,6 +80,7 @@ async function load(page, scene) {
     firstFrameMs,
     update25Ms: median(up),
     update15Ms: median(down),
+    orbitFps,
     jsFiles: js.length,
     jsBytes: js.reduce((s, r) => s + r.bytes, 0),
     totalBytes: responses.reduce((s, r) => s + r.bytes, 0),
@@ -101,6 +104,7 @@ for (const scene of SCENES) {
         firstFrameMs: Math.round(pick('firstFrameMs')),
         update25Ms: Math.round(pick('update25Ms')),
         update15Ms: Math.round(pick('update15Ms')),
+        orbitFps: Math.round(pick('orbitFps') * 10) / 10,
         jsFiles: pick('jsFiles'),
         jsKiB: Math.round(pick('jsBytes') / 102.4) / 10,
         totalKiB: Math.round(pick('totalBytes') / 102.4) / 10,

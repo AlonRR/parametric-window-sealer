@@ -1,10 +1,10 @@
 // Q49 spike: the wall drawn by three.js, with orbit controls as the real preview needs.
 import {
   AmbientLight, BufferAttribute, BufferGeometry, Color, DirectionalLight, Mesh,
-  MeshStandardMaterial, PerspectiveCamera, Scene, WebGLRenderer,
+  MeshPhongMaterial, PerspectiveCamera, Scene, WebGLRenderer,
 } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { layout, loadMesh, publish, shown } from './scene.mjs';
+import { layout, loadMesh, orbitWith, publish, shown } from './scene.mjs';
 
 const canvas = document.getElementById('c');
 const renderer = new WebGLRenderer({ canvas, antialias: true });
@@ -16,7 +16,10 @@ sun.position.set(300, -400, 800);
 scene.add(sun);
 const camera = new PerspectiveCamera(40, canvas.width / canvas.height, 1, 10000);
 const controls = new OrbitControls(camera, canvas);
-const material = new MeshStandardMaterial({ color: 0x9aa7b5, roughness: 0.7 });
+// Phong shading, as Babylon's StandardMaterial, so both pages do the same work per pixel.
+// The first version used three's physically based MeshStandardMaterial, a heavier shader;
+// on a software renderer the material alone could have decided the frame rate.
+const material = new MeshPhongMaterial({ color: 0x9aa7b5, shininess: 20 });
 const mesh = await loadMesh();
 let shownMeshes = [];
 
@@ -42,9 +45,19 @@ function build(n) {
 
 build(15);
 await shown();
-publish(performance.now(), async (n) => {
-  const start = performance.now();
-  build(n);
-  await shown();
-  return performance.now() - start;
-});
+const centre = controls.target.clone();
+publish(
+  performance.now(),
+  async (n) => {
+    const start = performance.now();
+    build(n);
+    await shown();
+    return performance.now() - start;
+  },
+  orbitWith((frame) => {
+    const angle = frame * 0.02;
+    camera.position.set(centre.x + 900 * Math.sin(angle), centre.y - 900 * Math.cos(angle), 1400);
+    camera.lookAt(centre);
+    renderer.render(scene, camera);
+  }),
+);

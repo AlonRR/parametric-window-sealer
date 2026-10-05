@@ -2,7 +2,7 @@
 // first written as a GLB (binary glTF) holding one mesh per piece, as the real page would
 // have to; that conversion is part of what is timed.
 import '@google/model-viewer';
-import { layout, loadMesh, publish, shown } from '../scene.mjs';
+import { layout, loadMesh, orbitWith, publish, shown } from '../scene.mjs';
 
 const viewer = document.querySelector('model-viewer');
 const mesh = await loadMesh();
@@ -11,8 +11,14 @@ function glb(n) {
   const places = layout(n);
   const pos = mesh.positions;
   const idx = mesh.indices;
-  const min = [0, 1, 2].map((k) => Math.min(...pos.filter((_, i) => i % 3 === k)));
-  const max = [0, 1, 2].map((k) => Math.max(...pos.filter((_, i) => i % 3 === k)));
+  // A loop, not Math.min(...array): the heavy meshes have more values than a call may
+  // take as arguments.
+  const min = [Infinity, Infinity, Infinity];
+  const max = [-Infinity, -Infinity, -Infinity];
+  for (let i = 0; i < pos.length; i++) {
+    min[i % 3] = Math.min(min[i % 3], pos[i]);
+    max[i % 3] = Math.max(max[i % 3], pos[i]);
+  }
   const each = pos.byteLength + idx.byteLength;
   const bin = new Uint8Array(each * n);
   const json = {
@@ -75,8 +81,15 @@ async function show(n) {
 }
 
 await show(15);
-publish(performance.now(), async (n) => {
-  const start = performance.now();
-  await show(n);
-  return performance.now() - start;
-});
+// model-viewer draws on its own schedule; moving its camera each frame makes it redraw.
+publish(
+  performance.now(),
+  async (n) => {
+    const start = performance.now();
+    await show(n);
+    return performance.now() - start;
+  },
+  orbitWith((frame) => {
+    viewer.cameraOrbit = `${(frame * 0.02 * 180) / Math.PI}deg 60deg auto`;
+  }),
+);
