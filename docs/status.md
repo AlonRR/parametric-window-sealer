@@ -47,27 +47,31 @@ engine is deliberately undecided until the design questions below are settled.
 | Q19 | Tools and commit identity persist through a **SessionStart hook committed in the repo**, which runs only in cloud sessions | 5 Oct 2026 |
 | Q20 | Decorative patterns: **brick**, **diamond**, **grid**, **decorative hexagon**; the list is extensible, and **users can add their own** (how: Q21) | 5 Oct 2026 |
 | Q21 | Users add their own patterns by **uploading an SVG tile**, **drawing one in the page**, or contributing a **pattern file to the repo** | 5 Oct 2026 |
+| Q24 | The page **runs in the browser with nothing sent to a server**, both **hosted on GitHub Pages** and as a **download that works offline** | 5 Oct 2026 |
+| Q25 | Users can add their own **STL (or similar) meshes**: organiser or accessory tiles placed on a panel, 3D pattern tiles, a model of their appliance to cut around, a whole custom piece the tool trims and fits connectors to, and **any other shape** | 5 Oct 2026 |
 
 The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-### Engine and how the page is used
+### Engine
 
 - **Q22.** Which engine builds the geometry? The owner's answer (5 Oct 2026): "my thinking was
-  that the page would run locally and users would add stl or other similar files". That needs
-  Q24 and Q25 settled first. The candidates so far:
+  that the page would run locally and users would add stl or other similar files", now settled
+  as Q24 and Q25. What that asks of the engine:
+  - run in the browser, hosted and offline. A page opened from a file usually cannot fetch its
+    WebAssembly module, so the offline build has to be one self-contained file or an installable
+    page (inferred);
+  - import user meshes (STL and similar) and cut, trim and join them with the generated parts.
+    User meshes are often not watertight, and solid booleans on those fail in any engine, so the
+    page needs a repair step and a clear refusal when a file cannot be used (inferred).
+
+  The candidates:
   - a custom web page with the model in OpenSCAD files, rendered in the browser by OpenSCAD's
     WebAssembly build (GPL, so the deployed page would be GPL-licensed as a whole (inferred));
   - a custom web page with the model in TypeScript on the Manifold geometry library
     (`manifold-3d`, Apache-2.0, verified on npm 5 Oct 2026), with no OpenSCAD files;
   - the OpenSCAD Customizer page alone (one piece at a time).
-- **Q24.** What does "run locally" mean: the page runs in the visitor's browser with nothing sent
-  to a server (true of every candidate above, even when served from GitHub Pages), a download
-  people open offline on their own computer, or both?
-- **Q25.** What are the user-added STL (or similar) files for: the user's own organiser or
-  accessory tiles placed on a panel, their own 3D pattern tiles, a model of their appliance to
-  cut around, or a whole custom piece the tool fits connectors to?
 
 ### A real case to design against
 
