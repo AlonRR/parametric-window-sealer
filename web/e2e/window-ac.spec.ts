@@ -19,7 +19,7 @@ test('in a slider the wall stands on the unit; the plan says so (C50, C53)', asy
   await expect(place(page)).toHaveValue('below');
   await expect(edge(page, 'Bottom')).toHaveValue('unit');
   await expect(units(page)).toHaveText('Window AC: the bottom edge stands on the unit’s top.');
-  await expect(page.getByText('Measure the opening left open around the unit')).toBeVisible();
+  await expect(page.getByTestId('ac').getByText('Measure the opening left open around the unit')).toBeVisible();
 
   await place(page).selectOption('left');
   await expect(edge(page, 'Bottom')).toHaveValue('track');

@@ -107,6 +107,13 @@
       .piece-map button[data-own='yes'] {
         font-weight: bold;
       }
+      /* The measuring guide's drawings (#14): drawn in the text's colour, so they follow the
+        theme, and never wider than the screen. */
+      .guide-drawing {
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
     </style>
   </head>
   <body>
@@ -118,6 +125,139 @@
       </p>
 
       <form id="params" novalidate>
+        <!-- The measuring guide (user-guide, #14; Q51, Q54): four steps, each with a drawing made for
+          this project and its sizes examples (Q18), whose fields fill the form below (C58 to C62). -->
+        <details data-testid="guide">
+          <summary>Measuring guide: what to measure, with pictures</summary>
+          <p class="note">
+            Each field here fills the form below as you type. The sizes in the drawings are
+            examples; use a tape measure for the window and calipers for printed parts.
+          </p>
+          <section data-step="opening">
+            <h3>1. The opening</h3>
+            <svg class="guide-drawing" role="img" aria-label="A window seen from the room: the frame, the closed sash on the right, and the open gap on the left, its width and height marked with arrows" viewBox="0 0 240 150" width="240" height="150" fill="none" stroke="currentColor" font-size="12" font-family="inherit">
+              <defs><marker id="guide-arrow-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor" /></marker></defs>
+              <rect x="10" y="10" width="220" height="130" stroke-width="4" />
+              <rect x="120" y="16" width="104" height="118" stroke-width="2" />
+              <path d="M140 40l20-20M140 60l40-40M190 110l20-20" stroke-width="1" />
+              <line x1="20" y1="75" x2="114" y2="75" stroke-width="1.5" marker-start="url(#guide-arrow-1)" marker-end="url(#guide-arrow-1)" />
+              <line x1="34" y1="18" x2="34" y2="132" stroke-width="1.5" marker-start="url(#guide-arrow-1)" marker-end="url(#guide-arrow-1)" />
+              <text x="70" y="68" text-anchor="middle" stroke="none" fill="currentColor">width</text>
+              <text x="40" y="112" stroke="none" fill="currentColor">height</text>
+            </svg>
+            <p>
+              Close the window as far as it goes against what is in it, then measure the gap left
+              open, inside the frame, at its narrowest. Do not count the track's depth here.
+            </p>
+            <label>
+              Width of the gap (mm)
+              <input data-fills="openingWidthMm" inputmode="decimal" autocomplete="off" />
+            </label>
+            <label>
+              Height of the gap (mm)
+              <input data-fills="openingHeightMm" inputmode="decimal" autocomplete="off" />
+            </label>
+          </section>
+          <section data-step="track">
+            <h3>2. The track</h3>
+            <svg class="guide-drawing" role="img" aria-label="A window track cut across: its two walls and its floor, the width inside it and its depth marked with arrows" viewBox="0 0 240 150" width="240" height="150" fill="none" stroke="currentColor" font-size="12" font-family="inherit">
+              <defs><marker id="guide-arrow-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor" /></marker></defs>
+              <path d="M60 20V110H180V20" stroke-width="5" />
+              <path d="M180 20H215M180 110H215" stroke-width="1" stroke-dasharray="3 3" />
+              <line x1="64" y1="45" x2="176" y2="45" stroke-width="1.5" marker-start="url(#guide-arrow-2)" marker-end="url(#guide-arrow-2)" />
+              <line x1="205" y1="22" x2="205" y2="108" stroke-width="1.5" marker-start="url(#guide-arrow-2)" marker-end="url(#guide-arrow-2)" />
+              <text x="120" y="38" text-anchor="middle" stroke="none" fill="currentColor">width inside</text>
+              <text x="198" y="135" text-anchor="middle" stroke="none" fill="currentColor">depth</text>
+            </svg>
+            <p>
+              Measure the track the window slides in: the width between its walls, and how deep it is
+              from its lip to its floor. The depth goes to every edge that sits in a track.
+            </p>
+            <label>
+              Track width, inside (mm)
+              <input data-fills="trackWidthMm" inputmode="decimal" autocomplete="off" />
+            </label>
+            <label>
+              Track depth (mm)
+              <input data-fills="depth" inputmode="decimal" autocomplete="off" />
+            </label>
+          </section>
+          <section data-step="appliance">
+            <h3>3. What passes through the wall</h3>
+            <div data-for="none">
+              <p>Nothing passes through a plain wall. If something does, choose it under What is in the window?</p>
+            </div>
+            <div data-for="hose" hidden>
+              <svg class="guide-drawing" role="img" aria-label="The end of a hose seen from the side, its outside diameter marked with an arrow" viewBox="0 0 240 150" width="240" height="150" fill="none" stroke="currentColor" font-size="12" font-family="inherit">
+              <defs><marker id="guide-arrow-3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor" /></marker></defs>
+              <path d="M30 40H170M30 110H170" stroke-width="2" />
+              <path d="M50 40v70M70 40v70M90 40v70M110 40v70M130 40v70" stroke-width="1" />
+              <ellipse cx="170" cy="75" rx="14" ry="35" stroke-width="2" />
+              <line x1="205" y1="42" x2="205" y2="108" stroke-width="1.5" marker-start="url(#guide-arrow-3)" marker-end="url(#guide-arrow-3)" />
+              <path d="M170 40H215M170 110H215" stroke-width="1" stroke-dasharray="3 3" />
+              <text x="100" y="135" text-anchor="middle" stroke="none" fill="currentColor">across the outside of the end</text>
+            </svg>
+              <p>Measure across the outside of the hose end that goes into the port, not the hose itself.</p>
+              <label>
+                Across the hose end (mm)
+                <input data-fills="hose" inputmode="decimal" autocomplete="off" />
+              </label>
+            </div>
+            <div data-for="cutout" hidden>
+              <svg class="guide-drawing" role="img" aria-label="An appliance seen from the room, its outside width and height marked with arrows" viewBox="0 0 240 155" width="240" height="155" fill="none" stroke="currentColor" font-size="12" font-family="inherit">
+              <defs><marker id="guide-arrow-4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor" /></marker></defs>
+              <rect x="40" y="25" width="140" height="90" stroke-width="3" />
+              <path d="M55 40h110M55 50h110M55 60h110M55 70h110" stroke-width="1" />
+              <line x1="42" y1="132" x2="178" y2="132" stroke-width="1.5" marker-start="url(#guide-arrow-4)" marker-end="url(#guide-arrow-4)" />
+              <line x1="205" y1="27" x2="205" y2="113" stroke-width="1.5" marker-start="url(#guide-arrow-4)" marker-end="url(#guide-arrow-4)" />
+              <text x="110" y="148" text-anchor="middle" stroke="none" fill="currentColor">width</text>
+              <text x="212" y="75" stroke="none" fill="currentColor">height</text>
+            </svg>
+              <p>Measure the outside of what passes through the wall, across and up, seen from the room.</p>
+              <label>
+                Unit width, outside (mm)
+                <input data-fills="cutout-width" inputmode="decimal" autocomplete="off" />
+              </label>
+              <label>
+                Unit height, outside (mm)
+                <input data-fills="cutout-height" inputmode="decimal" autocomplete="off" />
+              </label>
+            </div>
+            <div data-for="ac" hidden>
+              <p>Measure the opening left open around the unit, in step 1; the unit's own size is not needed.</p>
+            </div>
+          </section>
+          <section data-step="test">
+            <h3>4. A printed strip and piece</h3>
+            <svg class="guide-drawing" role="img" aria-label="A printed joint strip seen from its end, its slot between the flanges marked with an arrow, and a printed piece's edge with its thickness marked" viewBox="0 0 240 150" width="240" height="150" fill="none" stroke="currentColor" font-size="12" font-family="inherit">
+              <defs><marker id="guide-arrow-5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor" /></marker></defs>
+              <path d="M20 30H120M20 100H120" stroke-width="6" />
+              <path d="M70 30V100" stroke-width="6" />
+              <line x1="40" y1="35" x2="40" y2="95" stroke-width="1.5" marker-start="url(#guide-arrow-5)" marker-end="url(#guide-arrow-5)" />
+              <text x="46" y="70" stroke="none" fill="currentColor">slot</text>
+              <rect x="160" y="40" width="60" height="12" stroke-width="2" />
+              <line x1="230" y1="40" x2="230" y2="52" stroke-width="1.5" />
+              <text x="190" y="75" text-anchor="middle" stroke="none" fill="currentColor">piece:</text>
+              <text x="190" y="90" text-anchor="middle" stroke="none" fill="currentColor">thickness</text>
+            </svg>
+            <p>
+              Print one joint strip and one piece from the download. With calipers, measure the
+              strip's slot across, between its flanges, and the piece's thickness. The guide works
+              out the fit that gives the joint the play it is meant to have.
+            </p>
+            <label>
+              Slot across, measured (mm)
+              <input data-part="measured-slot" inputmode="decimal" autocomplete="off" />
+            </label>
+            <label>
+              Piece thickness, measured (mm)
+              <input data-part="measured-panel" inputmode="decimal" autocomplete="off" />
+            </label>
+            <p data-testid="guide-fit" aria-live="polite"></p>
+            <p><button type="button" data-part="use-fit" disabled>Use this fit</button></p>
+          </section>
+        </details>
+
         <fieldset>
           <legend>The opening</legend>
           <p class="note">

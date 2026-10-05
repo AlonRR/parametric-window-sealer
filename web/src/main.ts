@@ -5,6 +5,7 @@ import wasmUrl from 'manifold-3d/manifold.wasm?url';
 import { mountDownload } from './download-dialog';
 import { buildCheckPart, loadEngine } from 'parametric-window-sealer';
 import { mountPanel } from './panel';
+import { mountGuide } from './guide';
 import type { Params } from 'parametric-window-sealer';
 import { mountPreview } from './preview';
 
@@ -40,6 +41,7 @@ if (form && plan) {
     preview?.show(params);
   });
 }
+if (form) mountGuide(form);
 if (openButton && dialog) {
   mountDownload({
     openButton,
