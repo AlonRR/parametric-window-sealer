@@ -44,7 +44,7 @@ row below, and none needs the MVP rebuilt to add it. **Confirmed by the owner as
 |---|---|---|---|---|---|---|---|
 | `page-skeleton` | #2 | TypeScript project for the page: build, unit tests, a CI job, Manifold loaded | P0 | S | | Q22, Q34, Q35 | Tooling chosen: Vite, Vitest, and a Chromium test in CI |
 | `layout` | #3 | Divide the opening into a grid: per-axis mode (all equal, or full pieces plus one filler), filler position (start, end, middle, or split for symmetry), warning when a leftover is too small | P0 | S | `page-skeleton` | Q11, Q12 | None significant: pure arithmetic, test-first |
-| `printer-default` | #4 | Maximum piece size: one safe default plus "custom" | P0 | S | `layout` | Q5 | The default number needs verified bed sizes behind it (spec to verify) |
+| `printer-default` | #4 | Maximum piece size: one safe default plus "custom" | P0 | S | `layout` | Q5, Q38 | Verified: 29 build volumes from the makers' sites, in [`printer-beds.md`](printer-beds.md) |
 | `params-basic` | #5 | The basic parameter panel: opening size, maximum piece size, per-axis modes, thickness | P0 | S | `layout` | Q10, Q11 | |
 | `plain-panel` | #6 | A plain sealed piece of any size and thickness | P0 | S | `page-skeleton` | Q8 | |
 | `download-zip` | #7 | Download every piece in one zip, named by grid position | P0 | S | `plain-panel` | Q24 | STL or 3MF: Manifold's own README advises 3MF over STL (relayed) |

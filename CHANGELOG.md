@@ -25,3 +25,6 @@ complete. Until then every change is listed under Unreleased.
 - Dividing the opening into a grid of pieces (`web/src/layout.ts`): all equal, or full-size
   pieces plus one filler at the start, the end, the middle, or split for symmetry, chosen per
   axis; pieces under the minimum are reported, not refused.
+- A default maximum piece size of 200 × 200 mm, plus a custom size
+  (`web/src/printer.ts`), backed by the build volumes of 29 printers read from their makers'
+  sites ([`docs/printer-beds.md`](docs/printer-beds.md)).
