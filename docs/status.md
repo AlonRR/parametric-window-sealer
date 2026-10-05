@@ -137,6 +137,10 @@ is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | Q116 | A listed printer's bed is used **whichever way round needs fewer pieces**, as a piece can be turned on the bed; on a tie, as listed (the bed's X along the wall's width) | 5 Oct 2026 |
 | Q117 | The largest piece is **the bed less a margin, a setting under Advanced starting at 10 mm** each way, as the 200 mm default leaves at least 10 mm (Q38). It applies to a listed printer; "Custom" stays the piece size itself | 5 Oct 2026 |
 | Q118 | Downloads keep **the time they are made** inside their ZIP and 3MF files, so the same wall downloaded twice differs only there; no fixed time | 5 Oct 2026 |
+| Q119 | Tape goes on **the edge strips' outer face** by default: the face against the track's floor, the closed sash or the sill. **Under Advanced** it can also go on the edge strips' sides, along the joints between pieces, and around the hose port | 5 Oct 2026 |
+| Q120 | The tape sits **in a groove**: the tape's width, and part of its thickness deep, so it sits where it should and stands proud by the rest | 5 Oct 2026 |
+| Q121 | The tape's width and thickness are settings whose **starting values come from makers' own listings**, sourced, for the owner to approve (as with the hose sizes, Q103) | 5 Oct 2026 |
+| Q122 | The page offers **a seal choice starting at none**: None or Tape, with printed TPU joining it when `seal-tpu` (#22) is built (Q6) | 5 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
 | Q32 | The **hosted web API is parked** (`api-hosted`, #48, moved to P3): "I don't have the funding to run a server" | 5 Oct 2026 |
@@ -151,7 +155,8 @@ The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-None at the moment.
+- **Q121 (the list).** Which tape sizes to start from: being sourced from makers' own listings, to
+  bring to the owner for approval before they go in.
 
 ## Repository follow-ups
 
