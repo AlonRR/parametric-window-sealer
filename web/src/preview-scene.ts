@@ -1,7 +1,8 @@
 // The preview's scene (backlog item preview-3d, #9), with three.js (Q49). It draws the same
 // pieces the user downloads, built by the same code, each at its place in the wall, with a
 // thin outline so the joints between pieces show. The strips and cross pieces
-// (connector-strip, #10) are drawn in place around the panels, in a darker grey.
+// (connector-strip, #10) and the edge strips (track-edge, #11) are drawn in place around
+// the panels, in a darker grey.
 //
 // Measured in spikes/viewer-benchmark/: what slows a preview is the number of triangles,
 // not the library. Plain pieces have 12 each; when patterns arrive, drawing them in full
@@ -21,13 +22,14 @@ import type { Material } from 'three';
 import type { Manifold } from 'manifold-3d';
 import type { Engine } from './engine';
 import { meshOf } from './export';
-import { planJoints, stripWidthMm } from './joint';
+import { edgeStripSolid } from './edge-geometry';
+import { stripWidthMm } from './joint';
 import { crossSolid, stripSolid } from './joint-geometry';
 import { buildPieces } from './panel-geometry';
-import { planWall } from './params';
+import { planParts } from './params';
 import type { Params } from './params';
 
-export type PartKind = 'piece' | 'strip' | 'cross';
+export type PartKind = 'piece' | 'strip' | 'cross' | 'edge';
 
 // Shared by every wall; never disposed, since every wall uses them.
 const PANEL = new MeshPhongMaterial({ color: 0x9aa7b5, shininess: 20 });
@@ -55,7 +57,7 @@ function add(wall: Group, solid: Manifold, kind: PartKind, x: number, y: number,
 }
 
 export function buildWallScene(engine: Engine, params: Params): Group {
-  const plan = planWall(params);
+  const { plan, joints, edges } = planParts(params);
   const { joint, thicknessMm } = params;
   const wall = new Group();
   const built = buildPieces(engine, plan, thicknessMm);
@@ -70,7 +72,6 @@ export function buildWallScene(engine: Engine, params: Params): Group {
     throw error;
   }
   try {
-    const joints = planJoints(plan, joint);
     for (const s of joints.strips) {
       const pose = s.axis === 'vertical' ? 'wall-vertical' : 'wall-horizontal';
       add(wall, stripSolid(engine, s.lengthMm, joint, thicknessMm, pose), 'strip', s.xMm, s.yMm, JOINT);
@@ -78,6 +79,10 @@ export function buildWallScene(engine: Engine, params: Params): Group {
     const half = stripWidthMm(joint) / 2;
     for (const c of joints.crosses) {
       add(wall, crossSolid(engine, joint, thicknessMm, 'wall'), 'cross', c.xMm - half, c.yMm - half, JOINT);
+    }
+    for (const e of edges) {
+      const solid = edgeStripSolid(engine, e.lengthMm, e, joint, thicknessMm, e.edge);
+      add(wall, solid, 'edge', e.xMm, e.yMm, JOINT);
     }
   } catch (error) {
     disposeWall(wall);

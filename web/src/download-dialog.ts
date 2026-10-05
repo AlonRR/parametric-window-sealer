@@ -13,10 +13,12 @@ import type {
   Packaging,
 } from './export';
 import type { Engine } from './engine';
-import { partShapes, planJoints } from './joint';
+import { edgeShapes } from './edge';
+import { edgeStripSolid } from './edge-geometry';
+import { partShapes } from './joint';
 import { crossSolid, stripSolid } from './joint-geometry';
 import { buildPieces } from './panel-geometry';
-import { planWall } from './params';
+import { planParts, planWall } from './params';
 import type { Params } from './params';
 
 export const STORAGE_KEY = 'parametric-window-sealer.download-choice.v1';
@@ -65,8 +67,8 @@ function saveChoice(choice: DownloadChoice): void {
   }
 }
 
-// Every piece in its cell, and one strip or cross piece per shape, standing on its
-// flanges as it prints (Q53, Q58).
+// Every piece in its cell, and one strip, cross piece or edge strip per shape, lying as it
+// prints (Q53, Q58).
 export function buildExport(
   engine: Engine,
   params: Params,
@@ -84,11 +86,15 @@ export function buildExport(
     for (const b of built) b.solid.delete();
   }
   const { joint, thicknessMm } = params;
-  const parts = partShapes(planJoints(plan, joint), joint).map((shape) => {
+  const { joints, edges } = planParts(params, plan);
+  const shapes = [...partShapes(joints, joint), ...edgeShapes(edges)];
+  const parts = shapes.map((shape) => {
     const solid =
-      shape.kind === 'strip'
-        ? stripSolid(engine, shape.lengthMm, joint, thicknessMm, 'print')
-        : crossSolid(engine, joint, thicknessMm, 'print');
+      shape.kind === 'edge'
+        ? edgeStripSolid(engine, shape.lengthMm, shape, joint, thicknessMm, 'print')
+        : shape.kind === 'strip'
+          ? stripSolid(engine, shape.lengthMm, joint, thicknessMm, 'print')
+          : crossSolid(engine, joint, thicknessMm, 'print');
     try {
       return { name: partName(shape), mesh: meshOf(solid), count: shape.count };
     } finally {

@@ -60,26 +60,31 @@ test('STL in one zip: an STL for each of the 15 pieces and each strip shape', as
   ]);
   expect(download.suggestedFilename()).toBe('window-sealer-600x1000-stl.zip');
   const names = Object.keys(unzipSync(await readFile((await download.path()) ?? '')));
-  expect(names).toHaveLength(15 + 5);
-  expect(names).toContain('piece-c3-r5-196.7x196.stl');
-  expect(names).toContain('strip-188.7x18-print-8.stl');
+  expect(names).toHaveLength(15 + 6);
+  expect(names).toContain('piece-c3-r5-197.7x198.6.stl');
+  expect(names).toContain('strip-182.6x18-print-10.stl');
   expect(names).toContain('cross-18x18-print-8.stl');
+  expect(names).toContain('edge-200x15x10-print-5.stl');
   await expect(dialog).not.toBeVisible();
 });
 
 test('STL as separate files: one download per piece and per strip shape', async ({ page }) => {
-  await page.getByLabel('Opening width (mm)').fill('400');
-  await page.getByLabel('Opening height (mm)').fill('200');
+  // 400 x 200 mm of pieces with the edges: two pieces, one strip, three edge strip shapes.
+  await page.getByLabel('Opening width (mm)').fill('397');
+  await page.getByLabel('Opening height (mm)').fill('187');
   const seen = downloads(page);
   const dialog = await openDialog(page);
   await dialog.getByRole('radio', { name: 'STL', exact: true }).check();
   await dialog.getByRole('radio', { name: 'Separate files: one per piece' }).check();
   await dialog.getByRole('button', { name: 'Download', exact: true }).click();
-  await expect.poll(() => seen.length).toBe(3);
+  await expect.poll(() => seen.length).toBe(6);
   expect(seen.map((d) => d.suggestedFilename()).sort()).toEqual([
+    'edge-135.7x14x10-print-6.stl',
+    'edge-187x14x10-print-1.stl',
+    'edge-187x15x10-print-1.stl',
     'piece-c1-r1-197.5x200.stl',
     'piece-c2-r1-197.5x200.stl',
-    'strip-200x18-print-1.stl',
+    'strip-184x18-print-1.stl',
   ]);
 });
 
@@ -95,8 +100,8 @@ test('3MF in one file holding every piece, strip shape and cross piece', async (
   const files = unzipSync(await readFile((await download.path()) ?? ''));
   expect(Object.keys(files).sort()).toEqual(['3D/3dModel.model', '[Content_Types].xml', '_rels/.rels']);
   const model = strFromU8(files['3D/3dModel.model'] ?? new Uint8Array());
-  expect([...model.matchAll(/<object /g)]).toHaveLength(15 + 5);
-  expect([...model.matchAll(/<item /g)]).toHaveLength(15 + 22 + 8);
+  expect([...model.matchAll(/<object /g)]).toHaveLength(15 + 6);
+  expect([...model.matchAll(/<item /g)]).toHaveLength(15 + 22 + 8 + 18);
   expect(model).toContain('name="cross-18x18-print-8"');
 });
 

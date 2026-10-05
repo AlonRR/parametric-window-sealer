@@ -37,10 +37,11 @@ test.beforeEach(async ({ page }) => {
   await expect(preview(page)).toHaveAttribute('data-state', 'ready', { timeout: 30_000 });
 });
 
-test('draws the example wall: 15 pieces, 22 strips and 8 cross pieces', async ({ page }) => {
+test('draws the example wall: 15 pieces, 22 strips, 8 cross pieces and 18 edge strips', async ({ page }) => {
   await expect(preview(page)).toHaveAttribute('data-pieces', '15');
   await expect(preview(page)).toHaveAttribute('data-strips', '22');
   await expect(preview(page)).toHaveAttribute('data-crosses', '8');
+  await expect(preview(page)).toHaveAttribute('data-edges', '18');
   expect(await drawnShare(page)).toBeGreaterThan(0.05);
 });
 
@@ -78,8 +79,8 @@ test('redrawing frees the old pieces: graphics memory holds only the current wal
     await width.fill(value);
     await expect(preview(page)).toHaveAttribute('data-pieces', pieces);
   }
-  // 15 pieces, 22 strips and 8 cross pieces, each a solid and an outline.
-  await expect(preview(page)).toHaveAttribute('data-geometries', String(2 * (15 + 22 + 8)));
+  // 15 pieces, 22 strips, 8 cross pieces and 18 edge strips, each a solid and an outline.
+  await expect(preview(page)).toHaveAttribute('data-geometries', String(2 * (15 + 22 + 8 + 18)));
 });
 
 test('turns when dragged', async ({ page }) => {

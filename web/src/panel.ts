@@ -4,6 +4,8 @@
 
 import { EXAMPLE_PARAMS, describePlan, planWall, readParams, toFormValues } from './params';
 import type { FieldName, FormValues, LeftoverText, Params } from './params';
+import { EDGES, WINDOW_PRESETS } from './edge';
+import type { WindowType } from './edge';
 import { DEFAULT_MAX_PIECE } from './printer';
 
 const FIELDS: readonly FieldName[] = [
@@ -24,6 +26,17 @@ const FIELDS: readonly FieldName[] = [
   'webMm',
   'flangeMm',
   'fitMm',
+  'window',
+  'topEdge',
+  'bottomEdge',
+  'leftEdge',
+  'rightEdge',
+  'trackWidthMm',
+  'topDepthMm',
+  'bottomDepthMm',
+  'leftDepthMm',
+  'rightDepthMm',
+  'trackClearanceMm',
 ];
 
 type Control = HTMLInputElement | HTMLSelectElement | RadioNodeList;
@@ -107,6 +120,11 @@ export function mountPanel(
         filler.disabled = values[`${axis}Mode`] !== 'full-plus-filler';
       }
     }
+    // A track's depth applies only to an edge in a track.
+    for (const edge of EDGES) {
+      const depth = control(form, `${edge}DepthMm`);
+      if (depth instanceof HTMLInputElement) depth.disabled = values[`${edge}Edge`] !== 'track';
+    }
 
     const result = readParams(values);
     onChange(result.ok ? result.params : null);
@@ -130,14 +148,18 @@ export function mountPanel(
     warnings?.replaceChildren();
     if (!result.ok) {
       setText(plan, 'plan-headline', 'Fix the marked fields to see the plan.');
-      for (const id of ['plan-columns', 'plan-rows', 'plan-joints']) setText(plan, id, '');
+      for (const id of ['plan-columns', 'plan-rows', 'plan-span', 'plan-joints', 'plan-edges']) {
+        setText(plan, id, '');
+      }
       return;
     }
     const text = describePlan(planWall(result.params), result.params);
     setText(plan, 'plan-headline', text.headline);
     setText(plan, 'plan-columns', text.columns);
     setText(plan, 'plan-rows', text.rows);
+    setText(plan, 'plan-span', text.span);
     setText(plan, 'plan-joints', text.joints);
+    setText(plan, 'plan-edges', text.edges);
     for (const leftover of text.leftovers) {
       const hidden = control(form, `${leftover.axis}Leftover`);
       warnings?.append(
@@ -155,6 +177,18 @@ export function mountPanel(
     if (focused) warnings?.querySelector<HTMLInputElement>(focused)?.focus();
   };
 
+  // Choosing a window type presets each edge's role (Q66); the user can change any after.
+  const windowType = control(form, 'window');
+  if (windowType instanceof HTMLSelectElement) {
+    windowType.addEventListener('change', () => {
+      const roles = WINDOW_PRESETS[windowType.value as WindowType];
+      if (!roles) return;
+      for (const edge of EDGES) {
+        const role = control(form, `${edge}Edge`);
+        if (role instanceof HTMLSelectElement) role.value = roles[edge];
+      }
+    });
+  }
   form.addEventListener('input', update);
   form.addEventListener('change', update);
   update();

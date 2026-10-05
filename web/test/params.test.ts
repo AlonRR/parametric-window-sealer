@@ -3,7 +3,9 @@
 // the user will get. Defaults: Q39 (3 mm), Q40 (30 mm placeholder minimum), Q41 (all
 // equal), Q42 (a 600 x 1000 mm example opening), Q51 (the joint's starting dimensions).
 // With connector-strip (#10) each joint takes 5 mm (Q56), and full pieces that leave less
-// than a joint warn with a choice of resolutions (Q60 to Q64).
+// than a joint warn with a choice of resolutions (Q60 to Q64). With track-edge (#11) the
+// pieces span the opening plus each edge's reach: on the example slider 6.5 mm into each
+// of three tracks and 3.5 mm short of the sash, so 603 x 1013 mm (Q66, Q67, Q75).
 import { describe, expect, it } from 'vitest';
 import {
   EXAMPLE_PARAMS,
@@ -14,6 +16,7 @@ import {
   toFormValues,
 } from '../src/params';
 import type { FormValues } from '../src/params';
+import { EXAMPLE_TRACK, WINDOW_PRESETS } from '../src/edge';
 import { DEFAULT_JOINT } from '../src/joint';
 
 const example = toFormValues(EXAMPLE_PARAMS);
@@ -29,6 +32,7 @@ describe('the starting values', () => {
       height: { mode: 'equal', filler: 'end', leftover: 'spread' },
       thicknessMm: 3,
       joint: DEFAULT_JOINT,
+      edges: { window: 'slider', roles: WINDOW_PRESETS.slider, track: EXAMPLE_TRACK },
     });
     expect(PLACEHOLDER_MIN_PIECE_MM).toBe(30);
   });
@@ -128,6 +132,50 @@ describe('readParams', () => {
     }
   });
 
+  it('reads the window, each edge’s role and the tracks (Q66, Q67)', () => {
+    const r = read({
+      window: 'hung',
+      topEdge: 'sash',
+      bottomEdge: 'track',
+      leftEdge: 'track',
+      rightEdge: 'sill',
+      trackWidthMm: '18',
+      bottomDepthMm: '6',
+      leftDepthMm: '12.5',
+      trackClearanceMm: '0',
+    });
+    expect(r.ok && r.params.edges).toEqual({
+      window: 'hung',
+      roles: { top: 'sash', bottom: 'track', left: 'track', right: 'sill' },
+      track: { widthMm: 18, clearanceMm: 0, depthMm: { top: 10, bottom: 6, left: 12.5, right: 10 } },
+    });
+  });
+
+  it('checks a track depth only where the edge is in a track', () => {
+    expect(read({ rightDepthMm: 'deep' }).ok).toBe(true); // the right edge meets the sash
+    const r = read({ leftDepthMm: 'deep' });
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(Object.keys(r.errors)).toEqual(['leftDepthMm']);
+  });
+
+  it('refuses a role or window not on the list', () => {
+    const r = read({ window: 'casement', topEdge: 'glued' });
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(Object.keys(r.errors).sort()).toEqual(['topEdge', 'window']);
+  });
+
+  it('refuses a track too narrow for an edge strip with walls as thick as the flanges', () => {
+    // 3 mm panel + 2 x 0.2 fit + 2 x 1.6 walls + 2 x 0.5 clearance = 7.6 mm.
+    expect(read({ trackWidthMm: '7.6' }).ok).toBe(true);
+    const r = read({ trackWidthMm: '7.5' });
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errors).toEqual({
+        trackWidthMm: 'Make it at least 7.6 mm: an edge strip needs walls as thick as the flanges.',
+      });
+    }
+  });
+
   it('reads the leftover choice per axis, and refuses one not on the list', () => {
     const r = read({ widthLeftover: 'shorten', heightLeftover: 'equal' });
     expect(r.ok && [r.params.width.leftover, r.params.height.leftover]).toEqual([
@@ -147,37 +195,51 @@ describe('readParams', () => {
 });
 
 describe('planWall', () => {
-  it('the example: 600 x 1000 mm at 200 x 200 mm, all equal, with 5 mm joints', () => {
+  it('the example: 603 x 1013 mm of pieces and joints, 3 across and 5 up', () => {
     const plan = planWall(EXAMPLE_PARAMS);
-    expect(plan.columns).toEqual([590 / 3, 590 / 3, 590 / 3]);
-    expect(plan.rows).toEqual([196, 196, 196, 196, 196]);
+    expect(plan.columns).toEqual([593 / 3, 593 / 3, 593 / 3]);
+    expect(plan.rows).toEqual([198.6, 198.6, 198.6, 198.6, 198.6]);
     expect(plan.columnJointsMm).toEqual([5, 5]);
     expect(plan.pieces).toHaveLength(15);
     expect(plan.warnings).toEqual([]);
+    const last = plan.pieces.at(-1);
+    expect((last?.xMm ?? 0) + (last?.widthMm ?? 0)).toBeCloseTo(603, 9);
+    expect((last?.yMm ?? 0) + (last?.heightMm ?? 0)).toBeCloseTo(1013, 9);
+  });
+
+  it('a hung window: into both side tracks, short of the sash and the sill', () => {
+    const plan = planWall({
+      ...EXAMPLE_PARAMS,
+      edges: { ...EXAMPLE_PARAMS.edges, window: 'hung', roles: WINDOW_PRESETS.hung },
+    });
+    const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
+    expect(sum(plan.columns) + sum(plan.columnJointsMm)).toBeCloseTo(613, 9);
+    expect(sum(plan.rows) + sum(plan.rowJointsMm)).toBeCloseTo(993, 9);
   });
 
   it('uses the custom size and the placeholder minimum', () => {
     const plan = planWall({
       ...EXAMPLE_PARAMS,
-      openingWidthMm: 640,
+      openingWidthMm: 637, // 640 mm with the edges
       width: { mode: 'full-plus-filler', filler: 'end', leftover: 'spread' },
       printer: { kind: 'custom', widthMm: 200, heightMm: 250 },
     });
     expect(plan.columns).toEqual([200, 200, 200, 25]);
-    expect(plan.rows).toEqual([246.25, 246.25, 246.25, 246.25]);
+    expect(plan.rows).toEqual([249.5, 249.5, 249.5, 249.5]);
     expect(plan.warnings).toEqual([{ axis: 'width', index: 3, lengthMm: 25, minPieceMm: 30 }]);
   });
 
   it('the joint sets the width between pieces: no slide leaves just the web', () => {
+    // No slide: the pieces sit 8 mm into the tracks and 2 mm short of the sash.
     const plan = planWall({ ...EXAMPLE_PARAMS, joint: { ...DEFAULT_JOINT, slideMm: 0 } });
-    expect(plan.columnJointsMm).toEqual([2, 2]);
-    expect(plan.columns[0]).toBeCloseTo(596 / 3, 9);
+    expect(plan.columnJointsMm).toEqual([2, 2, 2]);
+    expect(plan.columns).toEqual([150, 150, 150, 150]);
   });
 
   it('passes each axis its leftover choice (Q60)', () => {
     const plan = planWall({
       ...EXAMPLE_PARAMS,
-      openingWidthMm: 612,
+      openingWidthMm: 609, // 612 mm with the edges
       width: { mode: 'full-plus-filler', filler: 'end', leftover: 'equal' },
     });
     expect(plan.columns).toEqual([149.25, 149.25, 149.25, 149.25]);
@@ -193,12 +255,14 @@ describe('describePlan', () => {
   });
   const describe_ = (p: typeof EXAMPLE_PARAMS) => describePlan(planWall(p), p);
 
-  it('summarises the example, joints included', () => {
+  it('summarises the example, joints and edges included', () => {
     expect(describe_(EXAMPLE_PARAMS)).toEqual({
       headline: '15 pieces: 3 across, 5 up, 3 mm thick',
-      columns: 'Widths: 196.7, 196.7, 196.7 mm',
-      rows: 'Heights: 196, 196, 196, 196, 196 mm',
-      joints: 'Joints: 22 strips in 4 lengths, and 8 cross pieces; each joint 5 mm wide.',
+      columns: 'Widths: 197.7, 197.7, 197.7 mm',
+      rows: 'Heights: 198.6, 198.6, 198.6, 198.6, 198.6 mm',
+      span: 'Pieces and joints: 603 × 1013 mm, for a 600 × 1000 mm opening.',
+      joints: 'Joints: 22 strips in 2 lengths, and 8 cross pieces; each joint 5 mm wide.',
+      edges: 'Edges: 18 edge strips in 3 shapes.',
       warnings: [],
       leftovers: [],
     });
@@ -206,27 +270,28 @@ describe('describePlan', () => {
 
   it('rounds to 0.1 mm and uses the singular for one', () => {
     const row = describe_({ ...EXAMPLE_PARAMS, openingWidthMm: 1000, openingHeightMm: 150 });
-    expect(row.columns).toBe('Widths: 196, 196, 196, 196, 196 mm');
+    expect(row.columns).toBe('Widths: 196.6, 196.6, 196.6, 196.6, 196.6 mm');
     expect(row.joints).toBe('Joints: 4 strips in 1 length; each joint 5 mm wide.');
     const one = describe_({ ...EXAMPLE_PARAMS, openingWidthMm: 100, openingHeightMm: 150 });
     expect(one.headline).toBe('1 piece: 1 across, 1 up, 3 mm thick');
     expect(one.joints).toBe('No joints: the wall is one piece.');
+    expect(one.edges).toBe('Edges: 4 edge strips in 3 shapes.');
     expect(describe_({ ...EXAMPLE_PARAMS, openingWidthMm: 700 }).columns).toBe(
-      'Widths: 171.3, 171.3, 171.3, 171.3 mm',
+      'Widths: 172, 172, 172, 172 mm',
     );
     expect(describe_({ ...EXAMPLE_PARAMS, openingWidthMm: 500 }).columns).toBe(
-      'Widths: 163.3, 163.3, 163.3 mm',
+      'Widths: 164.3, 164.3, 164.3 mm',
     );
   });
 
   it('words each small-piece warning with its position and the placeholder', () => {
-    expect(describe_(fillerWidth(640)).warnings).toEqual([
+    expect(describe_(fillerWidth(637)).warnings).toEqual([
       'Column 4 is 25 mm wide, under the 30 mm minimum (a placeholder for now).',
     ]);
   });
 
   it('offers the three resolutions when full pieces leave too little (Q60 to Q64)', () => {
-    expect(describe_(fillerWidth(612)).leftovers).toEqual([
+    expect(describe_(fillerWidth(609)).leftovers).toEqual([
       {
         axis: 'width',
         message: 'Width: 3 full 200 mm pieces leave 2 mm, too little for another joint and a filler.',
@@ -249,7 +314,7 @@ describe('describePlan', () => {
   });
 
   it('says why spreading cannot work, and uses equal pieces instead (Q63)', () => {
-    const [none] = describe_(fillerWidth(203)).leftovers;
+    const [none] = describe_(fillerWidth(200)).leftovers;
     expect(none?.message).toBe(
       'Width: 1 full 200 mm piece leaves 3 mm, too little for another joint and a filler.',
     );
@@ -259,7 +324,7 @@ describe('describePlan', () => {
       ['Equal pieces: 2 of 99 mm', true],
       ['Shorten one full piece: 168 and 30 mm', true],
     ]);
-    const [far] = describe_(fillerWidth(409)).leftovers;
+    const [far] = describe_(fillerWidth(406)).leftovers;
     expect(far?.options[0]).toEqual({
       value: 'spread',
       label: 'Spread the pieces: each joint would spread 4 mm, more than the 3 mm it can',
@@ -270,7 +335,7 @@ describe('describePlan', () => {
   it('names the height axis for a leftover in the rows', () => {
     const [rows] = describe_({
       ...EXAMPLE_PARAMS,
-      openingHeightMm: 612,
+      openingHeightMm: 599, // 612 mm with the edges
       height: { mode: 'full-plus-filler', filler: 'end', leftover: 'spread' },
     }).leftovers;
     expect(rows?.axis).toBe('height');

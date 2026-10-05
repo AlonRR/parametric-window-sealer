@@ -2,8 +2,9 @@
 // Q47): STL, one file per piece, separate or in one zip; or 3MF, every piece in one file,
 // or one file per piece, separate or zipped. Whatever is generated is the user's (Q36).
 //
-// The strips and cross pieces (connector-strip, #10) come as one file per shape, named with
-// how many to print; the single 3MF holds every copy (Q58).
+// The strips and cross pieces (connector-strip, #10) and the edge strips (track-edge, #11)
+// come as one file per shape, named with how many to print; the single 3MF holds every
+// copy (Q58).
 //
 // STL is written as binary STL. 3MF follows the 3MF Core Specification: an OPC (zip)
 // package holding [Content_Types].xml, _rels/.rels and the model at /3D/3dModel.model,
@@ -12,6 +13,7 @@
 
 import { strToU8, zipSync } from 'fflate';
 import type { Manifold } from 'manifold-3d';
+import type { EdgeShape } from './edge';
 import type { PartShape } from './joint';
 import type { GridPiece } from './layout';
 
@@ -65,11 +67,13 @@ export function pieceFileName(
   return `piece-c${cell.column + 1}-r${cell.row + 1}-${mm(cell.widthMm)}x${mm(cell.heightMm)}.${extension}`;
 }
 
-export function partName(shape: PartShape): string {
-  return `${shape.kind}-${mm(shape.lengthMm)}x${mm(shape.widthMm)}-print-${shape.count}`;
+// An edge strip's height depends on its track, so it is part of the name.
+export function partName(shape: PartShape | EdgeShape): string {
+  const height = shape.kind === 'edge' ? `x${mm(shape.heightMm)}` : '';
+  return `${shape.kind}-${mm(shape.lengthMm)}x${mm(shape.widthMm)}${height}-print-${shape.count}`;
 }
 
-export function partFileName(shape: PartShape, extension: Format): string {
+export function partFileName(shape: PartShape | EdgeShape, extension: Format): string {
   return `${partName(shape)}.${extension}`;
 }
 

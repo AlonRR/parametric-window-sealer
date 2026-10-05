@@ -104,7 +104,10 @@
       <form id="params" novalidate>
         <fieldset>
           <legend>The opening</legend>
-          <p class="note">Example sizes: measure your own window and enter them here.</p>
+          <p class="note">
+            Example sizes: measure the opening you can see in your own window. Enter the depth of
+            its tracks under The window.
+          </p>
           <label>
             Opening width (mm)
             <input name="openingWidthMm" inputmode="decimal" autocomplete="off" />
@@ -115,6 +118,80 @@
             <input name="openingHeightMm" inputmode="decimal" autocomplete="off" />
           </label>
           <span class="error" data-testid="error-openingHeightMm"></span>
+        </fieldset>
+
+        <fieldset>
+          <legend>The window</legend>
+          <label>
+            Window type
+            <select name="window">
+              <option value="slider">Horizontal slider</option>
+              <option value="hung">Single- or double-hung</option>
+            </select>
+          </label>
+          <p class="note">
+            Sets what each edge of the wall does. Change any edge below if your window differs.
+            Each edge gets an edge strip: in a track it fills the track; against the sash or on a
+            sill it gives a flat face.
+          </p>
+          <label>
+            Top edge
+            <select name="topEdge">
+              <option value="track">In a track</option>
+              <option value="sash">Pressed by the sash</option>
+              <option value="sill">On a flat sill</option>
+            </select>
+          </label>
+          <label>
+            Top track depth (mm)
+            <input name="topDepthMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <span class="error" data-testid="error-topDepthMm"></span>
+          <label>
+            Bottom edge
+            <select name="bottomEdge">
+              <option value="track">In a track</option>
+              <option value="sash">Pressed by the sash</option>
+              <option value="sill">On a flat sill</option>
+            </select>
+          </label>
+          <label>
+            Bottom track depth (mm)
+            <input name="bottomDepthMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <span class="error" data-testid="error-bottomDepthMm"></span>
+          <label>
+            Left edge
+            <select name="leftEdge">
+              <option value="track">In a track</option>
+              <option value="sash">Pressed by the sash</option>
+              <option value="sill">On a flat sill</option>
+            </select>
+          </label>
+          <label>
+            Left track depth (mm)
+            <input name="leftDepthMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <span class="error" data-testid="error-leftDepthMm"></span>
+          <label>
+            Right edge
+            <select name="rightEdge">
+              <option value="track">In a track</option>
+              <option value="sash">Pressed by the sash</option>
+              <option value="sill">On a flat sill</option>
+            </select>
+          </label>
+          <label>
+            Right track depth (mm)
+            <input name="rightDepthMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <span class="error" data-testid="error-rightDepthMm"></span>
+          <label>
+            Track width (mm)
+            <input name="trackWidthMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">Example sizes: measure your own tracks. Every edge strip is this wide.</p>
+          <span class="error" data-testid="error-trackWidthMm"></span>
         </fieldset>
 
         <fieldset>
@@ -229,6 +306,18 @@
           <span class="error" data-testid="error-fitMm"></span>
         </details>
 
+        <details>
+          <summary>Advanced: the edge strips</summary>
+          <label>
+            Clearance in the track (mm per side)
+            <input name="trackClearanceMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">
+            How much narrower than the track an edge strip is on each side, so it slides in.
+          </p>
+          <span class="error" data-testid="error-trackClearanceMm"></span>
+        </details>
+
         <!-- What to do when full pieces leave less room than a joint takes (Q60): set
           from the choice shown in the plan's warning. -->
         <input type="hidden" name="widthLeftover" />
@@ -243,7 +332,9 @@
         <p data-testid="plan-headline"></p>
         <p data-testid="plan-columns"></p>
         <p data-testid="plan-rows"></p>
+        <p data-testid="plan-span"></p>
         <p data-testid="plan-joints"></p>
+        <p data-testid="plan-edges"></p>
         <ul data-testid="plan-warnings"></ul>
         <p><button type="button" id="download-open">Download the pieces...</button></p>
       </section>

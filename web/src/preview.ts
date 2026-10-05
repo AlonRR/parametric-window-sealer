@@ -65,7 +65,7 @@ export function mountPreview(container: HTMLElement, getEngine: () => Promise<En
   let wall: Group | null = null;
 
   // After each frame, how many geometries the graphics card holds: it must stay at two per
-  // piece, strip and cross piece however often the wall is redrawn, or editing would leak
+  // piece, strip, cross piece and edge strip however often the wall is redrawn, or editing would leak
   // memory (browser-tested).
   const draw = () => {
     renderer.render(scene, camera);
@@ -110,6 +110,7 @@ export function mountPreview(container: HTMLElement, getEngine: () => Promise<En
       container.dataset.pieces = '0';
       container.dataset.strips = '0';
       container.dataset.crosses = '0';
+      container.dataset.edges = '0';
       container.dataset.state = 'waiting';
       say('Fix the marked fields to see the preview.');
       draw();
@@ -126,6 +127,7 @@ export function mountPreview(container: HTMLElement, getEngine: () => Promise<En
     container.dataset.pieces = String(countOf(wall, 'piece'));
     container.dataset.strips = String(countOf(wall, 'strip'));
     container.dataset.crosses = String(countOf(wall, 'cross'));
+    container.dataset.edges = String(countOf(wall, 'edge'));
     container.dataset.state = 'ready';
     say('Drag to turn the wall; scroll or pinch to zoom.');
     draw();

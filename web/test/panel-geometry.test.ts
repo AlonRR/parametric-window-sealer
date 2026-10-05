@@ -46,9 +46,10 @@ describe('buildPieces', () => {
         expect(max[1]).toBeCloseTo(cell?.heightMm ?? Number.NaN, 9);
         expect(max[2]).toBeCloseTo(3, 9);
       }
-      // The pieces fill the opening less the 5 mm joints: 2 across, 4 up (Q56).
+      // The pieces fill the opening plus the edges' reach, 503 x 1013 mm on the example
+      // slider (track-edge, #11), less the 5 mm joints: 2 across, 4 up (Q56).
       const total = pieces.reduce((sum, p) => sum + p.solid.volume(), 0);
-      expect(total).toBeCloseTo((500 - 2 * 5) * (1000 - 4 * 5) * 3, 3);
+      expect(total).toBeCloseTo((503 - 2 * 5) * (1013 - 4 * 5) * 3, 3);
     } finally {
       for (const p of pieces) p.solid.delete();
     }

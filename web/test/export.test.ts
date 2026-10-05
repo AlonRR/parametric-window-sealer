@@ -55,12 +55,18 @@ function readModel(xml: string) {
   );
 }
 
+// widthMm x heightMm is what the pieces and joints span. On the example slider the edges
+// add 3 mm across and 13 mm up to the opening (track-edge, #11), so the opening is less.
 async function exampleDownload(
   widthMm = 400,
   heightMm = 200,
 ): Promise<{ pieces: ExportPiece[]; parts: ExportPart[] }> {
   const engine = await loadEngine();
-  return buildExport(engine, { ...EXAMPLE_PARAMS, openingWidthMm: widthMm, openingHeightMm: heightMm });
+  return buildExport(engine, {
+    ...EXAMPLE_PARAMS,
+    openingWidthMm: widthMm - 3,
+    openingHeightMm: heightMm - 13,
+  });
 }
 
 const examplePieces = async (widthMm = 400, heightMm = 200) =>
@@ -83,6 +89,9 @@ describe('names', () => {
     expect(partFileName({ kind: 'cross', lengthMm: 18, widthMm: 18, count: 1 }, '3mf')).toBe(
       'cross-18x18-print-1.3mf',
     );
+    expect(
+      partFileName({ kind: 'edge', lengthMm: 152.5, widthMm: 14, heightMm: 10, count: 8 }, 'stl'),
+    ).toBe('edge-152.5x14x10-print-8.stl');
   });
 
   it('names the wall by the opening', () => {
@@ -187,15 +196,16 @@ describe('3MF', () => {
     ]);
   });
 
-  it('holds every copy of every strip and cross piece, below the wall, none overlapping', async () => {
+  it('holds every copy of every strip, cross piece and edge strip, below the wall, none overlapping', async () => {
     const engine = await loadEngine();
     const { pieces, parts } = await exampleDownload(600, 1000);
     expect(parts.map((p) => [p.name, p.count])).toEqual([
-      ['strip-188.7x18-print-8', 8],
-      ['strip-188x18-print-4', 4],
-      ['strip-180.7x18-print-4', 4],
-      ['strip-180x18-print-6', 6],
+      ['strip-180.7x18-print-12', 12],
+      ['strip-180x18-print-10', 10],
       ['cross-18x18-print-8', 8],
+      ['edge-197.4x14x10-print-5', 5],
+      ['edge-197.4x15x10-print-5', 5],
+      ['edge-151.8x14x10-print-8', 8], // 607 mm top and bottom, in four
     ]);
     const model = strFromU8(unzipSync(to3mf(pieces, parts))['3D/3dModel.model'] ?? new Uint8Array());
     const objects = readModel(model);
@@ -206,7 +216,7 @@ describe('3MF', () => {
     const items = [...model.matchAll(/<item objectid="(\d+)" transform="([^"]+)"\/>/g)].map(
       ([, id, t]) => ({ id: Number(id), move: (t ?? '').split(' ').map(Number).slice(9) }),
     );
-    expect(items).toHaveLength(15 + 8 + 4 + 4 + 6 + 8);
+    expect(items).toHaveLength(15 + 12 + 10 + 8 + 5 + 5 + 8);
     // Each copy's box on the plate, from its object's vertices moved by its transform.
     const boxes = items.map(({ id, move }) => {
       const o = objects[id - 1];
@@ -231,7 +241,7 @@ describe('3MF', () => {
     for (const box of boxes.slice(15)) expect(box.y[1]).toBeLessThan(0);
     const strip = objects[15];
     const solid = solidFromTriangles(engine, strip?.positions ?? new Float32Array(), strip?.triangles ?? new Uint32Array());
-    const expected = stripSolid(engine, 188.7, DEFAULT_JOINT, 3, 'print');
+    const expected = stripSolid(engine, 180.7, DEFAULT_JOINT, 3, 'print');
     expect(solid.volume()).toBeCloseTo(expected.volume(), 2);
     solid.delete();
     expected.delete();
@@ -239,17 +249,22 @@ describe('3MF', () => {
 });
 
 describe('packageDownload', () => {
-  // 400 x 200 mm: two 197.5 mm pieces side by side, and one strip the full 200 mm height.
+  // 400 x 200 mm: two 197.5 mm pieces side by side, one strip 8 mm short of each edge
+  // strip (Q74), and the edge strips: top and bottom 407 mm in three segments each.
   const names = (files: { name: string }[]) => files.map((f) => f.name);
+  const ALL = [
+    'piece-c1-r1-197.5x200.stl',
+    'piece-c2-r1-197.5x200.stl',
+    'strip-184x18-print-1.stl',
+    'edge-187x14x10-print-1.stl',
+    'edge-187x15x10-print-1.stl',
+    'edge-135.7x14x10-print-6.stl',
+  ];
 
   it('STL, separate: one .stl per piece and one per strip shape', async () => {
     const { pieces, parts } = await exampleDownload();
     const files = packageDownload(pieces, parts, { format: 'stl', packaging: 'separate' }, 400, 200);
-    expect(names(files)).toEqual([
-      'piece-c1-r1-197.5x200.stl',
-      'piece-c2-r1-197.5x200.stl',
-      'strip-200x18-print-1.stl',
-    ]);
+    expect(names(files)).toEqual(ALL);
     expect(files.every((f) => f.type === 'model/stl')).toBe(true);
   });
 
@@ -258,11 +273,7 @@ describe('packageDownload', () => {
     const [zip, ...rest] = packageDownload(pieces, parts, { format: 'stl', packaging: 'zip' }, 400, 200);
     expect(rest).toEqual([]);
     expect(zip?.name).toBe('window-sealer-400x200-stl.zip');
-    expect(Object.keys(unzipSync(zip?.bytes ?? new Uint8Array())).sort()).toEqual([
-      'piece-c1-r1-197.5x200.stl',
-      'piece-c2-r1-197.5x200.stl',
-      'strip-200x18-print-1.stl',
-    ]);
+    expect(Object.keys(unzipSync(zip?.bytes ?? new Uint8Array())).sort()).toEqual([...ALL].sort());
   });
 
   it('3MF, one file: everything in one .3mf', async () => {
@@ -275,20 +286,20 @@ describe('packageDownload', () => {
   it('3MF, one per piece or shape: separate or zipped, one copy in each', async () => {
     const { pieces, parts } = await exampleDownload(600, 1000);
     const separate = packageDownload(pieces, parts, { format: '3mf', packaging: 'separate' }, 600, 1000);
-    expect(separate).toHaveLength(15 + 5);
+    expect(separate).toHaveLength(15 + 6);
     const cross = separate.find((f) => f.name === 'cross-18x18-print-8.3mf');
     const model = strFromU8(unzipSync(cross?.bytes ?? new Uint8Array())['3D/3dModel.model'] ?? new Uint8Array());
     expect([...model.matchAll(/<item /g)]).toHaveLength(1);
     expect(model).toContain('transform="1 0 0 0 1 0 0 0 1 0 0 0"');
     const [zip] = packageDownload(pieces, parts, { format: '3mf', packaging: 'zip' }, 600, 1000);
     expect(zip?.name).toBe('window-sealer-600x1000-3mf.zip');
-    expect(Object.keys(unzipSync(zip?.bytes ?? new Uint8Array()))).toHaveLength(20);
+    expect(Object.keys(unzipSync(zip?.bytes ?? new Uint8Array()))).toHaveLength(21);
   });
 
-  it('a wall of one piece has no strips', async () => {
+  it('a wall of one piece has edge strips but no joint strips', async () => {
     const { pieces, parts } = await exampleDownload(150, 150);
     expect(pieces).toHaveLength(1);
-    expect(parts).toEqual([]);
+    expect(parts.map((p) => p.name.split('-')[0])).toEqual(['edge', 'edge', 'edge']);
   });
 
   it('refuses "one file" for STL, which holds a single object', async () => {

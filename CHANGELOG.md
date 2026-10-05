@@ -54,10 +54,17 @@ complete. Until then every change is listed under Unreleased.
 - When full-size pieces leave less room than a joint takes, the plan says so and offers three
   ways out, one already chosen: spread the pieces a little, use equal pieces, or shorten one
   full piece.
+- The wall's outer edges: an edge strip on every edge that slides onto the panel and fills the
+  window's track, or gives a flat face to the closed sash or a sill. Choose the window type
+  (horizontal slider or single- or double-hung) and each edge is set for you; change any edge
+  that differs. Track width and depth are settings, with example values; the strips sit
+  inside the track, and long ones come in segments that fit your printer.
 
 ### Changed
 
 - Each joint now takes room between the pieces (5 mm with the starting values), so the pieces
   are a little smaller than before for the same opening.
+- The opening is measured as you see it; the pieces now reach into the window's tracks and
+  stop short of the sash, so their sizes change again for the same opening.
 - The code that defines the pieces' shapes is licensed MPL-2.0 like the rest of the code; the
   documentation stays CERN-OHL-S-2.0.

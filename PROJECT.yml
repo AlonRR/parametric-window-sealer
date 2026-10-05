@@ -5,6 +5,6 @@ projects:
   - name:     Parametric window sealer
     kind:     build
     state:    not-designed
-    next:     "build track-edge (#11), the next MVP item in docs/backlog.md"
+    next:     "build min-piece-from-joint (#53), the last MVP item in docs/backlog.md"
     trackers: [docs/status.md, docs/backlog.md]
     review:   2026-10-05
