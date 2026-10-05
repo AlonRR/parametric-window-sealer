@@ -137,6 +137,7 @@ is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | Q116 | A listed printer's bed is used **whichever way round needs fewer pieces**, as a piece can be turned on the bed; on a tie, as listed (the bed's X along the wall's width) | 5 Oct 2026 |
 | Q117 | The largest piece is **the bed less a margin, a setting under Advanced starting at 10 mm** each way, as the 200 mm default leaves at least 10 mm (Q38). It applies to a listed printer; "Custom" stays the piece size itself | 5 Oct 2026 |
 | Q118 | Downloads keep **the time they are made** inside their ZIP and 3MF files, so the same wall downloaded twice differs only there; no fixed time | 5 Oct 2026 |
+| Q123 | **Tags and releases are made by a session on the owner's own machine**, asked by message once the release commit is on `main`, since a cloud session cannot push tags. The session is the one the owner names; its name is not kept in the repo | 5 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
 | Q32 | The **hosted web API is parked** (`api-hosted`, #48, moved to P3): "I don't have the funding to run a server" | 5 Oct 2026 |
@@ -155,8 +156,9 @@ None at the moment.
 
 ## Repository follow-ups
 
-- **Owner's step (Q101):** tag the release commit `chore(release): v0.2.0, the API` as `v0.2.0`
-  (annotated) and publish its GitHub release from the CHANGELOG's 0.2.0 section.
+- **Pending (Q101, Q123):** the `v0.2.0` tag on the release commit `chore(release): v0.2.0, the
+  API` (`983dc0f`) and its GitHub release, asked of the session on the owner's machine on
+  5 Oct 2026; done once both show on GitHub.
 - **Owner's step (Q82):** set the repository's About description on GitHub (the gear beside
   About on the repository's main page) to: "Parametric, 3D-printable panels that close off the part of a window left open around a window air conditioner, fan or hose. Runs in the browser; nothing to install."
 - Before the first npm publish (Q78): the package holds only `dist/` and its README, so add
