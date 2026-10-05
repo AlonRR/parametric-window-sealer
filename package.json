@@ -1,10 +1,11 @@
 {
   "name": "parametric-window-sealer-repo",
   "private": true,
-  "description": "The repository's npm workspace: the library and the page",
+  "description": "The repository's npm workspace: the library, the command-line tool and the page",
   "license": "MPL-2.0",
   "workspaces": [
     "packages/core",
+    "packages/cli",
     "web"
   ],
   "engines": {

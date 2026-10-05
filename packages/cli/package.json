@@ -1,0 +1,31 @@
+{
+  "name": "parametric-window-sealer-cli",
+  "version": "0.1.0",
+  "description": "The window-sealer command: plans the 3D-printable panels that close off the part of a window left open around a window air conditioner, fan or hose, and writes the STL or 3MF files to print.",
+  "license": "MPL-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "bin": {
+    "window-sealer": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc",
+    "test": "vitest run",
+    "test:dist": "node scripts/check-dist.mjs"
+  },
+  "dependencies": {
+    "parametric-window-sealer": "0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "typescript": "7.0.2",
+    "vitest": "5.0.3"
+  }
+}

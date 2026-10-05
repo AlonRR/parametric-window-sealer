@@ -174,20 +174,24 @@ bash scripts/check-history-identity.sh "Alon A. Rabinowitz" \
 ```
 
 The library, `packages/core` (the npm package `parametric-window-sealer`, not yet published:
-that is the owner's step, Q78, Q79), and the
+that is the owner's step, Q78, Q79), the command-line tool, `packages/cli`
+(`parametric-window-sealer-cli`, the command `window-sealer`, Q83, Q84), and the
 page, `web/` (Q34, Q35), are one npm workspace. After `npm ci` at the repo root:
 
 ```bash
-npm run typecheck --workspaces    # tsc over both: sources, tests and configs
+npm run typecheck --workspaces    # tsc over all three: sources, tests and configs
 npm test --workspaces             # unit tests (Vitest), in Node
 npm run build -w parametric-window-sealer        # the library, into packages/core/dist
 npm run test:dist -w parametric-window-sealer    # that build, loaded by name; the README's example
+npm run build -w parametric-window-sealer-cli        # the command, after the library's build
+npm run test:dist -w parametric-window-sealer-cli    # both packed, installed as its README says, run
 npm run build -w parametric-window-sealer-web         # the static site, into web/out/site
 npm run test:browser -w parametric-window-sealer-web  # the built page in Chromium (Playwright)
 ```
 
-The page builds the library from its source (an alias in `web/vite.config.ts`), so the two
-cannot drift apart.
+The page and the command's tests use the library's source (an alias in `web/vite.config.ts`
+and `packages/cli/vitest.config.ts`), so they cannot drift apart; the dist checks run the
+builds.
 
 `npx playwright install chromium` fetches the browser the browser test expects. A machine that
 already has a Chromium can point at it with `PW_CHROMIUM_PATH=<path>` instead.
