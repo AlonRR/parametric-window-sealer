@@ -4,10 +4,12 @@ All notable changes to this project are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (owner's decision Q29).
 
-The first version is `0.1.0`, tagged when the MVP in [`docs/backlog.md`](docs/backlog.md) is
-complete. Until then every change is listed under Unreleased.
+The first version, `0.1.0`, is the MVP in [`docs/backlog.md`](docs/backlog.md). Changes since
+the latest version are listed under Unreleased.
 
 ## [Unreleased]
+
+## [0.1.0] - 2026-10-05
 
 ### Added
 

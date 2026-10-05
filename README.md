@@ -8,24 +8,29 @@ panel style, and get a set of printable pieces that join together and fit the ga
 
 ## Status
 
-**Building the first version; there are no printable pieces yet.** Every decision so far is in
-[`docs/status.md`](docs/status.md). The geometry will be built in TypeScript on the
-[Manifold](https://github.com/elalish/manifold) library, chosen by measurement
-([`spikes/engine-benchmark/`](spikes/engine-benchmark/README.md)).
+**Version 0.1.0: a plain sealed wall, not yet test printed.** The page in `web/` takes the
+opening you can see and your window type, divides the opening into pieces your printer can
+make, joins them with connector strips and cross pieces, fits edge strips into the window's
+tracks, shows the wall in 3D and downloads every part as STL or 3MF. The joint's fit and the
+example track sizes are starting values that a test print still has to confirm. The site is
+built on every push but not published yet (see [Publishing the site](#publishing-the-site));
+to run it on your own computer, see [Developing](#developing).
+
+Every decision so far is in [`docs/status.md`](docs/status.md). The geometry is built in
+TypeScript on the [Manifold](https://github.com/elalish/manifold) library, chosen by
+measurement ([`spikes/engine-benchmark/`](spikes/engine-benchmark/README.md)).
 What gets built, in what order, is in [`docs/backlog.md`](docs/backlog.md) and its GitHub
 issues; what has changed is in [`CHANGELOG.md`](CHANGELOG.md).
 
-Planned:
+Planned next:
 
-- **Panel styles**: sealed or open, organiser patterns (pegboard-style), and decorative
-  patterns such as brick, diamond or grid.
-- **Splitting**: the opening is divided into pieces no bigger than your printer can make,
-  either all the same size or as many full-size pieces as fit plus one filler.
-- **Fitting**: joints between pieces, mounting in the window, and an adjustable interface to the
-  appliance.
-- **Windows**: horizontal sliders and single- or double-hung windows first.
-- **Running it**: a web page where you set the parameters, preview the result and download the
-  pieces, with no software to install.
+- **An API**: the geometry as an npm library, a command-line tool and a local MCP server.
+- **Appliances**: a round port for a portable air conditioner's hose, fittings for a window air
+  conditioner, and fan mounts.
+- **Panel styles**: organiser patterns (pegboard-style) and decorative patterns such as brick,
+  diamond or grid.
+- **Seals and help**: tape or printed TPU seals, a measuring guide with pictures, a printer
+  list, and the page as one file that works offline.
 
 ## Developing
 
