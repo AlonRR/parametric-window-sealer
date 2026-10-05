@@ -1,0 +1,30 @@
+# Licensing per the REUSE specification (https://reuse.software). Check with `reuse lint`.
+#
+# The split, chosen by the owner on 5 Oct 2026:
+#   CERN-OHL-S-2.0  the design (model sources and exported parts) and the documentation
+#   MPL-2.0         code: scripts, hooks, tests, CI and tool configuration
+#
+# When several annotations match a file, the LAST matching one wins, so the general
+# rule comes first and the narrower code rule after it.
+version = 1
+
+[[annotations]]
+path = "**"
+SPDX-FileCopyrightText = "2026 Alon A. Rabinowitz"
+SPDX-License-Identifier = "CERN-OHL-S-2.0"
+
+[[annotations]]
+path = [
+  ".githooks/**",
+  ".github/**",
+  "tests/**",
+  ".editorconfig",
+  ".gitattributes",
+  ".gitignore",
+  ".pre-commit-config.yaml",
+  ".repo-status",
+  "PROJECT.yml",
+  "REUSE.toml",
+]
+SPDX-FileCopyrightText = "2026 Alon A. Rabinowitz"
+SPDX-License-Identifier = "MPL-2.0"

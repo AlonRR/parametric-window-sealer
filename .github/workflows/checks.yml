@@ -1,0 +1,51 @@
+# .github/workflows/checks.yml
+#
+# Lives in .github/workflows on purpose. Gitea searches `.gitea/workflows` FIRST and, if that
+# directory exists at all, ignores `.github/workflows` entirely; GitHub never reads `.gitea/`.
+# One file in `.github/workflows` therefore runs on both forges, and creating a `.gitea/`
+# directory later would silently switch Gitea to it and skip everything here.
+#
+# What CI buys and what it does not: local hooks can be skipped with --no-verify or simply
+# never installed in a fresh clone, and CI cannot be. But on Gitea, a direct push to `main`
+# is only gated by force-push and signed-commit rules - status checks apply when a PULL
+# REQUEST merges. So for a solo pusher this DETECTS a problem after the push; it does not
+# prevent it. Treat a red run as something to fix, not as a gate that held.
+name: checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read        # least privilege; Scorecard's Token-Permissions check
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0          # betterleaks and the identity check need history, not a shallow tip
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Run every hook against every file
+        run: |
+          python -m pip install --upgrade pre-commit
+          pre-commit run --all-files --show-diff-on-failure
+
+  secrets-history:
+    # The pre-commit secret hook only sees staged content. This is the history gate, and it is
+    # the one that matters before a repo goes public.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Scan full history for secrets
+        run: |
+          curl -sSL -o bl.tar.gz \
+            https://github.com/betterleaks/betterleaks/releases/latest/download/betterleaks_linux_x64.tar.gz
+          tar xzf bl.tar.gz betterleaks
+          ./betterleaks git --no-banner --redact --exit-code 1 .

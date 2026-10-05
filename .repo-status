@@ -1,0 +1,9 @@
+# .repo-status -- the publish decision, where tooling can read it.
+# Template: publish-status.example in repo-secret-scan. One of: never | not-yet | ready | public.
+
+publish: not-yet
+reason:  meant to be public so people can run the web customizer from GitHub Pages
+review:  2026-10-05
+blockers:
+  - the design is not settled and there is no model yet
+  - the full history has not been scanned for secrets before going public
