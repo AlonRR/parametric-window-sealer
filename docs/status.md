@@ -37,6 +37,10 @@ engine is deliberately undecided until the design questions below are settled.
 | Q8 | **"Open" means a cut-through pattern**, not a separate fill type. So the fills are: sealed (solid), a pattern (through or relief), or an organiser | 5 Oct 2026 |
 | Q9 | Organiser systems: **Honeycomb Storage Wall**, **Skådis**, **Multiboard**, **openGrid**, built so **more can be added later**. "Honeycomb" in the brief is the organiser system | 5 Oct 2026 |
 | Q10 | The fill is set **once for the whole wall by default**, with an **advanced tab for per-piece overrides** | 5 Oct 2026 |
+| Q11 | The opening is divided as a **grid** (rows and columns as needed), and the division mode ("all equal" or "full-size pieces plus one filler") is **chosen separately for width and height** | 5 Oct 2026 |
+| Q12 | The filler's **position is the user's choice** (start, end or middle), **or it is split in two for symmetry**. What happens when the remainder is too small is still open (Q12 below) | 5 Oct 2026 |
+| Q19 | Tools and commit identity persist through a **SessionStart hook committed in the repo**, which runs only in cloud sessions | 5 Oct 2026 |
+| Q20 | Decorative patterns: **brick**, **diamond**, **grid**, **decorative hexagon**; the list is extensible, and **users can add their own** (how: Q21) | 5 Oct 2026 |
 
 The first four rows were answered before questions carried IDs.
 
@@ -44,15 +48,14 @@ The first four rows were answered before questions carried IDs.
 
 ### Panels and patterns
 
-- **Q20.** Which decorative patterns: brick, diamond, grid, and which others? With honeycomb now
-  the organiser system (Q9), is a decorative hexagon pattern wanted as well?
+- **Q21.** How do users add their own pattern: upload a tile image (SVG or DXF), draw one in the
+  page, or add a pattern file to the repository?
 
 ### Dividing the opening
 
-- **Q11.** Is the gap divided along one direction only (a strip of pieces), or as a grid when it
-  is larger than the bed in both directions?
-- **Q12.** In "maximum pieces plus one filler" mode: where does the filler go (an end, the
-  middle, chosen), and what happens when the remainder is too small to print or to hold?
+- **Q12.** (Partly answered.) In "full-size pieces plus one filler" mode, what happens when the
+  remainder is too small to print or to hold: a minimum filler size below which a full piece is
+  shrunk to make room, a warning, or something else?
 
 ### Joining and mounting
 
@@ -75,16 +78,7 @@ The first four rows were answered before questions carried IDs.
 - **Q18.** The dimensions of your window's open area and of the appliance in it, so the first
   model is tested against a real fit.
 
-### Sessions
-
-- **Q19.** The tools this repo's checks need (pre-commit, reuse) and the commit-identity setup are
-  lost when a new cloud session starts. Persist them with a startup hook committed in the repo,
-  with the cloud environment's setup script, both, or neither?
-
 ## Repository follow-ups
 
-- The kit's `yaml` lint profile is not adopted. On yamllint's default rules `--strict` refuses
-  the kit's own files (80-column lines, no `---`, aligned colons in `PROJECT.yml`), and the kit
-  has no yamllint config. Adopting it means writing that policy first; the owner has been told.
 - The kit also has a `gitleaks.toml` template that is not in its file table. Not adopted; ask
   for it if the secret scanner needs custom rules.
