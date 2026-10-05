@@ -29,7 +29,7 @@ Planned next:
 - **Appliances**: fan mounts with their screw patterns.
 - **Panel styles**: organiser patterns (pegboard-style), beside the grid, hexagon, brick and
   diamond patterns.
-- **Help**: a measuring guide with pictures.
+- **Fit**: a guided test print that adjusts the joint's fit after each print.
 
 ## Developing
 

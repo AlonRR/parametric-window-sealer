@@ -12,6 +12,12 @@ under Unreleased.
 
 ### Added
 
+- A measuring guide: "Measuring guide: what to measure, with pictures", at the top of the form,
+  in four steps (the opening, the track, what passes through the wall, and a printed strip and
+  piece), each with a drawing and fields that fill the form as you type. From a printed strip and
+  piece measured with calipers it works out the joint's fit and, with "Use this fit", sets it.
+  The library has the sum as `fitFromMeasured`.
+
 - The page as one file that works offline: "Save the page as one file that works offline", under
   the download button, saves `window-sealer.html` (about 1.4 MB), the page with everything it
   needs inside. Open it in a browser any time, with or without a connection: it plans, draws and

@@ -106,7 +106,8 @@ and `edgeTapeSolid` and `portTapeSolid`, the tape itself for a preview), the TPU
 (`wallPartShapes`), the pattern framework
 (`pieceOpenings`, `patternedPanel`, `patternBorderMm`, and a tile of openings passed to
 `buildPieces`, as `gridTile`, `hexagonTile`, `brickTile`, `diamondTile` and `fillPattern`
-make) and the file writers
+make), the measuring guide's sum (`fitFromMeasured` and `measuredPlayMm`, the fit from a
+printed strip and piece measured with calipers) and the file writers
 (`toStl`, `to3mf`, `packageDownload`), with `planFiles`, which names the files without
 building them. The types are in the package.
 
