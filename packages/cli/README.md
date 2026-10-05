@@ -83,7 +83,10 @@ window-sealer --width 600 --height 1000 --printer-model prusa-mk4s
   sill presses; `--tape-width` and `--tape-thickness` set its size (9 × 4 mm to start with;
   any `--tape-*` flag alone means tape). `--tape-sides yes` puts it on the strips' sides in a
   track too, and `--tape-port yes` inside each hose port's collar; `--tape-groove` and
-  `--tape-squeeze` change how deep its groove is and how far it is squeezed.
+  `--tape-squeeze` change how deep its groove is and how far it is squeezed. `--seal tpu` prints
+  gaskets in TPU in the tape's place, to the same sizes, with a TPU sleeve in each collar where
+  `--tape-port yes` says; `--tpu-joints yes` prints the joint strips and cross pieces in TPU
+  too (alone, it means `--seal tpu`).
 - `--fill grid` gives the pieces a grid of square openings, cut into the room side
   (`--relief-depth`, 50 % of the thickness to start with) or, with `--fill-style through`,
   right through. `--grid-opening` (15 mm) and `--grid-bar` (3 mm, at least 0.8) set its sizes;

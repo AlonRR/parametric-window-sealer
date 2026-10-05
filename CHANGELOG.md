@@ -12,6 +12,15 @@ under Unreleased.
 
 ### Added
 
+- A printed TPU seal: choose "Printed TPU" under "Seal" for gaskets printed in TPU in place of
+  foam tape, in the same grooves and to the same sizes: a base in the groove with two thin fins
+  that fold as the wall goes in. Where the tape's places under Advanced say, they also go on the
+  edge strips' sides, and a TPU sleeve goes inside each hose port's collar. Under Advanced the
+  joint strips and cross pieces can be printed in TPU too, gripping the panels. The TPU parts'
+  files say `-tpu`. The command takes `--seal tpu` and `--tpu-joints`, the MCP server
+  `seal.kind` `"tpu"` and `seal.tape.joints`. Not yet test printed: the fins and grip are
+  starting values.
+
 - A fill for any piece: under "Advanced: piece by piece", click a piece on the map of the wall
   and give it its own fill, sealed or a pattern, relief or cut through; the rest keep the wall's.
   The plan lists each one. The command repeats `--piece-fill 2,1=grid:through`, the MCP server
@@ -66,6 +75,8 @@ under Unreleased.
 
 ### Changed
 
+- On the page, "Tape size" is now "Seal size" and "Advanced: the tape" "Advanced: the seal", as
+  printed TPU takes the same sizes.
 - `--help` shows a percentage, such as `--tape-squeeze`, as `<%>` instead of `<mm>`.
 
 ## [0.2.0] - 2026-10-05
