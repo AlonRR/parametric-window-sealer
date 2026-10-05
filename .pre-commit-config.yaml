@@ -125,14 +125,14 @@ repos:
         stages: [commit-msg]
 
   # ---------------------------------------------------------------------------
-  # Language profiles, picked by what this repo tracks. Adopted: shell (the two
-  # hooks and tests/test-hooks.sh). NOT adopted yet, both for a missing config:
-  #   docs - needs a .markdownlint-cli2.yaml at the root; without one the hook is
-  #          permanently red (an ENOENT, not a fallback to defaults).
+  # Language profiles, picked by what this repo tracks. Adopted: shell (the hooks,
+  # scripts/ and tests/) and docs (Markdown, configured by .markdownlint-cli2.yaml,
+  # the kit's template). NOT adopted:
   #   yaml - yamllint --strict on its default rules refuses this file, the
   #          workflow and PROJECT.yml (80-column lines, no `---`, aligned colons),
-  #          measured 5 Oct 2026. It needs the kit's .yamllint, not received yet.
-  #          check-yaml above still validates syntax.
+  #          measured 5 Oct 2026. The kit has no yamllint config (confirmed by its
+  #          owner's admin session, 5 Oct 2026), so adopting it means writing that
+  #          policy first. check-yaml above still validates syntax.
   # ---------------------------------------------------------------------------
 
   # shell
@@ -150,3 +150,9 @@ repos:
         # -i 2 -ci -sr match the .editorconfig; shfmt reads .editorconfig only when no
         # printer flag is given, so these two must be kept in step by hand.
         args: [-i, "2", -ci, -sr, -w]
+
+  # docs
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.19.0
+    hooks:
+      - id: markdownlint-cli2

@@ -22,6 +22,7 @@ path = [
   ".editorconfig",
   ".gitattributes",
   ".gitignore",
+  ".markdownlint-cli2.yaml",
   ".pre-commit-config.yaml",
   ".repo-status",
   "PROJECT.yml",

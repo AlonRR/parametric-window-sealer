@@ -131,7 +131,8 @@ list.
 ## Checks to run
 
 ```bash
-bash tests/test-hooks.sh          # positive and negative controls: both hooks, history check
+bash tests/test-hooks.sh          # the kit's controls for both hooks, end to end through git
+bash tests/test-history-identity.sh   # controls for the history check CI runs
 pre-commit run --all-files        # the hooks CI runs
 reuse lint                        # every file has a licence and a copyright notice
 bash scripts/check-history-identity.sh "Alon A. Rabinowitz" \

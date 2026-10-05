@@ -45,7 +45,9 @@ jobs:
           bash scripts/check-history-identity.sh \
             "Alon A. Rabinowitz" "45129051+AlonRR@users.noreply.github.com"
       - name: Hook and history-check tests
-        run: bash tests/test-hooks.sh
+        run: |
+          bash tests/test-hooks.sh
+          bash tests/test-history-identity.sh
 
   secrets-history:
     # The pre-commit secret hook only sees staged content. This is the history gate, and it is
