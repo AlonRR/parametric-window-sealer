@@ -15,4 +15,5 @@ export * from './port.js';
 export * from './printer.js';
 export * from './printers.js';
 export * from './settings.js';
+export * from './tape.js';
 export * from './wall.js';

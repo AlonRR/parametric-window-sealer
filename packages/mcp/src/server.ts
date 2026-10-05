@@ -102,7 +102,9 @@ export function createServer(options: ServerOptions): McpServer {
     () => {
       const settings = SETTINGS.map((s) => {
         const start = s.path.startsWith('opening') ? null : (settingAt(EXAMPLE_PARAMS, s.path) ?? null);
-        return { path: s.path, help: s.help, startsAt: start, ...(s.values ? { choices: [...s.values] } : {}) };
+        // A place for the tape is true or false in the library's shape, not the page's yes or no.
+        const choices = s.onOff ? [false, true] : s.values ? [...s.values] : undefined;
+        return { path: s.path, help: s.help, startsAt: start, ...(choices ? { choices } : {}) };
       });
       return json({ settings });
     },

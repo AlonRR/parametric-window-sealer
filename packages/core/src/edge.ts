@@ -9,8 +9,14 @@
 // the slot, so in a shallow track it stands out. The panel sits in the middle of the
 // slot's slide (Q56), so it reaches that far into a track, and stops short of a sash or
 // a sill by the strip's height less that.
+//
+// With tape (seal-tape, #15) the outer face has a groove for it, with 2 mm kept over the groove
+// (Q126), and the squeezed tape standing out of it is part of the edge's height (Q125): in a
+// track the strip is that much shorter, at a sash or a sill the wall that much smaller. Tape on
+// the sides of a strip in a track takes the place of the clearance (Q127).
 
 import type { JointParams } from './joint.js';
+import type { TapeFit } from './tape.js';
 
 export type EdgeName = 'top' | 'bottom' | 'left' | 'right';
 export type EdgeRole = 'track' | 'sash' | 'sill';
@@ -44,24 +50,49 @@ export interface EdgeParams {
   track: TrackParams;
 }
 
+export interface EdgeGroove {
+  widthMm: number;
+  depthMm: number;
+  // On each side too, from..to measured from the outer face, centred on the part of the side
+  // inside the track; trackMm names the strip, as two depths can share a size (Q127).
+  side?: { fromMm: number; toMm: number; trackMm: number };
+}
+
+export interface EdgeTape {
+  standOutMm: number; // the squeezed tape beyond the strip's outer face
+  groove: EdgeGroove;
+}
+
 export interface EdgeProfile {
   widthMm: number; // across the wall's thickness
-  heightMm: number; // from the outer face to the slot's mouth
+  heightMm: number; // from the outer face, or the squeezed tape's face, to the slot's mouth
   reachMm: number; // how far the panel goes past the opening's edge (negative: short of it)
+  tape?: EdgeTape; // the strip itself is heightMm less tape.standOutMm
 }
 
 // How deep the panel sits in an edge strip's slot: the middle of the slide (Q56).
 const inSlotMm = (j: JointParams) => j.slotMm - j.slideMm / 2;
 
-export function edgeProfile(edge: EdgeName, edges: EdgeParams, joint: JointParams): EdgeProfile {
+export function edgeProfile(edge: EdgeName, edges: EdgeParams, joint: JointParams, tape?: TapeFit): EdgeProfile {
   const inTrack = edges.roles[edge] === 'track';
   const depth = inTrack ? edges.track.depthMm[edge] : 0;
-  const heightMm = Math.max(depth, joint.slotMm + EDGE_BASE_MM);
-  return {
-    widthMm: inTrack ? edges.track.widthMm - 2 * edges.track.clearanceMm : edges.track.widthMm,
+  const out = tape?.standOutMm ?? 0;
+  const body = Math.max(depth - out, joint.slotMm + EDGE_BASE_MM + (tape?.grooveDepthMm ?? 0));
+  const heightMm = body + out;
+  const sides = inTrack && tape?.sides === true;
+  const profile: EdgeProfile = {
+    widthMm: inTrack ? edges.track.widthMm - 2 * (sides ? out : edges.track.clearanceMm) : edges.track.widthMm,
     heightMm,
     reachMm: depth - heightMm + inSlotMm(joint),
   };
+  if (tape === undefined) return profile;
+  const groove: EdgeGroove = { widthMm: tape.grooveWidthMm, depthMm: tape.grooveDepthMm };
+  if (sides) {
+    const inside = Math.min(body, depth - out);
+    const fromMm = Math.max(0, (inside - tape.grooveWidthMm) / 2);
+    groove.side = { fromMm, toMm: fromMm + tape.grooveWidthMm, trackMm: depth };
+  }
+  return { ...profile, tape: { standOutMm: out, groove } };
 }
 
 // The size the pieces and joints have to fill: the opening, plus each edge's reach.
@@ -70,8 +101,9 @@ export function panelSpan(
   openingHeightMm: number,
   edges: EdgeParams,
   joint: JointParams,
+  tape?: TapeFit,
 ): { widthMm: number; heightMm: number } {
-  const reach = (e: EdgeName) => edgeProfile(e, edges, joint).reachMm;
+  const reach = (e: EdgeName) => edgeProfile(e, edges, joint, tape).reachMm;
   return {
     widthMm: openingWidthMm + reach('left') + reach('right'),
     heightMm: openingHeightMm + reach('bottom') + reach('top'),
@@ -88,7 +120,8 @@ export interface EdgeStripPlacement {
   yMm: number;
   lengthMm: number;
   widthMm: number;
-  heightMm: number;
+  heightMm: number; // the strip itself; with tape, its squeezed tape lies beyond its outer face
+  tape?: EdgeTape;
 }
 
 // The fewest equal segments no longer than the printer can make (Q73).
@@ -104,11 +137,13 @@ export function planEdges(
   edges: EdgeParams,
   joint: JointParams,
   maxLengthMm: number,
+  tape?: TapeFit,
 ): EdgeStripPlacement[] {
   const inSlot = inSlotMm(joint);
-  const p = (e: EdgeName) => edgeProfile(e, edges, joint);
+  const p = (e: EdgeName) => edgeProfile(e, edges, joint, tape);
   const [top, bottom, left, right] = [p('top'), p('bottom'), p('left'), p('right')];
-  // Across the wall, where each strip's outer face and slot mouth lie.
+  // Across the wall, where each edge's outer face (with tape, the squeezed tape's) and slot
+  // mouth lie. The strips through the corners reach the outer faces, tape and all.
   const outer = {
     left: inSlot - left.heightMm,
     right: spanWidthMm - inSlot + right.heightMm,
@@ -127,12 +162,16 @@ export function planEdges(
   ) =>
     segments(from ?? 0, (to ?? 0) - (from ?? 0), maxLengthMm).map(([at, lengthMm]) => {
       const [xMm, yMm] = place(at);
-      return { edge, xMm, yMm, lengthMm, widthMm: profile.widthMm, heightMm: profile.heightMm };
+      const out = profile.tape?.standOutMm ?? 0;
+      const strip: EdgeStripPlacement = { edge, xMm, yMm, lengthMm, widthMm: profile.widthMm, heightMm: profile.heightMm - out };
+      return profile.tape === undefined ? strip : { ...strip, tape: profile.tape };
     });
+  // The bottom and left strips start past their tape; the top and right ones at the mouth.
+  const out = (profile: EdgeProfile) => profile.tape?.standOutMm ?? 0;
   return [
-    ...run('bottom', bottom, across, (x) => [x, outer.bottom]),
+    ...run('bottom', bottom, across, (x) => [x, outer.bottom + out(bottom)]),
     ...run('top', top, across, (x) => [x, mouth.top]),
-    ...run('left', left, up, (y) => [outer.left, y]),
+    ...run('left', left, up, (y) => [outer.left + out(left), y]),
     ...run('right', right, up, (y) => [mouth.right, y]),
   ];
 }
@@ -142,6 +181,7 @@ export interface EdgeShape {
   lengthMm: number;
   widthMm: number;
   heightMm: number;
+  groove?: EdgeGroove;
   count: number;
 }
 
@@ -151,14 +191,15 @@ const tenth = (n: number) => Math.round(n * 10) / 10;
 export function edgeShapes(strips: EdgeStripPlacement[]): EdgeShape[] {
   const counts = new Map<string, EdgeShape>();
   for (const s of strips) {
-    const shape = {
+    const shape: EdgeShape = {
       kind: 'edge' as const,
       lengthMm: tenth(s.lengthMm),
       widthMm: tenth(s.widthMm),
       heightMm: tenth(s.heightMm),
+      ...(s.tape === undefined ? {} : { groove: s.tape.groove }),
       count: 0,
     };
-    const key = `${shape.lengthMm}x${shape.widthMm}x${shape.heightMm}`;
+    const key = `${shape.lengthMm}x${shape.widthMm}x${shape.heightMm}:${JSON.stringify(shape.groove ?? null)}`;
     const seen = counts.get(key) ?? shape;
     seen.count += 1;
     counts.set(key, seen);

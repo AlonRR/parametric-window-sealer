@@ -7,6 +7,7 @@ import type { FieldName, FormValues, LeftoverText, Params } from 'parametric-win
 import { EDGES, WINDOW_PRESETS } from 'parametric-window-sealer';
 import type { WindowType } from 'parametric-window-sealer';
 import { DEFAULT_MAX_PIECE, PRINTERS } from 'parametric-window-sealer';
+import { TAPE_SIZES } from 'parametric-window-sealer';
 
 const FIELDS: readonly FieldName[] = [
   'openingWidthMm',
@@ -44,6 +45,13 @@ const FIELDS: readonly FieldName[] = [
   'collarWallMm',
   'collarClearanceMm',
   'collarLipMm',
+  'seal',
+  'tapeWidthMm',
+  'tapeThicknessMm',
+  'tapeGrooveMm',
+  'tapeSqueezePct',
+  'tapeSides',
+  'tapePort',
 ];
 
 type Control = HTMLInputElement | HTMLSelectElement | RadioNodeList;
@@ -54,11 +62,15 @@ function control(form: HTMLFormElement, name: FieldName): Control | null {
 
 // Read by name rather than through FormData, which leaves out disabled controls: a
 // disabled filler select still has a value the plan needs.
+// A checkbox is yes or no, as the library writes a place for the tape.
+const isCheckbox = (c: Control | null): c is HTMLInputElement => c instanceof HTMLInputElement && c.type === 'checkbox';
+
 function readForm(form: HTMLFormElement): FormValues {
   const values: FormValues = {};
   for (const name of FIELDS) {
     const c = control(form, name);
-    if (c) values[name] = c.value;
+    if (isCheckbox(c)) values[name] = c.checked ? 'yes' : 'no';
+    else if (c) values[name] = c.value;
   }
   return values;
 }
@@ -67,8 +79,40 @@ function writeForm(form: HTMLFormElement, values: FormValues): void {
   for (const name of FIELDS) {
     const c = control(form, name);
     const v = values[name];
-    if (c && v !== undefined) c.value = v;
+    if (isCheckbox(c)) c.checked = v === 'yes';
+    else if (c && v !== undefined) c.value = v;
   }
+}
+
+// The tape's size (Q121): the listed sizes, or the user's own. A listed size is written into
+// the width and thickness fields, and read back from them.
+const tapeSize = (widthMm: string | number, thicknessMm: string | number) => `${widthMm}x${thicknessMm}`;
+
+function fillTapeSizes(choice: HTMLSelectElement): void {
+  const option = (value: string, text: string) => {
+    const o = document.createElement('option');
+    o.value = value;
+    o.textContent = text;
+    return o;
+  };
+  choice.replaceChildren(
+    ...TAPE_SIZES.map((t) => option(tapeSize(t.widthMm, t.thicknessMm), `${t.widthMm} × ${t.thicknessMm} mm`)),
+    option('own', 'Your own size'),
+  );
+}
+
+function tapeToForm(form: HTMLFormElement, choice: HTMLSelectElement): void {
+  const listed = TAPE_SIZES.find((t) => tapeSize(t.widthMm, t.thicknessMm) === choice.value);
+  if (!listed) return;
+  const width = control(form, 'tapeWidthMm');
+  const thickness = control(form, 'tapeThicknessMm');
+  if (width instanceof HTMLInputElement) width.value = String(listed.widthMm);
+  if (thickness instanceof HTMLInputElement) thickness.value = String(listed.thicknessMm);
+}
+
+function tapeFromForm(form: HTMLFormElement, choice: HTMLSelectElement): void {
+  const size = tapeSize(control(form, 'tapeWidthMm')?.value ?? '', control(form, 'tapeThicknessMm')?.value ?? '');
+  choice.value = TAPE_SIZES.some((t) => tapeSize(t.widthMm, t.thicknessMm) === size) ? size : 'own';
 }
 
 // The hose ports (hose-port, #12): the main form's port and any added under Advanced (Q111,
@@ -214,6 +258,11 @@ export function mountPanel(
   if (printerChoice) fillPrinters(printerChoice);
   writeForm(form, toFormValues(EXAMPLE_PARAMS));
   if (printerChoice) printerFromForm(form, printerChoice);
+  const tapeChoice = form.querySelector<HTMLSelectElement>('[data-part="tape-size"]');
+  if (tapeChoice) {
+    fillTapeSizes(tapeChoice);
+    tapeFromForm(form, tapeChoice);
+  }
 
   const extras = form.querySelector<HTMLElement>('[data-testid="extra-ports"]');
   const addPort = form.querySelector<HTMLButtonElement>('#add-port');
@@ -227,6 +276,13 @@ export function mountPanel(
       if (ownLabel) ownLabel.hidden = part(row, 'size')?.value !== 'own';
     }
     if (addPort) addPort.hidden = !hose;
+    // The tape's size shows with tape; its width and thickness only for the user's own.
+    const tape = (form.elements.namedItem('seal') as RadioNodeList | null)?.value === 'tape';
+    const tapeBox = form.querySelector<HTMLElement>('[data-testid="tape"]');
+    if (tapeBox) tapeBox.hidden = !tape;
+    if (tapeChoice) tapeToForm(form, tapeChoice);
+    const tapeOwn = form.querySelector<HTMLElement>('[data-part="tape-own"]');
+    if (tapeOwn) tapeOwn.hidden = tapeChoice?.value !== 'own';
     const ports = portsText(form);
     const portsField = control(form, 'ports');
     if (portsField instanceof HTMLInputElement) portsField.value = ports.text;
@@ -281,7 +337,7 @@ export function mountPanel(
     warnings?.replaceChildren();
     if (!result.ok) {
       setText(plan, 'plan-headline', 'Fix the marked fields to see the plan.');
-      for (const id of ['plan-columns', 'plan-rows', 'plan-span', 'plan-joints', 'plan-edges']) {
+      for (const id of ['plan-columns', 'plan-rows', 'plan-span', 'plan-joints', 'plan-edges', 'plan-seal']) {
         setText(plan, id, '');
       }
       plan.querySelector('[data-testid="plan-ports"]')?.replaceChildren();
@@ -294,6 +350,7 @@ export function mountPanel(
     setText(plan, 'plan-span', text.span);
     setText(plan, 'plan-joints', text.joints);
     setText(plan, 'plan-edges', text.edges);
+    setText(plan, 'plan-seal', text.seal);
     plan.querySelector('[data-testid="plan-ports"]')?.replaceChildren(
       ...text.ports.map((line) => {
         const li = document.createElement('li');

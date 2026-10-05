@@ -60,7 +60,8 @@ describe('the server', () => {
       const node = s.path.split('.').reduce((at: any, key: string) => at?.properties?.[key], settings);
       expect(node, s.path).toBeDefined();
       expect(node.description).toBe(s.help);
-      if (s.values) expect(node.enum).toEqual([...s.values]);
+      if (s.onOff) expect(node.type).toBe('boolean'); // a place for the tape: true or false
+      else if (s.values) expect(node.enum).toEqual([...s.values]);
     }
     expect(settings.required).toEqual(['openingWidthMm', 'openingHeightMm']);
   });
@@ -79,6 +80,8 @@ describe('window_sealer_list_settings', () => {
     expect(r.isError).toBeFalsy();
     const settings = r.data['settings'] as { path: string; help: string; startsAt: unknown; choices?: string[] }[];
     expect(settings.map((s) => s.path)).toEqual(SETTINGS.map((s) => s.path));
+    expect(settings.find((s) => s.path === 'seal.tape.sides')).toMatchObject({ startsAt: false, choices: [false, true] });
+    expect(settings.find((s) => s.path === 'seal.kind')).toMatchObject({ startsAt: 'none', choices: ['none', 'tape'] });
     expect(settings.find((s) => s.path === 'joint.slotMm')).toEqual({
       path: 'joint.slotMm',
       help: 'How deep a piece can go into a strip.',
@@ -120,6 +123,21 @@ describe('window_sealer_plan_wall', () => {
     expect(r.data['settings']).toEqual(EXAMPLE_PARAMS);
     expect(r.data['files']).toEqual(planFiles(EXAMPLE_PARAMS, { format: 'stl', packaging: 'separate' }));
     expect(listed(outRoot)).toEqual([]);
+  });
+
+  it('tape in the library’s shape: a place is true or false, and tape settings alone mean tape (Q122, Q127)', async () => {
+    const { call } = await connect();
+    const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, seal: { tape: { sides: true } } } });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['settings'].seal).toEqual({
+      kind: 'tape',
+      tape: { widthMm: 9, thicknessMm: 4, grooveMm: 1, squeezePct: 50, sides: true, port: false },
+    });
+    expect(r.data['summary'].seal).toBe('Seal: 9 × 4 mm foam tape along the edge strips’ outer faces and sides: 7.6 m in all.');
+    const names = (r.data['files'] as { name: string }[]).map((f) => f.name);
+    expect(names.some((n) => /^edge-[0-9.]+x13x11-track-10-print-[0-9]+\.stl$/.test(n))).toBe(true);
+    const yes = await call('window_sealer_plan_wall', { settings: { ...OPENING, seal: { tape: { sides: 'yes' } } } });
+    expect(yes.isError).toBe(true);
   });
 
   it('settings the page refuses are an error with the page’s message for each', async () => {

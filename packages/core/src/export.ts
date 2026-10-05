@@ -71,10 +71,13 @@ export function pieceFileName(
   return `piece-c${cell.column + 1}-r${cell.row + 1}-${mm(cell.widthMm)}x${mm(cell.heightMm)}${port}.${extension}`;
 }
 
-// An edge strip's height depends on its track, so it is part of the name.
+// An edge strip's height depends on its track, so it is part of the name; with tape on its
+// sides, so is the track's depth, as two depths can give one size with grooves in different
+// places (Q127).
 export function partName(shape: PartShape | EdgeShape): string {
   const height = shape.kind === 'edge' ? `x${mm(shape.heightMm)}` : '';
-  return `${shape.kind}-${mm(shape.lengthMm)}x${mm(shape.widthMm)}${height}-print-${shape.count}`;
+  const side = shape.kind === 'edge' && shape.groove?.side !== undefined ? `-track-${mm(shape.groove.side.trackMm)}` : '';
+  return `${shape.kind}-${mm(shape.lengthMm)}x${mm(shape.widthMm)}${height}${side}-print-${shape.count}`;
 }
 
 export function partFileName(shape: PartShape | EdgeShape, extension: Format): string {

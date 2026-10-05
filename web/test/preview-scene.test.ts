@@ -130,3 +130,34 @@ describe('a wall with a hose port (hose-port, #12)', () => {
     disposeWall(wall);
   });
 });
+
+// Backlog item seal-tape (#15): the tape is drawn in place, in its own colour (Q132): one
+// length along each edge strip, and a ring in each port's collar when it goes there too.
+describe('the tape in the preview', () => {
+  const tape = { widthMm: 9, thicknessMm: 4, grooveMm: 1, squeezePct: 50, sides: true, port: true };
+
+  it('none without a seal', async () => {
+    const engine = await loadEngine();
+    const wall = buildWallScene(engine, EXAMPLE_PARAMS);
+    expect(solidsOf(wall, 'tape')).toHaveLength(0);
+    disposeWall(wall);
+  });
+
+  it('one along each edge strip and one in the port, each clear of the parts it sits in', async () => {
+    const engine = await loadEngine();
+    const params = {
+      ...EXAMPLE_PARAMS,
+      ports: [{ hoseMm: 150, column: 2, row: 1 }],
+      seal: { kind: 'tape' as const, tape },
+    };
+    const wall = buildWallScene(engine, params);
+    const edges = solidsOf(wall, 'edge');
+    const tapes = solidsOf(wall, 'tape');
+    expect(tapes).toHaveLength(edges.length + 1);
+    // The bottom strips sit 1 mm off the track floor; their tape reaches down to it, 5.5 mm
+    // below the pieces as the bare strips are on the example slider.
+    const lowest = Math.min(...tapes.map((t) => new Box3().setFromObject(t).min.y));
+    expect(lowest).toBeCloseTo(-5.5, 4);
+    disposeWall(wall);
+  });
+});

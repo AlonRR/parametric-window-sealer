@@ -111,6 +111,7 @@ export function mountPreview(container: HTMLElement, getEngine: () => Promise<En
       container.dataset.strips = '0';
       container.dataset.crosses = '0';
       container.dataset.edges = '0';
+      container.dataset.tapes = '0';
       container.dataset.state = 'waiting';
       say('Fix the marked fields to see the preview.');
       draw();
@@ -128,6 +129,7 @@ export function mountPreview(container: HTMLElement, getEngine: () => Promise<En
     container.dataset.strips = String(countOf(wall, 'strip'));
     container.dataset.crosses = String(countOf(wall, 'cross'));
     container.dataset.edges = String(countOf(wall, 'edge'));
+    container.dataset.tapes = String(countOf(wall, 'tape'));
     container.dataset.state = 'ready';
     say('Drag to turn the wall; scroll or pinch to zoom.');
     draw();

@@ -47,6 +47,13 @@ const FLAG_NAMES: Record<FieldName, string> = {
   collarWallMm: 'collar-wall',
   collarClearanceMm: 'collar-clearance',
   collarLipMm: 'collar-lip',
+  seal: 'seal', // none or tape (Q122)
+  tapeWidthMm: 'tape-width', // a tape flag without --seal means tape, as a printer size means custom
+  tapeThicknessMm: 'tape-thickness',
+  tapeGrooveMm: 'tape-groove',
+  tapeSqueezePct: 'tape-squeeze',
+  tapeSides: 'tape-sides',
+  tapePort: 'tape-port',
 };
 
 export const SETTING_FLAGS: readonly SettingFlag[] = SETTINGS.map((s) => ({ ...s, flag: FLAG_NAMES[s.field] }));

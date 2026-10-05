@@ -42,7 +42,8 @@ describe('SETTINGS: every setting on the page', () => {
           ? WITH_PORTS
           : EXAMPLE_PARAMS;
     const value = settingAt(params, s.path);
-    expect(s.list ? formatPorts(value as []) : String(value)).toBe(toFormValues(params)[s.field]);
+    const shown = s.list ? formatPorts(value as []) : s.onOff ? (value === true ? 'yes' : 'no') : String(value);
+    expect(shown).toBe(toFormValues(params)[s.field]);
   });
 
   it.each(SETTINGS.filter((s) => s.values).map((s) => [s.path, s] as const))(
@@ -50,10 +51,12 @@ describe('SETTINGS: every setting on the page', () => {
     (_path, s) => {
       // A listed printer's id is read only for a listed printer, as the custom sizes are only
       // for a custom one: the starting values hold both, and the id's own test picks the list.
+      // The tape's settings likewise are read only with tape.
       const base = {
         ...toFormValues(CUSTOM_PRINTER),
         printerModel: 'prusa-mk4s',
         ...(s.field === 'printerModel' ? { printer: 'model' } : {}),
+        ...(s.path.startsWith('seal.tape.') ? { seal: 'tape' } : {}),
       };
       for (const value of s.values ?? []) {
         expect(readParams({ ...base, [s.field]: value })).toMatchObject({ ok: true });

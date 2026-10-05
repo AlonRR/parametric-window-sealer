@@ -4,7 +4,7 @@
 // Order, as on the page: its starting values, then the input, then any overrides in the
 // page's form values (the command's flags). Setting the window type presets the four edges
 // (Q66); edges given with it, or after it, change them. A printer size means a custom
-// printer. The opening has no starting value: it is required.
+// printer, and a tape setting means tape. The opening has no starting value: it is required.
 import { WINDOW_PRESETS } from './edge.js';
 import type { WindowType } from './edge.js';
 import { EXAMPLE_PARAMS, readParams, toFormValues } from './params.js';
@@ -17,12 +17,14 @@ export interface Setting {
   help: string; // in the page's words
   values?: readonly string[]; // a choice; otherwise a length in mm
   list?: true; // a list in the shape, written in the form as the command's --port takes it
+  onOff?: true; // true or false in the shape, written yes or no in the form
 }
 
 const DIVISION = ['equal', 'full-plus-filler'] as const;
 const FILLER = ['start', 'end', 'middle', 'split'] as const;
 const LEFTOVER = ['spread', 'equal', 'shorten'] as const;
 const ROLE = ['track', 'sash', 'sill'] as const;
+const YES_NO = ['no', 'yes'] as const;
 
 const axis = (name: 'width' | 'height'): Setting[] => [
   {
@@ -117,6 +119,38 @@ export const SETTINGS: readonly Setting[] = [
   { field: 'collarWallMm', path: 'collar.wallMm', help: "The collar's wall." },
   { field: 'collarClearanceMm', path: 'collar.clearanceMm', help: 'Clearance per side between the hose end and the collar.' },
   { field: 'collarLipMm', path: 'collar.lipMm', help: 'The lip the hose end stops against, inside the collar.' },
+  {
+    field: 'seal',
+    path: 'seal.kind',
+    help: "The seal: none, or foam tape along the edge strips' outer faces.",
+    values: ['none', 'tape'],
+  },
+  {
+    field: 'tapeWidthMm',
+    path: 'seal.tape.widthMm',
+    help: 'The foam tape: its width. Listed sizes: 9 × 4, 9.5 × 4.8, 9 × 6 and 9.5 × 6.4 mm.',
+  },
+  { field: 'tapeThicknessMm', path: 'seal.tape.thicknessMm', help: 'The foam tape: its thickness.' },
+  { field: 'tapeGrooveMm', path: 'seal.tape.grooveMm', help: "How deep the tape's groove is; 0 for a flat face." },
+  {
+    field: 'tapeSqueezePct',
+    path: 'seal.tape.squeezePct',
+    help: 'How far the tape is squeezed when the wall is in, as a percentage of its thickness.',
+  },
+  {
+    field: 'tapeSides',
+    path: 'seal.tape.sides',
+    help: "Tape on the sides of the edge strips in a track too: yes or no.",
+    values: YES_NO,
+    onOff: true,
+  },
+  {
+    field: 'tapePort',
+    path: 'seal.tape.port',
+    help: "Tape inside each hose port's collar too: yes or no.",
+    values: YES_NO,
+    onOff: true,
+  },
 ];
 
 // The value at a dotted path, such as `edges.track.widthMm`; undefined if it is not there.
@@ -172,7 +206,7 @@ function checkShape(value: unknown, shape: unknown, path: string, problems: Sett
       else checkShape(inner, shape[key], at, problems);
     }
   } else if (typeof value !== typeof shape) {
-    const kind = typeof shape === 'number' ? 'a number' : 'text';
+    const kind = typeof shape === 'number' ? 'a number' : typeof shape === 'boolean' ? 'true or false' : 'text';
     problems.push({ kind: 'shape', path, message: `${path} should be ${kind}` });
   }
 }
@@ -212,6 +246,8 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
   if (isObject(printer) && !('kind' in printer) && 'id' in printer) {
     params.printer = { ...params.printer, kind: 'model' } as Params['printer'];
   }
+  const seal = input['seal'];
+  if (isObject(seal) && !('kind' in seal) && 'tape' in seal) params.seal = { ...params.seal, kind: 'tape' };
 
   const values: FormValues = toFormValues(params);
   const presetWindow = overrides.window;
@@ -224,6 +260,8 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
     values.printer = 'custom';
   }
   if (overrides.printer === undefined && overrides.printerModel !== undefined) values.printer = 'model';
+  const tapeOverride = SETTINGS.some((s) => s.path.startsWith('seal.tape.') && overrides[s.field] !== undefined);
+  if (overrides.seal === undefined && tapeOverride) values.seal = 'tape';
   Object.assign(values, overrides);
 
   const problems: SettingProblem[] = [];

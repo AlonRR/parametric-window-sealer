@@ -113,7 +113,7 @@ function help(): string {
 
 function summaryLines(summary: PlanText): string[] {
   const lines = [summary.headline, summary.columns, summary.rows, summary.span, summary.joints, summary.edges];
-  lines.push(...summary.ports);
+  lines.push(...summary.ports, summary.seal);
   for (const warning of summary.warnings) lines.push(`Warning: ${warning}`);
   for (const leftover of summary.leftovers) {
     lines.push(leftover.message, `  Change it with --${leftover.axis}-leftover:`);

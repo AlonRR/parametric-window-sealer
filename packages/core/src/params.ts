@@ -22,8 +22,10 @@ import { DEFAULT_MAX_PIECE, maxPieceSize } from './printer.js';
 import type { PieceSize, PrinterChoice } from './printer.js';
 import { DEFAULT_BED_MARGIN_MM } from './printer.js';
 import { PRINTER_IDS } from './printers.js';
-import { DEFAULT_COLLAR, checkPort, defaultPortPiece, formatPorts, parsePorts, portHoleMm } from './port.js';
+import { DEFAULT_COLLAR, checkPort, collarInnerMm, defaultPortPiece, formatPorts, parsePorts, portHoleMm } from './port.js';
 import type { CollarParams, PortSetting } from './port.js';
+import { DEFAULT_TAPE, NO_SEAL, TAPE_GROOVE_WALL_MM, tapeFit, tapedCollar } from './tape.js';
+import type { SealKind, SealParams } from './tape.js';
 
 export interface AxisChoice {
   mode: AxisMode;
@@ -43,12 +45,13 @@ export interface Params {
   edges: EdgeParams;
   ports: Required<PortSetting>[]; // none for a plain wall (Q112); column and row from 1
   collar: CollarParams;
+  seal: SealParams; // none to start with (Q122)
 }
 
 // The page starts here: an example opening (Q42, labelled as an example, Q18), the default
 // piece size (Q38), all-equal pieces on both axes (Q41), 3 mm panels (Q39) and the joint's
 // starting dimensions (Q51). Spreading the pieces is the default way out (Q61). The window
-// starts as a horizontal slider (Q75) with example tracks (Q18).
+// starts as a horizontal slider (Q75) with example tracks (Q18), and no seal (Q122).
 export const EXAMPLE_PARAMS: Params = {
   openingWidthMm: 600,
   openingHeightMm: 1000,
@@ -61,6 +64,7 @@ export const EXAMPLE_PARAMS: Params = {
   edges: { window: 'slider', roles: WINDOW_PRESETS.slider, track: EXAMPLE_TRACK },
   ports: [],
   collar: DEFAULT_COLLAR,
+  seal: NO_SEAL,
 };
 
 export type FieldName =
@@ -98,7 +102,14 @@ export type FieldName =
   | 'collarDepthMm'
   | 'collarWallMm'
   | 'collarClearanceMm'
-  | 'collarLipMm';
+  | 'collarLipMm'
+  | 'seal'
+  | 'tapeWidthMm'
+  | 'tapeThicknessMm'
+  | 'tapeGrooveMm'
+  | 'tapeSqueezePct'
+  | 'tapeSides'
+  | 'tapePort';
 
 export type FormValues = Partial<Record<FieldName, string>>;
 export type FieldErrors = Partial<Record<FieldName, string>>;
@@ -109,6 +120,8 @@ const FILLERS: readonly FillerPosition[] = ['start', 'end', 'middle', 'split'];
 const LEFTOVERS: readonly Leftover[] = ['spread', 'equal', 'shorten'];
 const WINDOWS: readonly WindowType[] = ['slider', 'hung'];
 const ROLES: readonly EdgeRole[] = ['track', 'sash', 'sill'];
+const SEALS: readonly SealKind[] = ['none', 'tape'];
+const YES_NO = ['no', 'yes'] as const;
 
 export function toFormValues(p: Params): FormValues {
   return {
@@ -147,6 +160,13 @@ export function toFormValues(p: Params): FormValues {
     collarWallMm: String(p.collar.wallMm),
     collarClearanceMm: String(p.collar.clearanceMm),
     collarLipMm: String(p.collar.lipMm),
+    seal: p.seal.kind,
+    tapeWidthMm: String(p.seal.tape.widthMm),
+    tapeThicknessMm: String(p.seal.tape.thicknessMm),
+    tapeGrooveMm: String(p.seal.tape.grooveMm),
+    tapeSqueezePct: String(p.seal.tape.squeezePct),
+    tapeSides: p.seal.tape.sides ? 'yes' : 'no',
+    tapePort: p.seal.tape.port ? 'yes' : 'no',
   };
 }
 
@@ -235,10 +255,46 @@ export function readParams(values: FormValues): ReadResult {
     depthMm: { top: depthOf('top'), bottom: depthOf('bottom'), left: depthOf('left'), right: depthOf('right') },
   };
   const edges: EdgeParams = { window, roles, track };
-  // An edge strip keeps walls as thick as the joint's flanges either side of its slot.
+
+  // The seal (seal-tape, #15). The tape's fields are read only with tape, as a custom printer's
+  // size is; with no seal a value that is not filled in keeps its starting value (Q122).
+  const sealKind = oneOf('seal', SEALS);
+  const withTape = sealKind === 'tape';
+  const tapeNumber = (field: FieldName, fallback: number, fits: (n: number) => boolean, message: string): number => {
+    const n = number(field);
+    if (fits(n)) return n;
+    if (!withTape) return fallback;
+    errors[field] = message;
+    return Number.NaN;
+  };
+  const positive = (n: number) => n > 0;
+  const tape = {
+    widthMm: tapeNumber('tapeWidthMm', DEFAULT_TAPE.widthMm, positive, 'Enter a size in mm, greater than 0.'),
+    thicknessMm: tapeNumber('tapeThicknessMm', DEFAULT_TAPE.thicknessMm, positive, 'Enter a size in mm, greater than 0.'),
+    grooveMm: tapeNumber('tapeGrooveMm', DEFAULT_TAPE.grooveMm, (n) => n >= 0, 'Enter a size in mm, 0 or more.'),
+    squeezePct: tapeNumber(
+      'tapeSqueezePct',
+      DEFAULT_TAPE.squeezePct,
+      (n) => n > 0 && n <= 100,
+      'Enter a percentage greater than 0, up to 100.',
+    ),
+    sides: (withTape ? oneOf('tapeSides', YES_NO) : values.tapeSides) === 'yes',
+    port: (withTape ? oneOf('tapePort', YES_NO) : values.tapePort) === 'yes',
+  };
+  const seal: SealParams = { kind: sealKind, tape };
+  const fit = tapeFit(seal);
+  const sideTape = fit !== undefined && fit.sides && Object.values(tape).every((v) => !Number.isNaN(v));
+  if (fit !== undefined && Number.isFinite(fit.standOutMm) && fit.standOutMm <= 1e-9) {
+    errors.tapeSqueezePct =
+      `Squeezed to ${mm((tape.thicknessMm * tape.squeezePct) / 100)} mm, the tape would sit inside its ` +
+      `${mm(tape.grooveMm)} mm groove; squeeze it less or make the groove shallower.`;
+  }
+
+  // An edge strip keeps walls as thick as the joint's flanges either side of its slot; tape on
+  // its sides takes the clearance's place, its groove cut into those walls (Q127).
   const anyTrack = EDGES.some((e) => roles[e] === 'track');
-  const narrowest =
-    thicknessMm + 2 * joint.fitMm + 2 * joint.flangeMm + (anyTrack ? 2 * track.clearanceMm : 0);
+  const sideRoom = sideTape && fit !== undefined ? fit.standOutMm + fit.grooveDepthMm : track.clearanceMm;
+  const narrowest = thicknessMm + 2 * joint.fitMm + 2 * joint.flangeMm + (anyTrack ? 2 * sideRoom : 0);
   if (Number.isFinite(narrowest) && track.widthMm < narrowest - 1e-9) {
     errors.trackWidthMm = `Make it at least ${mm(narrowest)} mm: an edge strip needs walls as thick as the flanges.`;
   }
@@ -265,6 +321,28 @@ export function readParams(values: FormValues): ReadResult {
     }
   }
 
+  if (fit !== undefined && errors.tapeSqueezePct === undefined && Number.isFinite(fit.grooveWidthMm)) {
+    // The tape on the sides needs a track at least as deep as it is wide (Q127).
+    const shallow = sideTape ? EDGES.find((e) => roles[e] === 'track' && track.depthMm[e] < tape.widthMm) : undefined;
+    if (shallow !== undefined) {
+      errors.tapeSides =
+        `The ${shallow} track is ${mm(track.depthMm[shallow])} mm deep, less than the ${mm(tape.widthMm)} mm tape ` +
+        'is wide, so the tape cannot go on the edge strips’ sides.';
+    }
+    // Its groove on the outer face leaves the strip walls of at least 0.8 mm (Q131).
+    const widths = EDGES.map((e) =>
+      roles[e] !== 'track'
+        ? track.widthMm
+        : track.widthMm - 2 * (sideTape ? fit.standOutMm : track.clearanceMm),
+    );
+    const walls = (Math.min(...widths) - fit.grooveWidthMm) / 2;
+    if (walls < TAPE_GROOVE_WALL_MM - 1e-9) {
+      errors.tapeWidthMm =
+        `Leaves walls of ${hundredth(Math.max(0, walls))} mm beside the tape’s groove in the edge strips, under the ` +
+        `${mm(TAPE_GROOVE_WALL_MM)} mm they need; choose a narrower tape.`;
+    }
+  }
+
   // The hose port's collar (Q107): the clearance may be zero, as the joint's fit may.
   const collar: CollarParams = {
     depthMm: size('collarDepthMm'),
@@ -274,15 +352,19 @@ export function readParams(values: FormValues): ReadResult {
   };
   const given = parsePorts(values.ports ?? '');
   if (!given.ok) errors.ports = given.message;
+  // Tape inside the collar needs a collar as deep as its groove is wide (Q129).
+  if (fit?.port === true && given.ok && given.ports.length > 0 && collar.depthMm < fit.grooveWidthMm - 1e-9) {
+    errors.collarDepthMm = `Make it at least ${mm(fit.grooveWidthMm)} mm, so the tape’s groove fits inside the collar.`;
+  }
 
   if (Object.keys(errors).length === 0) {
     // The edge strips must leave the pieces something to cover.
-    const span = panelSpan(openingWidthMm, openingHeightMm, edges, joint);
+    const span = panelSpan(openingWidthMm, openingHeightMm, edges, joint, fit);
     if (span.widthMm <= 0) errors.openingWidthMm = 'Too small for the edge strips.';
     if (span.heightMm <= 0) errors.openingHeightMm = 'Too small for the edge strips.';
   }
 
-  const base = { openingWidthMm, openingHeightMm, printer, bedMarginMm, width, height, thicknessMm, joint, edges, collar };
+  const base = { openingWidthMm, openingHeightMm, printer, bedMarginMm, width, height, thicknessMm, joint, edges, collar, seal };
   const ports: Required<PortSetting>[] = [];
   if (Object.keys(errors).length === 0 && given.ok && given.ports.length > 0) {
     errors.ports = placePorts({ ...base, ports: [] }, given.ports, ports);
@@ -298,13 +380,14 @@ export function readParams(values: FormValues): ReadResult {
 function placePorts(params: Params, given: PortSetting[], placed: Required<PortSetting>[]): string | undefined {
   const plan = planWall(params);
   const start = defaultPortPiece(plan);
+  const collar = tapedCollar(params.collar, tapeFit(params.seal)); // with tape inside, Q129
   for (const [i, port] of given.entries()) {
     const column = port.column ?? start.column + 1;
     const row = port.row ?? start.row + 1;
-    if (!(portHoleMm(port.hoseMm, params.collar) > 0)) {
+    if (!(portHoleMm(port.hoseMm, collar) > 0)) {
       return `Port ${i + 1}: the ${mm(params.collar.lipMm)} mm lip would close a ${mm(port.hoseMm)} mm hose’s port; make the lip smaller.`;
     }
-    const fit = checkPort(plan, { hoseMm: port.hoseMm, column: column - 1, row: row - 1 }, params.collar, params.joint);
+    const fit = checkPort(plan, { hoseMm: port.hoseMm, column: column - 1, row: row - 1 }, collar, params.joint);
     if (!fit.ok) return `Port ${i + 1}: ${fit.message}`;
     const other = placed.findIndex((p) => p.column === column && p.row === row);
     if (other >= 0) {
@@ -316,7 +399,7 @@ function placePorts(params: Params, given: PortSetting[], placed: Required<PortS
 }
 
 function layoutFor(p: Params, max: PieceSize): GridLayout {
-  const span = panelSpan(p.openingWidthMm, p.openingHeightMm, p.edges, p.joint);
+  const span = panelSpan(p.openingWidthMm, p.openingHeightMm, p.edges, p.joint, tapeFit(p.seal));
   return layoutGrid({
     widthMm: span.widthMm,
     heightMm: span.heightMm,
@@ -354,12 +437,13 @@ export interface WallParts {
 // start here, so they cannot disagree.
 export function planParts(p: Params, plan: GridLayout = planWall(p)): WallParts {
   const max = pieceLimit(p);
-  const span = panelSpan(p.openingWidthMm, p.openingHeightMm, p.edges, p.joint);
+  const tape = tapeFit(p.seal);
+  const span = panelSpan(p.openingWidthMm, p.openingHeightMm, p.edges, p.joint, tape);
   return {
     plan,
     joints: planJoints(plan, p.joint, jointStripInsetMm(p.joint)),
     // A strip can be turned on the bed, so the longer side of the largest piece limits it.
-    edges: planEdges(span.widthMm, span.heightMm, p.edges, p.joint, Math.max(max.widthMm, max.heightMm)),
+    edges: planEdges(span.widthMm, span.heightMm, p.edges, p.joint, Math.max(max.widthMm, max.heightMm), tape),
   };
 }
 
@@ -380,11 +464,14 @@ export interface PlanText {
   warnings: string[];
   leftovers: LeftoverText[];
   ports: string[]; // one line for each hose port
+  seal: string;
 }
 
 function mm(n: number): string {
   return String(Math.round(n * 10) / 10);
 }
+
+const hundredth = (n: number): string => String(Math.round(n * 100) / 100);
 
 const plural = (count: number, one: string, many: string) => `${count} ${count === 1 ? one : many}`;
 
@@ -449,11 +536,30 @@ function describeJoints(joints: JointPlan, joint: JointParams): string {
   return `Joints: ${plural(joints.strips.length, 'strip', 'strips')} in ${plural(lengths, 'length', 'lengths')}${crosses}; each joint ${mm(jointWidthMm(joint))} mm wide.`;
 }
 
+// The tape (Q119, Q127, Q129): its size, where it goes, and how much the wall takes, along each
+// edge strip, twice more along those in a track for the sides, and round each collar's groove.
+function describeSeal(params: Params, parts: WallParts): string {
+  const fit = tapeFit(params.seal);
+  if (fit === undefined) return 'Seal: none.';
+  const { tape } = params.seal;
+  const sum = (lengths: number[]) => lengths.reduce((n, l) => n + l, 0);
+  const outer = sum(parts.edges.map((s) => s.lengthMm));
+  const sides = fit.sides ? 2 * sum(parts.edges.filter((s) => params.edges.roles[s.edge] === 'track').map((s) => s.lengthMm)) : 0;
+  const ports = fit.port ? params.ports : [];
+  const collar = tapedCollar(params.collar, fit);
+  const round = sum(ports.map((p) => Math.PI * (collarInnerMm(p.hoseMm, collar) + 2 * fit.grooveDepthMm)));
+  const faces = fit.sides ? 'outer faces and sides' : 'outer faces';
+  const inPorts =
+    ports.length === 0 ? '' : ports.length === 1 ? ', and inside the hose port’s collar' : ', and inside each hose port’s collar';
+  const metres = Math.round((outer + sides + round) / 100) / 10;
+  return `Seal: ${mm(tape.widthMm)} × ${mm(tape.thicknessMm)} mm foam tape along the edge strips’ ${faces}${inPorts}: ${metres} m in all.`;
+}
+
 export function describePlan(plan: GridLayout, params: Params): PlanText {
   const count = plan.pieces.length;
   const max = pieceLimit(params);
   const parts = planParts(params, plan);
-  const span = panelSpan(params.openingWidthMm, params.openingHeightMm, params.edges, params.joint);
+  const span = panelSpan(params.openingWidthMm, params.openingHeightMm, params.edges, params.joint, tapeFit(params.seal));
   const shapes = edgeShapes(parts.edges).length;
   return {
     headline: `${count} ${count === 1 ? 'piece' : 'pieces'}: ${plan.columns.length} across, ${plan.rows.length} up, ${mm(params.thicknessMm)} mm thick`,
@@ -470,5 +576,6 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
       describeLeftover(note, note.axis === 'width' ? max.widthMm : max.heightMm, params.joint),
     ),
     ports: params.ports.map((p) => `Hose port: a ${mm(p.hoseMm)} mm hose end, in column ${p.column}, row ${p.row}.`),
+    seal: describeSeal(params, parts),
   };
 }

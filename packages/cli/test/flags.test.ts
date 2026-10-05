@@ -23,7 +23,9 @@ describe('the setting flags (Q90)', () => {
     '--%s: its place in a --params file holds the value the page shows',
     (_flag, f) => {
       const params = f.field.startsWith('custom') ? CUSTOM_PRINTER : f.field === 'printerModel' ? LISTED_PRINTER : EXAMPLE_PARAMS;
-      expect(String(settingAt(params, f.path))).toBe(toFormValues(params)[f.field]);
+      const value = settingAt(params, f.path);
+      // A place for the tape is true or false in the file, yes or no as a flag.
+      expect(f.onOff ? (value === true ? 'yes' : 'no') : String(value)).toBe(toFormValues(params)[f.field]);
     },
   );
 
@@ -43,6 +45,9 @@ describe('the setting flags (Q90)', () => {
       'bottom-edge',
       'left-edge',
       'right-edge',
+      'seal',
+      'tape-sides',
+      'tape-port',
     ]);
   });
 
@@ -53,6 +58,7 @@ describe('the setting flags (Q90)', () => {
       ...toFormValues(CUSTOM_PRINTER),
       printerModel: 'prusa-mk4s',
       ...(f.field === 'printerModel' ? { printer: 'model' } : {}),
+      ...(f.path.startsWith('seal.tape.') ? { seal: 'tape' } : {}), // read only with tape
     };
     for (const value of f.values ?? []) {
       expect(readParams({ ...base, [f.field]: value })).toMatchObject({ ok: true });

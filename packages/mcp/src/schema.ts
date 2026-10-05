@@ -13,6 +13,8 @@ const GROUPS: Record<string, string> = {
   joint: 'The strips that join the pieces, in mm. Starting values; a test print confirms them.',
   edges: 'The window and its four edges.',
   collar: "The hose port's collar, in mm. Starting values; a test print confirms them.",
+  seal: 'The seal: none, or foam tape. Tape settings without a kind mean tape.',
+  'seal.tape': 'The foam tape: its size and groove in mm, how far it is squeezed in %, and where else it goes.',
   'edges.roles': 'What each edge meets. Setting the window type presets all four.',
   'edges.track': "The window's tracks, in mm.",
   'edges.track.depthMm': 'How deep each track is.',
@@ -28,8 +30,14 @@ const PORT = z.strictObject({
   row: z.number().int().min(1).optional().describe('The row of its piece, from 1 at the bottom.'),
 });
 
-function leaf(help: string, values: readonly string[] | undefined, required: boolean, list = false): z.ZodType {
-  const base = list ? z.array(PORT) : values === undefined ? z.number() : z.enum(values as [string, ...string[]]);
+function leaf(help: string, values: readonly string[] | undefined, required: boolean, list = false, onOff = false): z.ZodType {
+  const base = list
+    ? z.array(PORT)
+    : onOff
+      ? z.boolean()
+      : values === undefined
+        ? z.number()
+        : z.enum(values as [string, ...string[]]);
   const described = base.describe(help);
   return required ? described : described.optional();
 }
@@ -49,7 +57,7 @@ export function settingsSchema(): z.ZodObject {
     const keys = s.path.split('.');
     let at = tree;
     for (const key of keys.slice(0, -1)) at = (at[key] ??= {}) as Tree;
-    at[keys.at(-1) as string] = leaf(s.help, s.values, REQUIRED.has(s.path), s.list === true);
+    at[keys.at(-1) as string] = leaf(s.help, s.values, REQUIRED.has(s.path), s.list === true, s.onOff === true);
   }
   return toSchema(tree, '').describe(
     "The window's settings in the library's shape; every length in mm. Only the opening is required; " +

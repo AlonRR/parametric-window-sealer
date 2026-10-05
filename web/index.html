@@ -234,6 +234,36 @@
           <span class="error" data-testid="error-ports"></span>
         </fieldset>
 
+        <!-- The seal (seal-tape, #15): a choice starting at none (Q122), and foam tape from the
+          sizes on makers' own listings or the user's own (Q121). -->
+        <fieldset>
+          <legend>Seal</legend>
+          <label><input type="radio" name="seal" value="none" checked /> None</label>
+          <label><input type="radio" name="seal" value="tape" /> Foam tape</label>
+          <div data-testid="tape" hidden>
+            <label>
+              Tape size, width × thickness
+              <select data-part="tape-size"></select>
+            </label>
+            <div data-part="tape-own" hidden>
+              <label>
+                Width (mm)
+                <input name="tapeWidthMm" inputmode="decimal" autocomplete="off" />
+              </label>
+              <label>
+                Thickness (mm)
+                <input name="tapeThicknessMm" inputmode="decimal" autocomplete="off" />
+              </label>
+            </div>
+            <span class="error" data-testid="error-tapeWidthMm"></span>
+            <span class="error" data-testid="error-tapeThicknessMm"></span>
+            <p class="note">
+              Self-adhesive foam weather-seal tape. It goes in a groove along each edge strip's
+              outer face, where the track, the sash or the sill presses on it.
+            </p>
+          </div>
+        </fieldset>
+
         <fieldset>
           <legend>The largest piece your printer can make</legend>
           <!-- The printer list (printer-presets, #13; Q115): filled from the library's list,
@@ -410,6 +440,46 @@
           <p><button type="button" id="add-port">Add another port</button></p>
         </details>
 
+        <details>
+          <summary>Advanced: the tape</summary>
+          <p class="note">
+            Used when the seal is foam tape. These are starting values: a test print shows
+            whether to change them.
+          </p>
+          <label>
+            Groove depth (mm)
+            <input name="tapeGrooveMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">
+            The tape sits in a groove 0.5 mm wider than the tape and this deep; 0 for a flat face.
+          </p>
+          <span class="error" data-testid="error-tapeGrooveMm"></span>
+          <label>
+            Squeezed to (% of its thickness)
+            <input name="tapeSqueezePct" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">
+            How thin the tape is with the wall in place; the edge strips leave it that much room.
+            Half its thickness is inside every gap range the tape makers state.
+          </p>
+          <span class="error" data-testid="error-tapeSqueezePct"></span>
+          <label>
+            <input type="checkbox" name="tapeSides" value="yes" />
+            Also on the sides of the edge strips in a track
+          </label>
+          <p class="note">
+            Each strip is made narrower by the tape, so it still slides in. The track has to be at
+            least as deep as the tape is wide.
+          </p>
+          <span class="error" data-testid="error-tapeSides"></span>
+          <label>
+            <input type="checkbox" name="tapePort" value="yes" />
+            Also inside each hose port's collar
+          </label>
+          <p class="note">The collar is made wider by the tape and its groove.</p>
+          <span class="error" data-testid="error-tapePort"></span>
+        </details>
+
         <!-- What to do when full pieces leave less room than a joint takes (Q60): set
           from the choice shown in the plan's warning. -->
         <input type="hidden" name="widthLeftover" />
@@ -433,6 +503,7 @@
         <p data-testid="plan-joints"></p>
         <p data-testid="plan-edges"></p>
         <ul data-testid="plan-ports"></ul>
+        <p data-testid="plan-seal"></p>
         <ul data-testid="plan-warnings"></ul>
         <p><button type="button" id="download-open">Download the pieces...</button></p>
       </section>

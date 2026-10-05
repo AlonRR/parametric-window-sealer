@@ -343,3 +343,38 @@ describe('a printer from the list (printer-presets #13; Q115 to Q117)', () => {
     expect(r.out.replace(/\s+/g, ' ')).toContain('prusa-mk4s, prusa-mini-plus');
   });
 });
+
+describe('a tape seal (seal-tape #15; Q119 to Q132)', () => {
+  const params = async (args: string[]) => {
+    const r = await cli([...args, '--dry-run', '--json']);
+    return json(r.out).params as typeof EXAMPLE_PARAMS;
+  };
+
+  it('without --seal there is none, and the summary says so (Q122)', async () => {
+    const r = await cli([...OPENING, '--dry-run']);
+    expect(r.out).toContain('Seal: none.');
+  });
+
+  it('--seal tape: the summary names the tape and how much of it', async () => {
+    const r = await cli([...OPENING, '--seal', 'tape', '--dry-run']);
+    expect(r.code).toBe(0);
+    expect(r.out).toContain('Seal: 9 × 4 mm foam tape along the edge strips’ outer faces: 3.2 m in all.');
+  });
+
+  it('a tape flag without --seal means tape; with --tape-sides the strips are named by their track', async () => {
+    expect((await params([...OPENING, '--tape-sides', 'yes'])).seal).toEqual({
+      kind: 'tape',
+      tape: { widthMm: 9, thicknessMm: 4, grooveMm: 1, squeezePct: 50, sides: true, port: false },
+    });
+    const r = await cli([...OPENING, '--tape-sides', 'yes', '--dry-run']);
+    expect(r.out).toMatch(/ {2}edge-[0-9.]+x13x11-track-10-print-[0-9]+\.stl/);
+  });
+
+  it('refuses side tape in a track shallower than the tape is wide, naming the flag', async () => {
+    const r = await cli([...OPENING, '--tape-sides', 'yes', '--left-depth', '8']);
+    expect(r.code).toBe(2);
+    expect(r.err).toContain(
+      '--tape-sides: The left track is 8 mm deep, less than the 9 mm tape is wide, so the tape cannot go on the edge strips’ sides.',
+    );
+  });
+});

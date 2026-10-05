@@ -10,6 +10,8 @@ import type { Engine } from './engine.js';
 import type { GridLayout } from './layout.js';
 import { DEFAULT_COLLAR, collarInnerMm, collarOuterMm, portHoleMm } from './port.js';
 import type { CollarParams, PortSetting } from './port.js';
+import { tapedCollar } from './tape.js';
+import type { TapeFit } from './tape.js';
 
 export interface PanelSize {
   widthMm: number;
@@ -35,11 +37,22 @@ export const PORT_SEGMENTS = 128;
 
 // The piece with a hose port (hose-port, #12): the panel with a hole, and the collar standing
 // on its room side (Q106), centred. The hole is smaller than the collar's inside by the lip,
-// so the hose end stops on the panel and the piece prints flat with no supports.
-export function portPanel(engine: Engine, size: PanelSize, hoseMm: number, collar: CollarParams): Manifold {
+// so the hose end stops on the panel and the piece prints flat with no supports. With tape
+// inside the collar (seal-tape, #15; Q129), a groove for it runs round the collar's inside,
+// centred on its depth; the collar given is already the taped one (tapedCollar).
+export function portPanel(
+  engine: Engine,
+  size: PanelSize,
+  hoseMm: number,
+  collar: CollarParams,
+  groove?: { widthMm: number; depthMm: number },
+): Manifold {
   const hole = portHoleMm(hoseMm, collar);
   if (!(hole > 0)) {
     throw new RangeError(`The lip (${collar.lipMm} mm) closes a ${hoseMm} mm hose's port; make it smaller`);
+  }
+  if (groove !== undefined && (groove.widthMm > collar.depthMm || groove.depthMm >= collar.wallMm)) {
+    throw new RangeError(`A ${groove.widthMm} × ${groove.depthMm} mm groove does not fit the collar`);
   }
   const { Manifold } = engine;
   const [x, y] = [size.widthMm / 2, size.heightMm / 2];
@@ -53,12 +66,32 @@ export function portPanel(engine: Engine, size: PanelSize, hoseMm: number, colla
     const panel = keep(plainPanel(engine, size));
     const cut = keep(Manifold.cylinder(t + 2, hole / 2, -1, PORT_SEGMENTS).translate([x, y, -1]));
     const outer = keep(Manifold.cylinder(collar.depthMm, collarOuterMm(hoseMm, collar) / 2, -1, PORT_SEGMENTS));
-    const inside = keep(Manifold.cylinder(collar.depthMm + 2, collarInnerMm(hoseMm, collar) / 2, -1, PORT_SEGMENTS));
-    const ring = keep(outer.subtract(keep(inside.translate([0, 0, -1]))).translate([x, y, t]));
-    return keep(panel.subtract(cut)).add(ring);
+    const inner = collarInnerMm(hoseMm, collar);
+    const inside = keep(Manifold.cylinder(collar.depthMm + 2, inner / 2, -1, PORT_SEGMENTS));
+    let ring = keep(outer.subtract(keep(inside.translate([0, 0, -1]))));
+    if (groove !== undefined && groove.depthMm > 0) {
+      const cutter = keep(Manifold.cylinder(groove.widthMm, inner / 2 + groove.depthMm, -1, PORT_SEGMENTS));
+      ring = keep(ring.subtract(keep(cutter.translate([0, 0, (collar.depthMm - groove.widthMm) / 2]))));
+    }
+    return keep(panel.subtract(cut)).add(keep(ring.translate([x, y, t])));
   } finally {
     for (const m of parts) m.delete(); // WebAssembly memory: free everything but the result
   }
+}
+
+// The squeezed tape inside a port's collar, for the preview only (Q132): a ring from the hose
+// out to its groove's floor, as tall as the tape is wide, centred on the collar's depth. The
+// collar given is the taped one.
+export function portTapeSolid(engine: Engine, size: PanelSize, hoseMm: number, collar: CollarParams, tape: TapeFit): Manifold {
+  const { Manifold } = engine;
+  const outer = Manifold.cylinder(tape.widthMm, collarInnerMm(hoseMm, collar) / 2 + tape.grooveDepthMm, -1, PORT_SEGMENTS);
+  const inner = Manifold.cylinder(tape.widthMm + 2, hoseMm / 2, -1, PORT_SEGMENTS);
+  const moved = inner.translate([0, 0, -1]);
+  const ring = outer.subtract(moved);
+  const z = size.thicknessMm + (collar.depthMm - tape.widthMm) / 2;
+  const solid = ring.translate([size.widthMm / 2, size.heightMm / 2, z]);
+  for (const m of [outer, inner, moved, ring]) m.delete();
+  return solid;
 }
 
 export interface BuiltPiece {
@@ -75,8 +108,11 @@ export function buildPieces(
   thicknessMm: number,
   ports: readonly PortSetting[] = [],
   collar: CollarParams = DEFAULT_COLLAR,
+  tape?: TapeFit,
 ): BuiltPiece[] {
   const built: BuiltPiece[] = [];
+  const taped = tapedCollar(collar, tape);
+  const groove = tape?.port === true ? { widthMm: tape.grooveWidthMm, depthMm: tape.grooveDepthMm } : undefined;
   try {
     for (const cell of plan.pieces) {
       const size = { widthMm: cell.widthMm, heightMm: cell.heightMm, thicknessMm };
@@ -84,7 +120,12 @@ export function buildPieces(
       built.push(
         port === undefined
           ? { column: cell.column, row: cell.row, solid: plainPanel(engine, size) }
-          : { column: cell.column, row: cell.row, hoseMm: port.hoseMm, solid: portPanel(engine, size, port.hoseMm, collar) },
+          : {
+              column: cell.column,
+              row: cell.row,
+              hoseMm: port.hoseMm,
+              solid: portPanel(engine, size, port.hoseMm, taped, groove),
+            },
       );
     }
   } catch (error) {
