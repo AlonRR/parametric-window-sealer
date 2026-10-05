@@ -38,50 +38,49 @@ engine is deliberately undecided until the design questions below are settled.
 | Q9 | Organiser systems: **Honeycomb Storage Wall**, **Skådis**, **Multiboard**, **openGrid**, built so **more can be added later**. "Honeycomb" in the brief is the organiser system | 5 Oct 2026 |
 | Q10 | The fill is set **once for the whole wall by default**, with an **advanced tab for per-piece overrides** | 5 Oct 2026 |
 | Q11 | The opening is divided as a **grid** (rows and columns as needed), and the division mode ("all equal" or "full-size pieces plus one filler") is **chosen separately for width and height** | 5 Oct 2026 |
-| Q12 | The filler's **position is the user's choice** (start, end or middle), **or it is split in two for symmetry**. What happens when the remainder is too small is still open (Q12 below) | 5 Oct 2026 |
+| Q12 | The filler's **position is the user's choice** (start, end or middle), **or it is split in two for symmetry**. When the leftover is too small to print or hold, the page **warns and the user decides** | 5 Oct 2026 |
 | Q13 | Pieces join with **separate connector strips** by default (a tongue on each edge, an H-profile strip between pieces, a cross piece where four meet; removable, sealable in TPU, a few mm of slide per joint). **Puzzle dovetails, sliding dovetail rails and bolted flanges** are advanced options | 5 Oct 2026 |
 | Q14 | The wall is held **in the window track, clamped by the closed sash** (no screws). Track dimensions become parameters | 5 Oct 2026 |
 | Q15 | Appliances: **window AC**, **portable AC exhaust hose**, **exhaust fan**, and **no appliance** (a plain wall); more can be added later | 5 Oct 2026 |
 | Q16 | Fitting to the appliance, all as options: a **sliding insert** that closes in around it, a **measured cutout with a gasket**, **adjustable clamps** with slotted holes, and **standard ports** (round hose ports, fan mounts) chosen from a list | 5 Oct 2026 |
+| Q17 | Optional seals (TPU, tape or none, per Q6) can go **wall to window**, **piece to piece** (in the connector seams) and **around the appliance** | 5 Oct 2026 |
 | Q19 | Tools and commit identity persist through a **SessionStart hook committed in the repo**, which runs only in cloud sessions | 5 Oct 2026 |
 | Q20 | Decorative patterns: **brick**, **diamond**, **grid**, **decorative hexagon**; the list is extensible, and **users can add their own** (how: Q21) | 5 Oct 2026 |
+| Q21 | Users add their own patterns by **uploading an SVG tile**, **drawing one in the page**, or contributing a **pattern file to the repo** | 5 Oct 2026 |
 
 The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-### Panels and patterns
+### Engine and how the page is used
 
-- **Q21.** How do users add their own pattern: upload a tile image (SVG or DXF), draw one in the
-  page, or add a pattern file to the repository?
-
-### Dividing the opening
-
-- **Q12.** (Partly answered.) In "full-size pieces plus one filler" mode, what happens when the
-  remainder is too small to print or to hold: a minimum filler size below which a full piece is
-  shrunk to make room, a warning, or something else?
-
-### Sealing
-
-- **Q17.** How sealed must it be: against air, rain, insects, heat? And where do the optional seals
-  (Q6) sit: panel to window, panel to panel, panel to appliance? For tape, a groove or a flat
-  strip of edge?
-
-### Engine
-
-- **Q22.** Which engine builds the geometry? The answers so far ask for things a plain OpenSCAD
-  Customizer page handles poorly: per-piece overrides (Q10), user-uploaded patterns (Q20, Q21),
-  and downloading every piece at once. The candidates:
+- **Q22.** Which engine builds the geometry? The owner's answer (5 Oct 2026): "my thinking was
+  that the page would run locally and users would add stl or other similar files". That needs
+  Q24 and Q25 settled first. The candidates so far:
   - a custom web page with the model in OpenSCAD files, rendered in the browser by OpenSCAD's
     WebAssembly build (GPL, so the deployed page would be GPL-licensed as a whole (inferred));
   - a custom web page with the model in TypeScript on the Manifold geometry library
     (`manifold-3d`, Apache-2.0, verified on npm 5 Oct 2026), with no OpenSCAD files;
   - the OpenSCAD Customizer page alone (one piece at a time).
+- **Q24.** What does "run locally" mean: the page runs in the visitor's browser with nothing sent
+  to a server (true of every candidate above, even when served from GitHub Pages), a download
+  people open offline on their own computer, or both?
+- **Q25.** What are the user-added STL (or similar) files for: the user's own organiser or
+  accessory tiles placed on a panel, their own 3D pattern tiles, a model of their appliance to
+  cut around, or a whole custom piece the tool fits connectors to?
 
 ### A real case to design against
 
 - **Q18.** The dimensions of your window's open area and of the appliance in it, so the first
   model is tested against a real fit.
+
+### Sessions
+
+- **Q23.** The startup hook (Q19) is tested in a fresh clone (20 of 20), but it has not been seen
+  to fire in a real new cloud session. In this session it did not fire, most likely because the
+  session's project directory holds two repositories, so the repo's own `.claude/settings.json`
+  is not the project's (inferred). Verify it by opening a throwaway cloud session on this repo
+  alone, checking the identity and hooks, then archiving the session?
 
 ## Repository follow-ups
 

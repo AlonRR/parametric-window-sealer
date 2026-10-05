@@ -71,7 +71,11 @@ outside this tree; do not vendor them in. The ones that bite most often here:
   `Alon A. Rabinowitz <45129051+AlonRR@users.noreply.github.com>`.** A cloud session's default
   identity is wrong for this repo. In a cloud session, `.claude/hooks/session-start.sh` sets it
   up at session start, installs the tools and wires the hooks (owner's decision, Q19); check
-  with `git config --get user.email`. Anywhere else, before the first commit in a fresh clone:
+  with `git config --get user.email`. A session that holds several repositories has a parent
+  folder as its project directory, and there the hook did not fire (5 Oct 2026, inferred cause);
+  run it by hand with
+  `CLAUDE_CODE_REMOTE=true CLAUDE_PROJECT_DIR="$PWD" .claude/hooks/session-start.sh` from the
+  repo root. Anywhere else, before the first commit in a fresh clone:
 
   ```bash
   git config user.name  "Alon A. Rabinowitz"
