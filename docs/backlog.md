@@ -72,7 +72,7 @@ Nothing in either has been test printed yet.
 | `params-advanced` | #21 | Advanced: a fill for any piece, its fill and style, picked on a map of the pieces (C26 to C30) | P1 | M | `params-basic`, `patterns-core` | Q10, Q144 | |
 | `seal-tpu` | #22 | Printed TPU seal: gaskets in the tape's grooves, a sleeve in each hose port, and under Advanced the joint strips and cross pieces in TPU, where tape does not fit (Q128; C31 to C39) | P1 | M | `connector-strip`, `track-edge` | Q6, Q17, Q128, Q144 | Test print in TPU |
 | `measured-cutout` | #23 | Appliance cutout sized to measured dimensions, inside one piece with a rim, lined with the seal (TPU or foam) taking up the last few mm (C40 to C47) | P1 | M | `plain-panel` | Q16, Q144 | Test print |
-| `window-ac` | #24 | Fitting for a window AC: the wall meets the unit's side or top | P1 | M | `measured-cutout` | Q15 | Units differ; example sizes only |
+| `window-ac` | #24 | Fitting for a window AC: the wall meets the unit's side or top, as an edge's fourth role, set from where the unit is (C49 to C53) | P1 | M | `measured-cutout` | Q15, Q144 | Units differ; example sizes only |
 | `offline-file` | #25 | The page as one self-contained file that works offline | P1 | M | `page-skeleton` | Q24 | Inlining the engine adds about a third to its size (inferred) |
 | `user-guide` | #14 | A measuring guide with pictures, simple steps and input fields that fill the form: the window opening and track, the appliance, and printed test parts measured with calipers | P1 | M | `params-basic` | Q18, Q51, Q54 | Pictures drawn for this project; example sizes only (Q18) |
 | `pattern-plugins` | #26 | Pattern files contributed to the repo appear in the list | P2 | M | `patterns-core` | Q21 | Plugin format |

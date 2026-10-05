@@ -12,6 +12,13 @@ under Unreleased.
 
 ### Added
 
+- A window air conditioner: under "What is in the window?", choose "Window air conditioner" and
+  say where the unit is, seen from the room: below the wall, which stands on it, or to its left
+  or right. The edge facing it gets a flat face, with the seal if there is one, and the plan
+  says so. Measure the opening left open around the unit; in a hung window, make one wall for
+  each side. Each edge's role can also be set against the unit by hand; the command takes
+  `--bottom-edge unit`, the MCP server `edges.roles.bottom: "unit"`.
+
 - A measured cutout: under "What is in the window?", choose "Something else: a measured cutout"
   and give the appliance's outside width and height. It is cut through one piece you pick, with
   a rim round it on the room side (15 mm deep, a 2.4 mm wall and 1 mm clearance a side to start

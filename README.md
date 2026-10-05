@@ -26,7 +26,7 @@ issues; what has changed is in [`CHANGELOG.md`](CHANGELOG.md).
 
 Planned next:
 
-- **Appliances**: fittings for a window air conditioner, and fan mounts.
+- **Appliances**: fan mounts with their screw patterns.
 - **Panel styles**: organiser patterns (pegboard-style), beside the grid, hexagon, brick and
   diamond patterns.
 - **Help**: a measuring guide with pictures, and the page as one file that works offline.

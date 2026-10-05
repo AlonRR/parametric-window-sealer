@@ -74,6 +74,10 @@ window-sealer --width 600 --height 1000 --printer-model prusa-mk4s
   fewer pieces.
 - When full pieces leave too little room for a joint, it says so, the way the page does, and
   lists what `--width-leftover` or `--height-leftover` can do instead.
+- `--bottom-edge unit` puts the wall on a window air conditioner: that edge meets the unit with
+  a flat face, and the summary says so. Beside the unit, as in a hung window, it is
+  `--left-edge unit` or `--right-edge unit`, one wall for each side; measure the opening left
+  open around the unit.
 - `--port 150` adds a round port for a portable air conditioner's hose, sized to the hose end's
   outside diameter (150 and 130 mm are common; measure the end that goes in), in the bottom
   row's middle piece; `--port 150@2,1` puts it in column 2, row 1, counted from the bottom left
