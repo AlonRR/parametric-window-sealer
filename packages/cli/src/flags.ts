@@ -1,110 +1,47 @@
-// Every setting on the page as a flag (Q90), named after the page's field and described in
-// the page's words. `path` is where the same setting sits in a --params file, which has the
-// library's own shape (Q85).
-import type { FieldName, Params } from 'parametric-window-sealer';
+// Every setting on the page as a flag (Q90), named after the page's field. What each setting
+// is, where it sits in a --params file and its choices come from the library's SETTINGS, so
+// the command and the MCP server describe them alike.
+import { SETTINGS } from 'parametric-window-sealer';
+import type { FieldName, Setting } from 'parametric-window-sealer';
 
-export interface SettingFlag {
+export { settingAt } from 'parametric-window-sealer';
+
+export interface SettingFlag extends Setting {
   flag: string; // without the leading dashes
-  field: FieldName; // the page's field, and the library's name for it in errors
-  path: string; // in a --params file
-  help: string;
-  values?: readonly string[]; // a choice; otherwise a length in mm
 }
 
-const DIVISION = ['equal', 'full-plus-filler'] as const;
-const FILLER = ['start', 'end', 'middle', 'split'] as const;
-const LEFTOVER = ['spread', 'equal', 'shorten'] as const;
-const ROLE = ['track', 'sash', 'sill'] as const;
+// A Record over every field, so a field the library adds without a flag fails the type check.
+const FLAG_NAMES: Record<FieldName, string> = {
+  openingWidthMm: 'width',
+  openingHeightMm: 'height',
+  printer: 'printer',
+  customWidthMm: 'printer-width',
+  customHeightMm: 'printer-height',
+  widthMode: 'width-mode',
+  widthFiller: 'width-filler',
+  widthLeftover: 'width-leftover',
+  heightMode: 'height-mode',
+  heightFiller: 'height-filler',
+  heightLeftover: 'height-leftover',
+  thicknessMm: 'thickness',
+  slotMm: 'slot',
+  slideMm: 'slide',
+  webMm: 'web',
+  flangeMm: 'flange',
+  fitMm: 'fit',
+  window: 'window',
+  topEdge: 'top-edge',
+  bottomEdge: 'bottom-edge',
+  leftEdge: 'left-edge',
+  rightEdge: 'right-edge',
+  trackWidthMm: 'track-width',
+  topDepthMm: 'top-depth',
+  bottomDepthMm: 'bottom-depth',
+  leftDepthMm: 'left-depth',
+  rightDepthMm: 'right-depth',
+  trackClearanceMm: 'track-clearance',
+};
 
-const axis = (name: 'width' | 'height'): SettingFlag[] => [
-  {
-    flag: `${name}-mode`,
-    field: `${name}Mode`,
-    path: `${name}.mode`,
-    help: `Dividing the ${name}: equal pieces, or full pieces plus one filler.`,
-    values: DIVISION,
-  },
-  {
-    flag: `${name}-filler`,
-    field: `${name}Filler`,
-    path: `${name}.filler`,
-    help: `With full-plus-filler: where the ${name}'s filler goes.`,
-    values: FILLER,
-  },
-  {
-    flag: `${name}-leftover`,
-    field: `${name}Leftover`,
-    path: `${name}.leftover`,
-    help: `When full pieces leave too little for a joint: what to do instead.`,
-    values: LEFTOVER,
-  },
-];
+export const SETTING_FLAGS: readonly SettingFlag[] = SETTINGS.map((s) => ({ ...s, flag: FLAG_NAMES[s.field] }));
 
-const edge = (name: 'top' | 'bottom' | 'left' | 'right'): SettingFlag => ({
-  flag: `${name}-edge`,
-  field: `${name}Edge`,
-  path: `edges.roles.${name}`,
-  help: `The ${name} edge: in a track, pressed by the sash, or on a flat sill.`,
-  values: ROLE,
-});
-
-const depth = (name: 'top' | 'bottom' | 'left' | 'right'): SettingFlag => ({
-  flag: `${name}-depth`,
-  field: `${name}DepthMm`,
-  path: `edges.track.depthMm.${name}`,
-  help: `How deep the ${name} track is; used when that edge is in a track.`,
-});
-
-export const SETTING_FLAGS: readonly SettingFlag[] = [
-  { flag: 'width', field: 'openingWidthMm', path: 'openingWidthMm', help: 'The opening you can see: its width. Required.' },
-  { flag: 'height', field: 'openingHeightMm', path: 'openingHeightMm', help: 'The opening you can see: its height. Required.' },
-  {
-    flag: 'printer',
-    field: 'printer',
-    path: 'printer.kind',
-    help: 'The largest piece to print: default (200 × 200 mm) or custom.',
-    values: ['default', 'custom'],
-  },
-  { flag: 'printer-width', field: 'customWidthMm', path: 'printer.widthMm', help: "A custom printer's largest piece: its width." },
-  { flag: 'printer-height', field: 'customHeightMm', path: 'printer.heightMm', help: "A custom printer's largest piece: its height." },
-  ...axis('width'),
-  ...axis('height'),
-  { flag: 'thickness', field: 'thicknessMm', path: 'thicknessMm', help: 'Panel thickness.' },
-  { flag: 'slot', field: 'slotMm', path: 'joint.slotMm', help: 'How deep a piece can go into a strip.' },
-  { flag: 'slide', field: 'slideMm', path: 'joint.slideMm', help: 'How far a piece can move in its slot.' },
-  { flag: 'web', field: 'webMm', path: 'joint.webMm', help: "The wall between the strip's two slots." },
-  { flag: 'flange', field: 'flangeMm', path: 'joint.flangeMm', help: 'Each face of the strip, over the panel.' },
-  { flag: 'fit', field: 'fitMm', path: 'joint.fitMm', help: 'Clearance between each panel face and the strip.' },
-  {
-    flag: 'window',
-    field: 'window',
-    path: 'edges.window',
-    help: 'Window type; sets the four edges as the page does.',
-    values: ['slider', 'hung'],
-  },
-  edge('top'),
-  edge('bottom'),
-  edge('left'),
-  edge('right'),
-  { flag: 'track-width', field: 'trackWidthMm', path: 'edges.track.widthMm', help: 'Track width; every edge strip is this wide.' },
-  depth('top'),
-  depth('bottom'),
-  depth('left'),
-  depth('right'),
-  {
-    flag: 'track-clearance',
-    field: 'trackClearanceMm',
-    path: 'edges.track.clearanceMm',
-    help: 'Clearance in the track, per side.',
-  },
-];
-
-// The value at a dotted path, such as `edges.track.widthMm`; undefined if it is not there.
-export function settingAt(params: Params | Record<string, unknown>, path: string): unknown {
-  let value: unknown = params;
-  for (const key of path.split('.')) {
-    if (typeof value !== 'object' || value === null) return undefined;
-    value = (value as Record<string, unknown>)[key];
-  }
-  return value;
-}
+export const flagFor = (field: FieldName): string => `--${FLAG_NAMES[field]}`;
