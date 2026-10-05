@@ -70,7 +70,8 @@ from the room; without them it goes in the bottom row's middle piece. Foam tape 
 as `{ "kind": "tape" }`, or with its size and places, such as `{ "tape": { "widthMm": 9.5,
 "thicknessMm": 4.8, "sides": true } }`; tape settings without a `kind` mean tape. A grid pattern goes in `fill`, as `{ "kind": "grid" }`
 or with its sizes, such as `{ "grid": { "openingMm": 12, "barMm": 2 }, "style": "through" }`;
-grid settings without a `kind` mean the grid.
+grid settings without a `kind` mean the grid. A honeycomb is `"kind": "hexagon"`, its sizes in
+`fill.hexagon` (`openingMm` across the flats, `barMm`).
 
 `window_sealer_make_files` also takes:
 

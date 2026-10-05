@@ -12,6 +12,10 @@ under Unreleased.
 
 ### Added
 
+- A hexagon pattern: choose "Hexagon" under "Panel fill" for a honeycomb of hexagonal openings,
+  15 mm across the flats with 3 mm bars to start with, both under Advanced. The command takes
+  `--fill hexagon`, `--hex-opening` and `--hex-bar`, the MCP server `fill.hexagon`.
+
 - A grid pattern: choose "Grid" under "Panel fill" (sealed to start with). Its square openings
   are 15 mm with 3 mm bars to start with, both under Advanced, the bars no thinner than 0.8 mm.
   It is cut into the room side, half the panel deep, or cut through, letting air through. The

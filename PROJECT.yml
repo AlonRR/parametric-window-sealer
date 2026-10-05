@@ -5,6 +5,6 @@ projects:
   - name:     Parametric window sealer
     kind:     build
     state:    not-designed
-    next:     "build pattern-hexagon (#17), the next P1 item after pattern-grid (#16)"
+    next:     "build pattern-brick (#18), the next P1 item after pattern-hexagon (#17)"
     trackers: [docs/status.md, docs/backlog.md]
     review:   2026-10-05
