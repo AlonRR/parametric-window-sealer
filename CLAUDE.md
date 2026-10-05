@@ -11,14 +11,19 @@ hose. The design is still being worked out with the owner.
 
 - **`docs/status.md` is the plan and status document.** Read it first. It holds every decision
   made so far (with its question ID) and every open question. Keep it current as work lands.
+  `docs/choices.md` lists the choices the agent made without asking (Q144).
 - `PROJECT.yml` is this repo's entry in the owner's project ledger (schema: `SCHEMA.md` in
   project-ledger). `.repo-status` is the publish decision. They are separate on purpose:
   project status is a property of the work, publish status a property of the repository.
 
 ## Working style
 
-- **Never assume.** The owner asked explicitly for questions instead of assumptions. If a
-  requirement is ambiguous, ask; a wrong assumption acted on costs more than a question.
+- **Build the recommended option, and log it (Q144).** Since 5 Oct 2026 the owner has the
+  agent build the option it would recommend instead of asking him, as he had mostly chosen the
+  recommended one. Each such choice goes into `docs/choices.md` with the options not taken
+  (IDs `C1`, `C2` …); show him the new ones at the end of each item or batch, so he can name
+  one to change. Never assume silently: a choice not logged is an assumption. Questions he
+  must answer himself (anything outward-facing, below) are still asked.
 - **Never assume a step is done** unless the owner said he did it. A manual step handed off
   (a setting, a web wizard, a purchase) stays pending until he confirms.
 - **Answer the question; only an action needs confirmation.** Asked for a view or a
