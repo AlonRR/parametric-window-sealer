@@ -182,3 +182,8 @@ already has a Chromium can point at it with `PW_CHROMIUM_PATH=<path>` instead.
 
 CI (`.github/workflows/checks.yml`) skips the `house-identity` hook, which checks the
 machine making a commit, and runs the history check instead.
+
+`.github/workflows/pages.yml` builds the site on every push. It **publishes only when the
+repository variable `PAGES_PUBLISH` is `true`** (Q43). That variable, and enabling Pages, are
+the owner's switch (Q3): never set them, and never change the deploy job's condition so that it
+runs without them. `uvx --from actionlint-py actionlint` checks the workflow files.

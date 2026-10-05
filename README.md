@@ -49,6 +49,23 @@ npm test                          # unit tests
 npm run build                     # the static site, into web/out/site
 ```
 
+## Publishing the site
+
+`.github/workflows/pages.yml` builds the site on every push and keeps it as the run's
+downloadable `github-pages` artifact. It goes live only when the repository owner switches it
+on (decision Q43 in `docs/status.md`):
+
+1. **Settings → Pages**, under "Build and deployment", set **Source** to **GitHub Actions**
+   ([GitHub's steps](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)).
+2. **Settings → Secrets and variables → Actions → Variables → New repository variable**: name
+   `PAGES_PUBLISH`, value `true`
+   ([GitHub's steps](https://docs.github.com/en/actions/learn-github-actions/variables)).
+3. Push to `main`, or run the `pages` workflow from the Actions tab.
+
+Until both are set, the deploy job is skipped and the run stays green. GitHub's documentation
+notes that a Pages site is public on the internet even when its repository is private, where
+the plan allows Pages for a private repository.
+
 ## Licence
 
 **Your generated files are yours.** The STL and other files this tool generates, and anything

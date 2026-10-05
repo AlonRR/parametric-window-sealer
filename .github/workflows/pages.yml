@@ -1,0 +1,68 @@
+# .github/workflows/pages.yml
+#
+# The page on GitHub Pages (backlog item pages-deploy, #8).
+#
+# The site is BUILT on every push and pull request, and kept as the run's `github-pages`
+# artifact, which can be downloaded and opened offline. It is PUBLISHED only when the owner
+# switches it on (Q3, Q43): the deploy job runs on `main` only while the repository variable
+# PAGES_PUBLISH is "true". An unset variable reads as an empty string, so until the owner
+# sets it the deploy job is skipped and the run stays green. The owner's steps are in the
+# README ("Publishing the site").
+#
+# The build job deliberately does not use actions/configure-pages: that action fails when
+# Pages is not yet enabled for the repository, which would turn every run red before the
+# owner has decided to publish. The page needs nothing from it, because it is built with
+# relative asset paths (web/vite.config.ts, base: './').
+name: pages
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One publish at a time; a newer push does not cancel a deployment already under way.
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}   # as in checks.yml
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install the locked dependencies
+        run: npm ci
+      - name: Build the site
+        run: npm run build
+      - name: Keep the site as the run's artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: web/out/site
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.PAGES_PUBLISH == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write      # to publish
+      id-token: write   # to prove the deployment came from this workflow
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

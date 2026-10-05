@@ -35,6 +35,9 @@ complete. Until then every change is listed under Unreleased.
 - A statement, in the README and on the page, that the files the tool generates and anything
   printed from them are yours to use, change, share or sell, with no conditions.
 
+- A workflow that builds the site for GitHub Pages on every push and keeps it as a
+  downloadable artifact; it publishes only once the repository owner switches it on.
+
 ### Changed
 
 - The code that defines the pieces' shapes is licensed MPL-2.0 like the rest of the code; the
