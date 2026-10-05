@@ -5,6 +5,6 @@ projects:
   - name:     Parametric window sealer
     kind:     build
     state:    not-designed
-    next:     "build api-mcp-local (#47) on the library from #45, after api-cli (#46) (Q33, Q48)"
+    next:     "build hose-port (#12), the next P1 item after the API forms (#45 to #47)"
     trackers: [docs/status.md, docs/backlog.md]
     review:   2026-10-05

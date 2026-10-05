@@ -24,9 +24,6 @@ issues; what has changed is in [`CHANGELOG.md`](CHANGELOG.md).
 
 Planned next:
 
-- **An API**: a local MCP server for LLM agents, on the geometry library in
-  [`packages/core`](packages/core/README.md), as the `window-sealer` command in
-  [`packages/cli`](packages/cli/README.md) already is.
 - **Appliances**: a round port for a portable air conditioner's hose, fittings for a window air
   conditioner, and fan mounts.
 - **Panel styles**: organiser patterns (pegboard-style) and decorative patterns such as brick,
@@ -47,13 +44,14 @@ pre-commit run --all-files
 The commit hooks check the commit identity and message form; `CLAUDE.md` lists the rules.
 
 The geometry is a library in `packages/core`, the npm package `parametric-window-sealer`; the
-`window-sealer` command is in `packages/cli`; neither is on the registry yet, and each README
-([library](packages/core/README.md), [command](packages/cli/README.md)) says how to use it.
-The page lives in `web/`. The three are one npm workspace and need Node.js 22.12 or later:
+`window-sealer` command is in `packages/cli`, and the `window-sealer-mcp` server for LLM agents
+in `packages/mcp`. None is on the registry yet; each README ([library](packages/core/README.md),
+[command](packages/cli/README.md), [MCP server](packages/mcp/README.md)) says how to use it.
+The page lives in `web/`. The four are one npm workspace and need Node.js 22.12 or later:
 
 ```bash
 npm ci                                              # at the repo root
-npm test --workspaces                               # unit tests: library, command and page
+npm test --workspaces                               # unit tests: library, command, server, page
 npm run dev -w parametric-window-sealer-web         # the page, reloading as you edit
 npm run build -w parametric-window-sealer-web       # the static site, into web/out/site
 ```

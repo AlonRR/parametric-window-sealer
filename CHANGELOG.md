@@ -20,11 +20,17 @@ the latest version are listed under Unreleased.
   writes the files into one folder named after the wall, and prints the page's summary or,
   with `--json`, the plan and files for scripts and LLM agents; `--dry-run` writes nothing.
 - `planFiles` in the library: the names of the files a wall needs, without building them.
+- The `window-sealer-mcp` server, the npm package `parametric-window-sealer-mcp` in `packages/mcp`
+  (not yet on the registry): a local MCP server over stdio with four tools for LLM agents, to
+  list and check the settings, plan a wall and make its files. The files are written under the
+  one folder set with `--out-root`, or returned in the reply, as the agent chooses.
+- `readSettings` and `SETTINGS` in the library: settings in its own shape, possibly partial,
+  checked by the page's rules, and what each setting is. The command uses them too.
 
 ### Changed
 
-- The page uses the library like any other user would; the library, the command and the page
-  are one npm workspace.
+- The page uses the library like any other user would; the library, the command, the MCP server
+  and the page are one npm workspace.
 
 ## [0.1.0] - 2026-10-05
 

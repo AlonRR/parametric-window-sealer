@@ -55,12 +55,13 @@ jobs:
           bash tests/test-history-identity.sh
 
   web:
-    # The library, the command and the page (Q22, Q34, Q79, Q83): one npm workspace,
-    # installed from the root. Type check and unit tests for all three; the library built and
-    # loaded by name as a user gets it (#45); the command built, packed with the library and
-    # installed into an empty project as its README says (#46); the static build, and that
-    # build opened in Chromium, the only check that the WebAssembly engine starts in a
-    # browser (Q35).
+    # The library, the command, the MCP server and the page (Q22, Q34, Q79, Q83, Q91): one
+    # npm workspace, installed from the root. Type check and unit tests for all four; the
+    # library built and loaded by name as a user gets it (#45); the command built, packed with
+    # the library and installed into an empty project as its README says (#46); the server
+    # built, installed with -g as its README says and started from its README's agent
+    # configuration over stdio (#47); the static build, and that build opened in Chromium, the
+    # only check that the WebAssembly engine starts in a browser (Q35).
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -85,6 +86,10 @@ jobs:
         run: npm run build -w parametric-window-sealer-cli
       - name: The command as a user gets it
         run: npm run test:dist -w parametric-window-sealer-cli
+      - name: Build the MCP server
+        run: npm run build -w parametric-window-sealer-mcp
+      - name: The MCP server as a user gets it
+        run: npm run test:dist -w parametric-window-sealer-mcp
       - name: Build the page
         run: npm run build -w parametric-window-sealer-web
       - name: Install the Chromium this Playwright version expects
