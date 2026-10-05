@@ -77,12 +77,23 @@ is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | Q56 | The plan puts each piece **in the middle of its slide**: 6.5 mm into the strip, so a joint takes the web plus the slide (5 mm) and can close up or spread out by the slide (3 mm). Drawn to scale in the corrected drawing A; the first drawing showed the pieces only 1.5 mm in, a drawing error | 5 Oct 2026 |
 | Q57 | The **cross piece is a square as wide as the strip** (18 mm) with a + shaped web, and **strips stop half the slide (1.5 mm) short of it**, so a joint next to a crossing can close up fully | 5 Oct 2026 |
 | Q58 | Strips and cross pieces download as **one file per shape, with the count in its name** (e.g. `strip-184x18-print-10.stl`); a single 3MF holds every copy. Pieces stay one file each (Q46) | 5 Oct 2026 |
-| Q59 | At the wall's outer edge **a strip runs flush with the pieces**, until `track-edge` (#11) decides how the edge sits in the window track | 5 Oct 2026 |
+| Q59 | At the wall's outer edge **a strip runs flush with the pieces**, until `track-edge` (#11) decides how the edge sits in the window track (settled by Q74) | 5 Oct 2026 |
 | Q60 | When full pieces plus one filler leave **less room than a joint takes** (612 mm with 200 mm pieces leaves 2 mm), the page **warns, with a resolution already chosen that the user can click to change** | 5 Oct 2026 |
 | Q61 | That warning's default is to **spread the pieces**: the full pieces stay and the joints spread within their slide to take up what is left | 5 Oct 2026 |
 | Q62 | The warning offers **all three resolutions**: spread the pieces, equal pieces, or shorten one full piece so a minimum-width filler fits. One that cannot work for the size is greyed out | 5 Oct 2026 |
 | Q63 | When spreading cannot work (no joint, or more than the joints' slide), the default is **equal pieces** | 5 Oct 2026 |
 | Q64 | The page calls it **"Spread the pieces"**; "open the joints" needed explaining | 5 Oct 2026 |
+| Q65 | An edge sits in a window track through a **separate edge strip**: it slides onto the panel's edge like half a joint strip and fills the track's width, prints without supports, and can be replaced or printed in TPU | 5 Oct 2026 |
+| Q66 | **Each edge has a role**: in a track, pressed by the closed sash, or standing on a flat sill. The **window type presets** them (slider or hung) and the user can change any edge | 5 Oct 2026 |
+| Q67 | The user measures **the visible opening plus each track's depth**; the page adds the depth where an edge goes into a track | 5 Oct 2026 |
+| Q68 | The edge the **sash presses on gets the same edge strip**, with a flat face for the sash; a seal can go on it later (Q17) | 5 Oct 2026 |
+| Q69 | The edge strip sits **inside the track**: as tall as the track is deep, its slot at the top, so nothing shows above the track. In a track shallower than the slot plus a 2 mm base it stands out by the difference | 5 Oct 2026 |
+| Q70 | The edge strip is **0.5 mm narrower than the track on each side**, adjustable under advanced | 5 Oct 2026 |
+| Q71 | Where two edge strips meet, **one runs through the corner, by window type**: on a slider the top and bottom strips, on a hung window the side strips | 5 Oct 2026 |
+| Q72 | Edges not in a track get an edge strip **as wide as the track width**: one width setting for every edge strip | 5 Oct 2026 |
+| Q73 | An edge strip longer than the printer can make is split into **the fewest equal segments that fit**, butted end to end; they need not line up with the joints | 5 Oct 2026 |
+| Q74 | A **joint strip stops half the slide short of an edge strip**, as at a cross piece (Q57); this settles what Q59 left to `track-edge` | 5 Oct 2026 |
+| Q75 | The page **starts with a horizontal slider**, matching the tall example opening; each edge can still be changed | 5 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
 | Q32 | The **hosted web API is parked** (`api-hosted`, #48, moved to P3): "I don't have the funding to run a server" | 5 Oct 2026 |
