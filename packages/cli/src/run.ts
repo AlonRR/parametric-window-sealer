@@ -79,10 +79,11 @@ function help(): string {
     // A long list of choices (the printers) is named after the hint, so the table stays narrow.
     const long = (f.values?.length ?? 0) > 8;
     const unit = f.field.endsWith('Pct') ? '<%>' : '<mm>'; // a percentage, such as the tape's squeeze
-    const value = f.list ? '<mm[@column,row]>' : f.values === undefined ? unit : long ? '<id>' : `<${f.values.join('|')}>`;
+    const lists = { ports: '<mm[@column,row]>', pieceFills: '<column,row=fill[:style]>' };
+    const value = f.list ? lists[f.list] : f.values === undefined ? unit : long ? '<id>' : `<${f.values.join('|')}>`;
     const start = f.flag === 'width' || f.flag === 'height' ? '' : starting[f.field];
     const help = f.list
-      ? `${f.help} Give --${f.flag} again for each port.`
+      ? `${f.help} Give --${f.flag} again for each ${f.list === 'ports' ? 'port' : 'piece'}.`
       : long
         ? `${f.help} One of: ${f.values?.join(', ')}.`
         : f.help;
@@ -114,7 +115,7 @@ function help(): string {
 
 function summaryLines(summary: PlanText): string[] {
   const lines = [summary.headline, summary.columns, summary.rows, summary.span, summary.joints, summary.edges];
-  lines.push(...summary.ports, summary.seal, summary.fill);
+  lines.push(...summary.ports, summary.seal, summary.fill, ...summary.pieceFills);
   for (const warning of summary.warnings) lines.push(`Warning: ${warning}`);
   for (const leftover of summary.leftovers) {
     lines.push(leftover.message, `  Change it with --${leftover.axis}-leftover:`);
@@ -154,7 +155,7 @@ export async function run(args: string[], io: Io): Promise<number> {
         json: { type: 'boolean' },
         help: { type: 'boolean', short: 'h' },
         version: { type: 'boolean' },
-        ...Object.fromEntries(SETTING_FLAGS.map((f) => [f.flag, { type: 'string' as const, multiple: f.list === true }])),
+        ...Object.fromEntries(SETTING_FLAGS.map((f) => [f.flag, { type: 'string' as const, multiple: f.list !== undefined }])),
       },
     });
   } catch (error) {

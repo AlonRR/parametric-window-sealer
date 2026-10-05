@@ -457,3 +457,21 @@ describe('the diamond pattern (pattern-diamond #19; C22 to C25)', () => {
     expect(json(alone.out).params.fill).toMatchObject({ kind: 'diamond', diamond: { widthMm: 20, heightMm: 20, barMm: 3 } });
   });
 });
+
+describe('per-piece fills (params-advanced #21; C26 to C28)', () => {
+  it('--piece-fill gives a piece its own fill; given again, another', async () => {
+    const r = await cli([...OPENING, '--fill', 'grid', '--piece-fill', '2,1=sealed', '--piece-fill', '3,1=diamond:through', '--dry-run']);
+    expect(r.code).toBe(0);
+    expect(r.out).toContain('Column 2, row 1: sealed.');
+    expect(r.out).toContain('Column 3, row 1: diamonds 20 mm wide and 30 mm tall and 3 mm bars, cut through: air passes through the wall.');
+  });
+
+  it('refuses a piece the wall does not have, naming the flag; --help shows the form', async () => {
+    const r = await cli([...OPENING, '--piece-fill', '4,1=grid']);
+    expect(r.code).toBe(2);
+    expect(r.err).toContain('--piece-fill: Piece fill 1: there is no column 4, row 1: the wall has 3 columns and 5 rows.');
+    const help = await cli(['--help']);
+    expect(help.out).toMatch(/--piece-fill <column,row=fill\[:style\]> +/);
+    expect(help.out.replace(/\s+/g, ' ')).toContain('Give --piece-fill again for each piece.');
+  });
+});

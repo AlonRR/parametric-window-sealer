@@ -35,7 +35,9 @@ import {
   PATTERN_STYLES,
   SEALED,
 } from './fill.js';
-import type { FillParams } from './fill.js';
+import type { FillKind, FillParams } from './fill.js';
+import { fillFor, formatPieceFills, parsePieceFills } from './piece-fill.js';
+import type { PieceFill } from './piece-fill.js';
 import { reliefDepthMm } from './pattern.js';
 import type { SealKind, SealParams } from './tape.js';
 
@@ -59,6 +61,7 @@ export interface Params {
   collar: CollarParams;
   seal: SealParams; // none to start with (Q122)
   fill: FillParams; // sealed to start with (Q141)
+  pieceFills: PieceFill[]; // pieces with a fill of their own (#21); none to start with
 }
 
 // The page starts here: an example opening (Q42, labelled as an example, Q18), the default
@@ -79,6 +82,7 @@ export const EXAMPLE_PARAMS: Params = {
   collar: DEFAULT_COLLAR,
   seal: NO_SEAL,
   fill: SEALED,
+  pieceFills: [],
 };
 
 export type FieldName =
@@ -136,7 +140,8 @@ export type FieldName =
   | 'brickBarMm'
   | 'diamondWidthMm'
   | 'diamondHeightMm'
-  | 'diamondBarMm';
+  | 'diamondBarMm'
+  | 'pieceFills';
 
 export type FormValues = Partial<Record<FieldName, string>>;
 export type FieldErrors = Partial<Record<FieldName, string>>;
@@ -207,6 +212,7 @@ export function toFormValues(p: Params): FormValues {
     diamondWidthMm: String(p.fill.diamond.widthMm),
     diamondHeightMm: String(p.fill.diamond.heightMm),
     diamondBarMm: String(p.fill.diamond.barMm),
+    pieceFills: formatPieceFills(p.pieceFills),
   };
 }
 
@@ -406,7 +412,11 @@ export function readParams(values: FormValues): ReadResult {
 
   // The panel fill (Q141): a pattern's fields are read only with a pattern, as the tape's are.
   const fillKind = oneOf('fill', FILL_KINDS);
-  const patterned = fillKind !== 'sealed';
+  const givenFills = parsePieceFills(values.pieceFills ?? '');
+  if (!givenFills.ok) errors.pieceFills = givenFills.message;
+  // A pattern's sizes are read when the wall or any piece uses it.
+  const used = (kind: FillKind) => fillKind === kind || (givenFills.ok && givenFills.fills.some((f) => f.kind === kind));
+  const patterned = FILL_KINDS.some((k) => k !== 'sealed' && used(k));
   // Each pattern's own sizes are read only when it is the one chosen (C15).
   const fillNumber = (
     field: FieldName,
@@ -434,8 +444,8 @@ export function readParams(values: FormValues): ReadResult {
       'Enter a percentage greater than 0 and less than 100.',
     ),
     grid: {
-      openingMm: fillNumber('gridOpeningMm', DEFAULT_GRID.openingMm, positive, 'Enter a size in mm, greater than 0.', fillKind === 'grid'),
-      barMm: fillNumber('gridBarMm', DEFAULT_GRID.barMm, bar, barMessage, fillKind === 'grid'),
+      openingMm: fillNumber('gridOpeningMm', DEFAULT_GRID.openingMm, positive, 'Enter a size in mm, greater than 0.', used('grid')),
+      barMm: fillNumber('gridBarMm', DEFAULT_GRID.barMm, bar, barMessage, used('grid')),
     },
     hexagon: {
       openingMm: fillNumber(
@@ -443,31 +453,53 @@ export function readParams(values: FormValues): ReadResult {
         DEFAULT_HEXAGON.openingMm,
         positive,
         'Enter a size in mm, greater than 0.',
-        fillKind === 'hexagon',
+        used('hexagon'),
       ),
-      barMm: fillNumber('hexBarMm', DEFAULT_HEXAGON.barMm, bar, barMessage, fillKind === 'hexagon'),
+      barMm: fillNumber('hexBarMm', DEFAULT_HEXAGON.barMm, bar, barMessage, used('hexagon')),
     },
     brick: {
-      widthMm: fillNumber('brickWidthMm', DEFAULT_BRICK.widthMm, positive, sizeMessage, fillKind === 'brick'),
-      heightMm: fillNumber('brickHeightMm', DEFAULT_BRICK.heightMm, positive, sizeMessage, fillKind === 'brick'),
-      barMm: fillNumber('brickBarMm', DEFAULT_BRICK.barMm, bar, barMessage, fillKind === 'brick'),
+      widthMm: fillNumber('brickWidthMm', DEFAULT_BRICK.widthMm, positive, sizeMessage, used('brick')),
+      heightMm: fillNumber('brickHeightMm', DEFAULT_BRICK.heightMm, positive, sizeMessage, used('brick')),
+      barMm: fillNumber('brickBarMm', DEFAULT_BRICK.barMm, bar, barMessage, used('brick')),
     },
     diamond: {
-      widthMm: fillNumber('diamondWidthMm', DEFAULT_DIAMOND.widthMm, positive, sizeMessage, fillKind === 'diamond'),
-      heightMm: fillNumber('diamondHeightMm', DEFAULT_DIAMOND.heightMm, positive, sizeMessage, fillKind === 'diamond'),
-      barMm: fillNumber('diamondBarMm', DEFAULT_DIAMOND.barMm, bar, barMessage, fillKind === 'diamond'),
+      widthMm: fillNumber('diamondWidthMm', DEFAULT_DIAMOND.widthMm, positive, sizeMessage, used('diamond')),
+      heightMm: fillNumber('diamondHeightMm', DEFAULT_DIAMOND.heightMm, positive, sizeMessage, used('diamond')),
+      barMm: fillNumber('diamondBarMm', DEFAULT_DIAMOND.barMm, bar, barMessage, used('diamond')),
     },
   };
 
   const base = { openingWidthMm, openingHeightMm, printer, bedMarginMm, width, height, thicknessMm, joint, edges, collar, seal, fill };
   const ports: Required<PortSetting>[] = [];
   if (Object.keys(errors).length === 0 && given.ok && given.ports.length > 0) {
-    errors.ports = placePorts({ ...base, ports: [] }, given.ports, ports);
+    errors.ports = placePorts({ ...base, ports: [], pieceFills: [] }, given.ports, ports);
     if (errors.ports === undefined) delete errors.ports;
   }
 
+  // Each piece's own fill (#21): a piece the wall has, and one fill for each piece.
+  const pieceFills = givenFills.ok ? givenFills.fills : [];
+  if (Object.keys(errors).length === 0 && pieceFills.length > 0) {
+    const plan = planWall({ ...base, ports, pieceFills: [] });
+    const message = checkPieceFills(plan, pieceFills);
+    if (message !== undefined) errors.pieceFills = message;
+  }
+
   if (Object.keys(errors).length > 0) return { ok: false, errors };
-  return { ok: true, params: { ...base, ports } };
+  return { ok: true, params: { ...base, ports, pieceFills } };
+}
+
+function checkPieceFills(plan: GridLayout, fills: readonly PieceFill[]): string | undefined {
+  for (const [i, f] of fills.entries()) {
+    if (!plan.pieces.some((p) => p.column === f.column - 1 && p.row === f.row - 1)) {
+      const [columns, rows] = [plan.columns.length, plan.rows.length];
+      return `Piece fill ${i + 1}: there is no column ${f.column}, row ${f.row}: the wall has ${columns} columns and ${rows} rows.`;
+    }
+    const other = fills.findIndex((g) => g.column === f.column && g.row === f.row);
+    if (other < i) {
+      return `Piece fills ${other + 1} and ${i + 1} are both for column ${f.column}, row ${f.row}; give each piece one fill.`;
+    }
+  }
+  return undefined;
 }
 
 // Each port in its piece (Q105, Q110), its lip leaving a hole, the piece there and big enough
@@ -561,6 +593,7 @@ export interface PlanText {
   ports: string[]; // one line for each hose port
   seal: string;
   fill: string;
+  pieceFills: string[]; // one line for each piece with a fill of its own (#21)
 }
 
 function mm(n: number): string {
@@ -632,12 +665,9 @@ function describeJoints(joints: JointPlan, joint: JointParams): string {
   return `Joints: ${plural(joints.strips.length, 'strip', 'strips')} in ${plural(lengths, 'length', 'lengths')}${crosses}; each joint ${mm(jointWidthMm(joint))} mm wide.`;
 }
 
-// The tape (Q119, Q127, Q129): its size, where it goes, and how much the wall takes, along each
-// edge strip, twice more along those in a track for the sides, and round each collar's groove.
-// The fill (Q141): sealed, or the pattern, its sizes and how it is cut.
-function describeFill(params: Params): string {
-  const { fill } = params;
-  if (fill.kind === 'sealed') return 'Fill: sealed.';
+// A fill (Q141): sealed, or the pattern, its sizes and how it is cut.
+function fillWords(fill: FillParams, thicknessMm: number): string {
+  if (fill.kind === 'sealed') return 'sealed.';
   const { grid, hexagon, brick, diamond } = fill;
   const names: Record<Exclude<FillParams['kind'], 'sealed'>, string> = {
     grid: `a grid of ${mm(grid.openingMm)} mm square openings and ${mm(grid.barMm)} mm bars`,
@@ -647,10 +677,12 @@ function describeFill(params: Params): string {
   };
   const pattern = names[fill.kind];
   return fill.style === 'through'
-    ? `Fill: ${pattern}, cut through: air passes through the wall.`
-    : `Fill: ${pattern}, cut ${mm(reliefDepthMm(params.thicknessMm, fill.reliefPct))} mm into the room side.`;
+    ? `${pattern}, cut through: air passes through the wall.`
+    : `${pattern}, cut ${mm(reliefDepthMm(thicknessMm, fill.reliefPct))} mm into the room side.`;
 }
 
+// The tape (Q119, Q127, Q129): its size, where it goes, and how much the wall takes, along each
+// edge strip, twice more along those in a track for the sides, and round each collar's groove.
 function describeSeal(params: Params, parts: WallParts): string {
   const fit = tapeFit(params.seal);
   if (fit === undefined) return 'Seal: none.';
@@ -690,6 +722,9 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     ),
     ports: params.ports.map((p) => `Hose port: a ${mm(p.hoseMm)} mm hose end, in column ${p.column}, row ${p.row}.`),
     seal: describeSeal(params, parts),
-    fill: describeFill(params),
+    fill: `Fill: ${fillWords(params.fill, params.thicknessMm)}`,
+    pieceFills: params.pieceFills.map(
+      (f) => `Column ${f.column}, row ${f.row}: ${fillWords(fillFor(params, f.column, f.row), params.thicknessMm)}`,
+    ),
   };
 }

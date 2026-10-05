@@ -6,6 +6,7 @@ import {
   EXAMPLE_PARAMS,
   SETTINGS,
   WINDOW_PRESETS,
+  formatPieceFills,
   formatPorts,
   readParams,
   readSettings,
@@ -17,6 +18,7 @@ import type { Params } from '../src/index.js';
 const CUSTOM_PRINTER: Params = { ...EXAMPLE_PARAMS, printer: { kind: 'custom', widthMm: 250, heightMm: 210 } };
 const LISTED_PRINTER: Params = { ...EXAMPLE_PARAMS, printer: { kind: 'model', id: 'prusa-mk4s' } };
 const WITH_PORTS: Params = { ...EXAMPLE_PARAMS, ports: [{ hoseMm: 150, column: 2, row: 1 }] };
+const WITH_PIECE_FILLS: Params = { ...EXAMPLE_PARAMS, pieceFills: [{ column: 2, row: 1, kind: 'grid', style: 'through' }] };
 const OPENING = { openingWidthMm: 600, openingHeightMm: 1000 };
 const ok = (input: unknown, overrides = {}) => {
   const read = readSettings(input, overrides);
@@ -38,11 +40,14 @@ describe('SETTINGS: every setting on the page', () => {
       ? CUSTOM_PRINTER
       : s.field === 'printerModel'
         ? LISTED_PRINTER
-        : s.list
+        : s.list === 'ports'
           ? WITH_PORTS
+          : s.list === 'pieceFills'
+            ? WITH_PIECE_FILLS
           : EXAMPLE_PARAMS;
     const value = settingAt(params, s.path);
-    const shown = s.list ? formatPorts(value as []) : s.onOff ? (value === true ? 'yes' : 'no') : String(value);
+    const list = s.list === 'pieceFills' ? formatPieceFills : formatPorts;
+    const shown = s.list ? list(value as []) : s.onOff ? (value === true ? 'yes' : 'no') : String(value);
     expect(shown).toBe(toFormValues(params)[s.field]);
   });
 

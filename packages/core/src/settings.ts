@@ -17,7 +17,7 @@ export interface Setting {
   path: string; // where it sits in the library's shape, as `edges.track.widthMm`
   help: string; // in the page's words
   values?: readonly string[]; // a choice; otherwise a length in mm
-  list?: true; // a list in the shape, written in the form as the command's --port takes it
+  list?: ListKind; // a list in the shape, written in the form as the command's --port takes it
   onOff?: true; // true or false in the shape, written yes or no in the form
 }
 
@@ -26,6 +26,13 @@ const FILLER = ['start', 'end', 'middle', 'split'] as const;
 const LEFTOVER = ['spread', 'equal', 'shorten'] as const;
 const ROLE = ['track', 'sash', 'sill'] as const;
 const YES_NO = ['no', 'yes'] as const;
+
+// The settings that are lists, and the shape of each item: what each field holds.
+export type ListKind = 'ports' | 'pieceFills';
+export const LIST_ITEMS: Record<ListKind, Record<string, 'number' | 'text'>> = {
+  ports: { hoseMm: 'number', column: 'number', row: 'number' },
+  pieceFills: { column: 'number', row: 'number', kind: 'text', style: 'text' },
+};
 
 const axis = (name: 'width' | 'height'): Setting[] => [
   {
@@ -114,7 +121,7 @@ export const SETTINGS: readonly Setting[] = [
       "Hose ports: none for a plain wall, or for each port the hose end's outside diameter in mm (150 and 130 " +
       'are common; measure the end that goes in) and its piece, by column and row from 1 at the bottom left ' +
       "seen from the room. Without a piece, the first goes in the bottom row's middle piece.",
-    list: true,
+    list: 'ports',
   },
   { field: 'collarDepthMm', path: 'collar.depthMm', help: "How far the hose end goes into the port's collar." },
   { field: 'collarWallMm', path: 'collar.wallMm', help: "The collar's wall." },
@@ -179,6 +186,14 @@ export const SETTINGS: readonly Setting[] = [
   { field: 'diamondWidthMm', path: 'fill.diamond.widthMm', help: 'The diamonds: their width, corner to corner.' },
   { field: 'diamondHeightMm', path: 'fill.diamond.heightMm', help: 'The diamonds: their height, corner to corner.' },
   { field: 'diamondBarMm', path: 'fill.diamond.barMm', help: 'The bars between the diamonds; at least 0.8 mm.' },
+  {
+    field: 'pieceFills',
+    path: 'pieceFills',
+    help:
+      "Pieces with a fill of their own: for each, its column and row from 1 at the bottom left seen from the room, " +
+      'its fill (sealed or a pattern) and optionally its style; the sizes are the wall’s.',
+    list: 'pieceFills',
+  },
 ];
 
 // The value at a dotted path, such as `edges.track.widthMm`; undefined if it is not there.
@@ -204,10 +219,11 @@ type Json = Record<string, unknown>;
 const isObject = (value: unknown): value is Json =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
-// The shape an input may have: the library's own, with a custom printer's two sizes, and
-// each port as PORT_SHAPE.
+// The shape an input may have: the library's own, with a custom printer's two sizes, and each
+// list's items as LIST_ITEMS says.
 const SHAPE: Json = { ...EXAMPLE_PARAMS, printer: { kind: 'custom', widthMm: 0, heightMm: 0, id: '' } };
-const PORT_SHAPE: Json = { hoseMm: 0, column: 0, row: 0 };
+const itemShape = (kind: ListKind): Json =>
+  Object.fromEntries(Object.entries(LIST_ITEMS[kind]).map(([key, type]) => [key, type === 'number' ? 0 : '']));
 
 function checkShape(value: unknown, shape: unknown, path: string, problems: SettingProblem[]): void {
   if (Array.isArray(shape)) {
@@ -215,10 +231,11 @@ function checkShape(value: unknown, shape: unknown, path: string, problems: Sett
       problems.push({ kind: 'shape', path, message: `${path} should be a list` });
       return;
     }
+    const kind: ListKind = path === 'pieceFills' ? 'pieceFills' : 'ports';
     for (const [i, item] of value.entries()) {
       const at = `${path}.${i}`;
-      checkShape(item, PORT_SHAPE, at, problems);
-      if (isObject(item) && 'column' in item !== 'row' in item) {
+      checkShape(item, itemShape(kind), at, problems);
+      if (kind === 'ports' && isObject(item) && 'column' in item !== 'row' in item) {
         problems.push({ kind: 'shape', path: at, message: `${at} needs both column and row, or neither` });
       }
     }

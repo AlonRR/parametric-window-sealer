@@ -102,3 +102,35 @@ test('diamonds: point-up, sized by width, height and bar (C22 to C25)', async ({
   await page.getByLabel('Diamond height, corner to corner (mm)').fill('20');
   await expect(line(page)).toContainText('20 mm wide and 20 mm tall');
 });
+
+test('piece by piece: a map of the pieces, one given its own fill (params-advanced, #21; C26 to C29)', async ({ page }) => {
+  await expect(page.getByTestId('engine-status')).toHaveAttribute('data-state', 'ready');
+  await fill(page).selectOption('grid');
+  await page.getByText('Advanced: piece by piece').click();
+  const map = page.getByTestId('piece-map');
+  await expect(map.getByRole('button')).toHaveCount(15); // 3 across, 5 up
+  await expect(map.getByRole('button').first()).toHaveText('1,5'); // the top row first, as seen
+  await map.getByRole('button', { name: 'Column 2, row 1' }).click();
+  const own = page.getByLabel('Fill of column 2, row 1');
+  await expect(own).toHaveValue('');
+  await own.selectOption('sealed');
+  await expect(page.getByTestId('plan-piece-fills')).toHaveText('Column 2, row 1: sealed.');
+  await expect(map.getByRole('button', { name: 'Column 2, row 1' })).toHaveAttribute('data-own', 'yes');
+
+  // The download: that piece is a plain box, its neighbours carry the grid.
+  await page.getByRole('button', { name: 'Download the pieces' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Download the pieces' });
+  await dialog.getByRole('radio', { name: 'STL', exact: true }).check();
+  await dialog.getByRole('radio', { name: 'One zip file' }).check();
+  const [file] = await Promise.all([
+    page.waitForEvent('download'),
+    dialog.getByRole('button', { name: 'Download', exact: true }).click(),
+  ]);
+  const files = unzipSync(await readFile((await file.path()) ?? ''));
+  expect(files['piece-c2-r1-197.7x198.6.stl']?.length).toBe(684);
+  expect(files['piece-c1-r1-197.7x198.6.stl']?.length ?? 0).toBeGreaterThan(10 * 684);
+  await page.keyboard.press('Escape');
+
+  await own.selectOption('');
+  await expect(page.getByTestId('plan-piece-fills')).toBeEmpty();
+});

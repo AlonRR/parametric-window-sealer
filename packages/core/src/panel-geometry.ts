@@ -105,7 +105,9 @@ export interface BuiltPiece {
 
 // Every piece of the plan; a piece with a port (columns and rows from 1, as in Params) gets it.
 // With a pattern (patterns-core, #20), each piece gets the wall's pattern inside its border,
-// and a port's piece stays solid that far beyond the collar (Q134, Q137).
+// and a port's piece stays solid that far beyond the collar (Q134, Q137). The pattern can be
+// given for each piece, by its column and row from 0 (params-advanced, #21).
+export type PiecePattern = PatternChoice & { borderMm: number };
 export function buildPieces(
   engine: Engine,
   plan: GridLayout,
@@ -113,7 +115,7 @@ export function buildPieces(
   ports: readonly PortSetting[] = [],
   collar: CollarParams = DEFAULT_COLLAR,
   tape?: TapeFit,
-  pattern?: PatternChoice & { borderMm: number },
+  pattern?: PiecePattern | ((cell: { column: number; row: number }) => PiecePattern | undefined),
 ): BuiltPiece[] {
   const built: BuiltPiece[] = [];
   const taped = tapedCollar(collar, tape);
@@ -124,14 +126,15 @@ export function buildPieces(
     Math.max(0, ...plan.pieces.map((c) => c.yMm + c.heightMm)) / 2,
   ];
   const withPattern = (solid: Manifold, cell: GridLayout['pieces'][number], hoseMm?: number): Manifold => {
-    if (pattern === undefined) return solid;
+    const here = typeof pattern === 'function' ? pattern(cell) : pattern;
+    if (here === undefined) return solid;
     const keepOut =
       hoseMm === undefined
         ? undefined
-        : { xMm: cell.widthMm / 2, yMm: cell.heightMm / 2, radiusMm: collarOuterMm(hoseMm, taped) / 2 + pattern.borderMm };
-    const openings = pieceOpenings(engine, pattern.tile, centre, cell, pattern.borderMm, keepOut);
+        : { xMm: cell.widthMm / 2, yMm: cell.heightMm / 2, radiusMm: collarOuterMm(hoseMm, taped) / 2 + here.borderMm };
+    const openings = pieceOpenings(engine, here.tile, centre, cell, here.borderMm, keepOut);
     try {
-      return patternedPanel(engine, solid, openings, thicknessMm, pattern.style, pattern.reliefPct);
+      return patternedPanel(engine, solid, openings, thicknessMm, here.style, here.reliefPct);
     } finally {
       openings.delete();
     }

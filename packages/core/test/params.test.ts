@@ -40,6 +40,7 @@ describe('the starting values', () => {
       collar: DEFAULT_COLLAR,
       seal: NO_SEAL, // Q122
       fill: SEALED, // Q141
+      pieceFills: [], // #21
     });
   });
 
@@ -274,6 +275,7 @@ describe('describePlan', () => {
       ports: [],
       seal: 'Seal: none.',
       fill: 'Fill: sealed.',
+      pieceFills: [],
     });
   });
 

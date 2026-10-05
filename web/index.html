@@ -91,6 +91,22 @@
         margin: 1rem 0 0;
         padding: 0;
       }
+      /* The wall's pieces, as seen from the room, to give one its own fill (#21). */
+      .piece-map {
+        display: grid;
+        gap: 2px;
+        margin: 0.5rem 0;
+      }
+      .piece-map button {
+        min-width: 3rem;
+        padding: 0.25rem;
+      }
+      .piece-map button[aria-pressed='true'] {
+        outline: 2px solid currentColor;
+      }
+      .piece-map button[data-own='yes'] {
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
@@ -538,6 +554,22 @@
           </div>
         </details>
 
+        <!-- Per-piece fills (params-advanced, #21): a map of the pieces as seen from the room and a
+          fill for the one chosen, written into the hidden pieceFills field (C28, C29). -->
+        <details>
+          <summary>Advanced: piece by piece</summary>
+          <p class="note">
+            Choose a piece to give it a fill of its own; the rest keep the wall's. A bold piece has
+            its own. The pattern's sizes stay the wall's.
+          </p>
+          <div class="piece-map" data-testid="piece-map"></div>
+          <label data-part="piece-fill-label" hidden>
+            <span data-part="piece-fill-name"></span>
+            <select data-part="piece-fill"></select>
+          </label>
+          <span class="error" data-testid="error-pieceFills"></span>
+        </details>
+
         <details>
           <summary>Advanced: the tape</summary>
           <p class="note">
@@ -587,6 +619,8 @@
         <input type="hidden" name="printerModel" />
         <!-- Every port, written as the command's --port takes them (Q114). -->
         <input type="hidden" name="ports" />
+        <!-- Every piece's own fill, written as the command's --piece-fill takes them (C28). -->
+        <input type="hidden" name="pieceFills" />
       </form>
 
       <section id="plan" aria-live="polite">
@@ -603,6 +637,7 @@
         <ul data-testid="plan-ports"></ul>
         <p data-testid="plan-seal"></p>
         <p data-testid="plan-fill"></p>
+        <ul data-testid="plan-piece-fills"></ul>
         <ul data-testid="plan-warnings"></ul>
         <p><button type="button" id="download-open">Download the pieces...</button></p>
       </section>

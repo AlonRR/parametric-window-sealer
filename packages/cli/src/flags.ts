@@ -67,6 +67,7 @@ const FLAG_NAMES: Record<FieldName, string> = {
   diamondWidthMm: 'diamond-width', // a --diamond-* flag without --fill means the diamonds (C25)
   diamondHeightMm: 'diamond-height',
   diamondBarMm: 'diamond-bar',
+  pieceFills: 'piece-fill', // repeatable: one --piece-fill for each piece (C28)
 };
 
 export const SETTING_FLAGS: readonly SettingFlag[] = SETTINGS.map((s) => ({ ...s, flag: FLAG_NAMES[s.field] }));

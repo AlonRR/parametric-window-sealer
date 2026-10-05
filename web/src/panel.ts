@@ -8,6 +8,8 @@ import { EDGES, WINDOW_PRESETS } from 'parametric-window-sealer';
 import type { WindowType } from 'parametric-window-sealer';
 import { DEFAULT_MAX_PIECE, PRINTERS } from 'parametric-window-sealer';
 import { TAPE_SIZES } from 'parametric-window-sealer';
+import { FILL_KINDS, PATTERN_STYLES, formatPieceFills, parsePieceFills } from 'parametric-window-sealer';
+import type { PieceFill } from 'parametric-window-sealer';
 
 const FIELDS: readonly FieldName[] = [
   'openingWidthMm',
@@ -65,6 +67,7 @@ const FIELDS: readonly FieldName[] = [
   'diamondWidthMm',
   'diamondHeightMm',
   'diamondBarMm',
+  'pieceFills',
 ];
 
 type Control = HTMLInputElement | HTMLSelectElement | RadioNodeList;
@@ -229,6 +232,38 @@ function printerFromForm(form: HTMLFormElement, choice: HTMLSelectElement): void
   choice.value = kind === 'model' ? `model:${id}` : (kind ?? 'default');
 }
 
+// Per-piece fills (#21): one list for a piece, its fill and style together (C29), and the map of
+// the wall's pieces, the top row first as the wall is seen.
+const KIND_NAMES: Record<string, string> = { sealed: 'Sealed', grid: 'Grid', hexagon: 'Hexagon', brick: 'Brick', diamond: 'Diamond' };
+const STYLE_NAMES: Record<string, string> = { relief: 'relief', through: 'cut through' };
+
+function fillPieceChoice(choice: HTMLSelectElement): void {
+  const option = (value: string, text: string) => {
+    const o = document.createElement('option');
+    o.value = value;
+    o.textContent = text;
+    return o;
+  };
+  const options = [option('', "As the wall"), option('sealed', 'Sealed')];
+  for (const kind of FILL_KINDS.filter((k) => k !== 'sealed')) {
+    for (const style of PATTERN_STYLES) options.push(option(`${kind}:${style}`, `${KIND_NAMES[kind]}, ${STYLE_NAMES[style]}`));
+  }
+  choice.replaceChildren(...options);
+}
+
+function pieceFillsOf(form: HTMLFormElement): PieceFill[] {
+  const read = parsePieceFills(control(form, 'pieceFills')?.value ?? '');
+  return read.ok ? read.fills : [];
+}
+
+function setPieceFill(form: HTMLFormElement, column: number, row: number, value: string): void {
+  const others = pieceFillsOf(form).filter((f) => !(f.column === column && f.row === row));
+  const [kind, style] = value.split(':');
+  const own = value === '' ? [] : [{ column, row, kind, ...(style ? { style } : {}) } as PieceFill];
+  const field = control(form, 'pieceFills');
+  if (field instanceof HTMLInputElement) field.value = formatPieceFills([...others, ...own]);
+}
+
 function setText(root: ParentNode, testId: string, text: string): void {
   const el = root.querySelector(`[data-testid="${testId}"]`);
   if (el) el.textContent = text;
@@ -276,6 +311,52 @@ export function mountPanel(
     fillTapeSizes(tapeChoice);
     tapeFromForm(form, tapeChoice);
   }
+
+  const pieceMap = form.querySelector<HTMLElement>('[data-testid="piece-map"]');
+  const pieceChoice = form.querySelector<HTMLSelectElement>('[data-part="piece-fill"]');
+  const pieceLabel = form.querySelector<HTMLElement>('[data-part="piece-fill-label"]');
+  const pieceName = form.querySelector<HTMLElement>('[data-part="piece-fill-name"]');
+  if (pieceChoice) fillPieceChoice(pieceChoice);
+  let chosen: { column: number; row: number } | undefined;
+  let shownFor: string | undefined;
+  // The map follows the plan: a button for each piece, the top row first.
+  const drawPieceMap = (columns: number, rows: number): void => {
+    if (!pieceMap) return;
+    if (chosen && (chosen.column > columns || chosen.row > rows)) chosen = undefined;
+    const fills = pieceFillsOf(form);
+    pieceMap.style.gridTemplateColumns = `repeat(${columns}, auto)`;
+    const buttons: HTMLButtonElement[] = [];
+    for (let row = rows; row >= 1; row--) {
+      for (let column = 1; column <= columns; column++) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = `${column},${row}`;
+        b.setAttribute('aria-label', `Column ${column}, row ${row}`);
+        b.setAttribute('aria-pressed', String(chosen?.column === column && chosen.row === row));
+        b.dataset.own = fills.some((f) => f.column === column && f.row === row) ? 'yes' : 'no';
+        b.addEventListener('click', () => {
+          chosen = { column, row };
+          update();
+          pieceChoice?.focus();
+        });
+        buttons.push(b);
+      }
+    }
+    pieceMap.replaceChildren(...buttons);
+    if (pieceLabel) pieceLabel.hidden = chosen === undefined;
+    // The list shows the chosen piece's fill when the choice moves to it, and is left alone while
+    // the user changes it: the page redraws on its input event, before its change event is heard.
+    const key = chosen === undefined ? undefined : `${chosen.column},${chosen.row}`;
+    if (chosen && pieceChoice && pieceName && key !== shownFor) {
+      const own = fills.find((f) => f.column === chosen?.column && f.row === chosen.row);
+      pieceName.textContent = `Fill of column ${chosen.column}, row ${chosen.row}`;
+      pieceChoice.value = own === undefined ? '' : own.kind === 'sealed' ? 'sealed' : `${own.kind}:${own.style ?? control(form, 'fillStyle')?.value ?? 'relief'}`;
+    }
+    shownFor = key;
+  };
+  pieceChoice?.addEventListener('change', () => {
+    if (chosen) setPieceFill(form, chosen.column, chosen.row, pieceChoice.value);
+  });
 
   const extras = form.querySelector<HTMLElement>('[data-testid="extra-ports"]');
   const addPort = form.querySelector<HTMLButtonElement>('#add-port');
@@ -360,6 +441,7 @@ export function mountPanel(
       for (const id of ['plan-columns', 'plan-rows', 'plan-span', 'plan-joints', 'plan-edges', 'plan-seal', 'plan-fill']) {
         setText(plan, id, '');
       }
+      plan.querySelector('[data-testid="plan-piece-fills"]')?.replaceChildren();
       plan.querySelector('[data-testid="plan-ports"]')?.replaceChildren();
       return;
     }
@@ -372,6 +454,15 @@ export function mountPanel(
     setText(plan, 'plan-edges', text.edges);
     setText(plan, 'plan-seal', text.seal);
     setText(plan, 'plan-fill', text.fill);
+    plan.querySelector('[data-testid="plan-piece-fills"]')?.replaceChildren(
+      ...text.pieceFills.map((line) => {
+        const li = document.createElement('li');
+        li.textContent = line;
+        return li;
+      }),
+    );
+    const layout = planWall(result.params);
+    drawPieceMap(layout.columns.length, layout.rows.length);
     plan.querySelector('[data-testid="plan-ports"]')?.replaceChildren(
       ...text.ports.map((line) => {
         const li = document.createElement('li');

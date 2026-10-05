@@ -29,7 +29,7 @@ import { stripWidthMm } from 'parametric-window-sealer';
 import { crossSolid, stripSolid } from 'parametric-window-sealer';
 import { buildPieces, portTapeSolid } from 'parametric-window-sealer';
 import { tapeFit, tapedCollar } from 'parametric-window-sealer';
-import { fillPattern } from 'parametric-window-sealer';
+import { fillFor, fillPattern } from 'parametric-window-sealer';
 import { planParts } from 'parametric-window-sealer';
 import type { Params } from 'parametric-window-sealer';
 
@@ -66,7 +66,8 @@ export function buildWallScene(engine: Engine, params: Params): Group {
   const { joint, thicknessMm } = params;
   const wall = new Group();
   const tape = tapeFit(params.seal);
-  const pattern = fillPattern(params.fill, joint);
+  // Each piece's own fill, or the wall's (params-advanced, #21).
+  const pattern = (cell: { column: number; row: number }) => fillPattern(fillFor(params, cell.column + 1, cell.row + 1), joint);
   const built = buildPieces(engine, plan, thicknessMm, params.ports, params.collar, tape, pattern);
   try {
     built.forEach((piece, i) => {

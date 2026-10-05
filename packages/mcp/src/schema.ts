@@ -1,7 +1,8 @@
 // The settings as an input schema, in the library's own shape (Q99), built from the library's
 // SETTINGS so the server describes each one in the page's words and cannot miss one. Every
 // setting may be left out and then starts where the page starts, except the opening.
-import { SETTINGS } from 'parametric-window-sealer';
+import { FILL_KINDS, PATTERN_STYLES, SETTINGS } from 'parametric-window-sealer';
+import type { ListKind } from 'parametric-window-sealer';
 import * as z from 'zod';
 
 const REQUIRED = new Set(['openingWidthMm', 'openingHeightMm']);
@@ -35,9 +36,19 @@ const PORT = z.strictObject({
   row: z.number().int().min(1).optional().describe('The row of its piece, from 1 at the bottom.'),
 });
 
-function leaf(help: string, values: readonly string[] | undefined, required: boolean, list = false, onOff = false): z.ZodType {
+// A piece's own fill (#21; C26): its column and row from 1, its fill and optionally its style.
+const PIECE_FILL = z.strictObject({
+  column: z.number().int().min(1).describe('The column of the piece, from 1 at the left.'),
+  row: z.number().int().min(1).describe('The row of the piece, from 1 at the bottom.'),
+  kind: z.enum(FILL_KINDS as [string, ...string[]]).describe('Its fill: sealed or a pattern.'),
+  style: z.enum(PATTERN_STYLES as [string, ...string[]]).optional().describe("Its style; the wall's if left out."),
+});
+
+const ITEMS: Record<ListKind, z.ZodType> = { ports: PORT, pieceFills: PIECE_FILL };
+
+function leaf(help: string, values: readonly string[] | undefined, required: boolean, list?: ListKind, onOff = false): z.ZodType {
   const base = list
-    ? z.array(PORT)
+    ? z.array(ITEMS[list])
     : onOff
       ? z.boolean()
       : values === undefined
@@ -62,7 +73,7 @@ export function settingsSchema(): z.ZodObject {
     const keys = s.path.split('.');
     let at = tree;
     for (const key of keys.slice(0, -1)) at = (at[key] ??= {}) as Tree;
-    at[keys.at(-1) as string] = leaf(s.help, s.values, REQUIRED.has(s.path), s.list === true, s.onOff === true);
+    at[keys.at(-1) as string] = leaf(s.help, s.values, REQUIRED.has(s.path), s.list, s.onOff === true);
   }
   return toSchema(tree, '').describe(
     "The window's settings in the library's shape; every length in mm. Only the opening is required; " +

@@ -181,6 +181,15 @@ describe('window_sealer_plan_wall', () => {
     expect(r.data['summary'].fill).toBe('Fill: diamonds 20 mm wide and 30 mm tall and 2 mm bars, cut 1.5 mm into the room side.');
   });
 
+  it('pieces with fills of their own (#21)', async () => {
+    const { call } = await connect();
+    const r = await call('window_sealer_plan_wall', {
+      settings: { ...OPENING, fill: { kind: 'grid' }, pieceFills: [{ column: 2, row: 1, kind: 'sealed' }] },
+    });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['summary'].pieceFills).toEqual(['Column 2, row 1: sealed.']);
+  });
+
   it('settings the page refuses are an error with the page’s message for each', async () => {
     const { call } = await connect();
     const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, thicknessMm: 0, joint: { slideMm: 8 } } });
