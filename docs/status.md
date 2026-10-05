@@ -47,6 +47,7 @@ engine is deliberately undecided until the design questions below are settled.
 | Q19 | Tools and commit identity persist through a **SessionStart hook committed in the repo**, which runs only in cloud sessions | 5 Oct 2026 |
 | Q20 | Decorative patterns: **brick**, **diamond**, **grid**, **decorative hexagon**; the list is extensible, and **users can add their own** (how: Q21) | 5 Oct 2026 |
 | Q21 | Users add their own patterns by **uploading an SVG tile**, **drawing one in the page**, or contributing a **pattern file to the repo** | 5 Oct 2026 |
+| Q23 | The startup hook is **verified in a real cloud session**: a fresh session opened on this repo alone ran it on its own, ending with the owner's identity, all three git hooks wired and the tools installed. Its first reply came about 72 s after start, mostly building the hook environments. In a session holding several repositories it does not fire; run it by hand there (CLAUDE.md) | 5 Oct 2026 |
 | Q24 | The page **runs in the browser with nothing sent to a server**, both **hosted on GitHub Pages** and as a **download that works offline** | 5 Oct 2026 |
 | Q25 | Users can add their own **STL (or similar) meshes**: organiser or accessory tiles placed on a panel, 3D pattern tiles, a model of their appliance to cut around, a whole custom piece the tool trims and fits connectors to, and **any other shape** | 5 Oct 2026 |
 
@@ -77,14 +78,6 @@ The first four rows were answered before questions carried IDs.
 
 - **Q18.** The dimensions of your window's open area and of the appliance in it, so the first
   model is tested against a real fit.
-
-### Sessions
-
-- **Q23.** The startup hook (Q19) is tested in a fresh clone (20 of 20), but it has not been seen
-  to fire in a real new cloud session. In this session it did not fire, most likely because the
-  session's project directory holds two repositories, so the repo's own `.claude/settings.json`
-  is not the project's (inferred). Verify it by opening a throwaway cloud session on this repo
-  alone, checking the identity and hooks, then archiving the session?
 
 ## Repository follow-ups
 
