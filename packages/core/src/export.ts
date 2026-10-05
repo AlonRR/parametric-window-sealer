@@ -208,11 +208,18 @@ export function to3mf(pieces: ExportPiece[], parts: ExportPart[] = []): Uint8Arr
   });
 }
 
-const TYPES: Record<Format | 'zip', string> = {
+export const MEDIA_TYPES: Record<Format | 'zip', string> = {
   stl: 'model/stl',
   '3mf': 'model/3mf',
   zip: 'application/zip',
 };
+
+// The one choice that cannot be made: an STL holds a single object.
+export function checkChoice(choice: DownloadChoice): void {
+  if (choice.packaging === 'single' && choice.format !== '3mf') {
+    throw new RangeError('Only 3MF holds every piece in one file; STL holds one object');
+  }
+}
 
 export function packageDownload(
   pieces: ExportPiece[],
@@ -221,14 +228,12 @@ export function packageDownload(
   openingWidthMm: number,
   openingHeightMm: number,
 ): DownloadFile[] {
+  checkChoice(choice);
   const label = wallLabel(openingWidthMm, openingHeightMm);
   if (choice.packaging === 'single') {
-    if (choice.format !== '3mf') {
-      throw new RangeError('Only 3MF holds every piece in one file; STL holds one object');
-    }
-    return [{ name: `${label}.3mf`, type: TYPES['3mf'], bytes: to3mf(pieces, parts) }];
+    return [{ name: `${label}.3mf`, type: MEDIA_TYPES['3mf'], bytes: to3mf(pieces, parts) }];
   }
-  const type = TYPES[choice.format];
+  const type = MEDIA_TYPES[choice.format];
   const perPiece = pieces.map((piece) => {
     const name = pieceFileName(piece.cell, choice.format);
     const bytes =
@@ -246,5 +251,5 @@ export function packageDownload(
   const files = [...perPiece, ...perPart];
   if (choice.packaging === 'separate') return files;
   const zip = zipSync(Object.fromEntries(files.map((f) => [f.name, f.bytes])));
-  return [{ name: `${label}-${choice.format}.zip`, type: TYPES.zip, bytes: zip }];
+  return [{ name: `${label}-${choice.format}.zip`, type: MEDIA_TYPES.zip, bytes: zip }];
 }

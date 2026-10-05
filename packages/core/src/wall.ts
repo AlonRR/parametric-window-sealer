@@ -6,7 +6,7 @@ import { edgeShapes } from './edge.js';
 import { edgeStripSolid } from './edge-geometry.js';
 import { loadEngine } from './engine.js';
 import type { Engine } from './engine.js';
-import { meshOf, packageDownload, partName } from './export.js';
+import { MEDIA_TYPES, checkChoice, meshOf, packageDownload, partName, pieceFileName, wallLabel } from './export.js';
 import type { DownloadChoice, DownloadFile, ExportPart, ExportPiece } from './export.js';
 import { partShapes } from './joint.js';
 import { crossSolid, stripSolid } from './joint-geometry.js';
@@ -97,4 +97,30 @@ export async function makeWall(
   const engine = options.engine ?? (await loadEngine(options.wasmUrl));
   const plan = planWall(params);
   return { plan, summary: describePlan(plan, params), files: makeFiles(engine, params, choice) };
+}
+
+export interface PlannedFile {
+  name: string;
+  type: string;
+}
+
+// The names and types makeFiles would write, found without building anything, so without
+// the engine: what a dry run lists (Q89). Refuses what makeWall refuses.
+export function planFiles(params: Params, choice: DownloadChoice): PlannedFile[] {
+  const errors = validateParams(params);
+  if (Object.keys(errors).length > 0) throw new ParamsError(errors);
+  checkChoice(choice);
+  const label = wallLabel(params.openingWidthMm, params.openingHeightMm);
+  if (choice.packaging === 'single') return [{ name: `${label}.3mf`, type: MEDIA_TYPES['3mf'] }];
+  if (choice.packaging === 'zip') return [{ name: `${label}-${choice.format}.zip`, type: MEDIA_TYPES.zip }];
+  const plan = planWall(params);
+  const { joints, edges } = planParts(params, plan);
+  const type = MEDIA_TYPES[choice.format];
+  return [
+    ...plan.pieces.map((cell) => ({ name: pieceFileName(cell, choice.format), type })),
+    ...[...partShapes(joints, params.joint), ...edgeShapes(edges)].map((shape) => ({
+      name: `${partName(shape)}.${choice.format}`,
+      type,
+    })),
+  ];
 }

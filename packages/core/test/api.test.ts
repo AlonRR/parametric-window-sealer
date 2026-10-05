@@ -4,7 +4,18 @@
 import { strFromU8, unzipSync } from 'fflate';
 import { describe, expect, it } from 'vitest';
 import * as api from '../src/index.js';
-import { DEFAULT_JOINT, EXAMPLE_PARAMS, ParamsError, loadEngine, makeWall, validateParams } from '../src/index.js';
+import {
+  DEFAULT_JOINT,
+  EXAMPLE_PARAMS,
+  ParamsError,
+  WINDOW_PRESETS,
+  loadEngine,
+  makeFiles,
+  makeWall,
+  planFiles,
+  validateParams,
+} from '../src/index.js';
+import type { DownloadChoice, Params } from '../src/index.js';
 
 describe('makeWall', () => {
   it('turns the page’s parameters into the plan and the files: STL in one zip', async () => {
@@ -51,6 +62,55 @@ describe('makeWall', () => {
   });
 });
 
+// What a dry run lists (Q89): the files makeFiles would write, without building anything.
+describe('planFiles', () => {
+  const CHOICES: DownloadChoice[] = [
+    { format: 'stl', packaging: 'separate' },
+    { format: 'stl', packaging: 'zip' },
+    { format: '3mf', packaging: 'separate' },
+    { format: '3mf', packaging: 'single' },
+  ];
+  const WALLS: [string, Params][] = [
+    ['the example slider', EXAMPLE_PARAMS],
+    [
+      'a hung window with a filler row and a custom printer',
+      {
+        ...EXAMPLE_PARAMS,
+        openingWidthMm: 812.5,
+        openingHeightMm: 455,
+        printer: { kind: 'custom', widthMm: 250, heightMm: 210 },
+        height: { mode: 'full-plus-filler', filler: 'start', leftover: 'spread' },
+        edges: { ...EXAMPLE_PARAMS.edges, window: 'hung', roles: WINDOW_PRESETS.hung },
+      },
+    ],
+    ['a single piece', { ...EXAMPLE_PARAMS, openingWidthMm: 150, openingHeightMm: 120 }],
+  ];
+  const cases = WALLS.flatMap(([wall, params]) =>
+    CHOICES.map((choice) => [wall, `${choice.format} ${choice.packaging}`, params, choice] as const),
+  );
+
+  it.each(cases)('%s, %s: the names and types makeFiles writes', async (_wall, _choice, params, choice) => {
+    const engine = await loadEngine();
+    const written = makeFiles(engine, params, choice).map(({ name, type }) => ({ name, type }));
+    expect(planFiles(params, choice)).toEqual(written);
+  });
+
+  it('answers at once, without the engine', () => {
+    const files = planFiles(EXAMPLE_PARAMS, { format: 'stl', packaging: 'separate' });
+    expect(Array.isArray(files)).toBe(true);
+    expect(files).toHaveLength(15 + 6);
+  });
+
+  it('refuses what makeWall refuses', () => {
+    expect(() => planFiles({ ...EXAMPLE_PARAMS, thicknessMm: 0 }, CHOICES[0] as DownloadChoice)).toThrow(
+      ParamsError,
+    );
+    expect(() => planFiles(EXAMPLE_PARAMS, { format: 'stl', packaging: 'single' })).toThrow(
+      'Only 3MF holds every piece in one file; STL holds one object',
+    );
+  });
+});
+
 describe('validateParams', () => {
   it('accepts the page’s starting point and names what is wrong otherwise', () => {
     expect(validateParams(EXAMPLE_PARAMS)).toEqual({});
@@ -87,6 +147,7 @@ describe('the package’s exports (Q80): the main call and the steps underneath'
     'packageDownload',
     'buildExport',
     'makeFiles',
+    'planFiles',
     'maxPieceSize',
     'minPieceMm',
   ];

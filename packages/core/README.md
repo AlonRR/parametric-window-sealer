@@ -85,7 +85,8 @@ start it with `loadEngine(wasmUrl)` and pass it as `{ engine }`.
 Everything `makeWall` uses is exported too: `planWall` and `planParts` (the layout, joints
 and edges), `describePlan`, `readParams` and `toFormValues` (the page's form values), the
 shapes (`plainPanel`, `stripSolid`, `crossSolid`, `edgeStripSolid`) and the file writers
-(`toStl`, `to3mf`, `packageDownload`). The types are in the package.
+(`toStl`, `to3mf`, `packageDownload`), with `planFiles`, which names the files without
+building them. The types are in the package.
 
 ## Licence
 
