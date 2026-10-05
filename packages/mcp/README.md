@@ -68,7 +68,9 @@ height makes the printer custom, and a printer `id` from the list, such as `"pri
 end that goes in), and optionally its piece as `column` and `row`, from 1 at the bottom left seen
 from the room; without them it goes in the bottom row's middle piece. Foam tape goes in `seal`,
 as `{ "kind": "tape" }`, or with its size and places, such as `{ "tape": { "widthMm": 9.5,
-"thicknessMm": 4.8, "sides": true } }`; tape settings without a `kind` mean tape.
+"thicknessMm": 4.8, "sides": true } }`; tape settings without a `kind` mean tape. A grid pattern goes in `fill`, as `{ "kind": "grid" }`
+or with its sizes, such as `{ "grid": { "openingMm": 12, "barMm": 2 }, "style": "through" }`;
+grid settings without a `kind` mean the grid.
 
 `window_sealer_make_files` also takes:
 

@@ -12,6 +12,13 @@ under Unreleased.
 
 ### Added
 
+- A grid pattern: choose "Grid" under "Panel fill" (sealed to start with). Its square openings
+  are 15 mm with 3 mm bars to start with, both under Advanced, the bars no thinner than 0.8 mm.
+  It is cut into the room side, half the panel deep, or cut through, letting air through. The
+  pattern runs across the whole wall, inside a solid border on each piece. The command takes
+  `--fill`, `--fill-style`, `--relief-depth`, `--grid-opening` and `--grid-bar`, the MCP server
+  `fill`.
+
 - A pattern framework in the library, for the patterns to come (the grid first): a tile of
   openings repeated across the whole wall so it lines up across the joints, inside a solid
   border on each piece (the slot depth plus 2 mm) and clear of a hose port's collar, cut
@@ -37,6 +44,10 @@ under Unreleased.
   said so, with what fixes it. The page, the command (`--port`) and the MCP server (`ports`)
   all offer it; the port's piece is named with its hose, as `piece-c2-r1-…-port-150.stl`.
   Not yet test printed: the collar's sizes are starting values.
+
+### Changed
+
+- `--help` shows a percentage, such as `--tape-squeeze`, as `<%>` instead of `<mm>`.
 
 ## [0.2.0] - 2026-10-05
 

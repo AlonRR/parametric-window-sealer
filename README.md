@@ -27,8 +27,8 @@ issues; what has changed is in [`CHANGELOG.md`](CHANGELOG.md).
 Planned next:
 
 - **Appliances**: fittings for a window air conditioner, and fan mounts.
-- **Panel styles**: organiser patterns (pegboard-style) and decorative patterns such as brick,
-  diamond or grid.
+- **Panel styles**: organiser patterns (pegboard-style) and more decorative patterns: brick,
+  diamond and hexagon, beside the grid.
 - **Seals and help**: printed TPU seals, a measuring guide with pictures, and the page as one
   file that works offline.
 
