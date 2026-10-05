@@ -1,5 +1,7 @@
 // The parameter panel in a real browser (params-basic, #5): the form starts from the
 // example (Q42), the plan follows every change, and bad values are marked, not planned.
+// With connector-strip (#10): the joint under advanced (Q51), and the warning with a choice
+// when full pieces leave less room than a joint takes (Q60 to Q64).
 import { expect, test } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
@@ -15,14 +17,17 @@ test('opens with the example opening, labelled as one, and its plan', async ({ p
   await expect(page.getByLabel('Panel thickness (mm)')).toHaveValue('3');
   await expect(page.getByText('Default: 200 × 200 mm')).toBeVisible();
   await expect(headline(page)).toHaveText('15 pieces: 3 across, 5 up, 3 mm thick');
+  await expect(page.getByTestId('plan-joints')).toHaveText(
+    'Joints: 22 strips in 4 lengths, and 8 cross pieces; each joint 5 mm wide.',
+  );
 });
 
 test('follows a change, and warns about a small filler', async ({ page }) => {
-  await page.getByLabel('Opening width (mm)').fill('810');
+  await page.getByLabel('Opening width (mm)').fill('640');
   await page.getByLabel('Width division').selectOption('full-plus-filler');
-  await expect(headline(page)).toHaveText('25 pieces: 5 across, 5 up, 3 mm thick');
+  await expect(headline(page)).toHaveText('20 pieces: 4 across, 5 up, 3 mm thick');
   await expect(page.getByTestId('plan-warnings')).toContainText(
-    'Column 5 is 10 mm wide, under the 30 mm minimum',
+    'Column 4 is 25 mm wide, under the 30 mm minimum',
   );
 });
 
@@ -32,14 +37,14 @@ test('the filler position applies only to full pieces plus a filler', async ({ p
   await expect(page.getByLabel('Width filler')).toBeEnabled();
   await page.getByLabel('Opening width (mm)').fill('500');
   await page.getByLabel('Width filler').selectOption('split');
-  await expect(page.getByTestId('plan-columns')).toHaveText('Widths: 50, 200, 200, 50 mm');
+  await expect(page.getByTestId('plan-columns')).toHaveText('Widths: 42.5, 200, 200, 42.5 mm');
 });
 
 test('a custom piece size changes the plan', async ({ page }) => {
   await page.getByLabel('Custom', { exact: true }).check();
   await page.getByLabel('Custom width (mm)').fill('170');
   await page.getByLabel('Custom height (mm)').fill('165');
-  await expect(headline(page)).toHaveText('28 pieces: 4 across, 7 up, 3 mm thick');
+  await expect(headline(page)).toHaveText('24 pieces: 4 across, 6 up, 3 mm thick');
 });
 
 test('a bad value is marked, and nothing is planned from it', async ({ page }) => {
@@ -53,4 +58,58 @@ test('a bad value is marked, and nothing is planned from it', async ({ page }) =
   await width.fill('600');
   await expect(width).not.toHaveAttribute('aria-invalid', 'true');
   await expect(headline(page)).toHaveText('15 pieces: 3 across, 5 up, 3 mm thick');
+});
+
+test('the joint is under advanced, starts from the owner’s numbers, and sets the joints', async ({
+  page,
+}) => {
+  const slide = page.getByLabel('Slide (mm)');
+  await expect(slide).toBeHidden();
+  await page.getByText('Advanced: the joint between pieces').click();
+  await expect(page.getByLabel('Slot depth (mm)')).toHaveValue('8');
+  await expect(slide).toHaveValue('3');
+  await expect(page.getByLabel('Web (mm)')).toHaveValue('2');
+  await expect(page.getByLabel('Flanges (mm)')).toHaveValue('1.6');
+  await expect(page.getByLabel('Fit (mm per face)')).toHaveValue('0.2');
+  await slide.fill('0');
+  await expect(page.getByTestId('plan-joints')).toContainText('each joint 2 mm wide');
+  await expect(page.getByTestId('plan-columns')).toHaveText('Widths: 198.7, 198.7, 198.7 mm');
+  await slide.fill('8');
+  await expect(page.getByTestId('error-slideMm')).toHaveText(
+    'Make it less than the slot depth, so a piece always stays in its slot.',
+  );
+  await expect(headline(page)).toHaveText('Fix the marked fields to see the plan.');
+});
+
+test('full pieces that leave too little: a warning, spreading chosen, the others a click away', async ({
+  page,
+}) => {
+  await page.getByLabel('Opening width (mm)').fill('612');
+  await page.getByLabel('Width division').selectOption('full-plus-filler');
+  const warning = page.getByTestId('leftover-width');
+  await expect(warning).toContainText(
+    'Width: 3 full 200 mm pieces leave 2 mm, too little for another joint and a filler.',
+  );
+  const spread = warning.getByLabel('Spread the pieces 1 mm further apart at each joint');
+  const equal = warning.getByLabel('Equal pieces: 4 of 149.3 mm');
+  const shorten = warning.getByLabel('Shorten one full piece: 200, 200, 167 and 30 mm');
+  await expect(spread).toBeChecked();
+  await expect(page.getByTestId('plan-columns')).toHaveText('Widths: 200, 200, 200 mm');
+  await equal.check();
+  await expect(page.getByTestId('plan-columns')).toHaveText(
+    'Widths: 149.3, 149.3, 149.3, 149.3 mm',
+  );
+  await expect(warning.getByLabel('Equal pieces: 4 of 149.3 mm')).toBeChecked();
+  await expect(warning.getByLabel('Equal pieces: 4 of 149.3 mm')).toBeFocused();
+  await shorten.check();
+  await expect(page.getByTestId('plan-columns')).toHaveText('Widths: 200, 200, 167, 30 mm');
+});
+
+test('when spreading cannot work it is greyed out, and equal pieces is chosen', async ({ page }) => {
+  await page.getByLabel('Opening width (mm)').fill('203');
+  await page.getByLabel('Width division').selectOption('full-plus-filler');
+  const warning = page.getByTestId('leftover-width');
+  await expect(warning.getByLabel('Spread the pieces: there is no joint to spread')).toBeDisabled();
+  await expect(warning.getByLabel('Equal pieces: 2 of 99 mm')).toBeChecked();
+  await expect(page.getByTestId('plan-columns')).toHaveText('Widths: 99, 99 mm');
 });

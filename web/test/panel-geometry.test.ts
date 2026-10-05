@@ -46,8 +46,9 @@ describe('buildPieces', () => {
         expect(max[1]).toBeCloseTo(cell?.heightMm ?? Number.NaN, 9);
         expect(max[2]).toBeCloseTo(3, 9);
       }
+      // The pieces fill the opening less the 5 mm joints: 2 across, 4 up (Q56).
       const total = pieces.reduce((sum, p) => sum + p.solid.volume(), 0);
-      expect(total).toBeCloseTo(500 * 1000 * 3, 3); // the pieces fill the opening, no more
+      expect(total).toBeCloseTo((500 - 2 * 5) * (1000 - 4 * 5) * 3, 3);
     } finally {
       for (const p of pieces) p.solid.delete();
     }

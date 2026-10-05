@@ -18,7 +18,7 @@ import type { Group } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import type { Engine } from './engine';
 import type { Params } from './params';
-import { buildWallScene, disposeWall } from './preview-scene';
+import { buildWallScene, countOf, disposeWall } from './preview-scene';
 
 const BACKGROUND = 0xf4f4f4;
 
@@ -65,7 +65,8 @@ export function mountPreview(container: HTMLElement, getEngine: () => Promise<En
   let wall: Group | null = null;
 
   // After each frame, how many geometries the graphics card holds: it must stay at two per
-  // piece however often the wall is redrawn, or editing would leak memory (browser-tested).
+  // piece, strip and cross piece however often the wall is redrawn, or editing would leak
+  // memory (browser-tested).
   const draw = () => {
     renderer.render(scene, camera);
     container.dataset.geometries = String(renderer.info.memory.geometries);
@@ -107,6 +108,8 @@ export function mountPreview(container: HTMLElement, getEngine: () => Promise<En
     }
     if (!params) {
       container.dataset.pieces = '0';
+      container.dataset.strips = '0';
+      container.dataset.crosses = '0';
       container.dataset.state = 'waiting';
       say('Fix the marked fields to see the preview.');
       draw();
@@ -120,7 +123,9 @@ export function mountPreview(container: HTMLElement, getEngine: () => Promise<En
       frame(wall);
       framedFor = key;
     }
-    container.dataset.pieces = String(wall.children.length / 2);
+    container.dataset.pieces = String(countOf(wall, 'piece'));
+    container.dataset.strips = String(countOf(wall, 'strip'));
+    container.dataset.crosses = String(countOf(wall, 'cross'));
     container.dataset.state = 'ready';
     say('Drag to turn the wall; scroll or pinch to zoom.');
     draw();

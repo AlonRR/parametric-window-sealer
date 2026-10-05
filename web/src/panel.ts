@@ -3,7 +3,7 @@
 // form and those functions.
 
 import { EXAMPLE_PARAMS, describePlan, planWall, readParams, toFormValues } from './params';
-import type { FieldName, FormValues, Params } from './params';
+import type { FieldName, FormValues, LeftoverText, Params } from './params';
 import { DEFAULT_MAX_PIECE } from './printer';
 
 const FIELDS: readonly FieldName[] = [
@@ -17,6 +17,13 @@ const FIELDS: readonly FieldName[] = [
   'heightMode',
   'heightFiller',
   'thicknessMm',
+  'widthLeftover',
+  'heightLeftover',
+  'slotMm',
+  'slideMm',
+  'webMm',
+  'flangeMm',
+  'fitMm',
 ];
 
 type Control = HTMLInputElement | HTMLSelectElement | RadioNodeList;
@@ -47,6 +54,33 @@ function writeForm(form: HTMLFormElement, values: FormValues): void {
 function setText(root: ParentNode, testId: string, text: string): void {
   const el = root.querySelector(`[data-testid="${testId}"]`);
   if (el) el.textContent = text;
+}
+
+// The warning when full pieces leave less room than a joint takes (Q60): one way out is
+// chosen, and the user can click another (Q61, Q62); one that cannot work is greyed out.
+function leftoverWarning(text: LeftoverText, choose: (value: string) => void): HTMLLIElement {
+  const li = document.createElement('li');
+  li.className = 'choice';
+  li.dataset.testid = `leftover-${text.axis}`;
+  const choices = document.createElement('fieldset');
+  choices.className = 'choices';
+  const legend = document.createElement('legend');
+  legend.textContent = text.message;
+  choices.append(legend);
+  for (const option of text.options) {
+    const label = document.createElement('label');
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = `leftover-${text.axis}`;
+    input.value = option.value;
+    input.checked = option.value === text.used;
+    input.disabled = !option.possible;
+    input.addEventListener('change', () => choose(option.value));
+    label.append(input, ` ${option.label}`);
+    choices.append(label);
+  }
+  li.append(choices);
+  return li;
 }
 
 // onChange hears the parameters after every edit, or null while a field is wrong.
@@ -87,22 +121,38 @@ export function mountPanel(
     }
 
     const warnings = plan.querySelector('[data-testid="plan-warnings"]');
+    // Redrawing the warnings replaces their radio buttons; keep the focus on the one chosen.
+    const active = document.activeElement;
+    const focused =
+      active instanceof HTMLInputElement && warnings?.contains(active)
+        ? `input[name="${active.name}"][value="${active.value}"]`
+        : null;
     warnings?.replaceChildren();
     if (!result.ok) {
       setText(plan, 'plan-headline', 'Fix the marked fields to see the plan.');
-      setText(plan, 'plan-columns', '');
-      setText(plan, 'plan-rows', '');
+      for (const id of ['plan-columns', 'plan-rows', 'plan-joints']) setText(plan, id, '');
       return;
     }
-    const text = describePlan(planWall(result.params), result.params.thicknessMm);
+    const text = describePlan(planWall(result.params), result.params);
     setText(plan, 'plan-headline', text.headline);
     setText(plan, 'plan-columns', text.columns);
     setText(plan, 'plan-rows', text.rows);
+    setText(plan, 'plan-joints', text.joints);
+    for (const leftover of text.leftovers) {
+      const hidden = control(form, `${leftover.axis}Leftover`);
+      warnings?.append(
+        leftoverWarning(leftover, (value) => {
+          if (hidden instanceof HTMLInputElement) hidden.value = value;
+          update();
+        }),
+      );
+    }
     for (const w of text.warnings) {
       const li = document.createElement('li');
       li.textContent = w;
       warnings?.append(li);
     }
+    if (focused) warnings?.querySelector<HTMLInputElement>(focused)?.focus();
   };
 
   form.addEventListener('input', update);

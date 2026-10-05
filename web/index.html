@@ -67,6 +67,23 @@
         border-radius: 0.5rem;
         max-width: min(32rem, 92vw);
       }
+      details {
+        margin: 0 0 1rem;
+      }
+      summary {
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .choices {
+        border-color: #b06d00;
+        margin: 0.4rem 0;
+      }
+      li.choice {
+        list-style: none;
+      }
+      .choices label {
+        margin-top: 0.3rem;
+      }
       dialog menu {
         display: flex;
         gap: 0.6rem;
@@ -167,6 +184,55 @@
           </label>
           <span class="error" data-testid="error-thicknessMm"></span>
         </fieldset>
+
+        <details>
+          <summary>Advanced: the joint between pieces</summary>
+          <p class="note">
+            Pieces join with strips that slide over their edges and hold by friction. These are
+            starting values: a test print shows whether to change them, the fit most of all.
+          </p>
+          <label>
+            Slot depth (mm)
+            <input name="slotMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">How deep a piece can go into a strip.</p>
+          <span class="error" data-testid="error-slotMm"></span>
+          <label>
+            Slide (mm)
+            <input name="slideMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">
+            How far a piece can move in its slot. Pieces are planned in the middle, so each joint
+            can close up or spread out by this much.
+          </p>
+          <span class="error" data-testid="error-slideMm"></span>
+          <label>
+            Web (mm)
+            <input name="webMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">The wall between the strip's two slots.</p>
+          <span class="error" data-testid="error-webMm"></span>
+          <label>
+            Flanges (mm)
+            <input name="flangeMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">Each face of the strip, over the panel.</p>
+          <span class="error" data-testid="error-flangeMm"></span>
+          <label>
+            Fit (mm per face)
+            <input name="fitMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">
+            The gap between each panel face and the strip. Raise it if strips are too tight; lower
+            it if they slip off.
+          </p>
+          <span class="error" data-testid="error-fitMm"></span>
+        </details>
+
+        <!-- What to do when full pieces leave less room than a joint takes (Q60): set
+          from the choice shown in the plan's warning. -->
+        <input type="hidden" name="widthLeftover" />
+        <input type="hidden" name="heightLeftover" />
       </form>
 
       <section id="plan" aria-live="polite">
@@ -177,6 +243,7 @@
         <p data-testid="plan-headline"></p>
         <p data-testid="plan-columns"></p>
         <p data-testid="plan-rows"></p>
+        <p data-testid="plan-joints"></p>
         <ul data-testid="plan-warnings"></ul>
         <p><button type="button" id="download-open">Download the pieces...</button></p>
       </section>
@@ -192,13 +259,19 @@
           <fieldset>
             <legend>Files</legend>
             <label>
-              <input type="radio" name="packaging" value="separate" /> Separate files, one per piece
+              <input type="radio" name="packaging" value="separate" /> Separate files: one per
+              piece, and one per strip or cross piece shape
             </label>
             <label><input type="radio" name="packaging" value="zip" /> One zip file</label>
             <label>
-              <input type="radio" name="packaging" value="single" /> One 3MF file holding every piece
+              <input type="radio" name="packaging" value="single" /> One 3MF file holding
+              everything
             </label>
           </fieldset>
+          <p class="note">
+            Strip and cross piece files say how many to print, e.g. <code>-print-8</code>. Print
+            them standing as they lie in the file.
+          </p>
           <p class="note">
             The files are yours to use, change, share or sell for any purpose, with no conditions
             from this project.

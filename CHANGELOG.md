@@ -45,8 +45,19 @@ complete. Until then every change is listed under Unreleased.
 - A 3D preview of the wall, drawn with three.js: the same pieces you download, each outlined,
   redrawn as you edit; drag to turn it, scroll or pinch to zoom. A browser without WebGL is
   told so, and the rest of the page still works.
+- The joint between pieces: an H-shaped strip that slides over the edges of two pieces and
+  holds by friction, standing proud of both faces, and a square cross piece where four pieces
+  meet. Its slot depth, slide, web, flanges and fit are starting values, not yet test printed,
+  and can be changed under "Advanced". The preview shows the strips in place, and the download
+  includes one file per strip shape and the cross piece, named with how many to print and
+  lying as they print, standing on their flanges.
+- When full-size pieces leave less room than a joint takes, the plan says so and offers three
+  ways out, one already chosen: spread the pieces a little, use equal pieces, or shorten one
+  full piece.
 
 ### Changed
 
+- Each joint now takes room between the pieces (5 mm with the starting values), so the pieces
+  are a little smaller than before for the same opening.
 - The code that defines the pieces' shapes is licensed MPL-2.0 like the rest of the code; the
   documentation stays CERN-OHL-S-2.0.

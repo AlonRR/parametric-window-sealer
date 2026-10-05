@@ -3,9 +3,18 @@
 // default. Nothing is chosen the first time; after that the last choice is chosen again
 // (Q47), remembered in the user's own browser only.
 
-import { meshOf, packageDownload } from './export';
-import type { DownloadChoice, DownloadFile, ExportPiece, Format, Packaging } from './export';
+import { meshOf, packageDownload, partName } from './export';
+import type {
+  DownloadChoice,
+  DownloadFile,
+  ExportPart,
+  ExportPiece,
+  Format,
+  Packaging,
+} from './export';
 import type { Engine } from './engine';
+import { partShapes, planJoints } from './joint';
+import { crossSolid, stripSolid } from './joint-geometry';
 import { buildPieces } from './panel-geometry';
 import { planWall } from './params';
 import type { Params } from './params';
@@ -56,19 +65,42 @@ function saveChoice(choice: DownloadChoice): void {
   }
 }
 
-export function makeFiles(engine: Engine, params: Params, choice: DownloadChoice): DownloadFile[] {
+// Every piece in its cell, and one strip or cross piece per shape, standing on its
+// flanges as it prints (Q53, Q58).
+export function buildExport(
+  engine: Engine,
+  params: Params,
+): { pieces: ExportPiece[]; parts: ExportPart[] } {
   const plan = planWall(params);
   const built = buildPieces(engine, plan, params.thicknessMm);
+  let pieces: ExportPiece[];
   try {
-    const pieces: ExportPiece[] = built.map((b, i) => {
+    pieces = built.map((b, i) => {
       const cell = plan.pieces[i];
       if (!cell) throw new Error('The plan and the built pieces differ');
       return { cell, mesh: meshOf(b.solid) };
     });
-    return packageDownload(pieces, choice, params.openingWidthMm, params.openingHeightMm);
   } finally {
     for (const b of built) b.solid.delete();
   }
+  const { joint, thicknessMm } = params;
+  const parts = partShapes(planJoints(plan, joint), joint).map((shape) => {
+    const solid =
+      shape.kind === 'strip'
+        ? stripSolid(engine, shape.lengthMm, joint, thicknessMm, 'print')
+        : crossSolid(engine, joint, thicknessMm, 'print');
+    try {
+      return { name: partName(shape), mesh: meshOf(solid), count: shape.count };
+    } finally {
+      solid.delete();
+    }
+  });
+  return { pieces, parts };
+}
+
+export function makeFiles(engine: Engine, params: Params, choice: DownloadChoice): DownloadFile[] {
+  const { pieces, parts } = buildExport(engine, params);
+  return packageDownload(pieces, parts, choice, params.openingWidthMm, params.openingHeightMm);
 }
 
 function saveFile(file: DownloadFile): void {

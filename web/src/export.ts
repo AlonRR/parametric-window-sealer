@@ -2,6 +2,9 @@
 // Q47): STL, one file per piece, separate or in one zip; or 3MF, every piece in one file,
 // or one file per piece, separate or zipped. Whatever is generated is the user's (Q36).
 //
+// The strips and cross pieces (connector-strip, #10) come as one file per shape, named with
+// how many to print; the single 3MF holds every copy (Q58).
+//
 // STL is written as binary STL. 3MF follows the 3MF Core Specification: an OPC (zip)
 // package holding [Content_Types].xml, _rels/.rels and the model at /3D/3dModel.model,
 // in millimetres, with triangles wound counter-clockwise seen from outside (Manifold's
@@ -9,6 +12,7 @@
 
 import { strToU8, zipSync } from 'fflate';
 import type { Manifold } from 'manifold-3d';
+import type { PartShape } from './joint';
 import type { GridPiece } from './layout';
 
 export interface MeshData {
@@ -19,6 +23,13 @@ export interface MeshData {
 export interface ExportPiece {
   cell: GridPiece;
   mesh: MeshData;
+}
+
+// A strip or cross piece shape, lying as it prints, and how many to print.
+export interface ExportPart {
+  name: string; // without the extension
+  mesh: MeshData;
+  count: number;
 }
 
 export type Format = 'stl' | '3mf';
@@ -52,6 +63,14 @@ export function pieceFileName(
   extension: Format,
 ): string {
   return `piece-c${cell.column + 1}-r${cell.row + 1}-${mm(cell.widthMm)}x${mm(cell.heightMm)}.${extension}`;
+}
+
+export function partName(shape: PartShape): string {
+  return `${shape.kind}-${mm(shape.lengthMm)}x${mm(shape.widthMm)}-print-${shape.count}`;
+}
+
+export function partFileName(shape: PartShape, extension: Format): string {
+  return `${partName(shape)}.${extension}`;
 }
 
 export function wallLabel(openingWidthMm: number, openingHeightMm: number): string {
@@ -93,7 +112,8 @@ export function toStl(mesh: MeshData, name: string): Uint8Array {
 }
 
 // Pieces in one 3MF are laid out as the wall, with this gap between them, so that none
-// overlap when a slicer opens the file.
+// overlap when a slicer opens the file. Strips and cross pieces go below the wall, one
+// column per shape with its copies one under the other, the same gap apart.
 const GAP_MM = 10;
 
 const num = (n: number) => {
@@ -104,31 +124,62 @@ const num = (n: number) => {
 const xmlAttr = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-export function to3mf(pieces: ExportPiece[]): Uint8Array {
+function footprint(mesh: MeshData) {
+  const min = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
+  const max = [Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY];
+  for (let v = 0; v < mesh.positions.length; v += 3) {
+    for (let k = 0; k < 2; k++) {
+      const x = mesh.positions[v + k] ?? 0;
+      min[k] = Math.min(min[k] ?? x, x);
+      max[k] = Math.max(max[k] ?? x, x);
+    }
+  }
+  return { minX: min[0] ?? 0, minY: min[1] ?? 0, width: (max[0] ?? 0) - (min[0] ?? 0), depth: (max[1] ?? 0) - (min[1] ?? 0) };
+}
+
+function objectXml(id: number, name: string, mesh: MeshData): string {
+  const { positions, triangles } = mesh;
+  const vertices: string[] = [];
+  for (let v = 0; v < positions.length; v += 3) {
+    vertices.push(
+      `<vertex x="${num(positions[v] ?? 0)}" y="${num(positions[v + 1] ?? 0)}" z="${num(positions[v + 2] ?? 0)}"/>`,
+    );
+  }
+  const tris: string[] = [];
+  for (let t = 0; t < triangles.length; t += 3) {
+    tris.push(`<triangle v1="${triangles[t]}" v2="${triangles[t + 1]}" v3="${triangles[t + 2]}"/>`);
+  }
+  return (
+    `<object id="${id}" type="model" name="${xmlAttr(name)}"><mesh><vertices>${vertices.join('')}</vertices>` +
+    `<triangles>${tris.join('')}</triangles></mesh></object>`
+  );
+}
+
+const itemXml = (id: number, x: number, y: number) =>
+  `<item objectid="${id}" transform="1 0 0 0 1 0 0 0 1 ${num(x)} ${num(y)} 0"/>`;
+
+export function to3mf(pieces: ExportPiece[], parts: ExportPart[] = []): Uint8Array {
   const objects: string[] = [];
   const items: string[] = [];
+  // A file holding one thing puts it at the origin.
+  const alone = pieces.length + parts.reduce((n, p) => n + p.count, 0) === 1;
   pieces.forEach((piece, i) => {
     const id = i + 1;
-    const name = pieceFileName(piece.cell, '3mf').replace(/\.3mf$/, '');
-    const { positions, triangles } = piece.mesh;
-    const vertices: string[] = [];
-    for (let v = 0; v < positions.length; v += 3) {
-      vertices.push(
-        `<vertex x="${num(positions[v] ?? 0)}" y="${num(positions[v + 1] ?? 0)}" z="${num(positions[v + 2] ?? 0)}"/>`,
-      );
+    objects.push(objectXml(id, pieceFileName(piece.cell, '3mf').replace(/\.3mf$/, ''), piece.mesh));
+    const x = alone ? 0 : piece.cell.xMm + piece.cell.column * GAP_MM;
+    const y = alone ? 0 : piece.cell.yMm + piece.cell.row * GAP_MM;
+    items.push(itemXml(id, x, y));
+  });
+  let column = 0;
+  parts.forEach((part, i) => {
+    const id = pieces.length + i + 1;
+    objects.push(objectXml(id, part.name, part.mesh));
+    const { minX, minY, width, depth } = footprint(part.mesh);
+    for (let copy = 0; copy < part.count; copy++) {
+      const top = alone ? 0 : -(GAP_MM + copy * (depth + GAP_MM));
+      items.push(itemXml(id, alone ? -minX : column - minX, alone ? -minY : top - depth - minY));
     }
-    const tris: string[] = [];
-    for (let t = 0; t < triangles.length; t += 3) {
-      tris.push(`<triangle v1="${triangles[t]}" v2="${triangles[t + 1]}" v3="${triangles[t + 2]}"/>`);
-    }
-    objects.push(
-      `<object id="${id}" type="model" name="${xmlAttr(name)}"><mesh><vertices>${vertices.join('')}</vertices>` +
-        `<triangles>${tris.join('')}</triangles></mesh></object>`,
-    );
-    // One piece goes at the origin; several are spread out as the wall.
-    const x = pieces.length === 1 ? 0 : piece.cell.xMm + piece.cell.column * GAP_MM;
-    const y = pieces.length === 1 ? 0 : piece.cell.yMm + piece.cell.row * GAP_MM;
-    items.push(`<item objectid="${id}" transform="1 0 0 0 1 0 0 0 1 ${num(x)} ${num(y)} 0"/>`);
+    column += width + GAP_MM;
   });
 
   const model =
@@ -161,6 +212,7 @@ const TYPES: Record<Format | 'zip', string> = {
 
 export function packageDownload(
   pieces: ExportPiece[],
+  parts: ExportPart[],
   choice: DownloadChoice,
   openingWidthMm: number,
   openingHeightMm: number,
@@ -170,17 +222,25 @@ export function packageDownload(
     if (choice.format !== '3mf') {
       throw new RangeError('Only 3MF holds every piece in one file; STL holds one object');
     }
-    return [{ name: `${label}.3mf`, type: TYPES['3mf'], bytes: to3mf(pieces) }];
+    return [{ name: `${label}.3mf`, type: TYPES['3mf'], bytes: to3mf(pieces, parts) }];
   }
+  const type = TYPES[choice.format];
   const perPiece = pieces.map((piece) => {
     const name = pieceFileName(piece.cell, choice.format);
     const bytes =
       choice.format === 'stl'
         ? toStl(piece.mesh, name.replace(/\.stl$/, ''))
         : to3mf([piece]);
-    return { name, type: TYPES[choice.format], bytes };
+    return { name, type, bytes };
   });
-  if (choice.packaging === 'separate') return perPiece;
-  const zip = zipSync(Object.fromEntries(perPiece.map((f) => [f.name, f.bytes])));
+  // One copy in each file; the name says how many to print.
+  const perPart = parts.map((part) => ({
+    name: `${part.name}.${choice.format}`,
+    type,
+    bytes: choice.format === 'stl' ? toStl(part.mesh, part.name) : to3mf([], [{ ...part, count: 1 }]),
+  }));
+  const files = [...perPiece, ...perPart];
+  if (choice.packaging === 'separate') return files;
+  const zip = zipSync(Object.fromEntries(files.map((f) => [f.name, f.bytes])));
   return [{ name: `${label}-${choice.format}.zip`, type: TYPES.zip, bytes: zip }];
 }
