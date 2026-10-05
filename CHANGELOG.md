@@ -12,6 +12,11 @@ under Unreleased.
 
 ### Added
 
+- The page as one file that works offline: "Save the page as one file that works offline", under
+  the download button, saves `window-sealer.html` (about 1.4 MB), the page with everything it
+  needs inside. Open it in a browser any time, with or without a connection: it plans, draws and
+  downloads as the hosted page does.
+
 - A window air conditioner: under "What is in the window?", choose "Window air conditioner" and
   say where the unit is, seen from the room: below the wall, which stands on it, or to its left
   or right. The edge facing it gets a flat face, with the seal if there is one, and the plan

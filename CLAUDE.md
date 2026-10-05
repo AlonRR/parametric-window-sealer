@@ -197,7 +197,7 @@ npm run build -w parametric-window-sealer-cli        # the command, after the li
 npm run test:dist -w parametric-window-sealer-cli    # both packed, installed as its README says, run
 npm run build -w parametric-window-sealer-mcp        # the MCP server, after the library's build
 npm run test:dist -w parametric-window-sealer-mcp    # installed with -g, started from its README, called
-npm run build -w parametric-window-sealer-web         # the static site, into web/out/site
+npm run build -w parametric-window-sealer-web         # the static site and the offline file, into web/out/site
 npm run test:browser -w parametric-window-sealer-web  # the built page in Chromium (Playwright)
 ```
 

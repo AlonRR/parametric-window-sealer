@@ -29,7 +29,7 @@ Planned next:
 - **Appliances**: fan mounts with their screw patterns.
 - **Panel styles**: organiser patterns (pegboard-style), beside the grid, hexagon, brick and
   diamond patterns.
-- **Help**: a measuring guide with pictures, and the page as one file that works offline.
+- **Help**: a measuring guide with pictures.
 
 ## Developing
 
@@ -53,7 +53,7 @@ The page lives in `web/`. The four are one npm workspace and need Node.js 22.12 
 npm ci                                              # at the repo root
 npm test --workspaces                               # unit tests: library, command, server, page
 npm run dev -w parametric-window-sealer-web         # the page, reloading as you edit
-npm run build -w parametric-window-sealer-web       # the static site, into web/out/site
+npm run build -w parametric-window-sealer-web       # the static site and the offline file, into web/out/site
 ```
 
 ## Publishing the site
