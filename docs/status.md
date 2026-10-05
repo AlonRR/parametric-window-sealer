@@ -161,9 +161,9 @@ The first four rows were answered before questions carried IDs.
 
 ## Repository follow-ups
 
-- **Pending (Q101, Q123):** the `v0.2.0` tag on the release commit `chore(release): v0.2.0, the
-  API` (`983dc0f`) and its GitHub release, asked of the session on the owner's machine on
-  5 Oct 2026; done once both show on GitHub.
+- **Done (Q101, Q123):** the `v0.2.0` tag on the release commit `chore(release): v0.2.0, the
+  API` (`983dc0f`) and its GitHub release, made by the session on the owner's machine on
+  5 Oct 2026 (verified: GitHub lists the annotated tag on `983dc0f` and the release).
 - **Owner's step (Q82):** set the repository's About description on GitHub (the gear beside
   About on the repository's main page) to: "Parametric, 3D-printable panels that close off the part of a window left open around a window air conditioner, fan or hose. Runs in the browser; nothing to install."
 - Before the first npm publish (Q78): the package holds only `dist/` and its README, so add
