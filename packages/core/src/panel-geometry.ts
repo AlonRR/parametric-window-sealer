@@ -6,10 +6,10 @@
 // and the edge that sits in the window track (track-edge, #11) add to it later.
 
 import type { Manifold } from 'manifold-3d';
-import type { Engine } from './engine';
-import type { GridLayout } from './layout';
+import type { Engine } from './engine.js';
+import type { GridLayout } from './layout.js';
 
-export interface PieceSize {
+export interface PanelSize {
   widthMm: number;
   heightMm: number;
   thicknessMm: number;
@@ -21,7 +21,7 @@ function requirePositive(name: string, value: number): void {
   }
 }
 
-export function plainPanel(engine: Engine, size: PieceSize): Manifold {
+export function plainPanel(engine: Engine, size: PanelSize): Manifold {
   requirePositive('widthMm', size.widthMm);
   requirePositive('heightMm', size.heightMm);
   requirePositive('thicknessMm', size.thicknessMm);

@@ -10,7 +10,7 @@
 // slot's slide (Q56), so it reaches that far into a track, and stops short of a sash or
 // a sill by the strip's height less that.
 
-import type { JointParams } from './joint';
+import type { JointParams } from './joint.js';
 
 export type EdgeName = 'top' | 'bottom' | 'left' | 'right';
 export type EdgeRole = 'track' | 'sash' | 'sill';

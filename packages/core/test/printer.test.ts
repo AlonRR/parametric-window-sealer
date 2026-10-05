@@ -4,7 +4,7 @@
 // and its evidence cannot drift apart.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_MAX_PIECE, maxPieceSize } from '../src/printer';
+import { DEFAULT_MAX_PIECE, maxPieceSize } from '../src/printer.js';
 
 interface Bed {
   model: string;
@@ -14,7 +14,7 @@ interface Bed {
 }
 
 function readBeds(): Bed[] {
-  const md = readFileSync(new URL('../../docs/printer-beds.md', import.meta.url), 'utf8');
+  const md = readFileSync(new URL('../../../docs/printer-beds.md', import.meta.url), 'utf8');
   const section = md.split('## Build volumes')[1]?.split('\n## ')[0] ?? '';
   const rows = section
     .split('\n')

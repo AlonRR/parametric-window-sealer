@@ -2,11 +2,11 @@
 // params.ts, where the unit tests reach them; this file only moves values between the
 // form and those functions.
 
-import { EXAMPLE_PARAMS, describePlan, planWall, readParams, toFormValues } from './params';
-import type { FieldName, FormValues, LeftoverText, Params } from './params';
-import { EDGES, WINDOW_PRESETS } from './edge';
-import type { WindowType } from './edge';
-import { DEFAULT_MAX_PIECE } from './printer';
+import { EXAMPLE_PARAMS, describePlan, planWall, readParams, toFormValues } from 'parametric-window-sealer';
+import type { FieldName, FormValues, LeftoverText, Params } from 'parametric-window-sealer';
+import { EDGES, WINDOW_PRESETS } from 'parametric-window-sealer';
+import type { WindowType } from 'parametric-window-sealer';
+import { DEFAULT_MAX_PIECE } from 'parametric-window-sealer';
 
 const FIELDS: readonly FieldName[] = [
   'openingWidthMm',

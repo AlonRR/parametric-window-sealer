@@ -12,14 +12,14 @@ import {
   jointStripInsetMm,
   panelSpan,
   planEdges,
-} from './edge';
-import type { EdgeName, EdgeParams, EdgeRole, EdgeStripPlacement, WindowType } from './edge';
-import { DEFAULT_JOINT, jointWidthMm, minPieceMm, partShapes, planJoints } from './joint';
-import type { JointParams, JointPlan } from './joint';
-import { layoutGrid } from './layout';
-import type { Axis, AxisMode, FillerPosition, GridLayout, Leftover } from './layout';
-import { DEFAULT_MAX_PIECE, maxPieceSize } from './printer';
-import type { PrinterChoice } from './printer';
+} from './edge.js';
+import type { EdgeName, EdgeParams, EdgeRole, EdgeStripPlacement, WindowType } from './edge.js';
+import { DEFAULT_JOINT, jointWidthMm, minPieceMm, partShapes, planJoints } from './joint.js';
+import type { JointParams, JointPlan } from './joint.js';
+import { layoutGrid } from './layout.js';
+import type { Axis, AxisMode, FillerPosition, GridLayout, Leftover } from './layout.js';
+import { DEFAULT_MAX_PIECE, maxPieceSize } from './printer.js';
+import type { PrinterChoice } from './printer.js';
 
 export interface AxisChoice {
   mode: AxisMode;

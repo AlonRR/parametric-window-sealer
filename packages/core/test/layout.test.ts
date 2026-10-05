@@ -2,8 +2,8 @@
 // place the filler where the user asks or split it for symmetry (Q12), and warn, without
 // refusing, when a piece is under the minimum the joint needs (Q12, Q37).
 import { describe, expect, it } from 'vitest';
-import { divideAxis, layoutGrid } from '../src/layout';
-import type { AxisSpec } from '../src/layout';
+import { divideAxis, layoutGrid } from '../src/layout.js';
+import type { AxisSpec } from '../src/layout.js';
 
 const axis = (over: Partial<AxisSpec>): AxisSpec => ({
   lengthMm: 1000,

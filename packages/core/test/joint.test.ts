@@ -11,10 +11,10 @@ import {
   planJoints,
   stripThicknessMm,
   stripWidthMm,
-} from '../src/joint';
-import type { JointParams, StripPlacement } from '../src/joint';
-import { layoutGrid } from '../src/layout';
-import type { GridSpec } from '../src/layout';
+} from '../src/joint.js';
+import type { JointParams, StripPlacement } from '../src/joint.js';
+import { layoutGrid } from '../src/layout.js';
+import type { GridSpec } from '../src/layout.js';
 
 const grid = (over: Partial<GridSpec> = {}, joint: JointParams = DEFAULT_JOINT) =>
   layoutGrid({

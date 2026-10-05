@@ -20,14 +20,14 @@ import {
 } from 'three';
 import type { Material } from 'three';
 import type { Manifold } from 'manifold-3d';
-import type { Engine } from './engine';
-import { meshOf } from './export';
-import { edgeStripSolid } from './edge-geometry';
-import { stripWidthMm } from './joint';
-import { crossSolid, stripSolid } from './joint-geometry';
-import { buildPieces } from './panel-geometry';
-import { planParts } from './params';
-import type { Params } from './params';
+import type { Engine } from 'parametric-window-sealer';
+import { meshOf } from 'parametric-window-sealer';
+import { edgeStripSolid } from 'parametric-window-sealer';
+import { stripWidthMm } from 'parametric-window-sealer';
+import { crossSolid, stripSolid } from 'parametric-window-sealer';
+import { buildPieces } from 'parametric-window-sealer';
+import { planParts } from 'parametric-window-sealer';
+import type { Params } from 'parametric-window-sealer';
 
 export type PartKind = 'piece' | 'strip' | 'cross' | 'edge';
 

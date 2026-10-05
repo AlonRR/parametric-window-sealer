@@ -3,9 +3,9 @@
 // them as the MVP items land (docs/backlog.md).
 import wasmUrl from 'manifold-3d/manifold.wasm?url';
 import { mountDownload } from './download-dialog';
-import { buildCheckPart, loadEngine } from './engine';
+import { buildCheckPart, loadEngine } from 'parametric-window-sealer';
 import { mountPanel } from './panel';
-import type { Params } from './params';
+import type { Params } from 'parametric-window-sealer';
 import { mountPreview } from './preview';
 
 async function start(status: HTMLElement): Promise<void> {

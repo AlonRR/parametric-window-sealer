@@ -13,9 +13,9 @@
 
 import { strToU8, zipSync } from 'fflate';
 import type { Manifold } from 'manifold-3d';
-import type { EdgeShape } from './edge';
-import type { PartShape } from './joint';
-import type { GridPiece } from './layout';
+import type { EdgeShape } from './edge.js';
+import type { PartShape } from './joint.js';
+import type { GridPiece } from './layout.js';
 
 export interface MeshData {
   positions: Float32Array; // x, y, z per vertex, in mm

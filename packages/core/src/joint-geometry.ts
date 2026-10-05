@@ -7,9 +7,9 @@
 // the flanges (Q53), so the web is a short bridge and nothing overhangs.
 
 import type { Manifold } from 'manifold-3d';
-import type { Engine } from './engine';
-import type { JointParams } from './joint';
-import { stripThicknessMm, stripWidthMm } from './joint';
+import type { Engine } from './engine.js';
+import type { JointParams } from './joint.js';
+import { stripThicknessMm, stripWidthMm } from './joint.js';
 
 export type StripPose = 'wall-vertical' | 'wall-horizontal' | 'print';
 export type CrossPose = 'wall' | 'print';

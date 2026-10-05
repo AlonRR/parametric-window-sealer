@@ -1,0 +1,15 @@
+// parametric-window-sealer: the geometry behind the page, as a library (backlog item
+// api-library, #45). makeWall is the main call (Q80); everything it is built from is
+// exported too: the layout, the joints, the edges, the shapes and the file writers.
+
+export * from './edge.js';
+export * from './edge-geometry.js';
+export * from './engine.js';
+export * from './export.js';
+export * from './joint.js';
+export * from './joint-geometry.js';
+export * from './layout.js';
+export * from './panel-geometry.js';
+export * from './params.js';
+export * from './printer.js';
+export * from './wall.js';

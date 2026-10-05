@@ -8,9 +8,9 @@
 // downloaded, standing on its base with the slot open upward (Q53).
 
 import type { Manifold } from 'manifold-3d';
-import type { EdgeName } from './edge';
-import type { Engine } from './engine';
-import type { JointParams } from './joint';
+import type { EdgeName } from './edge.js';
+import type { Engine } from './engine.js';
+import type { JointParams } from './joint.js';
 
 export type EdgePose = EdgeName | 'print';
 

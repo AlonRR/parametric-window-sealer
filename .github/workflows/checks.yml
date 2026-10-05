@@ -55,12 +55,10 @@ jobs:
           bash tests/test-history-identity.sh
 
   web:
-    # The page (Q22, Q34): type check, unit tests, the static build, and that build opened
-    # in Chromium, the only check that the WebAssembly engine starts in a browser (Q35).
+    # The library and the page (Q22, Q34, Q79): one npm workspace, installed from the root.
+    # Type check and unit tests for both, the static build, and that build opened in
+    # Chromium, the only check that the WebAssembly engine starts in a browser (Q35).
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: web
     steps:
       - uses: actions/checkout@v5
         with:
@@ -69,19 +67,20 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-          cache-dependency-path: web/package-lock.json
+          cache-dependency-path: package-lock.json
       - name: Install the locked dependencies
         run: npm ci
       - name: Type check
-        run: npm run typecheck
+        run: npm run typecheck --workspaces
       - name: Unit tests
-        run: npm test
-      - name: Build
-        run: npm run build
+        run: npm test --workspaces
+      - name: Build the page
+        run: npm run build -w parametric-window-sealer-web
       - name: Install the Chromium this Playwright version expects
+        working-directory: web
         run: npx playwright install --with-deps chromium
       - name: Browser test
-        run: npm run test:browser
+        run: npm run test:browser -w parametric-window-sealer-web
 
   secrets-history:
     # The pre-commit secret hook only sees staged content. This is the history gate, and it is

@@ -173,14 +173,18 @@ bash scripts/check-history-identity.sh "Alon A. Rabinowitz" \
   "45129051+AlonRR@users.noreply.github.com"   # every commit's identity, as CI checks it
 ```
 
-The page, in `web/` (Q34, Q35), after `npm ci` there:
+The library, `packages/core` (published as `parametric-window-sealer`, Q78, Q79), and the
+page, `web/` (Q34, Q35), are one npm workspace. After `npm ci` at the repo root:
 
 ```bash
-npm run typecheck                 # tsc over src, tests and configs
-npm test                          # unit tests (Vitest), in Node
-npm run build                     # the static site, into out/site
-npm run test:browser              # the built page in Chromium (Playwright)
+npm run typecheck --workspaces    # tsc over both: sources, tests and configs
+npm test --workspaces             # unit tests (Vitest), in Node
+npm run build -w parametric-window-sealer-web         # the static site, into web/out/site
+npm run test:browser -w parametric-window-sealer-web  # the built page in Chromium (Playwright)
 ```
+
+The page builds the library from its source (an alias in `web/vite.config.ts`), so the two
+cannot drift apart.
 
 `npx playwright install chromium` fetches the browser the browser test expects. A machine that
 already has a Chromium can point at it with `PW_CHROMIUM_PATH=<path>` instead.

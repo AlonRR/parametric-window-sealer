@@ -3,23 +3,15 @@
 // default. Nothing is chosen the first time; after that the last choice is chosen again
 // (Q47), remembered in the user's own browser only.
 
-import { meshOf, packageDownload, partName } from './export';
+import { makeFiles } from 'parametric-window-sealer';
 import type {
   DownloadChoice,
   DownloadFile,
-  ExportPart,
-  ExportPiece,
+  Engine,
   Format,
   Packaging,
-} from './export';
-import type { Engine } from './engine';
-import { edgeShapes } from './edge';
-import { edgeStripSolid } from './edge-geometry';
-import { partShapes } from './joint';
-import { crossSolid, stripSolid } from './joint-geometry';
-import { buildPieces } from './panel-geometry';
-import { planParts, planWall } from './params';
-import type { Params } from './params';
+  Params,
+} from 'parametric-window-sealer';
 
 export const STORAGE_KEY = 'parametric-window-sealer.download-choice.v1';
 const FORMATS: readonly Format[] = ['stl', '3mf'];
@@ -65,48 +57,6 @@ function saveChoice(choice: DownloadChoice): void {
   } catch {
     // Not remembered; nothing else depends on it.
   }
-}
-
-// Every piece in its cell, and one strip, cross piece or edge strip per shape, lying as it
-// prints (Q53, Q58).
-export function buildExport(
-  engine: Engine,
-  params: Params,
-): { pieces: ExportPiece[]; parts: ExportPart[] } {
-  const plan = planWall(params);
-  const built = buildPieces(engine, plan, params.thicknessMm);
-  let pieces: ExportPiece[];
-  try {
-    pieces = built.map((b, i) => {
-      const cell = plan.pieces[i];
-      if (!cell) throw new Error('The plan and the built pieces differ');
-      return { cell, mesh: meshOf(b.solid) };
-    });
-  } finally {
-    for (const b of built) b.solid.delete();
-  }
-  const { joint, thicknessMm } = params;
-  const { joints, edges } = planParts(params, plan);
-  const shapes = [...partShapes(joints, joint), ...edgeShapes(edges)];
-  const parts = shapes.map((shape) => {
-    const solid =
-      shape.kind === 'edge'
-        ? edgeStripSolid(engine, shape.lengthMm, shape, joint, thicknessMm, 'print')
-        : shape.kind === 'strip'
-          ? stripSolid(engine, shape.lengthMm, joint, thicknessMm, 'print')
-          : crossSolid(engine, joint, thicknessMm, 'print');
-    try {
-      return { name: partName(shape), mesh: meshOf(solid), count: shape.count };
-    } finally {
-      solid.delete();
-    }
-  });
-  return { pieces, parts };
-}
-
-export function makeFiles(engine: Engine, params: Params, choice: DownloadChoice): DownloadFile[] {
-  const { pieces, parts } = buildExport(engine, params);
-  return packageDownload(pieces, parts, choice, params.openingWidthMm, params.openingHeightMm);
 }
 
 function saveFile(file: DownloadFile): void {

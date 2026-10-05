@@ -8,7 +8,7 @@
 // still close up (Q57). At the wall's outer edge a strip stops short of the edge strip
 // (Q74), or runs flush with the pieces when there is none (Q59).
 
-import type { GridLayout } from './layout';
+import type { GridLayout } from './layout.js';
 
 export interface JointParams {
   slotMm: number; // how deep a piece can go into the strip

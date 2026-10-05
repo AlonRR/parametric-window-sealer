@@ -44,14 +44,14 @@ pre-commit run --all-files
 
 The commit hooks check the commit identity and message form; `CLAUDE.md` lists the rules.
 
-The page lives in `web/` and needs Node.js 22.12 or later:
+The geometry is a library in `packages/core` (published as `parametric-window-sealer`) and
+the page lives in `web/`; they are one npm workspace and need Node.js 22.12 or later:
 
 ```bash
-cd web
-npm ci
-npm run dev                       # a local server that reloads as you edit
-npm test                          # unit tests
-npm run build                     # the static site, into web/out/site
+npm ci                                              # at the repo root
+npm test --workspaces                               # unit tests, library and page
+npm run dev -w parametric-window-sealer-web         # the page, reloading as you edit
+npm run build -w parametric-window-sealer-web       # the static site, into web/out/site
 ```
 
 ## Publishing the site

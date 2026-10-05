@@ -4,10 +4,10 @@
 // wall they sit around the panel (z from 0 to the thickness); downloaded, they stand on
 // their flanges (Q53), so no part of them overhangs.
 import { describe, expect, it } from 'vitest';
-import { loadEngine } from '../src/engine';
-import type { Engine } from '../src/engine';
-import { DEFAULT_JOINT } from '../src/joint';
-import { crossSolid, stripSolid } from '../src/joint-geometry';
+import { loadEngine } from '../src/engine.js';
+import type { Engine } from '../src/engine.js';
+import { DEFAULT_JOINT } from '../src/joint.js';
+import { crossSolid, stripSolid } from '../src/joint-geometry.js';
 import type { Manifold } from 'manifold-3d';
 
 const T = 3; // panel thickness

@@ -5,10 +5,10 @@
 // upward, so nothing overhangs (Q53).
 import type { Manifold } from 'manifold-3d';
 import { describe, expect, it } from 'vitest';
-import { edgeStripSolid } from '../src/edge-geometry';
-import { loadEngine } from '../src/engine';
-import type { Engine } from '../src/engine';
-import { DEFAULT_JOINT } from '../src/joint';
+import { edgeStripSolid } from '../src/edge-geometry.js';
+import { loadEngine } from '../src/engine.js';
+import type { Engine } from '../src/engine.js';
+import { DEFAULT_JOINT } from '../src/joint.js';
 
 const T = 3; // panel thickness
 const L = 100;

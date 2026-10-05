@@ -2,7 +2,7 @@
 // operation gives the volume worked out by hand. Runs in Node; the browser half is
 // e2e/page.spec.ts.
 import { describe, expect, it } from 'vitest';
-import { CHECK_PART_VOLUME_MM3, buildCheckPart, loadEngine } from '../src/engine';
+import { CHECK_PART_VOLUME_MM3, buildCheckPart, loadEngine } from '../src/engine.js';
 
 describe('loadEngine', () => {
   it('starts Manifold and returns the same instance on every call', async () => {

@@ -2,9 +2,9 @@
 // one such piece for every cell of the plan. A piece lies flat as it is printed: width
 // along X, height along Y, thickness along Z, from the origin.
 import { describe, expect, it } from 'vitest';
-import { loadEngine } from '../src/engine';
-import { buildPieces, plainPanel } from '../src/panel-geometry';
-import { EXAMPLE_PARAMS, planWall } from '../src/params';
+import { loadEngine } from '../src/engine.js';
+import { buildPieces, plainPanel } from '../src/panel-geometry.js';
+import { EXAMPLE_PARAMS, planWall } from '../src/params.js';
 
 describe('plainPanel', () => {
   it('is a solid block of exactly the given size, lying flat from the origin', async () => {

@@ -31,9 +31,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: web
     steps:
       - uses: actions/checkout@v5
         with:
@@ -42,11 +39,11 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-          cache-dependency-path: web/package-lock.json
-      - name: Install the locked dependencies
+          cache-dependency-path: package-lock.json
+      - name: Install the locked dependencies (the workspace, from the root)
         run: npm ci
       - name: Build the site
-        run: npm run build
+        run: npm run build -w parametric-window-sealer-web
       - name: Keep the site as the run's artifact
         uses: actions/upload-pages-artifact@v5
         with:

@@ -13,10 +13,10 @@ import {
   planWall,
   readParams,
   toFormValues,
-} from '../src/params';
-import type { FormValues } from '../src/params';
-import { EXAMPLE_TRACK, WINDOW_PRESETS } from '../src/edge';
-import { DEFAULT_JOINT } from '../src/joint';
+} from '../src/params.js';
+import type { FormValues } from '../src/params.js';
+import { EXAMPLE_TRACK, WINDOW_PRESETS } from '../src/edge.js';
+import { DEFAULT_JOINT } from '../src/joint.js';
 
 const example = toFormValues(EXAMPLE_PARAMS);
 const read = (over: FormValues) => readParams({ ...example, ...over });

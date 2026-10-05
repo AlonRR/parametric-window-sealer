@@ -172,7 +172,7 @@ export function divideAxis(input: AxisSpec): AxisLayout {
   return { ...layout, warnings };
 }
 
-export interface AxisChoice {
+export interface AxisDivision {
   mode: AxisMode;
   filler?: FillerPosition;
   leftover?: Leftover;
@@ -186,8 +186,8 @@ export interface GridSpec {
   minPieceMm: number;
   jointMm?: number;
   jointSpreadMm?: number;
-  width: AxisChoice;
-  height: AxisChoice;
+  width: AxisDivision;
+  height: AxisDivision;
 }
 
 export interface GridPiece {

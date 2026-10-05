@@ -23,6 +23,7 @@ path = [
   ".github/**",
   "scripts/**",
   "spikes/**",
+  "packages/**",
   "tests/**",
   "web/**",
   ".editorconfig",
@@ -34,12 +35,14 @@ path = [
   ".yamllint.yaml",
   "PROJECT.yml",
   "REUSE.toml",
+  "package.json",
+  "package-lock.json",
 ]
 SPDX-FileCopyrightText = "2026 Alon A. Rabinowitz"
 SPDX-License-Identifier = "MPL-2.0"
 
 # Documentation inside the code folders stays under the documentation licence.
 [[annotations]]
-path = "spikes/**/README.md"
+path = ["packages/**/README.md", "spikes/**/README.md"]
 SPDX-FileCopyrightText = "2026 Alon A. Rabinowitz"
 SPDX-License-Identifier = "CERN-OHL-S-2.0"

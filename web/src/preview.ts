@@ -16,8 +16,8 @@ import {
 } from 'three';
 import type { Group } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import type { Engine } from './engine';
-import type { Params } from './params';
+import type { Engine } from 'parametric-window-sealer';
+import type { Params } from 'parametric-window-sealer';
 import { buildWallScene, countOf, disposeWall } from './preview-scene';
 
 const BACKGROUND = 0xf4f4f4;

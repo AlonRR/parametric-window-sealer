@@ -13,9 +13,9 @@ import {
   jointStripInsetMm,
   panelSpan,
   planEdges,
-} from '../src/edge';
-import type { EdgeName, EdgeParams, EdgeStripPlacement } from '../src/edge';
-import { DEFAULT_JOINT } from '../src/joint';
+} from '../src/edge.js';
+import type { EdgeName, EdgeParams, EdgeStripPlacement } from '../src/edge.js';
+import { DEFAULT_JOINT } from '../src/joint.js';
 
 const slider: EdgeParams = { window: 'slider', roles: WINDOW_PRESETS.slider, track: EXAMPLE_TRACK };
 const hung: EdgeParams = { window: 'hung', roles: WINDOW_PRESETS.hung, track: EXAMPLE_TRACK };

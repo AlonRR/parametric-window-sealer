@@ -7,8 +7,8 @@
 import { Box3, LineSegments, Mesh } from 'three';
 import type { Object3D } from 'three';
 import { describe, expect, it } from 'vitest';
-import { loadEngine } from '../src/engine';
-import { EXAMPLE_PARAMS } from '../src/params';
+import { loadEngine } from 'parametric-window-sealer';
+import { EXAMPLE_PARAMS } from 'parametric-window-sealer';
 import { buildWallScene, disposeWall } from '../src/preview-scene';
 
 const solidsOf = (wall: Object3D, kind: string) =>

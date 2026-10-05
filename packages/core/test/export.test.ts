@@ -4,9 +4,9 @@
 // holds the strips and cross pieces, one file per shape with the count in its name (Q58).
 import { strFromU8, unzipSync } from 'fflate';
 import { describe, expect, it } from 'vitest';
-import { loadEngine } from '../src/engine';
-import type { Engine } from '../src/engine';
-import { buildExport } from '../src/download-dialog';
+import { loadEngine } from '../src/engine.js';
+import type { Engine } from '../src/engine.js';
+import { buildExport } from '../src/wall.js';
 import {
   meshOf,
   packageDownload,
@@ -15,11 +15,11 @@ import {
   to3mf,
   toStl,
   wallLabel,
-} from '../src/export';
-import type { ExportPart, ExportPiece } from '../src/export';
-import { DEFAULT_JOINT } from '../src/joint';
-import { stripSolid } from '../src/joint-geometry';
-import { EXAMPLE_PARAMS } from '../src/params';
+} from '../src/export.js';
+import type { ExportPart, ExportPiece } from '../src/export.js';
+import { DEFAULT_JOINT } from '../src/joint.js';
+import { stripSolid } from '../src/joint-geometry.js';
+import { EXAMPLE_PARAMS } from '../src/params.js';
 
 const solidFromTriangles = (engine: Engine, positions: Float32Array, tris: Uint32Array) => {
   const mesh = new engine.Mesh({ numProp: 3, vertProperties: positions, triVerts: tris });
