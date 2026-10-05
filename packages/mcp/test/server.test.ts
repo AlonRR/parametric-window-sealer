@@ -4,6 +4,7 @@ import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { unzipSync } from 'fflate';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { describe, expect, it } from 'vitest';
 import { EXAMPLE_PARAMS, SETTINGS, WINDOW_PRESETS, makeWall, planFiles } from 'parametric-window-sealer';
@@ -182,7 +183,10 @@ describe('window_sealer_make_files', () => {
     expect(resources).toHaveLength(1);
     expect(resources[0]?.resource.uri).toBe('window-sealer:///window-sealer-600x1000/window-sealer-600x1000.3mf');
     expect(resources[0]?.resource.mimeType).toBe('model/3mf');
-    expect(Buffer.from(resources[0]?.resource.blob ?? '', 'base64')).toEqual(Buffer.from(wall.files[0]?.bytes ?? []));
+    // A 3MF is a ZIP, and each entry carries the time it was made, so two made a second apart
+    // differ in their bytes: compare what is inside.
+    const inside = (bytes: Uint8Array) => unzipSync(bytes);
+    expect(inside(Buffer.from(resources[0]?.resource.blob ?? '', 'base64'))).toEqual(inside(wall.files[0]?.bytes ?? new Uint8Array()));
     expect(r.data['folder']).toBeUndefined();
   });
 
