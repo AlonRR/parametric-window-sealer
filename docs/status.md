@@ -157,6 +157,9 @@ is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | Q136 | A relief pattern is **cut into the room-side face**: it prints flat with no supports, and the outside face stays plain | 5 Oct 2026 |
 | Q137 | On a piece with a hose port, the panel stays **solid out to the border's width beyond the collar's outside**; the pattern carries on past that | 5 Oct 2026 |
 | Q138 | The relief's depth is **a percentage of the panel's thickness, starting at 50**, a setting under Advanced, so it stays half when the thickness changes | 5 Oct 2026 |
+| Q139 | The grid starts with **15 mm square openings and 3 mm bars**, an 18 mm pitch: about 9 × 9 openings on a 200 mm piece | 5 Oct 2026 |
+| Q140 | Under Advanced, the grid's **opening size and bar width** can be changed; the openings stay square | 5 Oct 2026 |
+| Q141 | The page has a **"Panel fill" choice**: "Sealed" to start with, or a pattern from a list (the grid for now, the others as they come), then **"Cut through" or "Relief"**; under "Cut through" a note says air passes through it | 5 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
 | Q32 | The **hosted web API is parked** (`api-hosted`, #48, moved to P3): "I don't have the funding to run a server" | 5 Oct 2026 |
