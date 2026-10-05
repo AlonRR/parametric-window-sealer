@@ -90,7 +90,8 @@ window-sealer --width 600 --height 1000 --printer-model prusa-mk4s
   either alone means the grid. `--fill hexagon` gives a honeycomb instead, sized with
   `--hex-opening` (15 mm across the flats) and `--hex-bar` (3 mm), and `--fill brick` bricks in
   a running bond, sized with `--brick-width` (30 mm), `--brick-height` (12 mm) and `--brick-bar`
-  (3 mm).
+  (3 mm). `--fill diamond` gives point-up diamonds, sized with `--diamond-width` (20 mm),
+  `--diamond-height` (30 mm) and `--diamond-bar` (3 mm).
 
 ### Settings in a file
 

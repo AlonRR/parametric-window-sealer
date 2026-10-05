@@ -62,7 +62,7 @@ Start from `EXAMPLE_PARAMS` and change what differs. Every length is in mm.
 | `ports`                                | Hose ports, none for a plain wall: each `{ hoseMm, column, row }`, the hose end's outside diameter (`COMMON_HOSE_MM`: 150 and 130) and its piece, from 1 at the bottom left seen from the room                     |
 | `collar`                               | The port's collar: `depthMm`, `wallMm`, `clearanceMm`, `lipMm` (`DEFAULT_COLLAR`)                                                                                                                                       |
 | `seal`                                 | `{ kind: 'none' }` or `'tape'`, with the `tape`'s `widthMm`, `thicknessMm` (`TAPE_SIZES`), `grooveMm`, `squeezePct`, and whether it also goes on the strips' `sides` and in each `port` (`NO_SEAL`, `DEFAULT_TAPE`)   |
-| `fill`                                 | `{ kind: 'sealed' }`, `'grid'`, `'hexagon'` or `'brick'`, its `style` (`'relief'`, cut into the room side to `reliefPct` of the thickness, or `'through'`), the `grid`'s `openingMm` and `barMm`, the `hexagon`'s (across the flats) and the `brick`'s `widthMm`, `heightMm` and `barMm` (`SEALED`, `DEFAULT_GRID`, `DEFAULT_HEXAGON`, `DEFAULT_BRICK`; bars at least `MIN_BAR_MM`) |
+| `fill`                                 | `{ kind: 'sealed' }`, or a pattern: `'grid'`, `'hexagon'`, `'brick'` or `'diamond'` (`FILL_KINDS`), its `style` (`'relief'`, cut into the room side to `reliefPct` of the thickness, or `'through'`), and each pattern's sizes in `grid`, `hexagon`, `brick` and `diamond` (`SEALED` holds the starting ones; bars at least `MIN_BAR_MM`) |
 
 Wrong parameters throw a `ParamsError` whose `errors` names every wrong field with the page's
 message. `validateParams(params)` gives the same messages without building anything.
@@ -96,8 +96,8 @@ shapes (`plainPanel`, `portPanel`, `stripSolid`, `crossSolid`, `edgeStripSolid`)
 port's rules (`checkPort`, `parsePorts`, `formatPorts`), the tape's (`tapeFit`, `tapedCollar`,
 and `edgeTapeSolid` and `portTapeSolid`, the tape itself for a preview), the pattern framework
 (`pieceOpenings`, `patternedPanel`, `patternBorderMm`, and a tile of openings passed to
-`buildPieces`, as `gridTile`, `hexagonTile`, `brickTile` and `fillPattern` make) and the file
-writers
+`buildPieces`, as `gridTile`, `hexagonTile`, `brickTile`, `diamondTile` and `fillPattern`
+make) and the file writers
 (`toStl`, `to3mf`, `packageDownload`), with `planFiles`, which names the files without
 building them. The types are in the package.
 

@@ -31,3 +31,7 @@ The first entries are choices made before Q144 in work the owner had not been as
 | C19 | `pattern-brick` (#18) | **30 × 12 mm openings with 3 mm bars** to start with | Real brick proportions, about 3.3 : 1 (33 × 10 mm); 40 × 20 mm |
 | C20 | `pattern-brick` (#18) | The bricks have **a width, a height and a bar of their own**, read only when they are chosen | A width and a bar, the height fixed at half the width |
 | C21 | `pattern-brick` (#18) | The command's flags are **`--brick-width`, `--brick-height` and `--brick-bar`**, any alone meaning the bricks; the MCP server's `fill.brick` | A shared set of size flags for whichever pattern |
+| C22 | `pattern-diamond` (#19) | **Point-up diamonds in a lattice**, each a bar from its four diagonal neighbours, as a leaded window | Square diamonds only (the grid turned 45°); diamonds in plain rows and columns |
+| C23 | `pattern-diamond` (#19) | **20 mm wide and 30 mm tall** across the corners, **with 3 mm bars**, to start with | 20 × 20 mm (square diamonds); 15 × 25 mm |
+| C24 | `pattern-diamond` (#19) | The diamonds have **a width, a height and a bar of their own**, read only when they are chosen | One size, always square |
+| C25 | `pattern-diamond` (#19) | The command's flags are **`--diamond-width`, `--diamond-height` and `--diamond-bar`**, any alone meaning the diamonds; the MCP server's `fill.diamond` | A shared set of size flags for whichever pattern |

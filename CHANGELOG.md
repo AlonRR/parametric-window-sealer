@@ -12,6 +12,11 @@ under Unreleased.
 
 ### Added
 
+- A diamond pattern: choose "Diamond" under "Panel fill" for point-up diamonds in a lattice, as
+  a leaded window, 20 mm wide and 30 mm tall with 3 mm bars to start with, all three under
+  Advanced. The command takes `--fill diamond`, `--diamond-width`, `--diamond-height` and
+  `--diamond-bar`, the MCP server `fill.diamond`.
+
 - A brick pattern: choose "Brick" under "Panel fill" for brick-shaped openings in a running
   bond, 30 × 12 mm with 3 mm bars to start with, all three under Advanced. The command takes
   `--fill brick`, `--brick-width`, `--brick-height` and `--brick-bar`, the MCP server

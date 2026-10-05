@@ -72,7 +72,8 @@ as `{ "kind": "tape" }`, or with its size and places, such as `{ "tape": { "widt
 or with its sizes, such as `{ "grid": { "openingMm": 12, "barMm": 2 }, "style": "through" }`;
 grid settings without a `kind` mean the grid. A honeycomb is `"kind": "hexagon"`, its sizes in
 `fill.hexagon` (`openingMm` across the flats, `barMm`); bricks are `"kind": "brick"`, sized in
-`fill.brick` (`widthMm`, `heightMm`, `barMm`).
+`fill.brick` (`widthMm`, `heightMm`, `barMm`), and diamonds `"kind": "diamond"`, in `fill.diamond`
+(`widthMm` and `heightMm` corner to corner, `barMm`).
 
 `window_sealer_make_files` also takes:
 
