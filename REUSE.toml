@@ -21,6 +21,7 @@ path = [
   "scripts/**",
   "spikes/**",
   "tests/**",
+  "web/**",
   ".editorconfig",
   ".gitattributes",
   ".gitignore",

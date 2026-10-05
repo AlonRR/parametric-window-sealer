@@ -12,6 +12,7 @@ hand. Mark claims (verified: how), (inferred) or (relayed). -->
 - [ ] `bash tests/test-hooks.sh`
 - [ ] `pre-commit run --all-files`
 - [ ] `reuse lint`
+- [ ] If `web/` changed: `npm run typecheck`, `npm test`, `npm run build`, `npm run test:browser`
 
 ## Not done here
 

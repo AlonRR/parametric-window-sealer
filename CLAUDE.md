@@ -75,8 +75,8 @@ outside this tree; do not vendor them in. The ones that bite most often here:
   with GitHub's merge button or API: those make `GitHub <noreply@github.com>` the committer,
   which the identity check refuses (inferred from PR #44's test merge, which had that
   committer and failed the check). If `main` has moved, merge it into the branch locally
-  first, wait for CI on the new head, then fast-forward. GitHub marks a pull request merged
-  when its head commit reaches the base branch (inferred; check it after each merge).
+  first, wait for CI on the new head, then fast-forward. GitHub then marks the pull request
+  merged (verified on PR #44, 5 Oct 2026: `merged: true` once `main` reached its head).
 - **Backlog as GitHub issues** (Q29): each row of `docs/backlog.md` has an issue. The file is the
   ranked overview and the issue holds the work; when a priority or estimate changes, change both.
 - **Versions** (Q29): Semantic Versioning, first tag `v0.1.0` when the MVP is complete. Record
@@ -163,6 +163,18 @@ reuse lint                        # every file has a licence and a copyright not
 bash scripts/check-history-identity.sh "Alon A. Rabinowitz" \
   "45129051+AlonRR@users.noreply.github.com"   # every commit's identity, as CI checks it
 ```
+
+The page, in `web/` (Q34, Q35), after `npm ci` there:
+
+```bash
+npm run typecheck                 # tsc over src, tests and configs
+npm test                          # unit tests (Vitest), in Node
+npm run build                     # the static site, into out/site
+npm run test:browser              # the built page in Chromium (Playwright)
+```
+
+`npx playwright install chromium` fetches the browser the browser test expects. A machine that
+already has a Chromium can point at it with `PW_CHROMIUM_PATH=<path>` instead.
 
 CI (`.github/workflows/checks.yml`) skips the `house-identity` hook, which checks the
 machine making a commit, and runs the history check instead.

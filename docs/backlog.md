@@ -42,7 +42,7 @@ row below, and none needs the MVP rebuilt to add it. **Confirmed by the owner as
 
 | Key | Issue | Item | Priority | Ease | Depends on | From | What makes the estimate uncertain |
 |---|---|---|---|---|---|---|---|
-| `page-skeleton` | #2 | TypeScript project for the page: build, unit tests, a CI job, Manifold loaded | P0 | S | | Q22 | Tooling choice (to propose when it starts) |
+| `page-skeleton` | #2 | TypeScript project for the page: build, unit tests, a CI job, Manifold loaded | P0 | S | | Q22, Q34, Q35 | Tooling chosen: Vite, Vitest, and a Chromium test in CI |
 | `layout` | #3 | Divide the opening into a grid: per-axis mode (all equal, or full pieces plus one filler), filler position (start, end, middle, or split for symmetry), warning when a leftover is too small | P0 | S | `page-skeleton` | Q11, Q12 | None significant: pure arithmetic, test-first |
 | `printer-default` | #4 | Maximum piece size: one safe default plus "custom" | P0 | S | `layout` | Q5 | The default number needs verified bed sizes behind it (spec to verify) |
 | `params-basic` | #5 | The basic parameter panel: opening size, maximum piece size, per-axis modes, thickness | P0 | S | `layout` | Q10, Q11 | |

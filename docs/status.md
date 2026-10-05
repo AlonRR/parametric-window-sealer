@@ -3,8 +3,9 @@
 Working document: the brief, every decision so far, and every open question. Keep it current;
 a fresh session resumes from here.
 
-Last updated: 5 Oct 2026. Phase: **requirements settled**. No model has been written yet; the
-engine is chosen (Q22) and measured in `spikes/engine-benchmark/`.
+Last updated: 5 Oct 2026. Phase: **building the MVP** ([`backlog.md`](backlog.md)). The page's
+skeleton is in `web/` (`page-skeleton`, #2); no panel geometry has been written yet. The engine
+is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 
 ## The brief (the owner's request, 5 Oct 2026)
 
@@ -58,6 +59,8 @@ engine is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | Q29 | Version control beyond plain commits: **semantic version tags with GitHub releases** and a `CHANGELOG.md` (first version `v0.1.0` when the MVP is complete); **a branch and pull request per backlog item**, merged with CI green; the **backlog mirrored as GitHub issues** (#2 to #43), labelled by priority and ease | 5 Oct 2026 |
 | Q30 | **The agent merges each pull request once CI is green**; the owner reviews whenever he likes. Documentation-only changes go through a pull request too (all three answers offered assumed so). **The agent tags a release at each planned milestone**, starting with `v0.1.0` when every MVP issue is closed | 5 Oct 2026 |
 | Q31 | Issue #1's API and MCP take **all four forms**: an **npm library** (the base the rest call), a **command-line tool**, a **local MCP server** and a **hosted web API**. Priority **P1, right after the MVP**, whose geometry is the library's core. Ranked as `api-library`, `api-cli`, `api-mcp-local`, `api-hosted` (#45 to #48, sub-issues of #1) | 5 Oct 2026 |
+| Q34 | The page is built with **Vite** and unit-tested with **Vitest** (TypeScript, npm with a committed lockfile), in `web/` | 5 Oct 2026 |
+| Q35 | CI also opens the **built page in Chromium** (Playwright) and checks that the WebAssembly engine starts and builds a part | 5 Oct 2026 |
 
 The first four rows were answered before questions carried IDs.
 
@@ -72,6 +75,14 @@ The first four rows were answered before questions carried IDs.
 - **Q33.** Within P1, the round hose port was first in line after the MVP (Q28), and the API was
   put "right after the MVP" (Q31). The backlog keeps `hose-port` first and the API rows next.
   Should the API rows come before `hose-port` instead?
+
+### Licensing
+
+- **Q36.** Q1 put the design under CERN-OHL-S-2.0 and code under MPL-2.0, when the design was
+  expected to be model files. With the engine chosen (Q22) the design is TypeScript: the
+  modules that define the pieces' shapes (from `plain-panel` on) are both the design source
+  and code. Which licence covers them? Until answered, everything in `web/` is MPL-2.0 as code;
+  the skeleton holds no panel geometry yet.
 
 ## Repository follow-ups
 

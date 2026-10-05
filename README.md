@@ -8,7 +8,7 @@ panel style, and get a set of printable pieces that join together and fit the ga
 
 ## Status
 
-**Requirements settled; there is no model yet.** Every decision so far is in
+**Building the first version; there are no printable pieces yet.** Every decision so far is in
 [`docs/status.md`](docs/status.md). The geometry will be built in TypeScript on the
 [Manifold](https://github.com/elalish/manifold) library, chosen by measurement
 ([`spikes/engine-benchmark/`](spikes/engine-benchmark/README.md)).
@@ -38,6 +38,16 @@ pre-commit run --all-files
 ```
 
 The commit hooks check the commit identity and message form; `CLAUDE.md` lists the rules.
+
+The page lives in `web/` and needs Node.js 22.12 or later:
+
+```bash
+cd web
+npm ci
+npm run dev                       # a local server that reloads as you edit
+npm test                          # unit tests
+npm run build                     # the static site, into web/out/site
+```
 
 ## Licence
 
