@@ -1,0 +1,21 @@
+{
+  "name": "viewer-benchmark",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Q49 spike: the same wall drawn by three.js, Babylon.js and model-viewer; download size and speed measured in Chromium.",
+  "scripts": {
+    "prepare-meshes": "node prepare.mjs",
+    "build": "for p in three babylon model-viewer; do PAGE=$p vite build --config vite.config.mjs || exit 1; done",
+    "bench": "node bench.mjs"
+  },
+  "devDependencies": {
+    "manifold-3d": "3.5.4",
+    "playwright-core": "1.56.1",
+    "vite": "8.3.2"
+  },
+  "dependencies": {
+    "@babylonjs/core": "9.29.0",
+    "three": "0.186.1"
+  }
+}

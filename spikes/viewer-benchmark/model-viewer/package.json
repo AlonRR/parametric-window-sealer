@@ -1,0 +1,11 @@
+{
+  "name": "viewer-benchmark-model-viewer",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "model-viewer needs three.js 0.183.x as its peer, so it lives in its own folder with its own three.js.",
+  "dependencies": {
+    "@google/model-viewer": "4.3.1",
+    "three": "0.183.2"
+  }
+}

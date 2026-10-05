@@ -1,0 +1,67 @@
+{
+  "meta": {
+    "date": "2026-10-05",
+    "chromium": "141.0.7390.37",
+    "loads": 5,
+    "updates": 5,
+    "versions": {
+      "three": "0.186.1",
+      "babylon": "9.29.0",
+      "modelViewer": "4.3.1 (with three 0.183.2)"
+    }
+  },
+  "results": {
+    "plain": {
+      "three": {
+        "firstFrameMs": 114,
+        "update25Ms": 32,
+        "update15Ms": 32,
+        "jsFiles": 1,
+        "jsKiB": 132.4,
+        "totalKiB": 132.7
+      },
+      "babylon": {
+        "firstFrameMs": 294,
+        "update25Ms": 32,
+        "update15Ms": 31,
+        "jsFiles": 16,
+        "jsKiB": 280.6,
+        "totalKiB": 281.1
+      },
+      "model-viewer": {
+        "firstFrameMs": 2593,
+        "update25Ms": 65,
+        "update15Ms": 65,
+        "jsFiles": 1,
+        "jsKiB": 282.2,
+        "totalKiB": 281.8
+      }
+    },
+    "pattern": {
+      "three": {
+        "firstFrameMs": 161,
+        "update25Ms": 99,
+        "update15Ms": 141,
+        "jsFiles": 1,
+        "jsKiB": 132.4,
+        "totalKiB": 169.6
+      },
+      "babylon": {
+        "firstFrameMs": 343,
+        "update25Ms": 97,
+        "update15Ms": 146,
+        "jsFiles": 16,
+        "jsKiB": 280.6,
+        "totalKiB": 318
+      },
+      "model-viewer": {
+        "firstFrameMs": 2855,
+        "update25Ms": 319,
+        "update15Ms": 234,
+        "jsFiles": 1,
+        "jsKiB": 282.2,
+        "totalKiB": 318.7
+      }
+    }
+  }
+}
