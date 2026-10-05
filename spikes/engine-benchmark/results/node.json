@@ -1,0 +1,60 @@
+{
+  "when": "2026-10-05T09:24:37.763Z",
+  "runtime": "node v22.22.0",
+  "panel": {
+    "size": 200,
+    "thickness": 3,
+    "border": 10,
+    "hexAF": 10,
+    "wall": 2
+  },
+  "holes": 247,
+  "engines": {
+    "manifold": {
+      "package": "manifold-3d@3.5.4",
+      "initMs": 26.63843200000001,
+      "renderMs": {
+        "first": 91.55162500000006,
+        "medianWarm": 102.51534700000047,
+        "min": 85.51041600000008,
+        "max": 145.74015499999996
+      }
+    },
+    "openscad": {
+      "package": "@lofcz/openscad-wasm@0.0.2 (--backend Manifold)",
+      "initMs": 197.03374999999997,
+      "renderMs": {
+        "first": 286.90339700000004,
+        "medianWarm": 304.87126700000044,
+        "min": 239.74525699999958,
+        "max": 368.70139199999994
+      },
+      "renderParts": {
+        "instantiateMs": {
+          "first": 25.180635000000166,
+          "medianWarm": 27.16102899999987,
+          "min": 22.194010000000162,
+          "max": 35.63099600000032
+        },
+        "runMs": {
+          "first": 261.614826,
+          "medianWarm": 279.90331700000024,
+          "min": 217.5042969999995,
+          "max": 335.4309380000004
+        }
+      }
+    }
+  },
+  "equality": {
+    "volumeA": 55827.50349998474,
+    "volumeB": 55827.50349998474,
+    "trianglesA": 6928,
+    "trianglesB": 6928,
+    "genusA": 247,
+    "genusB": 247,
+    "differenceVolume": 0,
+    "toleranceMm3": 0.001,
+    "controlDifferenceVolume": 43686.19584950872
+  },
+  "runs": 15
+}

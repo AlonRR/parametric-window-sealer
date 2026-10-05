@@ -1,0 +1,18 @@
+{
+  "name": "engine-benchmark",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Q22 spike: one test panel built by Manifold (JavaScript) and by OpenSCAD (WebAssembly), checked for identical geometry, then timed in Node and in Chromium.",
+  "scripts": {
+    "bench:node": "node bench-node.mjs",
+    "bench:browser": "node bench-browser.mjs"
+  },
+  "dependencies": {
+    "@lofcz/openscad-wasm": "0.0.2",
+    "manifold-3d": "3.5.4"
+  },
+  "devDependencies": {
+    "playwright-core": "1.56.1"
+  }
+}

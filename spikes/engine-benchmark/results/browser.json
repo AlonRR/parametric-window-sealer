@@ -1,0 +1,160 @@
+{
+  "when": "2026-10-05T09:27:00.434Z",
+  "browser": "chromium 141.0.7390.37",
+  "runsPerLoad": 7,
+  "loads": 3,
+  "results": [
+    {
+      "condition": "local, unthrottled",
+      "engine": "manifold",
+      "readyAtMs": {
+        "median": 94.80000000004657,
+        "all": [
+          94.80000000004657,
+          94.90000000002328,
+          87.59999999997672
+        ]
+      },
+      "renderMs": {
+        "firstMedian": 213.59999999997672,
+        "warmMedian": 135.89999999990687
+      },
+      "triangles": [
+        6928
+      ],
+      "holes": [
+        247
+      ],
+      "transferredBytes": 228144,
+      "requests": 6,
+      "largest": [
+        {
+          "url": "/node_modules/manifold-3d/manifold.wasm",
+          "bytes": 205713
+        },
+        {
+          "url": "/node_modules/manifold-3d/manifold.js",
+          "bytes": 19213
+        },
+        {
+          "url": "/page.mjs",
+          "bytes": 1246
+        }
+      ]
+    },
+    {
+      "condition": "local, unthrottled",
+      "engine": "openscad",
+      "readyAtMs": {
+        "median": 639.8000000000466,
+        "all": [
+          1282.4000000000233,
+          639.8000000000466,
+          345.5
+        ]
+      },
+      "renderMs": {
+        "firstMedian": 475.79999999993015,
+        "warmMedian": 280.79999999993015
+      },
+      "triangles": [
+        6928
+      ],
+      "holes": [
+        247
+      ],
+      "transferredBytes": 3353469,
+      "requests": 8,
+      "largest": [
+        {
+          "url": "/node_modules/@lofcz/openscad-wasm/openscad.wasm",
+          "bytes": 3324812
+        },
+        {
+          "url": "/node_modules/@lofcz/openscad-wasm/openscad.wasm.js",
+          "bytes": 24089
+        },
+        {
+          "url": "/page.mjs",
+          "bytes": 1246
+        }
+      ]
+    },
+    {
+      "condition": "example: 20 Mbit/s, 40 ms",
+      "engine": "manifold",
+      "readyAtMs": {
+        "median": 366.0999999999767,
+        "all": [
+          368.5999999999767,
+          362.0999999999767,
+          366.0999999999767
+        ]
+      },
+      "renderMs": {
+        "firstMedian": 221.30000000004657,
+        "warmMedian": 126.5
+      },
+      "triangles": [
+        6928
+      ],
+      "holes": [
+        247
+      ],
+      "transferredBytes": 228144,
+      "requests": 6,
+      "largest": [
+        {
+          "url": "/node_modules/manifold-3d/manifold.wasm",
+          "bytes": 205713
+        },
+        {
+          "url": "/node_modules/manifold-3d/manifold.js",
+          "bytes": 19213
+        },
+        {
+          "url": "/page.mjs",
+          "bytes": 1246
+        }
+      ]
+    },
+    {
+      "condition": "example: 20 Mbit/s, 40 ms",
+      "engine": "openscad",
+      "readyAtMs": {
+        "median": 2020.5,
+        "all": [
+          2011.4000000000233,
+          2028.2000000000698,
+          2020.5
+        ]
+      },
+      "renderMs": {
+        "firstMedian": 536.7999999999302,
+        "warmMedian": 284.80000000004657
+      },
+      "triangles": [
+        6928
+      ],
+      "holes": [
+        247
+      ],
+      "transferredBytes": 3353469,
+      "requests": 8,
+      "largest": [
+        {
+          "url": "/node_modules/@lofcz/openscad-wasm/openscad.wasm",
+          "bytes": 3324812
+        },
+        {
+          "url": "/node_modules/@lofcz/openscad-wasm/openscad.wasm.js",
+          "bytes": 24089
+        },
+        {
+          "url": "/page.mjs",
+          "bytes": 1246
+        }
+      ]
+    }
+  ]
+}

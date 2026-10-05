@@ -47,6 +47,11 @@ indent_size = 2
 [.repo-status]
 indent_size = 2
 
+# JavaScript, HTML and OpenSCAD: 2 spaces, the usual convention for each. The kit has no
+# profile for them; without this section the [*] default of 4 would apply.
+[*.{js,mjs,cjs,ts,html,scad}]
+indent_size = 2
+
 # Shell, including the EXTENSIONLESS git hooks. Separate sections on purpose: a brace
 # group that mixes a basename pattern with a path pattern (`{*.sh,.githooks/*}`) changes
 # how EditorConfig matches ALL of its alternatives, and made every .sh file fail. Found

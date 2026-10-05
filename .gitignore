@@ -45,3 +45,6 @@ service-account*.json
 secrets.*
 !secrets.example.*
 config.local.*
+
+# --- dependencies installed by npm (spikes/, later the web page) ---
+node_modules/
