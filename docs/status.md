@@ -86,8 +86,10 @@ The first four rows were answered before questions carried IDs.
 - **Q49.** Which library draws the 3D preview (`preview-3d`, #9): three.js, Babylon.js or
   model-viewer? Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md):
   three.js is the smallest download (132 KiB against about 281 KiB) and draws the first frame
-  2.1 to 2.6× sooner than Babylon.js; redraws tie. The owner asked how they compare as the
-  model grows more complex; that measurement is under way.
+  1.5 to 2.6× sooner than Babylon.js; redraws tie. Asked how they compare as the model grows
+  more complex: up to 953 580 triangles, three.js and Babylon.js stay within about 10 % of each
+  other on turning and redrawing, model-viewer slower; the triangle count, not the library,
+  is what slows the preview.
 
 ## Repository follow-ups
 
