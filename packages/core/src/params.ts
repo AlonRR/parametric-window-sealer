@@ -24,7 +24,8 @@ import { DEFAULT_BED_MARGIN_MM } from './printer.js';
 import { PRINTER_IDS } from './printers.js';
 import { DEFAULT_COLLAR, checkPort, collarInnerMm, defaultPortPiece, formatPorts, parsePorts, portHoleMm } from './port.js';
 import type { CollarParams, PortSetting } from './port.js';
-import { DEFAULT_TAPE, NO_SEAL, TAPE_GROOVE_WALL_MM, tapeFit, tapedCollar } from './tape.js';
+import { DEFAULT_TAPE, NO_SEAL, TAPE_GROOVE_PLAY_MM, TAPE_GROOVE_WALL_MM, tapeFit, tapedCollar } from './tape.js';
+import { TPU_FIN_MM, gasketBaseMm } from './tpu.js';
 import {
   DEFAULT_BRICK,
   DEFAULT_DIAMOND,
@@ -128,6 +129,7 @@ export type FieldName =
   | 'tapeSqueezePct'
   | 'tapeSides'
   | 'tapePort'
+  | 'tpuJoints'
   | 'fill'
   | 'fillStyle'
   | 'reliefPct'
@@ -152,7 +154,7 @@ const FILLERS: readonly FillerPosition[] = ['start', 'end', 'middle', 'split'];
 const LEFTOVERS: readonly Leftover[] = ['spread', 'equal', 'shorten'];
 const WINDOWS: readonly WindowType[] = ['slider', 'hung'];
 const ROLES: readonly EdgeRole[] = ['track', 'sash', 'sill'];
-const SEALS: readonly SealKind[] = ['none', 'tape'];
+const SEALS: readonly SealKind[] = ['none', 'tape', 'tpu'];
 const YES_NO = ['no', 'yes'] as const;
 
 export function toFormValues(p: Params): FormValues {
@@ -199,6 +201,7 @@ export function toFormValues(p: Params): FormValues {
     tapeSqueezePct: String(p.seal.tape.squeezePct),
     tapeSides: p.seal.tape.sides ? 'yes' : 'no',
     tapePort: p.seal.tape.port ? 'yes' : 'no',
+    tpuJoints: p.seal.tape.joints ? 'yes' : 'no',
     fill: p.fill.kind,
     fillStyle: p.fill.style,
     reliefPct: String(p.fill.reliefPct),
@@ -303,9 +306,10 @@ export function readParams(values: FormValues): ReadResult {
   const edges: EdgeParams = { window, roles, track };
 
   // The seal (seal-tape, #15). The tape's fields are read only with tape, as a custom printer's
-  // size is; with no seal a value that is not filled in keeps its starting value (Q122).
+  // size is; with no seal a value that is not filled in keeps its starting value (Q122). Printed
+  // TPU (seal-tpu, #22) reads them too, as its gaskets take the tape's size (C35).
   const sealKind = oneOf('seal', SEALS);
-  const withTape = sealKind === 'tape';
+  const withTape = sealKind !== 'none';
   const tapeNumber = (field: FieldName, fallback: number, fits: (n: number) => boolean, message: string): number => {
     const n = number(field);
     if (fits(n)) return n;
@@ -326,8 +330,13 @@ export function readParams(values: FormValues): ReadResult {
     ),
     sides: (withTape ? oneOf('tapeSides', YES_NO) : values.tapeSides) === 'yes',
     port: (withTape ? oneOf('tapePort', YES_NO) : values.tapePort) === 'yes',
+    joints: (withTape ? oneOf('tpuJoints', YES_NO) : values.tpuJoints) === 'yes',
   };
   const seal: SealParams = { kind: sealKind, tape };
+  // Foam tape does not fit a joint (Q128): the joints in TPU are for the TPU seal (C38).
+  if (sealKind === 'tape' && tape.joints) {
+    errors.tpuJoints = 'Tape does not fit a joint (Q128): choose printed TPU for the joints.';
+  }
   const fit = tapeFit(seal);
   const sideTape = fit !== undefined && fit.sides && Object.values(tape).every((v) => !Number.isNaN(v));
   if (fit !== undefined && Number.isFinite(fit.standOutMm) && fit.standOutMm <= 1e-9) {
@@ -386,6 +395,18 @@ export function readParams(values: FormValues): ReadResult {
       errors.tapeWidthMm =
         `Leaves walls of ${hundredth(Math.max(0, walls))} mm beside the tape’s groove in the edge strips, under the ` +
         `${mm(TAPE_GROOVE_WALL_MM)} mm they need; choose a narrower tape.`;
+    }
+  }
+  // A TPU gasket's two fins stand on its base, up to the tape's thickness (C32).
+  if (sealKind === 'tpu' && fit !== undefined) {
+    const base = gasketBaseMm(fit);
+    if (tape.thicknessMm <= base + 1e-9) {
+      errors.tapeThicknessMm = `Make it more than ${mm(base)} mm: the gasket’s fins stand on its ${mm(base)} mm base.`;
+    }
+    if (fit.grooveWidthMm <= 2 * TPU_FIN_MM + 1e-9 && errors.tapeWidthMm === undefined) {
+      errors.tapeWidthMm =
+        `Make it more than ${mm(2 * TPU_FIN_MM - TAPE_GROOVE_PLAY_MM)} mm: the gasket’s base holds two ` +
+        `${mm(TPU_FIN_MM)} mm fins.`;
     }
   }
 
@@ -683,6 +704,8 @@ function fillWords(fill: FillParams, thicknessMm: number): string {
 
 // The tape (Q119, Q127, Q129): its size, where it goes, and how much the wall takes, along each
 // edge strip, twice more along those in a track for the sides, and round each collar's groove.
+// Printed TPU (#22): the gaskets' size and length in the same places, a sleeve in each collar,
+// and whether the joints are TPU too.
 function describeSeal(params: Params, parts: WallParts): string {
   const fit = tapeFit(params.seal);
   if (fit === undefined) return 'Seal: none.';
@@ -692,10 +715,21 @@ function describeSeal(params: Params, parts: WallParts): string {
   const sides = fit.sides ? 2 * sum(parts.edges.filter((s) => params.edges.roles[s.edge] === 'track').map((s) => s.lengthMm)) : 0;
   const ports = fit.port ? params.ports : [];
   const collar = tapedCollar(params.collar, fit);
-  const round = sum(ports.map((p) => Math.PI * (collarInnerMm(p.hoseMm, collar) + 2 * fit.grooveDepthMm)));
   const faces = fit.sides ? 'outer faces and sides' : 'outer faces';
-  const inPorts =
-    ports.length === 0 ? '' : ports.length === 1 ? ', and inside the hose port’s collar' : ', and inside each hose port’s collar';
+  const each = ports.length === 1 ? 'the hose port’s collar' : 'each hose port’s collar';
+  if (params.seal.kind === 'tpu') {
+    const metres = Math.round((outer + sides) / 100) / 10;
+    const gaskets = `${mm(fit.grooveWidthMm)} × ${mm(tape.thicknessMm)} mm gaskets along the edge strips’ ${faces}: ${metres} m in all`;
+    const also = [
+      ...(ports.length === 0 ? [] : [`a sleeve inside ${each}`]),
+      ...(tape.joints ? ['the joint strips and cross pieces in TPU'] : []),
+    ];
+    const list = [gaskets, ...also];
+    const last = list.length > 1 ? `, and ${list.pop() ?? ''}` : '';
+    return `Seal: printed TPU, ${list.join(', ')}${last}.`;
+  }
+  const round = sum(ports.map((p) => Math.PI * (collarInnerMm(p.hoseMm, collar) + 2 * fit.grooveDepthMm)));
+  const inPorts = ports.length === 0 ? '' : `, and inside ${each}`;
   const metres = Math.round((outer + sides + round) / 100) / 10;
   return `Seal: ${mm(tape.widthMm)} × ${mm(tape.thicknessMm)} mm foam tape along the edge strips’ ${faces}${inPorts}: ${metres} m in all.`;
 }

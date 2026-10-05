@@ -73,7 +73,15 @@ describe('the sizes and the starting values (Q121, Q122, Q124, Q125, Q130)', () 
   it('starts at no seal; the tape at 9 × 4 mm, a 1 mm groove, squeezed to 50 %, on the outer face only', () => {
     expect(EXAMPLE_PARAMS.seal).toEqual(NO_SEAL);
     expect(NO_SEAL.kind).toBe('none');
-    expect(DEFAULT_TAPE).toEqual({ widthMm: 9, thicknessMm: 4, grooveMm: 1, squeezePct: 50, sides: false, port: false });
+    expect(DEFAULT_TAPE).toEqual({
+      widthMm: 9,
+      thicknessMm: 4,
+      grooveMm: 1,
+      squeezePct: 50,
+      sides: false,
+      port: false,
+      joints: false, // for the printed TPU seal (#22)
+    });
     expect(TAPE_GROOVE_PLAY_MM).toBe(0.5);
   });
 
@@ -394,13 +402,14 @@ describe('settings in the library’s shape', () => {
   it('lists every tape setting, the places as yes or no', () => {
     const paths = SETTINGS.filter((s) => s.path.startsWith('seal')).map((s) => [s.path, s.values ?? null, s.onOff ?? false]);
     expect(paths).toEqual([
-      ['seal.kind', ['none', 'tape'], false],
+      ['seal.kind', ['none', 'tape', 'tpu'], false],
       ['seal.tape.widthMm', null, false],
       ['seal.tape.thicknessMm', null, false],
       ['seal.tape.grooveMm', null, false],
       ['seal.tape.squeezePct', null, false],
       ['seal.tape.sides', ['no', 'yes'], true],
       ['seal.tape.port', ['no', 'yes'], true],
+      ['seal.tape.joints', ['no', 'yes'], true],
     ]);
   });
 

@@ -81,7 +81,7 @@ describe('window_sealer_list_settings', () => {
     const settings = r.data['settings'] as { path: string; help: string; startsAt: unknown; choices?: string[] }[];
     expect(settings.map((s) => s.path)).toEqual(SETTINGS.map((s) => s.path));
     expect(settings.find((s) => s.path === 'seal.tape.sides')).toMatchObject({ startsAt: false, choices: [false, true] });
-    expect(settings.find((s) => s.path === 'seal.kind')).toMatchObject({ startsAt: 'none', choices: ['none', 'tape'] });
+    expect(settings.find((s) => s.path === 'seal.kind')).toMatchObject({ startsAt: 'none', choices: ['none', 'tape', 'tpu'] });
     expect(settings.find((s) => s.path === 'joint.slotMm')).toEqual({
       path: 'joint.slotMm',
       help: 'How deep a piece can go into a strip.',
@@ -131,13 +131,29 @@ describe('window_sealer_plan_wall', () => {
     expect(r.isError).toBeFalsy();
     expect(r.data['settings'].seal).toEqual({
       kind: 'tape',
-      tape: { widthMm: 9, thicknessMm: 4, grooveMm: 1, squeezePct: 50, sides: true, port: false },
+      tape: { widthMm: 9, thicknessMm: 4, grooveMm: 1, squeezePct: 50, sides: true, port: false, joints: false },
     });
     expect(r.data['summary'].seal).toBe('Seal: 9 × 4 mm foam tape along the edge strips’ outer faces and sides: 7.6 m in all.');
     const names = (r.data['files'] as { name: string }[]).map((f) => f.name);
     expect(names.some((n) => /^edge-[0-9.]+x13x11-track-10-print-[0-9]+\.stl$/.test(n))).toBe(true);
     const yes = await call('window_sealer_plan_wall', { settings: { ...OPENING, seal: { tape: { sides: 'yes' } } } });
     expect(yes.isError).toBe(true);
+  });
+
+  it('printed TPU in the library’s shape: joints in TPU alone mean the TPU seal (C39), its parts named -tpu', async () => {
+    const { call } = await connect();
+    const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, seal: { tape: { joints: true } } } });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['settings'].seal).toMatchObject({ kind: 'tpu', tape: { joints: true } });
+    expect(r.data['summary'].seal).toBe(
+      'Seal: printed TPU, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all, and the joint strips and cross pieces in TPU.',
+    );
+    const names = (r.data['files'] as { name: string }[]).map((f) => f.name);
+    expect(names.some((n) => /^gasket-[0-9.]+x9\.5x4-tpu-print-[0-9]+\.stl$/.test(n))).toBe(true);
+    expect(names.some((n) => /^cross-18x18-tpu-print-[0-9]+\.stl$/.test(n))).toBe(true);
+    const tape = await call('window_sealer_plan_wall', { settings: { ...OPENING, seal: { kind: 'tape', tape: { joints: true } } } });
+    expect(tape.isError).toBe(true);
+    expect(tape.text).toContain('- seal.tape.joints: Tape does not fit a joint (Q128): choose printed TPU for the joints.');
   });
 
   it('a grid fill in the library’s shape: grid settings alone mean the grid, in relief to start with (Q141, Q142)', async () => {

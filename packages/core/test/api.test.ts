@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import * as api from '../src/index.js';
 import {
   DEFAULT_JOINT,
+  DEFAULT_TAPE,
   EXAMPLE_PARAMS,
   ParamsError,
   WINDOW_PRESETS,
@@ -92,6 +93,14 @@ describe('planFiles', () => {
           { hoseMm: 150, column: 2, row: 1 },
           { hoseMm: 130, column: 1, row: 4 },
         ],
+      },
+    ],
+    [
+      'the printed TPU seal everywhere, with a hose port',
+      {
+        ...EXAMPLE_PARAMS,
+        ports: [{ hoseMm: 150, column: 2, row: 1 }],
+        seal: { kind: 'tpu', tape: { ...DEFAULT_TAPE, sides: true, port: true, joints: true } },
       },
     ],
   ];

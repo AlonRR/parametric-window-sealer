@@ -54,6 +54,7 @@ const FIELDS: readonly FieldName[] = [
   'tapeSqueezePct',
   'tapeSides',
   'tapePort',
+  'tpuJoints',
   'fill',
   'fillStyle',
   'reliefPct',
@@ -370,10 +371,12 @@ export function mountPanel(
       if (ownLabel) ownLabel.hidden = part(row, 'size')?.value !== 'own';
     }
     if (addPort) addPort.hidden = !hose;
-    // The tape's size shows with tape; its width and thickness only for the user's own.
-    const tape = (form.elements.namedItem('seal') as RadioNodeList | null)?.value === 'tape';
+    // The seal's size shows with tape or TPU, with the note for the one chosen (C35); its width
+    // and thickness only for the user's own.
+    const sealKind = (form.elements.namedItem('seal') as RadioNodeList | null)?.value ?? 'none';
     const tapeBox = form.querySelector<HTMLElement>('[data-testid="tape"]');
-    if (tapeBox) tapeBox.hidden = !tape;
+    if (tapeBox) tapeBox.hidden = sealKind === 'none';
+    for (const note of form.querySelectorAll<HTMLElement>('[data-seal]')) note.hidden = note.dataset.seal !== sealKind;
     if (tapeChoice) tapeToForm(form, tapeChoice);
     const tapeOwn = form.querySelector<HTMLElement>('[data-part="tape-own"]');
     if (tapeOwn) tapeOwn.hidden = tapeChoice?.value !== 'own';

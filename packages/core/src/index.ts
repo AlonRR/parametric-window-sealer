@@ -20,3 +20,4 @@ export * from './tape.js';
 export * from './fill.js';
 export * from './piece-fill.js';
 export * from './wall.js';
+export * from './tpu.js';

@@ -16,6 +16,7 @@ import type { Manifold } from 'manifold-3d';
 import type { EdgeShape } from './edge.js';
 import type { PartShape } from './joint.js';
 import type { GridPiece } from './layout.js';
+import type { GasketShape, SleeveShape } from './tpu.js';
 
 export interface MeshData {
   positions: Float32Array; // x, y, z per vertex, in mm
@@ -71,16 +72,21 @@ export function pieceFileName(
   return `piece-c${cell.column + 1}-r${cell.row + 1}-${mm(cell.widthMm)}x${mm(cell.heightMm)}${port}.${extension}`;
 }
 
+// Every part beside the pieces: the joints, the edge strips and the TPU seal's parts.
+export type AnyPartShape = PartShape | EdgeShape | GasketShape | SleeveShape;
+
 // An edge strip's height depends on its track, so it is part of the name; with tape on its
 // sides, so is the track's depth, as two depths can give one size with grooves in different
-// places (Q127).
-export function partName(shape: PartShape | EdgeShape): string {
-  const height = shape.kind === 'edge' ? `x${mm(shape.heightMm)}` : '';
+// places (Q127). A part printed in TPU says so (C37); a sleeve is named by its hose.
+export function partName(shape: AnyPartShape): string {
+  if (shape.kind === 'sleeve') return `sleeve-${mm(shape.hoseMm)}-tpu-print-${shape.count}`;
+  const height = shape.kind === 'edge' || shape.kind === 'gasket' ? `x${mm(shape.heightMm)}` : '';
   const side = shape.kind === 'edge' && shape.groove?.side !== undefined ? `-track-${mm(shape.groove.side.trackMm)}` : '';
-  return `${shape.kind}-${mm(shape.lengthMm)}x${mm(shape.widthMm)}${height}${side}-print-${shape.count}`;
+  const tpu = shape.kind === 'gasket' || (shape.kind !== 'edge' && shape.tpu === true) ? '-tpu' : '';
+  return `${shape.kind}-${mm(shape.lengthMm)}x${mm(shape.widthMm)}${height}${side}${tpu}-print-${shape.count}`;
 }
 
-export function partFileName(shape: PartShape | EdgeShape, extension: Format): string {
+export function partFileName(shape: AnyPartShape, extension: Format): string {
   return `${partName(shape)}.${extension}`;
 }
 

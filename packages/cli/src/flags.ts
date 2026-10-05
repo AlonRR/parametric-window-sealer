@@ -47,13 +47,14 @@ const FLAG_NAMES: Record<FieldName, string> = {
   collarWallMm: 'collar-wall',
   collarClearanceMm: 'collar-clearance',
   collarLipMm: 'collar-lip',
-  seal: 'seal', // none or tape (Q122)
+  seal: 'seal', // none, tape (Q122) or tpu (#22)
   tapeWidthMm: 'tape-width', // a tape flag without --seal means tape, as a printer size means custom
   tapeThicknessMm: 'tape-thickness',
   tapeGrooveMm: 'tape-groove',
   tapeSqueezePct: 'tape-squeeze',
   tapeSides: 'tape-sides',
   tapePort: 'tape-port',
+  tpuJoints: 'tpu-joints', // without --seal means the TPU seal (C39)
   fill: 'fill', // sealed or a pattern (Q141)
   fillStyle: 'fill-style',
   reliefPct: 'relief-depth',

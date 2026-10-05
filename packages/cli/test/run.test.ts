@@ -364,7 +364,7 @@ describe('a tape seal (seal-tape #15; Q119 to Q132)', () => {
   it('a tape flag without --seal means tape; with --tape-sides the strips are named by their track', async () => {
     expect((await params([...OPENING, '--tape-sides', 'yes'])).seal).toEqual({
       kind: 'tape',
-      tape: { widthMm: 9, thicknessMm: 4, grooveMm: 1, squeezePct: 50, sides: true, port: false },
+      tape: { widthMm: 9, thicknessMm: 4, grooveMm: 1, squeezePct: 50, sides: true, port: false, joints: false },
     });
     const r = await cli([...OPENING, '--tape-sides', 'yes', '--dry-run']);
     expect(r.out).toMatch(/ {2}edge-[0-9.]+x13x11-track-10-print-[0-9]+\.stl/);
@@ -376,6 +376,33 @@ describe('a tape seal (seal-tape #15; Q119 to Q132)', () => {
     expect(r.err).toContain(
       '--tape-sides: The left track is 8 mm deep, less than the 9 mm tape is wide, so the tape cannot go on the edge strips’ sides.',
     );
+  });
+});
+
+describe('the printed TPU seal (seal-tpu #22; C31 to C39)', () => {
+  const params = async (args: string[]) => {
+    const r = await cli([...args, '--dry-run', '--json']);
+    return json(r.out).params as typeof EXAMPLE_PARAMS;
+  };
+
+  it('--seal tpu: the summary names the gaskets, and the dry run lists them', async () => {
+    const r = await cli([...OPENING, '--seal', 'tpu', '--dry-run']);
+    expect(r.code).toBe(0);
+    expect(r.out).toContain('Seal: printed TPU, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all.');
+    expect(r.out).toMatch(/ {2}gasket-[0-9.]+x9\.5x4-tpu-print-[0-9]+\.stl/);
+  });
+
+  it('--tpu-joints yes without --seal means the TPU seal, its strips and cross pieces named -tpu', async () => {
+    expect((await params([...OPENING, '--tpu-joints', 'yes'])).seal).toMatchObject({ kind: 'tpu', tape: { joints: true } });
+    const r = await cli([...OPENING, '--tpu-joints', 'yes', '--dry-run']);
+    expect(r.out).toMatch(/ {2}strip-[0-9.]+x18-tpu-print-[0-9]+\.stl/);
+    expect(r.out).toMatch(/ {2}cross-18x18-tpu-print-[0-9]+\.stl/);
+  });
+
+  it('refuses TPU joints with foam tape, naming the flag', async () => {
+    const r = await cli([...OPENING, '--seal', 'tape', '--tpu-joints', 'yes']);
+    expect(r.code).toBe(2);
+    expect(r.err).toContain('--tpu-joints: Tape does not fit a joint (Q128): choose printed TPU for the joints.');
   });
 });
 

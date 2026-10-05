@@ -4,12 +4,12 @@
 // (#10) the scene also holds the strips and cross pieces, in place around the panels, and
 // with track-edge (#11) the edge strips. Everything is in the pieces' frame: on the example
 // slider the opening's left edge is 6.5 mm in from the pieces' left edge.
-import { Box3, LineSegments, Mesh } from 'three';
+import { Box3, LineSegments, Mesh, MeshPhongMaterial } from 'three';
 import type { Object3D } from 'three';
 import { describe, expect, it } from 'vitest';
 import { loadEngine } from 'parametric-window-sealer';
 import { EXAMPLE_PARAMS } from 'parametric-window-sealer';
-import { buildWallScene, disposeWall } from '../src/preview-scene';
+import { TPU_COLOUR, buildWallScene, disposeWall } from '../src/preview-scene';
 
 const solidsOf = (wall: Object3D, kind: string) =>
   wall.children.filter((c): c is Mesh => c instanceof Mesh && c.userData.kind === kind);
@@ -134,7 +134,7 @@ describe('a wall with a hose port (hose-port, #12)', () => {
 // Backlog item seal-tape (#15): the tape is drawn in place, in its own colour (Q132): one
 // length along each edge strip, and a ring in each port's collar when it goes there too.
 describe('the tape in the preview', () => {
-  const tape = { widthMm: 9, thicknessMm: 4, grooveMm: 1, squeezePct: 50, sides: true, port: true };
+  const tape = { widthMm: 9, thicknessMm: 4, grooveMm: 1, squeezePct: 50, sides: true, port: true, joints: false };
 
   it('none without a seal', async () => {
     const engine = await loadEngine();
@@ -159,5 +159,44 @@ describe('the tape in the preview', () => {
     const lowest = Math.min(...tapes.map((t) => new Box3().setFromObject(t).min.y));
     expect(lowest).toBeCloseTo(-5.5, 4);
     disposeWall(wall);
+  });
+});
+
+// Backlog item seal-tpu (#22): the printed TPU seal is drawn where the tape would be, in a dark
+// grey of its own (C36), and joint strips and cross pieces in TPU in the same grey, gripping the
+// panels (C34).
+describe('the printed TPU seal in the preview', () => {
+  const tpu = { widthMm: 9, thicknessMm: 4, grooveMm: 1, squeezePct: 50, sides: false, port: true, joints: true };
+  const params = { ...EXAMPLE_PARAMS, ports: [{ hoseMm: 150, column: 2, row: 1 }], seal: { kind: 'tpu' as const, tape: tpu } };
+  const colour = (m: Mesh) => (m.material as MeshPhongMaterial).color.getHex();
+  const thickness = (m: Mesh) => {
+    const box = new Box3().setFromObject(m);
+    return box.max.z - box.min.z;
+  };
+
+  it('a gasket along each edge strip and a sleeve in the port, in dark grey; no tape', async () => {
+    const engine = await loadEngine();
+    const wall = buildWallScene(engine, params);
+    const gaskets = solidsOf(wall, 'tpu');
+    expect(gaskets).toHaveLength(solidsOf(wall, 'edge').length + 1);
+    expect(solidsOf(wall, 'tape')).toHaveLength(0);
+    expect(new Set(gaskets.map(colour))).toEqual(new Set([TPU_COLOUR]));
+    expect(TPU_COLOUR).not.toBe(colour(solidsOf(wall, 'edge')[0] as Mesh));
+    disposeWall(wall);
+  });
+
+  it('TPU strips and cross pieces in the same grey, 0.4 mm thinner across the panel', async () => {
+    const engine = await loadEngine();
+    const wall = buildWallScene(engine, params);
+    const loose = buildWallScene(engine, { ...params, seal: { kind: 'tpu' as const, tape: { ...tpu, joints: false } } });
+    for (const kind of ['strip', 'cross']) {
+      const [inTpu, inPla] = [solidsOf(wall, kind)[0] as Mesh, solidsOf(loose, kind)[0] as Mesh];
+      expect(colour(inTpu)).toBe(TPU_COLOUR);
+      expect(colour(inPla)).not.toBe(TPU_COLOUR);
+      expect(thickness(inTpu)).toBeCloseTo(3 - 0.2 + 3.2, 4);
+      expect(thickness(inPla)).toBeCloseTo(3 + 0.4 + 3.2, 4);
+    }
+    disposeWall(wall);
+    disposeWall(loose);
   });
 });

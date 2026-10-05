@@ -7,6 +7,10 @@
 // (Q119); under Advanced also on their sides (Q127) and inside the hose port's collar (Q129).
 // The joints between pieces are left to the printed TPU seal (Q128).
 //
+// The printed TPU seal (seal-tpu, #22) takes the tape's place and its sizes (C31, C35): its
+// gaskets sit in the same grooves and the panels leave them the same room. Its own parts are in
+// tpu.ts.
+//
 // The shapes are in edge.ts, edge-geometry.ts and panel-geometry.ts; this file holds the rules.
 import type { CollarParams } from './port.js';
 
@@ -17,11 +21,13 @@ export interface TapeParams {
   squeezePct: number; // its thickness, squeezed, as the panels leave it room for
   sides: boolean; // also on the sides of the edge strips in a track (Q127)
   port: boolean; // also inside each hose port's collar (Q129)
+  joints: boolean; // with printed TPU, the joint strips and cross pieces in TPU too (C34)
 }
 
-export type SealKind = 'none' | 'tape';
+export type SealKind = 'none' | 'tape' | 'tpu';
 
-// The tape's settings are kept with no seal too, so turning it on starts where it was left.
+// Foam tape, or gaskets printed in TPU to the tape's size (C35). The tape's settings are kept
+// with no seal too, so turning it on starts where it was left.
 export interface SealParams {
   kind: SealKind;
   tape: TapeParams;
@@ -34,7 +40,15 @@ export const TAPE_SIZES: readonly { widthMm: number; thicknessMm: number }[] = [
   { widthMm: 9.5, thicknessMm: 6.4 },
 ];
 
-export const DEFAULT_TAPE: TapeParams = { widthMm: 9, thicknessMm: 4, grooveMm: 1, squeezePct: 50, sides: false, port: false };
+export const DEFAULT_TAPE: TapeParams = {
+  widthMm: 9,
+  thicknessMm: 4,
+  grooveMm: 1,
+  squeezePct: 50,
+  sides: false,
+  port: false,
+  joints: false,
+};
 
 export const NO_SEAL: SealParams = { kind: 'none', tape: DEFAULT_TAPE };
 
@@ -54,8 +68,9 @@ export interface TapeFit {
   port: boolean;
 }
 
+// The same for the tape and for the TPU gaskets that take its place (C31).
 export function tapeFit(seal: SealParams): TapeFit | undefined {
-  if (seal.kind !== 'tape') return undefined;
+  if (seal.kind === 'none') return undefined;
   const t = seal.tape;
   return {
     widthMm: t.widthMm,

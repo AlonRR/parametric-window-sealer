@@ -48,6 +48,7 @@ describe('the setting flags (Q90)', () => {
       'seal',
       'tape-sides',
       'tape-port',
+      'tpu-joints',
       'fill',
       'fill-style',
     ]);
@@ -60,7 +61,8 @@ describe('the setting flags (Q90)', () => {
       ...toFormValues(CUSTOM_PRINTER),
       printerModel: 'prusa-mk4s',
       ...(f.field === 'printerModel' ? { printer: 'model' } : {}),
-      ...(f.path.startsWith('seal.tape.') ? { seal: 'tape' } : {}), // read only with tape
+      // read only with tape; joints in TPU, with the TPU seal (C38)
+      ...(f.path.startsWith('seal.tape.') ? { seal: f.field === 'tpuJoints' ? 'tpu' : 'tape' } : {}),
       ...(f.path.startsWith('fill.') && f.path !== 'fill.kind' ? { fill: 'grid' } : {}), // and with a pattern
     };
     for (const value of f.values ?? []) {

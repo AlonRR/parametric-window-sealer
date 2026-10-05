@@ -4,7 +4,7 @@
 // Order, as on the page: its starting values, then the input, then any overrides in the
 // page's form values (the command's flags). Setting the window type presets the four edges
 // (Q66); edges given with it, or after it, change them. A printer size means a custom
-// printer, and a tape setting means tape. The opening has no starting value: it is required.
+// printer, and a tape setting means tape, or the TPU seal when it is its joints in TPU. The opening has no starting value: it is required.
 import { WINDOW_PRESETS } from './edge.js';
 import type { WindowType } from './edge.js';
 import { EXAMPLE_PARAMS, readParams, toFormValues } from './params.js';
@@ -130,8 +130,8 @@ export const SETTINGS: readonly Setting[] = [
   {
     field: 'seal',
     path: 'seal.kind',
-    help: "The seal: none, or foam tape along the edge strips' outer faces.",
-    values: ['none', 'tape'],
+    help: "The seal: none, foam tape along the edge strips' outer faces, or gaskets printed in TPU in its place.",
+    values: ['none', 'tape', 'tpu'],
   },
   {
     field: 'tapeWidthMm',
@@ -156,6 +156,13 @@ export const SETTINGS: readonly Setting[] = [
     field: 'tapePort',
     path: 'seal.tape.port',
     help: "Tape inside each hose port's collar too: yes or no.",
+    values: YES_NO,
+    onOff: true,
+  },
+  {
+    field: 'tpuJoints',
+    path: 'seal.tape.joints',
+    help: 'With printed TPU, the joint strips and cross pieces in TPU too: yes or no.',
     values: YES_NO,
     onOff: true,
   },
@@ -292,7 +299,11 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
     params.printer = { ...params.printer, kind: 'model' } as Params['printer'];
   }
   const seal = input['seal'];
-  if (isObject(seal) && !('kind' in seal) && 'tape' in seal) params.seal = { ...params.seal, kind: 'tape' };
+  if (isObject(seal) && !('kind' in seal) && 'tape' in seal) {
+    // Joints in TPU mean the TPU seal (C39); any other tape setting, tape.
+    const tape = seal['tape'];
+    params.seal = { ...params.seal, kind: isObject(tape) && tape['joints'] === true ? 'tpu' : 'tape' };
+  }
   const fill = input['fill'];
   if (isObject(fill) && !('kind' in fill) && 'grid' in fill) params.fill = { ...params.fill, kind: 'grid' };
   if (isObject(fill) && !('kind' in fill) && 'hexagon' in fill) params.fill = { ...params.fill, kind: 'hexagon' };
@@ -311,7 +322,7 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
   }
   if (overrides.printer === undefined && overrides.printerModel !== undefined) values.printer = 'model';
   const tapeOverride = SETTINGS.some((s) => s.path.startsWith('seal.tape.') && overrides[s.field] !== undefined);
-  if (overrides.seal === undefined && tapeOverride) values.seal = 'tape';
+  if (overrides.seal === undefined && tapeOverride) values.seal = overrides.tpuJoints === 'yes' ? 'tpu' : 'tape';
   const gridOverride = SETTINGS.some((s) => s.path.startsWith('fill.grid.') && overrides[s.field] !== undefined);
   if (overrides.fill === undefined && gridOverride) values.fill = 'grid';
   const hexOverride = SETTINGS.some((s) => s.path.startsWith('fill.hexagon.') && overrides[s.field] !== undefined);

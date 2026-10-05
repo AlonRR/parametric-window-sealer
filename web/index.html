@@ -251,14 +251,16 @@
         </fieldset>
 
         <!-- The seal (seal-tape, #15): a choice starting at none (Q122), and foam tape from the
-          sizes on makers' own listings or the user's own (Q121). -->
+          sizes on makers' own listings or the user's own (Q121). Printed TPU (seal-tpu, #22)
+          takes the same sizes (C35). -->
         <fieldset>
           <legend>Seal</legend>
           <label><input type="radio" name="seal" value="none" checked /> None</label>
           <label><input type="radio" name="seal" value="tape" /> Foam tape</label>
+          <label><input type="radio" name="seal" value="tpu" /> Printed TPU</label>
           <div data-testid="tape" hidden>
             <label>
-              Tape size, width × thickness
+              Seal size, width × thickness
               <select data-part="tape-size"></select>
             </label>
             <div data-part="tape-own" hidden>
@@ -273,9 +275,13 @@
             </div>
             <span class="error" data-testid="error-tapeWidthMm"></span>
             <span class="error" data-testid="error-tapeThicknessMm"></span>
-            <p class="note">
+            <p class="note" data-seal="tape">
               Self-adhesive foam weather-seal tape. It goes in a groove along each edge strip's
               outer face, where the track, the sash or the sill presses on it.
+            </p>
+            <p class="note" data-seal="tpu" hidden>
+              Gaskets printed in TPU, in place of tape of this size: each sits in the tape's groove
+              with two fins that fold as the wall goes in. Print them in TPU and the rest as usual.
             </p>
           </div>
         </fieldset>
@@ -571,17 +577,18 @@
         </details>
 
         <details>
-          <summary>Advanced: the tape</summary>
+          <summary>Advanced: the seal</summary>
           <p class="note">
-            Used when the seal is foam tape. These are starting values: a test print shows
-            whether to change them.
+            Used when the seal is foam tape or printed TPU. These are starting values: a test print
+            shows whether to change them.
           </p>
           <label>
             Groove depth (mm)
             <input name="tapeGrooveMm" inputmode="decimal" autocomplete="off" />
           </label>
           <p class="note">
-            The tape sits in a groove 0.5 mm wider than the tape and this deep; 0 for a flat face.
+            The tape, or the gasket's base, sits in a groove 0.5 mm wider than the tape and this
+            deep; 0 for a flat face.
           </p>
           <span class="error" data-testid="error-tapeGrooveMm"></span>
           <label>
@@ -608,6 +615,15 @@
           </label>
           <p class="note">The collar is made wider by the tape and its groove.</p>
           <span class="error" data-testid="error-tapePort"></span>
+          <label>
+            <input type="checkbox" name="tpuJoints" value="yes" />
+            Also the joint strips and cross pieces, in TPU
+          </label>
+          <p class="note">
+            For printed TPU only: foam tape does not fit a joint. Their slots are 0.2 mm narrower
+            than the panel, so they grip it.
+          </p>
+          <span class="error" data-testid="error-tpuJoints"></span>
         </details>
 
         <!-- What to do when full pieces leave less room than a joint takes (Q60): set

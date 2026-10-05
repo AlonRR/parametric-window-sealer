@@ -56,12 +56,13 @@ describe('SETTINGS: every setting on the page', () => {
     (_path, s) => {
       // A listed printer's id is read only for a listed printer, as the custom sizes are only
       // for a custom one: the starting values hold both, and the id's own test picks the list.
-      // The tape's settings likewise are read only with tape, and a pattern's with a pattern.
+      // The tape's settings likewise are read only with tape, and a pattern's with a pattern;
+      // joints in TPU, with the TPU seal (C38).
       const base = {
         ...toFormValues(CUSTOM_PRINTER),
         printerModel: 'prusa-mk4s',
         ...(s.field === 'printerModel' ? { printer: 'model' } : {}),
-        ...(s.path.startsWith('seal.tape.') ? { seal: 'tape' } : {}),
+        ...(s.path.startsWith('seal.tape.') ? { seal: s.field === 'tpuJoints' ? 'tpu' : 'tape' } : {}),
         ...(s.path.startsWith('fill.') && s.path !== 'fill.kind' ? { fill: 'grid' } : {}),
       };
       for (const value of s.values ?? []) {

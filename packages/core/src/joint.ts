@@ -124,6 +124,7 @@ export interface PartShape {
   lengthMm: number;
   widthMm: number;
   count: number;
+  tpu?: true; // printed in TPU, with the TPU seal (seal-tpu, #22; C34)
 }
 
 const tenth = (n: number) => Math.round(n * 10) / 10;

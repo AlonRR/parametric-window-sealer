@@ -14,8 +14,12 @@ const GROUPS: Record<string, string> = {
   joint: 'The strips that join the pieces, in mm. Starting values; a test print confirms them.',
   edges: 'The window and its four edges.',
   collar: "The hose port's collar, in mm. Starting values; a test print confirms them.",
-  seal: 'The seal: none, or foam tape. Tape settings without a kind mean tape.',
-  'seal.tape': 'The foam tape: its size and groove in mm, how far it is squeezed in %, and where else it goes.',
+  seal:
+    'The seal: none, foam tape, or gaskets printed in TPU to the tape’s size. Tape settings without a kind mean tape; ' +
+    'joints in TPU, the TPU seal.',
+  'seal.tape':
+    'The foam tape, or the TPU gaskets: its size and groove in mm, how far it is squeezed in %, where else it goes, ' +
+    'and with TPU whether the joints are TPU too.',
   fill: "The panel fill: sealed, or a pattern, in relief or cut through. A pattern's settings without a kind mean that pattern.",
   'fill.grid': "The grid's square openings and the bars between them, in mm.",
   'fill.hexagon': "The honeycomb's hexagonal openings, across the flats, and the bars between them, in mm.",
