@@ -57,6 +57,7 @@ a flag; `window-sealer --help` lists them with their starting values. Some more:
 window-sealer --width 600 --height 1000 --window hung --thickness 4
 window-sealer --width 600 --height 1000 --format 3mf --packaging single
 window-sealer --width 600 --height 1000 --dry-run
+window-sealer --width 600 --height 1000 --port 150
 ```
 
 - `--format stl` or `3mf`, and `--packaging separate` (one file per panel or shape), `zip` (those
@@ -69,6 +70,11 @@ window-sealer --width 600 --height 1000 --dry-run
   printer custom.
 - When full pieces leave too little room for a joint, it says so, the way the page does, and
   lists what `--width-leftover` or `--height-leftover` can do instead.
+- `--port 150` adds a round port for a portable air conditioner's hose, sized to the hose end's
+  outside diameter (150 and 130 mm are common; measure the end that goes in), in the bottom
+  row's middle piece; `--port 150@2,1` puts it in column 2, row 1, counted from the bottom left
+  seen from the room. Give `--port` again for each port. `--collar-depth`, `--collar-wall`,
+  `--collar-clearance` and `--collar-lip` change the collar the hose end slides into.
 
 ### Settings in a file
 

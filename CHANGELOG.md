@@ -10,6 +10,15 @@ under Unreleased.
 
 ## [Unreleased]
 
+### Added
+
+- A round port for a portable air conditioner's hose: a push-fit collar on the room side of one
+  piece, sized to the hose end's outside diameter (150 mm, 130 mm, or your own measurement),
+  in the piece you pick, with more ports under Advanced. A piece too small for its port is
+  said so, with what fixes it. The page, the command (`--port`) and the MCP server (`ports`)
+  all offer it; the port's piece is named with its hose, as `piece-c2-r1-…-port-150.stl`.
+  Not yet test printed: the collar's sizes are starting values.
+
 ## [0.2.0] - 2026-10-05
 
 ### Added

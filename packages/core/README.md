@@ -58,6 +58,8 @@ Start from `EXAMPLE_PARAMS` and change what differs. Every length is in mm.
 | `thicknessMm`                          | The panels' thickness                                                                                                                                                                                                   |
 | `joint`                                | The strips' `slotMm`, `slideMm`, `webMm`, `flangeMm` and `fitMm` (`DEFAULT_JOINT`)                                                                                                                                      |
 | `edges`                                | The `window` (`'slider'` or `'hung'`), each edge's role (`'track'`, `'sash'` or `'sill'`; `WINDOW_PRESETS`) and the `track`'s width, clearance and depth at each edge                                                   |
+| `ports`                                | Hose ports, none for a plain wall: each `{ hoseMm, column, row }`, the hose end's outside diameter (`COMMON_HOSE_MM`: 150 and 130) and its piece, from 1 at the bottom left seen from the room                     |
+| `collar`                               | The port's collar: `depthMm`, `wallMm`, `clearanceMm`, `lipMm` (`DEFAULT_COLLAR`)                                                                                                                                       |
 
 Wrong parameters throw a `ParamsError` whose `errors` names every wrong field with the page's
 message. `validateParams(params)` gives the same messages without building anything.
@@ -85,7 +87,8 @@ start it with `loadEngine(wasmUrl)` and pass it as `{ engine }`.
 Everything `makeWall` uses is exported too: `planWall` and `planParts` (the layout, joints
 and edges), `describePlan`, `readParams` and `toFormValues` (the page's form values), `readSettings`
 and `SETTINGS` (settings in the library's shape, possibly partial, and what each one is), the
-shapes (`plainPanel`, `stripSolid`, `crossSolid`, `edgeStripSolid`) and the file writers
+shapes (`plainPanel`, `portPanel`, `stripSolid`, `crossSolid`, `edgeStripSolid`), the hose
+port's rules (`checkPort`, `parsePorts`, `formatPorts`) and the file writers
 (`toStl`, `to3mf`, `packageDownload`), with `planFiles`, which names the files without
 building them. The types are in the package.
 

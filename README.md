@@ -26,8 +26,7 @@ issues; what has changed is in [`CHANGELOG.md`](CHANGELOG.md).
 
 Planned next:
 
-- **Appliances**: a round port for a portable air conditioner's hose, fittings for a window air
-  conditioner, and fan mounts.
+- **Appliances**: fittings for a window air conditioner, and fan mounts.
 - **Panel styles**: organiser patterns (pegboard-style) and decorative patterns such as brick,
   diamond or grid.
 - **Seals and help**: tape or printed TPU seals, a measuring guide with pictures, a printer
