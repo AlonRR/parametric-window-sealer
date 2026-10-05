@@ -22,3 +22,6 @@ complete. Until then every change is listed under Unreleased.
   [`spikes/engine-benchmark/`](spikes/engine-benchmark/README.md).
 - The page's skeleton in `web/`: a TypeScript page that starts the Manifold geometry engine,
   with unit tests, a browser test in Chromium, and a CI job for both.
+- Dividing the opening into a grid of pieces (`web/src/layout.ts`): all equal, or full-size
+  pieces plus one filler at the start, the end, the middle, or split for symmetry, chosen per
+  axis; pieces under the minimum are reported, not refused.

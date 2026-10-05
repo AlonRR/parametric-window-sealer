@@ -61,6 +61,7 @@ is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | Q31 | Issue #1's API and MCP take **all four forms**: an **npm library** (the base the rest call), a **command-line tool**, a **local MCP server** and a **hosted web API**. Priority **P1, right after the MVP**, whose geometry is the library's core. Ranked as `api-library`, `api-cli`, `api-mcp-local`, `api-hosted` (#45 to #48, sub-issues of #1) | 5 Oct 2026 |
 | Q34 | The page is built with **Vite** and unit-tested with **Vitest** (TypeScript, npm with a committed lockfile), in `web/` | 5 Oct 2026 |
 | Q35 | CI also opens the **built page in Chromium** (Playwright) and checks that the WebAssembly engine starts and builds a part | 5 Oct 2026 |
+| Q37 | A piece is **"too small" (Q12's warning) when it is narrower than the joint needs**: the connector's width on both edges plus a solid band between. It is computed from the joint's dimensions once `connector-strip` (#10) exists; until then the page uses a placeholder, labelled as one. The layout code takes the minimum as an input | 5 Oct 2026 |
 
 The first four rows were answered before questions carried IDs.
 
