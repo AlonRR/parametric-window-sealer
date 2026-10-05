@@ -156,6 +156,7 @@
               <option value="track">In a track</option>
               <option value="sash">Pressed by the sash</option>
               <option value="sill">On a flat sill</option>
+              <option value="unit">Against a window AC</option>
             </select>
           </label>
           <label>
@@ -169,6 +170,7 @@
               <option value="track">In a track</option>
               <option value="sash">Pressed by the sash</option>
               <option value="sill">On a flat sill</option>
+              <option value="unit">Against a window AC</option>
             </select>
           </label>
           <label>
@@ -182,6 +184,7 @@
               <option value="track">In a track</option>
               <option value="sash">Pressed by the sash</option>
               <option value="sill">On a flat sill</option>
+              <option value="unit">Against a window AC</option>
             </select>
           </label>
           <label>
@@ -195,6 +198,7 @@
               <option value="track">In a track</option>
               <option value="sash">Pressed by the sash</option>
               <option value="sill">On a flat sill</option>
+              <option value="unit">Against a window AC</option>
             </select>
           </label>
           <label>
@@ -222,6 +226,23 @@
           <label>
             <input type="radio" name="appliance" value="cutout" /> Something else: a measured cutout
           </label>
+          <!-- A window AC (window-ac, #24): the edge facing the unit meets it (C49, C50). -->
+          <label><input type="radio" name="appliance" value="ac" /> Window air conditioner</label>
+          <div data-testid="ac" hidden>
+            <label>
+              Where is the unit, seen from the room?
+              <select data-part="ac-place">
+                <option value="below">Below the wall: the wall stands on it</option>
+                <option value="left">To the wall's left</option>
+                <option value="right">To the wall's right</option>
+              </select>
+            </label>
+            <p class="note">
+              Measure the opening left open around the unit. The edge facing it gets a flat face,
+              with the seal if you choose one. In a hung window the unit leaves a gap each side:
+              make one wall for each, with the unit on its right, then on its left.
+            </p>
+          </div>
           <div data-port="1" data-testid="port-1" hidden>
             <label>
               Hose end, outside diameter
@@ -710,6 +731,7 @@
         <p data-testid="plan-edges"></p>
         <ul data-testid="plan-ports"></ul>
         <ul data-testid="plan-cutouts"></ul>
+        <ul data-testid="plan-units"></ul>
         <p data-testid="plan-seal"></p>
         <p data-testid="plan-fill"></p>
         <ul data-testid="plan-piece-fills"></ul>

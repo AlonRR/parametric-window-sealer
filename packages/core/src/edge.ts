@@ -14,12 +14,17 @@
 // (Q126), and the squeezed tape standing out of it is part of the edge's height (Q125): in a
 // track the strip is that much shorter, at a sash or a sill the wall that much smaller. Tape on
 // the sides of a strip in a track takes the place of the clearance (Q127).
+//
+// A window AC (window-ac, #24; Q15) is a fourth role, chosen without asking (Q144;
+// docs/choices.md): an edge against the unit, its top or its side, is shaped as at a sash or a
+// sill, a flat face with the seal on it (C49). Where the unit is, seen from the room, sets which
+// edge meets it (C50): below the wall, as in a slider, or beside it, as in a hung window (C53).
 
 import type { JointParams } from './joint.js';
 import type { TapeFit } from './tape.js';
 
 export type EdgeName = 'top' | 'bottom' | 'left' | 'right';
-export type EdgeRole = 'track' | 'sash' | 'sill';
+export type EdgeRole = 'track' | 'sash' | 'sill' | 'unit';
 export type WindowType = 'slider' | 'hung';
 
 export const EDGES: readonly EdgeName[] = ['top', 'bottom', 'left', 'right'];
@@ -28,6 +33,18 @@ export const WINDOW_PRESETS: Record<WindowType, Record<EdgeName, EdgeRole>> = {
   slider: { top: 'track', bottom: 'track', left: 'track', right: 'sash' },
   hung: { top: 'sash', bottom: 'sill', left: 'track', right: 'track' },
 };
+
+// Where a window AC is, seen from the room: the edge facing it meets it.
+export type UnitPlace = 'below' | 'left' | 'right';
+export const UNIT_PLACES: readonly UnitPlace[] = ['below', 'left', 'right'];
+const FACING: Record<UnitPlace, EdgeName> = { below: 'bottom', left: 'left', right: 'right' };
+
+export function unitRoles(window: WindowType, place: UnitPlace): Record<EdgeName, EdgeRole> {
+  return { ...WINDOW_PRESETS[window], [FACING[place]]: 'unit' };
+}
+
+// In a slider the wall stands on the unit; in a hung window the unit stands beside it (C53).
+export const defaultUnitPlace = (window: WindowType): UnitPlace => (window === 'slider' ? 'below' : 'right');
 
 export interface TrackParams {
   widthMm: number; // one width for every edge strip (Q72)

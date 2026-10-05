@@ -5,7 +5,8 @@
 import { EXAMPLE_PARAMS, describePlan, planWall, readParams, toFormValues } from 'parametric-window-sealer';
 import type { FieldName, FormValues, LeftoverText, Params } from 'parametric-window-sealer';
 import { EDGES, WINDOW_PRESETS } from 'parametric-window-sealer';
-import type { WindowType } from 'parametric-window-sealer';
+import type { UnitPlace, WindowType } from 'parametric-window-sealer';
+import { defaultUnitPlace, unitRoles } from 'parametric-window-sealer';
 import { DEFAULT_MAX_PIECE, PRINTERS } from 'parametric-window-sealer';
 import { TAPE_SIZES } from 'parametric-window-sealer';
 import { FILL_KINDS, PATTERN_STYLES, formatPieceFills, parsePieceFills } from 'parametric-window-sealer';
@@ -397,6 +398,8 @@ export function mountPanel(
       if (ownLabel) ownLabel.hidden = part(row, 'size')?.value !== 'own';
     }
     if (addPort) addPort.hidden = !hose;
+    const acRow = form.querySelector<HTMLElement>('[data-testid="ac"]');
+    if (acRow) acRow.hidden = (form.elements.namedItem('appliance') as RadioNodeList | null)?.value !== 'ac';
     const cutoutRow = cutoutBox(form);
     if (cutoutRow) cutoutRow.hidden = (form.elements.namedItem('appliance') as RadioNodeList | null)?.value !== 'cutout';
     // The seal's size shows with tape or TPU, with the note for the one chosen (C35); its width
@@ -488,6 +491,7 @@ export function mountPanel(
       plan.querySelector('[data-testid="plan-piece-fills"]')?.replaceChildren();
       plan.querySelector('[data-testid="plan-ports"]')?.replaceChildren();
       plan.querySelector('[data-testid="plan-cutouts"]')?.replaceChildren();
+      plan.querySelector('[data-testid="plan-units"]')?.replaceChildren();
       return;
     }
     const text = describePlan(planWall(result.params), result.params);
@@ -510,6 +514,13 @@ export function mountPanel(
     drawPieceMap(layout.columns.length, layout.rows.length);
     plan.querySelector('[data-testid="plan-ports"]')?.replaceChildren(
       ...text.ports.map((line) => {
+        const li = document.createElement('li');
+        li.textContent = line;
+        return li;
+      }),
+    );
+    plan.querySelector('[data-testid="plan-units"]')?.replaceChildren(
+      ...text.units.map((line) => {
         const li = document.createElement('li');
         li.textContent = line;
         return li;
@@ -541,16 +552,38 @@ export function mountPanel(
 
   // Choosing a window type presets each edge's role (Q66); the user can change any after.
   const windowType = control(form, 'window');
+  const acPlace = form.querySelector<HTMLSelectElement>('[data-part="ac-place"]');
   if (windowType instanceof HTMLSelectElement) {
     windowType.addEventListener('change', () => {
-      const roles = WINDOW_PRESETS[windowType.value as WindowType];
-      if (!roles) return;
-      for (const edge of EDGES) {
-        const role = control(form, `${edge}Edge`);
-        if (role instanceof HTMLSelectElement) role.value = roles[edge];
-      }
+      if (!WINDOW_PRESETS[windowType.value as WindowType]) return;
+      if (applianceNow() === 'ac' && acPlace) acPlace.value = defaultUnitPlace(windowType.value as WindowType);
+      presetRoles();
     });
   }
+  // A window AC (#24): the edge facing the unit meets it (C50), the unit starting below the wall
+  // in a slider and to its right in a hung window (C53). Leaving the AC puts the window's edges back.
+  function applianceNow(): string | undefined {
+    return (form.elements.namedItem('appliance') as RadioNodeList | null)?.value;
+  }
+  function presetRoles(): void {
+    const kind = control(form, 'window')?.value as WindowType;
+    if (!WINDOW_PRESETS[kind]) return;
+    const roles = applianceNow() === 'ac' && acPlace ? unitRoles(kind, acPlace.value as UnitPlace) : WINDOW_PRESETS[kind];
+    for (const edge of EDGES) {
+      const role = control(form, `${edge}Edge`);
+      if (role instanceof HTMLSelectElement) role.value = roles[edge];
+    }
+  }
+  let appliance = applianceNow();
+  for (const radio of form.querySelectorAll<HTMLInputElement>('input[name="appliance"]')) {
+    radio.addEventListener('change', () => {
+      const now = applianceNow();
+      if (now === 'ac' && acPlace) acPlace.value = defaultUnitPlace(control(form, 'window')?.value as WindowType);
+      if (now === 'ac' || appliance === 'ac') presetRoles();
+      appliance = now;
+    });
+  }
+  acPlace?.addEventListener('change', presetRoles);
   addPort?.addEventListener('click', () => {
     const row = newPortRow(form);
     if (!row || !extras) return;

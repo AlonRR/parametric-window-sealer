@@ -163,7 +163,7 @@ const MODES: readonly AxisMode[] = ['equal', 'full-plus-filler'];
 const FILLERS: readonly FillerPosition[] = ['start', 'end', 'middle', 'split'];
 const LEFTOVERS: readonly Leftover[] = ['spread', 'equal', 'shorten'];
 const WINDOWS: readonly WindowType[] = ['slider', 'hung'];
-const ROLES: readonly EdgeRole[] = ['track', 'sash', 'sill'];
+const ROLES: readonly EdgeRole[] = ['track', 'sash', 'sill', 'unit'];
 const SEALS: readonly SealKind[] = ['none', 'tape', 'tpu'];
 const YES_NO = ['no', 'yes'] as const;
 
@@ -667,6 +667,7 @@ export interface PlanText {
   leftovers: LeftoverText[];
   ports: string[]; // one line for each hose port
   cutouts: string[]; // one line for each measured cutout (#23)
+  units: string[]; // one line for each edge against a window AC (#24)
   seal: string;
   fill: string;
   pieceFills: string[]; // one line for each piece with a fill of its own (#21)
@@ -836,6 +837,9 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     ),
     ports: params.ports.map((p) => `Hose port: a ${mm(p.hoseMm)} mm hose end, in column ${p.column}, row ${p.row}.`),
     cutouts: describeCutouts(params),
+    units: EDGES.filter((e) => params.edges.roles[e] === 'unit').map(
+      (e) => `Window AC: the ${e} edge ${e === 'bottom' ? 'stands on the unit’s top' : e === 'top' ? 'meets the unit’s underside' : 'meets the unit’s side'}.`,
+    ),
     seal: describeSeal(params, parts),
     fill: `Fill: ${fillWords(params.fill, params.thicknessMm)}`,
     pieceFills: params.pieceFills.map(

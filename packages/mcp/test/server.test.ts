@@ -173,6 +173,16 @@ describe('window_sealer_plan_wall', () => {
     expect(half.text).toContain('cutouts.0 needs both column and row, or neither');
   });
 
+  it('a window AC as an edge role, and the summary’s line for it (C49, C52)', async () => {
+    const { call } = await connect();
+    const r = await call('window_sealer_plan_wall', {
+      settings: { openingWidthMm: 600, openingHeightMm: 400, edges: { roles: { bottom: 'unit' } } },
+    });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['settings'].edges.roles.bottom).toBe('unit');
+    expect(r.data['summary'].units).toEqual(['Window AC: the bottom edge stands on the unit’s top.']);
+  });
+
   it('a grid fill in the library’s shape: grid settings alone mean the grid, in relief to start with (Q141, Q142)', async () => {
     const { call } = await connect();
     const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { grid: { barMm: 2 } } } });

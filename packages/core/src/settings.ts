@@ -24,7 +24,7 @@ export interface Setting {
 const DIVISION = ['equal', 'full-plus-filler'] as const;
 const FILLER = ['start', 'end', 'middle', 'split'] as const;
 const LEFTOVER = ['spread', 'equal', 'shorten'] as const;
-const ROLE = ['track', 'sash', 'sill'] as const;
+const ROLE = ['track', 'sash', 'sill', 'unit'] as const;
 const YES_NO = ['no', 'yes'] as const;
 
 // The settings that are lists, and the shape of each item: what each field holds.
@@ -59,7 +59,7 @@ const axis = (name: 'width' | 'height'): Setting[] => [
 const edge = (name: 'top' | 'bottom' | 'left' | 'right'): Setting => ({
   field: `${name}Edge`,
   path: `edges.roles.${name}`,
-  help: `The ${name} edge: in a track, pressed by the sash, or on a flat sill.`,
+  help: `The ${name} edge: in a track, pressed by the sash, on a flat sill, or against a window AC (unit).`,
   values: ROLE,
 });
 

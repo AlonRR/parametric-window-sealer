@@ -383,6 +383,19 @@ describe('measured cutouts (measured-cutout #23; C40 to C47: --cutout, repeatabl
   });
 });
 
+describe('a window AC (window-ac #24; C49 to C53)', () => {
+  it('--bottom-edge unit: the wall stands on the unit, and the summary says so', async () => {
+    const r = await cli(['--width', '600', '--height', '400', '--bottom-edge', 'unit', '--dry-run']);
+    expect(r.code).toBe(0);
+    expect(r.out).toContain('Window AC: the bottom edge stands on the unit’s top.');
+  });
+
+  it('--help lists the role among each edge’s choices', async () => {
+    const r = await cli(['--help']);
+    expect(r.out).toMatch(/--right-edge <track\|sash\|sill\|unit>/);
+  });
+});
+
 describe('a tape seal (seal-tape #15; Q119 to Q132)', () => {
   const params = async (args: string[]) => {
     const r = await cli([...args, '--dry-run', '--json']);

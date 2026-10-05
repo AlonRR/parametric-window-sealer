@@ -277,6 +277,7 @@ describe('describePlan', () => {
       leftovers: [],
       ports: [],
       cutouts: [],
+      units: [], // #24
       seal: 'Seal: none.',
       fill: 'Fill: sealed.',
       pieceFills: [],
