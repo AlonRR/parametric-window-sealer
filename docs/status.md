@@ -26,7 +26,7 @@ engine is deliberately undecided until the design questions below are settled.
 | (none) | Fabrication: **FDM 3D printing** | 5 Oct 2026 |
 | (none) | Windows: **horizontal sliders** and **single/double-hung** first; other types maybe later, so the design must not rule them out | 5 Oct 2026 |
 | (none) | Users run it from a **web page on GitHub Pages** | 5 Oct 2026 |
-| (none) | CAD engine: **decided later**, once the design is workshopped | 5 Oct 2026 |
+| (none) | CAD engine: **decided later**, once the design is workshopped (now asked as Q22) | 5 Oct 2026 |
 | Q1 | Licence: **CERN-OHL-S-2.0** for the design and docs, **MPL-2.0** for code | 5 Oct 2026 |
 | Q2 | Branch: commit to **`main`** | 5 Oct 2026 |
 | Q3 | Build the Pages site now; **the owner publishes it later** (the repo is private, and making it public is his action) | 5 Oct 2026 |
@@ -39,6 +39,10 @@ engine is deliberately undecided until the design questions below are settled.
 | Q10 | The fill is set **once for the whole wall by default**, with an **advanced tab for per-piece overrides** | 5 Oct 2026 |
 | Q11 | The opening is divided as a **grid** (rows and columns as needed), and the division mode ("all equal" or "full-size pieces plus one filler") is **chosen separately for width and height** | 5 Oct 2026 |
 | Q12 | The filler's **position is the user's choice** (start, end or middle), **or it is split in two for symmetry**. What happens when the remainder is too small is still open (Q12 below) | 5 Oct 2026 |
+| Q13 | Pieces join with **separate connector strips** by default (a tongue on each edge, an H-profile strip between pieces, a cross piece where four meet; removable, sealable in TPU, a few mm of slide per joint). **Puzzle dovetails, sliding dovetail rails and bolted flanges** are advanced options | 5 Oct 2026 |
+| Q14 | The wall is held **in the window track, clamped by the closed sash** (no screws). Track dimensions become parameters | 5 Oct 2026 |
+| Q15 | Appliances: **window AC**, **portable AC exhaust hose**, **exhaust fan**, and **no appliance** (a plain wall); more can be added later | 5 Oct 2026 |
+| Q16 | Fitting to the appliance, all as options: a **sliding insert** that closes in around it, a **measured cutout with a gasket**, **adjustable clamps** with slotted holes, and **standard ports** (round hose ports, fan mounts) chosen from a list | 5 Oct 2026 |
 | Q19 | Tools and commit identity persist through a **SessionStart hook committed in the repo**, which runs only in cloud sessions | 5 Oct 2026 |
 | Q20 | Decorative patterns: **brick**, **diamond**, **grid**, **decorative hexagon**; the list is extensible, and **users can add their own** (how: Q21) | 5 Oct 2026 |
 
@@ -57,21 +61,22 @@ The first four rows were answered before questions carried IDs.
   remainder is too small to print or to hold: a minimum filler size below which a full piece is
   shrunk to make room, a warning, or something else?
 
-### Joining and mounting
+### Sealing
 
-- **Q13.** How do pieces join each other: dovetail or puzzle joints, sliding rails,
-  tongue-and-groove, snap clips, separate connector strips, bolts? Removable for the season, or
-  permanent?
-- **Q14.** How does the panel stay in the window: held in the track by the closed sash, friction
-  fit, telescoping to the exact width, screws, adhesive, foam tape? Rented windows may rule out
-  screws.
-- **Q15.** Which appliances must it fit: a window AC (the body passes through), a portable AC's
-  exhaust hose, an exhaust fan (which kind)?
-- **Q16.** How does it attach to the appliance, and how is that adjustable: slotted holes, a
-  sliding insert, an adjustable clamp, a compressible gasket?
 - **Q17.** How sealed must it be: against air, rain, insects, heat? And where do the optional seals
   (Q6) sit: panel to window, panel to panel, panel to appliance? For tape, a groove or a flat
   strip of edge?
+
+### Engine
+
+- **Q22.** Which engine builds the geometry? The answers so far ask for things a plain OpenSCAD
+  Customizer page handles poorly: per-piece overrides (Q10), user-uploaded patterns (Q20, Q21),
+  and downloading every piece at once. The candidates:
+  - a custom web page with the model in OpenSCAD files, rendered in the browser by OpenSCAD's
+    WebAssembly build (GPL, so the deployed page would be GPL-licensed as a whole (inferred));
+  - a custom web page with the model in TypeScript on the Manifold geometry library
+    (`manifold-3d`, Apache-2.0, verified on npm 5 Oct 2026), with no OpenSCAD files;
+  - the OpenSCAD Customizer page alone (one piece at a time).
 
 ### A real case to design against
 
