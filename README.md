@@ -12,7 +12,8 @@ panel style, and get a set of printable pieces that join together and fit the ga
 [`docs/status.md`](docs/status.md). The geometry will be built in TypeScript on the
 [Manifold](https://github.com/elalish/manifold) library, chosen by measurement
 ([`spikes/engine-benchmark/`](spikes/engine-benchmark/README.md)).
-What gets built, in what order, is in [`docs/backlog.md`](docs/backlog.md).
+What gets built, in what order, is in [`docs/backlog.md`](docs/backlog.md) and its GitHub
+issues; what has changed is in [`CHANGELOG.md`](CHANGELOG.md).
 
 Planned:
 

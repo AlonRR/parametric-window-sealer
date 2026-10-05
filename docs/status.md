@@ -28,7 +28,7 @@ engine is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | (none) | Users run it from a **web page on GitHub Pages** | 5 Oct 2026 |
 | (none) | CAD engine: **decided later**, once the design is workshopped (decided as Q22) | 5 Oct 2026 |
 | Q1 | Licence: **CERN-OHL-S-2.0** for the design and docs, **MPL-2.0** for code | 5 Oct 2026 |
-| Q2 | Branch: commit to **`main`** | 5 Oct 2026 |
+| Q2 | Branch: commit to **`main`** (replaced by Q29: a branch and pull request per backlog item) | 5 Oct 2026 |
 | Q3 | Build the Pages site now; **the owner publishes it later** (the repo is private, and making it public is his action) | 5 Oct 2026 |
 | Q4 | `.repo-status`: **`publish: not-yet`** | 5 Oct 2026 |
 | Q5 | Printed on **users' own printers**: the maximum piece size is a parameter, not tied to one printer. It is set from a **printer-presets list**, with a **safe default** (one size most mainstream beds fit) selected until the user picks a printer; "custom" stays available. Every preset's bed size is to be verified from the maker's own specification | 5 Oct 2026 |
@@ -55,12 +55,22 @@ engine is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | Q22 | Engine: **TypeScript on the Manifold geometry library** (`manifold-3d`), in a custom web page. Chosen from measurements in [`spikes/engine-benchmark/`](../spikes/engine-benchmark/README.md): on the same panel, ready about 5x sooner, re-renders about 2x faster and a download about 15x smaller than OpenSCAD's WebAssembly build. No `.scad` model files | 5 Oct 2026 |
 | Q27 | Before building: **work out the MVP** and keep **a file listing every item by priority and estimated ease** of implementation: [`backlog.md`](backlog.md) | 5 Oct 2026 |
 | Q28 | The **MVP is confirmed as proposed** in [`backlog.md`](backlog.md): a plain sealed wall of joined pieces held in the window track, previewed and downloaded in the browser. The round hose port is first in line after it | 5 Oct 2026 |
+| Q29 | Version control beyond plain commits: **semantic version tags with GitHub releases** and a `CHANGELOG.md` (first version `v0.1.0` when the MVP is complete); **a branch and pull request per backlog item**, merged with CI green; the **backlog mirrored as GitHub issues** (#2 to #43), labelled by priority and ease | 5 Oct 2026 |
 
 The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-No design question is open.
+### Workflow
+
+- **Q30.** Who merges pull requests: the agent once CI is green, or the owner after review? Do
+  documentation-only changes (decision records like this file) also need a pull request? And who
+  approves a release?
+
+### New requirement
+
+- **Q31.** The owner's issue #1 asks for "an API and MCP for use by users and LLM agents". What
+  form should they take, who runs them, and what priority do they get against the MVP?
 
 ## Repository follow-ups
 

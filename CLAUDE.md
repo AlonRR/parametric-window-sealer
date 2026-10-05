@@ -66,7 +66,16 @@ outside this tree; do not vendor them in. The ones that bite most often here:
 
 ## Git
 
-- **Branch: commit to `main`** (owner's decision, 5 Oct 2026, Q2).
+- **A branch and a pull request per backlog item** (owner's decision Q29, replacing Q2's
+  commits straight to `main`). Name the branch `<type>/<backlog-key>`, e.g. `feat/page-skeleton`.
+  The pull request uses `.github/pull_request_template.md`, says `Closes #<issue>`, and is merged
+  only with CI green. Who merges, and whether documentation-only changes need a pull request,
+  is open (Q30 in `docs/status.md`).
+- **Backlog as GitHub issues** (Q29): each row of `docs/backlog.md` has an issue. The file is the
+  ranked overview and the issue holds the work; when a priority or estimate changes, change both.
+- **Versions** (Q29): Semantic Versioning, first tag `v0.1.0` when the MVP is complete. Record
+  changes in `CHANGELOG.md` under Unreleased. Tags are annotated, `vX.Y.Z`, each with a GitHub
+  release. Who approves a release is open (Q30).
 - **Identity: author AND committer are
   `Alon A. Rabinowitz <45129051+AlonRR@users.noreply.github.com>`.** A cloud session's default
   identity is wrong for this repo. In a cloud session, `.claude/hooks/session-start.sh` sets it
