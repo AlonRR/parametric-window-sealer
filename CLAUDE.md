@@ -105,6 +105,11 @@ outside this tree; do not vendor them in. The ones that bite most often here:
 
   Rebase and amend set the committer separately; check both with
   `git log --format='%an <%ae> | %cn <%ce>'`.
+- **Signing (Q77).** In a cloud session the startup hook signs commits with the owner's
+  dedicated key when the environment holds `WINDOW_SEALER_SIGNING_KEY_B64` (the private key
+  in base64, one line); the key lives in the clone's `.git`, never the work tree. Without it
+  the platform signs, and GitHub shows those commits as unverified. A cloud session cannot
+  push tags (HTTP 403, verified 5 Oct 2026): tagging a release is the owner's step there.
 - **Subject: `type(scope): summary`. The scope is required; a bare `type: summary` is
   forbidden.** Lowercase type, at most 72 characters, line 2 blank, detail in the body.
   `.githooks/commit-msg` enforces this (tightened from the kit, which made the scope optional).

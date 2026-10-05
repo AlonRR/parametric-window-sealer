@@ -8,7 +8,8 @@
 #
 #   bash tests/test-session-start.sh
 #
-# Needs uv (the hook installs its tools with it), so it runs locally, not in CI.
+# Needs uv (the hook installs its tools with it) and ssh-keygen (to make a test signing
+# key), so it runs locally, not in CI.
 set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HOOK="$HERE/.claude/hooks/session-start.sh"
@@ -39,9 +40,11 @@ git clone -q "$HERE" "$C"
 run_hook() { # run_hook <env file> [VAR=value ...]
   local envfile=$1
   shift
-  (cd "$C" && env -u CLAUDE_CODE_REMOTE "$@" CLAUDE_PROJECT_DIR="$C" \
+  (cd "$C" && env -u CLAUDE_CODE_REMOTE -u WINDOW_SEALER_SIGNING_KEY_B64 "$@" CLAUDE_PROJECT_DIR="$C" \
     CLAUDE_ENV_FILE="$envfile" bash "$HOOK")
 }
+export -f run_hook
+export HOOK
 
 echo "outside a cloud session -- must change nothing:"
 run_hook "$TMP/env-local" > /dev/null 2>&1
@@ -73,10 +76,60 @@ before=$(git -C "$C" rev-list --count HEAD)
 (cd "$C" && git commit -q --allow-empty -m 'docs: no scope' > /dev/null 2>&1)
 check "a bare 'docs: no scope' is refused" is "$(git -C "$C" rev-list --count HEAD)" "$before"
 
+echo "no signing key in the environment -- signing stays the platform's:"
+check "no repo-local gpg.ssh.program" isnt_set gpg.ssh.program
+check "no repo-local user.signingkey" isnt_set user.signingkey
+check "no key file written" test ! -e "$C/.git/window-sealer-signing-key"
+
 echo "run again -- must be safe to repeat:"
 run_hook "$TMP/env-cloud-2" CLAUDE_CODE_REMOTE=true > /dev/null 2>&1
 check "exits 0 the second time" is "$?" 0
 check "identity unchanged" is "$(local_cfg user.email)" "$EMAIL"
+
+# Q77: the owner's dedicated signing key, given as WINDOW_SEALER_SIGNING_KEY_B64.
+echo "with the owner's signing key -- commits are signed with it:"
+ssh-keygen -q -t ed25519 -N '' -C 'test signing key' -f "$TMP/test-key"
+K="$TMP/signed"
+git clone -q "$HERE" "$K"
+C="$K" run_hook "$TMP/env-signed" CLAUDE_CODE_REMOTE=true \
+  WINDOW_SEALER_SIGNING_KEY_B64="$(base64 -w0 "$TMP/test-key")" > "$TMP/signed.log" 2>&1
+check "exits 0" is "$?" 0
+key_cfg() { git -C "$K" config --local --get "$1"; }
+check "gpg.format is ssh" is "$(key_cfg gpg.format)" ssh
+check "signs with ssh-keygen, not the platform's helper" is "$(key_cfg gpg.ssh.program)" ssh-keygen
+check "commit.gpgsign set" is "$(key_cfg commit.gpgsign)" true
+check "the key sits in .git, not the work tree" is "$(key_cfg user.signingkey)" \
+  "$K/.git/window-sealer-signing-key"
+check "the key file is the given key" cmp -s "$TMP/test-key" "$K/.git/window-sealer-signing-key"
+check "the key file is private (600)" is "$(stat -c %a "$K/.git/window-sealer-signing-key")" 600
+check "the key is never printed" sh -c "! grep -q 'PRIVATE KEY' '$TMP/signed.log'"
+check "git status is clean: nothing to commit by accident" is "$(git -C "$K" status --porcelain)" ""
+(cd "$K" && git commit -q --allow-empty -m 'test(session): a signed commit' > /dev/null 2>&1)
+check "a commit lands" is "$(git -C "$K" log -1 --format=%s)" "test(session): a signed commit"
+check "and verifies as signed by that key (G)" is "$(git -C "$K" log -1 --format=%G?)" G
+check "the signature's key is the test key" is "$(git -C "$K" log -1 --format=%GK)" \
+  "$(ssh-keygen -lf "$TMP/test-key.pub" | awk '{print $2}')"
+
+echo "with a broken key -- warns, keeps the platform's signing, sets the rest up:"
+B="$TMP/broken"
+git clone -q "$HERE" "$B"
+C="$B" run_hook "$TMP/env-broken" CLAUDE_CODE_REMOTE=true \
+  WINDOW_SEALER_SIGNING_KEY_B64="$(printf 'not a key' | base64)" > "$TMP/broken.log" 2>&1
+check "exits 0" is "$?" 0
+check "says the key is unusable" grep -q 'WINDOW_SEALER_SIGNING_KEY_B64' "$TMP/broken.log"
+check "no repo-local user.signingkey" sh -c "! git -C '$B' config --local --get user.signingkey"
+check "no key file left behind" test ! -e "$B/.git/window-sealer-signing-key"
+check "the identity is still set" is "$(git -C "$B" config --local --get user.email)" "$EMAIL"
+
+echo "with a key that needs a passphrase -- refused at once, never waits for one:"
+ssh-keygen -q -t ed25519 -N 'secret' -C 'test key with a passphrase' -f "$TMP/locked-key"
+L="$TMP/locked"
+git clone -q "$HERE" "$L"
+C="$L" timeout 120 bash -c 'run_hook "$@"' _ "$TMP/env-locked" CLAUDE_CODE_REMOTE=true \
+  WINDOW_SEALER_SIGNING_KEY_B64="$(base64 -w0 "$TMP/locked-key")" < /dev/null > "$TMP/locked.log" 2>&1
+check "exits 0 (not killed by the timeout)" is "$?" 0
+check "says the key is unusable" grep -q 'WINDOW_SEALER_SIGNING_KEY_B64' "$TMP/locked.log"
+check "no key file left behind" test ! -e "$L/.git/window-sealer-signing-key"
 
 printf '\n%s\n' "$pass passed, $fail failed"
 if [ $((pass + fail)) -eq 0 ]; then
