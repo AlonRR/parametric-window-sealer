@@ -10,7 +10,8 @@ import { maxPieceSize } from './printer';
 import type { PrinterChoice } from './printer';
 
 // Until the joint is designed (connector-strip, #10), a placeholder (Q40); the joint's own
-// dimensions replace it (Q37).
+// dimensions replace it (Q37). That replacement is backlog item min-piece-from-joint (#53),
+// part of the MVP, so v0.1.0 cannot ship with this constant still here.
 export const PLACEHOLDER_MIN_PIECE_MM = 30;
 
 export interface AxisChoice {
