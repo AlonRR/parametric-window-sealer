@@ -17,11 +17,13 @@ import { tapeFit, tapedCollar } from './tape.js';
 import { fillPattern } from './fill.js';
 import { fillFor } from './piece-fill.js';
 import { gasketShapes, gasketSolid, sleeveShapes, sleeveSolid, tpuJoint } from './tpu.js';
+import { frameShapes, frameSolid, linedRim } from './cutout.js';
 import type { FieldErrors, Params, PlanText } from './params.js';
 
 // Every part beside the pieces, one shape with a count for identical ones (Q58): the joint
 // strips and cross pieces, in TPU if chosen (C34), the edge strips, and with the TPU seal its
-// gaskets and the sleeves for the hose ports (#22). The download and the dry run both list these.
+// gaskets, the sleeves for the hose ports (#22) and the frames for the cutouts (#23; C43). The
+// download and the dry run both list these.
 export function wallPartShapes(params: Params, plan: GridLayout = planWall(params)): AnyPartShape[] {
   const { joints, edges } = planParts(params, plan);
   const fit = tapeFit(params.seal);
@@ -32,6 +34,7 @@ export function wallPartShapes(params: Params, plan: GridLayout = planWall(param
     ...edgeShapes(edges),
     ...(tpu === undefined ? [] : gasketShapes(edges, tpu, params.seal.tape.thicknessMm)),
     ...(tpu === undefined ? [] : sleeveShapes(params.ports, tapedCollar(params.collar, tpu), tpu)),
+    ...(tpu === undefined ? [] : frameShapes(params.cutouts, linedRim(params.rim, tpu), tpu)),
   ];
 }
 
@@ -45,13 +48,28 @@ export function buildExport(
   // Each piece's own fill, or the wall's (#21).
   const pattern = (cell: { column: number; row: number }) =>
     fillPattern(fillFor(params, cell.column + 1, cell.row + 1), params.joint);
-  const built = buildPieces(engine, plan, params.thicknessMm, params.ports, params.collar, tapeFit(params.seal), pattern);
+  const built = buildPieces(
+    engine,
+    plan,
+    params.thicknessMm,
+    params.ports,
+    params.collar,
+    tapeFit(params.seal),
+    pattern,
+    params.cutouts,
+    params.rim,
+  );
   let pieces: ExportPiece[];
   try {
     pieces = built.map((b, i) => {
       const cell = plan.pieces[i];
       if (!cell) throw new Error('The plan and the built pieces differ');
-      return { cell, mesh: meshOf(b.solid), ...(b.hoseMm === undefined ? {} : { hoseMm: b.hoseMm }) };
+      return {
+        cell,
+        mesh: meshOf(b.solid),
+        ...(b.hoseMm === undefined ? {} : { hoseMm: b.hoseMm }),
+        ...(b.cutout === undefined ? {} : { cutout: b.cutout }),
+      };
     });
   } finally {
     for (const b of built) b.solid.delete();
@@ -72,6 +90,8 @@ export function buildExport(
         return gasketSolid(engine, shape.lengthMm, fit, shape.heightMm);
       case 'sleeve':
         return sleeveSolid(engine, shape);
+      case 'frame':
+        return frameSolid(engine, shape);
     }
   };
   const parts = wallPartShapes(params, plan).map((shape) => {
@@ -151,7 +171,9 @@ export function planFiles(params: Params, choice: DownloadChoice): PlannedFile[]
   return [
     ...plan.pieces.map((cell) => {
       const port = params.ports.find((p) => p.column === cell.column + 1 && p.row === cell.row + 1);
-      return { name: pieceFileName(cell, choice.format, port?.hoseMm), type };
+      const cut = params.cutouts.find((c) => c.column === cell.column + 1 && c.row === cell.row + 1);
+      const cutout = cut === undefined ? undefined : { widthMm: cut.widthMm, heightMm: cut.heightMm };
+      return { name: pieceFileName(cell, choice.format, port?.hoseMm, cutout), type };
     }),
     ...wallPartShapes(params, plan).map((shape) => ({
       name: `${partName(shape)}.${choice.format}`,

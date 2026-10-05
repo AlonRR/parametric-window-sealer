@@ -200,3 +200,29 @@ describe('the printed TPU seal in the preview', () => {
     disposeWall(loose);
   });
 });
+
+// Backlog item measured-cutout (#23): the cutout's piece is drawn as it is downloaded, and its
+// lining, tape or TPU, in place in the rim (C43).
+describe('a measured cutout in the preview', () => {
+  const cutouts = [{ widthMm: 120, heightMm: 80, column: 2, row: 1 }];
+  const tape = { widthMm: 9, thicknessMm: 4, grooveMm: 1, squeezePct: 50, sides: false, port: false, joints: false };
+
+  it('its piece has the opening and the rim', async () => {
+    const engine = await loadEngine();
+    const wall = buildWallScene(engine, { ...EXAMPLE_PARAMS, cutouts });
+    const pieces = solidsOf(wall, 'piece');
+    const deepest = Math.max(...pieces.map((m) => new Box3().setFromObject(m).max.z));
+    expect(deepest).toBeCloseTo(3 + 15, 4); // the rim stands 15 mm on the room side
+    disposeWall(wall);
+  });
+
+  it('lined with the tape, or with the TPU frame in its own grey', async () => {
+    const engine = await loadEngine();
+    const taped = buildWallScene(engine, { ...EXAMPLE_PARAMS, cutouts, seal: { kind: 'tape' as const, tape } });
+    expect(solidsOf(taped, 'tape')).toHaveLength(solidsOf(taped, 'edge').length + 1);
+    disposeWall(taped);
+    const tpu = buildWallScene(engine, { ...EXAMPLE_PARAMS, cutouts, seal: { kind: 'tpu' as const, tape } });
+    expect(solidsOf(tpu, 'tpu')).toHaveLength(solidsOf(tpu, 'edge').length + 1);
+    disposeWall(tpu);
+  });
+});

@@ -48,12 +48,9 @@ export interface PieceArea {
   heightMm: number;
 }
 
-// Kept solid round a port: a circle in the piece's frame.
-export interface KeepOut {
-  xMm: number;
-  yMm: number;
-  radiusMm: number;
-}
+// Kept solid round a port: a circle in the piece's frame; round a cutout's rim, a rectangle
+// centred there (measured-cutout, #23).
+export type KeepOut = { xMm: number; yMm: number; radiusMm: number } | { xMm: number; yMm: number; widthMm: number; heightMm: number };
 
 const CIRCLE_SEGMENTS = 128; // as the port is drawn (PORT_SEGMENTS)
 const MITER_LIMIT = 10; // keeps sharp corners sharp when an opening is shrunk and grown back
@@ -105,8 +102,12 @@ export function pieceOpenings(
   try {
     let allowed = keep(CrossSection.square(inner as [number, number]).translate([borderMm, borderMm]));
     if (keepOut !== undefined) {
-      const disc = keep(CrossSection.circle(keepOut.radiusMm, CIRCLE_SEGMENTS).translate([keepOut.xMm, keepOut.yMm]));
-      allowed = keep(allowed.subtract(disc));
+      const shape =
+        'radiusMm' in keepOut
+          ? CrossSection.circle(keepOut.radiusMm, CIRCLE_SEGMENTS)
+          : CrossSection.square([keepOut.widthMm, keepOut.heightMm], true);
+      const zone = keep(keep(shape).translate([keepOut.xMm, keepOut.yMm]));
+      allowed = keep(allowed.subtract(zone));
     }
     const clipped = keep(keep(tiledOver(engine, tile, wallCentre, piece)).intersect(allowed));
     const half = tile.barMm / 2;

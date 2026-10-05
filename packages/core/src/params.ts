@@ -24,6 +24,8 @@ import { DEFAULT_BED_MARGIN_MM } from './printer.js';
 import { PRINTER_IDS } from './printers.js';
 import { DEFAULT_COLLAR, checkPort, collarInnerMm, defaultPortPiece, formatPorts, parsePorts, portHoleMm } from './port.js';
 import type { CollarParams, PortSetting } from './port.js';
+import { DEFAULT_RIM, checkCutout, formatCutouts, linedRim, parseCutouts, rimInnerMm } from './cutout.js';
+import type { CutoutSetting, RimParams } from './cutout.js';
 import { DEFAULT_TAPE, NO_SEAL, TAPE_GROOVE_PLAY_MM, TAPE_GROOVE_WALL_MM, tapeFit, tapedCollar } from './tape.js';
 import { TPU_FIN_MM, gasketBaseMm } from './tpu.js';
 import {
@@ -63,6 +65,8 @@ export interface Params {
   seal: SealParams; // none to start with (Q122)
   fill: FillParams; // sealed to start with (Q141)
   pieceFills: PieceFill[]; // pieces with a fill of their own (#21); none to start with
+  cutouts: Required<CutoutSetting>[]; // measured cutouts (#23); none to start with
+  rim: RimParams; // round each cutout (C42)
 }
 
 // The page starts here: an example opening (Q42, labelled as an example, Q18), the default
@@ -84,6 +88,8 @@ export const EXAMPLE_PARAMS: Params = {
   seal: NO_SEAL,
   fill: SEALED,
   pieceFills: [],
+  cutouts: [],
+  rim: DEFAULT_RIM,
 };
 
 export type FieldName =
@@ -143,7 +149,11 @@ export type FieldName =
   | 'diamondWidthMm'
   | 'diamondHeightMm'
   | 'diamondBarMm'
-  | 'pieceFills';
+  | 'pieceFills'
+  | 'cutouts'
+  | 'rimDepthMm'
+  | 'rimWallMm'
+  | 'rimClearanceMm';
 
 export type FormValues = Partial<Record<FieldName, string>>;
 export type FieldErrors = Partial<Record<FieldName, string>>;
@@ -216,6 +226,10 @@ export function toFormValues(p: Params): FormValues {
     diamondHeightMm: String(p.fill.diamond.heightMm),
     diamondBarMm: String(p.fill.diamond.barMm),
     pieceFills: formatPieceFills(p.pieceFills),
+    cutouts: formatCutouts(p.cutouts),
+    rimDepthMm: String(p.rim.depthMm),
+    rimWallMm: String(p.rim.wallMm),
+    rimClearanceMm: String(p.rim.clearanceMm),
   };
 }
 
@@ -424,6 +438,19 @@ export function readParams(values: FormValues): ReadResult {
     errors.collarDepthMm = `Make it at least ${mm(fit.grooveWidthMm)} mm, so the tape’s groove fits inside the collar.`;
   }
 
+  // The measured cutouts' rim (C42): the clearance may be zero, as the collar's may. With a seal,
+  // it is lined, and needs to be as deep as the seal's groove is wide (C43, as Q129).
+  const rim: RimParams = {
+    depthMm: size('rimDepthMm'),
+    wallMm: size('rimWallMm'),
+    clearanceMm: sizeOrZero('rimClearanceMm'),
+  };
+  const givenCutouts = parseCutouts(values.cutouts ?? '');
+  if (!givenCutouts.ok) errors.cutouts = givenCutouts.message;
+  if (fit !== undefined && givenCutouts.ok && givenCutouts.cutouts.length > 0 && rim.depthMm < fit.grooveWidthMm - 1e-9) {
+    errors.rimDepthMm = `Make it at least ${mm(fit.grooveWidthMm)} mm, so the seal’s groove fits inside the rim.`;
+  }
+
   if (Object.keys(errors).length === 0) {
     // The edge strips must leave the pieces something to cover.
     const span = panelSpan(openingWidthMm, openingHeightMm, edges, joint, fit);
@@ -493,20 +520,25 @@ export function readParams(values: FormValues): ReadResult {
   const base = { openingWidthMm, openingHeightMm, printer, bedMarginMm, width, height, thicknessMm, joint, edges, collar, seal, fill };
   const ports: Required<PortSetting>[] = [];
   if (Object.keys(errors).length === 0 && given.ok && given.ports.length > 0) {
-    errors.ports = placePorts({ ...base, ports: [], pieceFills: [] }, given.ports, ports);
+    errors.ports = placePorts({ ...base, ports: [], pieceFills: [], cutouts: [], rim }, given.ports, ports);
     if (errors.ports === undefined) delete errors.ports;
+  }
+  const cutouts: Required<CutoutSetting>[] = [];
+  if (Object.keys(errors).length === 0 && givenCutouts.ok && givenCutouts.cutouts.length > 0) {
+    errors.cutouts = placeCutouts({ ...base, ports, pieceFills: [], cutouts: [], rim }, givenCutouts.cutouts, cutouts);
+    if (errors.cutouts === undefined) delete errors.cutouts;
   }
 
   // Each piece's own fill (#21): a piece the wall has, and one fill for each piece.
   const pieceFills = givenFills.ok ? givenFills.fills : [];
   if (Object.keys(errors).length === 0 && pieceFills.length > 0) {
-    const plan = planWall({ ...base, ports, pieceFills: [] });
+    const plan = planWall({ ...base, ports, pieceFills: [], cutouts, rim });
     const message = checkPieceFills(plan, pieceFills);
     if (message !== undefined) errors.pieceFills = message;
   }
 
   if (Object.keys(errors).length > 0) return { ok: false, errors };
-  return { ok: true, params: { ...base, ports, pieceFills } };
+  return { ok: true, params: { ...base, ports, pieceFills, cutouts, rim } };
 }
 
 function checkPieceFills(plan: GridLayout, fills: readonly PieceFill[]): string | undefined {
@@ -542,6 +574,28 @@ function placePorts(params: Params, given: PortSetting[], placed: Required<PortS
       return `Ports ${other + 1} and ${i + 1} are both in column ${column}, row ${row}; give each its own piece.`;
     }
     placed.push({ hoseMm: port.hoseMm, column, row });
+  }
+  return undefined;
+}
+
+// Each cutout in its piece (C47, as Q105 and Q110), the piece there and big enough for the rim
+// (C40, as Q108), and one cutout or port to a piece. Fills `placed`; returns the first problem.
+function placeCutouts(params: Params, given: CutoutSetting[], placed: Required<CutoutSetting>[]): string | undefined {
+  const plan = planWall(params);
+  const start = defaultPortPiece(plan);
+  const rim = linedRim(params.rim, tapeFit(params.seal));
+  for (const [i, cutout] of given.entries()) {
+    const column = cutout.column ?? start.column + 1;
+    const row = cutout.row ?? start.row + 1;
+    const fit = checkCutout(plan, { ...cutout, column: column - 1, row: row - 1 }, rim, params.joint);
+    if (!fit.ok) return `Cutout ${i + 1}: ${fit.message}`;
+    const port = params.ports.findIndex((p) => p.column === column && p.row === row);
+    if (port >= 0) return `Cutout ${i + 1} and port ${port + 1} are both in column ${column}, row ${row}; give each its own piece.`;
+    const other = placed.findIndex((c) => c.column === column && c.row === row);
+    if (other >= 0) {
+      return `Cutouts ${other + 1} and ${i + 1} are both in column ${column}, row ${row}; give each its own piece.`;
+    }
+    placed.push({ widthMm: cutout.widthMm, heightMm: cutout.heightMm, column, row });
   }
   return undefined;
 }
@@ -612,6 +666,7 @@ export interface PlanText {
   warnings: string[];
   leftovers: LeftoverText[];
   ports: string[]; // one line for each hose port
+  cutouts: string[]; // one line for each measured cutout (#23)
   seal: string;
   fill: string;
   pieceFills: string[]; // one line for each piece with a fill of its own (#21)
@@ -717,11 +772,15 @@ function describeSeal(params: Params, parts: WallParts): string {
   const collar = tapedCollar(params.collar, fit);
   const faces = fit.sides ? 'outer faces and sides' : 'outer faces';
   const each = ports.length === 1 ? 'the hose port’s collar' : 'each hose port’s collar';
+  // Every cutout's rim is lined (C43).
+  const cutouts = params.cutouts;
+  const eachRim = cutouts.length === 1 ? 'the cutout’s rim' : 'each cutout’s rim';
   if (params.seal.kind === 'tpu') {
     const metres = Math.round((outer + sides) / 100) / 10;
     const gaskets = `${mm(fit.grooveWidthMm)} × ${mm(tape.thicknessMm)} mm gaskets along the edge strips’ ${faces}: ${metres} m in all`;
     const also = [
       ...(ports.length === 0 ? [] : [`a sleeve inside ${each}`]),
+      ...(cutouts.length === 0 ? [] : [`a frame inside ${eachRim}`]),
       ...(tape.joints ? ['the joint strips and cross pieces in TPU'] : []),
     ];
     const list = [gaskets, ...also];
@@ -729,9 +788,30 @@ function describeSeal(params: Params, parts: WallParts): string {
     return `Seal: printed TPU, ${list.join(', ')}${last}.`;
   }
   const round = sum(ports.map((p) => Math.PI * (collarInnerMm(p.hoseMm, collar) + 2 * fit.grooveDepthMm)));
-  const inPorts = ports.length === 0 ? '' : `, and inside ${each}`;
-  const metres = Math.round((outer + sides + round) / 100) / 10;
+  const rim = linedRim(params.rim, fit);
+  const rims = sum(
+    cutouts.map((c) => {
+      const floor = rimInnerMm(c, rim);
+      return 2 * (floor.widthMm + floor.heightMm) + 8 * fit.grooveDepthMm;
+    }),
+  );
+  const places = [...(ports.length === 0 ? [] : [`inside ${each}`]), ...(cutouts.length === 0 ? [] : [`round ${eachRim}`])];
+  const inPorts = places.length === 0 ? '' : `, and ${places.join(' and ')}`;
+  const metres = Math.round((outer + sides + round + rims) / 100) / 10;
   return `Seal: ${mm(tape.widthMm)} × ${mm(tape.thicknessMm)} mm foam tape along the edge strips’ ${faces}${inPorts}: ${metres} m in all.`;
+}
+
+// Each cutout: the appliance, where, the opening and its rim, and what lines it (C43).
+function describeCutouts(params: Params): string[] {
+  const rim = linedRim(params.rim, tapeFit(params.seal));
+  const lining = { none: '', tape: ', lined with the foam tape', tpu: ', lined with a TPU frame' }[params.seal.kind];
+  return params.cutouts.map((c) => {
+    const opening = rimInnerMm(c, rim);
+    return (
+      `Cutout: a ${mm(c.widthMm)} × ${mm(c.heightMm)} mm appliance, in column ${c.column}, row ${c.row}, through a ` +
+      `${mm(opening.widthMm)} × ${mm(opening.heightMm)} mm opening in a ${mm(rim.depthMm)} mm rim${lining}.`
+    );
+  });
 }
 
 export function describePlan(plan: GridLayout, params: Params): PlanText {
@@ -755,6 +835,7 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
       describeLeftover(note, note.axis === 'width' ? max.widthMm : max.heightMm, params.joint),
     ),
     ports: params.ports.map((p) => `Hose port: a ${mm(p.hoseMm)} mm hose end, in column ${p.column}, row ${p.row}.`),
+    cutouts: describeCutouts(params),
     seal: describeSeal(params, parts),
     fill: `Fill: ${fillWords(params.fill, params.thicknessMm)}`,
     pieceFills: params.pieceFills.map(

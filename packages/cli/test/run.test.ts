@@ -344,6 +344,45 @@ describe('a printer from the list (printer-presets #13; Q115 to Q117)', () => {
   });
 });
 
+describe('measured cutouts (measured-cutout #23; C40 to C47: --cutout, repeatable)', () => {
+  const params = async (args: string[]) => {
+    const r = await cli([...args, '--dry-run', '--json']);
+    return json(r.out).params as typeof EXAMPLE_PARAMS;
+  };
+
+  it('--cutout 120x80 puts one in the bottom row’s middle piece, and says so', async () => {
+    const r = await cli([...OPENING, '--cutout', '120x80', '--dry-run']);
+    expect(r.code).toBe(0);
+    expect(r.out).toContain(
+      'Cutout: a 120 × 80 mm appliance, in column 2, row 1, through a 122 × 82 mm opening in a 15 mm rim.',
+    );
+    expect(r.out).toContain('  piece-c2-r1-197.7x198.6-cutout-120x80.stl');
+  });
+
+  it('--cutout 120x80@3,1 names the piece; given again, it adds one; the rim has flags too', async () => {
+    const p = await params([...OPENING, '--cutout', '120x80@3,1', '--cutout', '60x60@1,5', '--rim-depth', '20']);
+    expect(p.cutouts).toEqual([
+      { widthMm: 120, heightMm: 80, column: 3, row: 1 },
+      { widthMm: 60, heightMm: 60, column: 1, row: 5 },
+    ]);
+    expect(p.rim).toEqual({ depthMm: 20, wallMm: 2.4, clearanceMm: 1 });
+  });
+
+  it('refuses a cutout in a port’s piece, or one it cannot read', async () => {
+    const both = await cli([...OPENING, '--port', '150', '--cutout', '120x80']);
+    expect(both.code).toBe(2);
+    expect(both.err).toContain('--cutout: Cutout 1 and port 1 are both in column 2, row 1; give each its own piece.');
+    const bad = await cli([...OPENING, '--cutout', '120']);
+    expect(bad.err).toContain('--cutout: Cutout 1: write each as the appliance’s measured width x height in mm');
+  });
+
+  it('--help shows the form and that it repeats', async () => {
+    const r = await cli(['--help']);
+    expect(r.out.replace(/\s+/g, ' ')).toContain('--cutout <width>x<height>[@column,row]');
+    expect(r.out.replace(/\s+/g, ' ')).toContain('Give --cutout again for each cutout.');
+  });
+});
+
 describe('a tape seal (seal-tape #15; Q119 to Q132)', () => {
   const params = async (args: string[]) => {
     const r = await cli([...args, '--dry-run', '--json']);

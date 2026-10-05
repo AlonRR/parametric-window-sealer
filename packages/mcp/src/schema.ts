@@ -14,6 +14,7 @@ const GROUPS: Record<string, string> = {
   joint: 'The strips that join the pieces, in mm. Starting values; a test print confirms them.',
   edges: 'The window and its four edges.',
   collar: "The hose port's collar, in mm. Starting values; a test print confirms them.",
+  rim: "The rim round each measured cutout, in mm. Starting values; a test print confirms them.",
   seal:
     'The seal: none, foam tape, or gaskets printed in TPU to the tape’s size. Tape settings without a kind mean tape; ' +
     'joints in TPU, the TPU seal.',
@@ -48,7 +49,16 @@ const PIECE_FILL = z.strictObject({
   style: z.enum(PATTERN_STYLES as [string, ...string[]]).optional().describe("Its style; the wall's if left out."),
 });
 
-const ITEMS: Record<ListKind, z.ZodType> = { ports: PORT, pieceFills: PIECE_FILL };
+// A measured cutout (#23; C44): the appliance's outside, seen from the room, and its piece as a
+// port's; without a piece, the first goes in the starting one (C47).
+const CUTOUT = z.strictObject({
+  widthMm: z.number().describe("The appliance's measured outside width in mm, seen from the room."),
+  heightMm: z.number().describe("The appliance's measured outside height in mm."),
+  column: z.number().int().min(1).optional().describe('The column of its piece, from 1 at the left.'),
+  row: z.number().int().min(1).optional().describe('The row of its piece, from 1 at the bottom.'),
+});
+
+const ITEMS: Record<ListKind, z.ZodType> = { ports: PORT, pieceFills: PIECE_FILL, cutouts: CUTOUT };
 
 function leaf(help: string, values: readonly string[] | undefined, required: boolean, list?: ListKind, onOff = false): z.ZodType {
   const base = list

@@ -23,8 +23,8 @@ test('starts with no port: a plain wall', async ({ page }) => {
 test('a hose: 150 mm in the bottom row’s middle piece, a listed size or your own', async ({ page }) => {
   await hose(page).check();
   await expect(page.getByLabel('Hose end, outside diameter')).toHaveValue('150');
-  await expect(page.getByLabel('Column', { exact: true })).toHaveValue('2');
-  await expect(page.getByLabel('Row', { exact: true })).toHaveValue('1');
+  await expect(page.getByTestId('port-1').getByLabel('Column', { exact: true })).toHaveValue('2');
+  await expect(page.getByTestId('port-1').getByLabel('Row', { exact: true })).toHaveValue('1');
   await expect(ports(page)).toHaveText('Hose port: a 150 mm hose end, in column 2, row 1.');
   await expect(page.getByText('Measure across the outside of the end that goes into the port')).toBeVisible();
 
@@ -34,7 +34,7 @@ test('a hose: 150 mm in the bottom row’s middle piece, a listed size or your o
   await page.getByLabel('Your measurement (mm)').fill('142');
   await expect(ports(page)).toHaveText('Hose port: a 142 mm hose end, in column 2, row 1.');
 
-  await page.getByLabel('Column', { exact: true }).fill('3');
+  await page.getByTestId('port-1').getByLabel('Column', { exact: true }).fill('3');
   await expect(ports(page)).toHaveText('Hose port: a 142 mm hose end, in column 3, row 1.');
 });
 

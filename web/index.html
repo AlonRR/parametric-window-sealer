@@ -217,6 +217,11 @@
           <legend>What is in the window?</legend>
           <label><input type="radio" name="appliance" value="none" checked /> None, a plain wall</label>
           <label><input type="radio" name="appliance" value="hose" /> Portable AC hose</label>
+          <!-- A measured cutout (measured-cutout, #23): one on the page (C45), its piece as the
+            port's (C47); the command and the MCP server take several. -->
+          <label>
+            <input type="radio" name="appliance" value="cutout" /> Something else: a measured cutout
+          </label>
           <div data-port="1" data-testid="port-1" hidden>
             <label>
               Hose end, outside diameter
@@ -248,6 +253,34 @@
             </p>
           </div>
           <span class="error" data-testid="error-ports"></span>
+          <div data-testid="cutout" hidden>
+            <label>
+              Appliance width (mm)
+              <input data-part="cutout-width" inputmode="decimal" autocomplete="off" />
+            </label>
+            <label>
+              Appliance height (mm)
+              <input data-part="cutout-height" inputmode="decimal" autocomplete="off" />
+            </label>
+            <p class="note">
+              Measure the outside of what passes through the wall, across and up, seen from the
+              room. The opening is a little larger, with a rim round it on the room side; a seal,
+              if you choose one, lines the rim and takes up the last few mm.
+            </p>
+            <label>
+              Column
+              <input data-part="column" inputmode="numeric" autocomplete="off" />
+            </label>
+            <label>
+              Row
+              <input data-part="row" inputmode="numeric" autocomplete="off" />
+            </label>
+            <p class="note">
+              The piece the cutout is centred in, counted from 1 at the bottom left, seen from the
+              room. It starts in the bottom row's middle piece.
+            </p>
+          </div>
+          <span class="error" data-testid="error-cutouts"></span>
         </fieldset>
 
         <!-- The seal (seal-tape, #15): a choice starting at none (Q122), and foam tape from the
@@ -487,6 +520,30 @@
         </details>
 
         <details>
+          <summary>Advanced: the cutout’s rim</summary>
+          <p class="note">
+            The rim round a measured cutout, on the room side. These are starting values: a test
+            print shows whether to change them.
+          </p>
+          <label>
+            Rim depth (mm)
+            <input name="rimDepthMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <span class="error" data-testid="error-rimDepthMm"></span>
+          <label>
+            Rim wall (mm)
+            <input name="rimWallMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <span class="error" data-testid="error-rimWallMm"></span>
+          <label>
+            Rim clearance (mm)
+            <input name="rimClearanceMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">The gap each side between the appliance and the rim; a seal takes its place.</p>
+          <span class="error" data-testid="error-rimClearanceMm"></span>
+        </details>
+
+        <details>
           <summary>Advanced: the pattern</summary>
           <p class="note">Used when the fill is a pattern. It stays 2 mm further in than the strips reach.</p>
           <label>
@@ -635,6 +692,7 @@
         <input type="hidden" name="printerModel" />
         <!-- Every port, written as the command's --port takes them (Q114). -->
         <input type="hidden" name="ports" />
+        <input type="hidden" name="cutouts" />
         <!-- Every piece's own fill, written as the command's --piece-fill takes them (C28). -->
         <input type="hidden" name="pieceFills" />
       </form>
@@ -651,6 +709,7 @@
         <p data-testid="plan-joints"></p>
         <p data-testid="plan-edges"></p>
         <ul data-testid="plan-ports"></ul>
+        <ul data-testid="plan-cutouts"></ul>
         <p data-testid="plan-seal"></p>
         <p data-testid="plan-fill"></p>
         <ul data-testid="plan-piece-fills"></ul>

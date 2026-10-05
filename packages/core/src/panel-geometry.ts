@@ -10,6 +10,8 @@ import type { Engine } from './engine.js';
 import type { GridLayout } from './layout.js';
 import { DEFAULT_COLLAR, collarInnerMm, collarOuterMm, portHoleMm } from './port.js';
 import type { CollarParams, PortSetting } from './port.js';
+import { DEFAULT_RIM, linedRim, rectangularRing, rimInnerMm, rimOuterMm } from './cutout.js';
+import type { CutoutSetting, Rectangle, RimParams } from './cutout.js';
 import { tapedCollar } from './tape.js';
 import type { TapeFit } from './tape.js';
 import { patternedPanel, pieceOpenings } from './pattern.js';
@@ -96,17 +98,72 @@ export function portTapeSolid(engine: Engine, size: PanelSize, hoseMm: number, c
   return solid;
 }
 
+// The piece with a measured cutout (measured-cutout, #23): the rim's inside right through the
+// panel, centred, and the rim standing on its room side (C41, C42). With a seal (C43), a groove
+// for it runs round the rim's inside, centred on its depth; the rim given is already lined
+// (linedRim).
+export function cutoutPanel(
+  engine: Engine,
+  size: PanelSize,
+  cutout: Rectangle,
+  rim: RimParams,
+  groove?: { widthMm: number; depthMm: number },
+): Manifold {
+  if (groove !== undefined && (groove.widthMm > rim.depthMm || groove.depthMm >= rim.wallMm)) {
+    throw new RangeError(`A ${groove.widthMm} × ${groove.depthMm} mm groove does not fit the rim`);
+  }
+  const inner = rimInnerMm(cutout, rim);
+  const outer = rimOuterMm(cutout, rim);
+  const { Manifold } = engine;
+  const [x, y] = [size.widthMm / 2, size.heightMm / 2];
+  const t = size.thicknessMm;
+  const parts: Manifold[] = [];
+  const keep = (m: Manifold): Manifold => {
+    parts.push(m);
+    return m;
+  };
+  try {
+    const panel = keep(plainPanel(engine, size));
+    const hole = keep(Manifold.cube([inner.widthMm, inner.heightMm, t + 2], true).translate([x, y, t / 2]));
+    let ring = keep(rectangularRing(engine, outer, inner, rim.depthMm));
+    if (groove !== undefined && groove.depthMm > 0) {
+      const floor = { widthMm: inner.widthMm + 2 * groove.depthMm, heightMm: inner.heightMm + 2 * groove.depthMm };
+      const cutter = keep(Manifold.cube([floor.widthMm, floor.heightMm, groove.widthMm], true));
+      ring = keep(ring.subtract(keep(cutter.translate([0, 0, rim.depthMm / 2]))));
+    }
+    return keep(panel.subtract(hole)).add(keep(ring.translate([x, y, t])));
+  } finally {
+    for (const m of parts) m.delete(); // WebAssembly memory: free everything but the result
+  }
+}
+
+// The seal lining a cutout's rim, for the preview only, as the tape in a collar is: a ring from
+// the appliance out to the groove's floor, as tall as the tape is wide, centred on the rim's
+// depth. The rim given is the lined one.
+export function cutoutTapeSolid(engine: Engine, size: PanelSize, cutout: Rectangle, rim: RimParams, tape: TapeFit): Manifold {
+  const inner = rimInnerMm(cutout, rim);
+  const floor = { widthMm: inner.widthMm + 2 * tape.grooveDepthMm, heightMm: inner.heightMm + 2 * tape.grooveDepthMm };
+  const ring = rectangularRing(engine, floor, cutout, tape.widthMm);
+  const z = size.thicknessMm + (rim.depthMm - tape.widthMm) / 2;
+  const solid = ring.translate([size.widthMm / 2, size.heightMm / 2, z]);
+  ring.delete();
+  return solid;
+}
+
 export interface BuiltPiece {
   column: number;
   row: number;
   hoseMm?: number; // the piece holds a hose port of this size
+  cutout?: Rectangle; // or a cutout for an appliance this size (#23)
   solid: Manifold; // WebAssembly memory: the caller frees it with solid.delete()
 }
 
 // Every piece of the plan; a piece with a port (columns and rows from 1, as in Params) gets it.
 // With a pattern (patterns-core, #20), each piece gets the wall's pattern inside its border,
 // and a port's piece stays solid that far beyond the collar (Q134, Q137). The pattern can be
-// given for each piece, by its column and row from 0 (params-advanced, #21).
+// given for each piece, by its column and row from 0 (params-advanced, #21). A piece with a
+// cutout (measured-cutout, #23) gets it, lined with the seal if there is one (C43), and a
+// pattern stays a border clear of its rim.
 export type PiecePattern = PatternChoice & { borderMm: number };
 export function buildPieces(
   engine: Engine,
@@ -116,22 +173,30 @@ export function buildPieces(
   collar: CollarParams = DEFAULT_COLLAR,
   tape?: TapeFit,
   pattern?: PiecePattern | ((cell: { column: number; row: number }) => PiecePattern | undefined),
+  cutouts: readonly CutoutSetting[] = [],
+  rim: RimParams = DEFAULT_RIM,
 ): BuiltPiece[] {
   const built: BuiltPiece[] = [];
   const taped = tapedCollar(collar, tape);
+  const lined = linedRim(rim, tape);
+  const seam = tape === undefined ? undefined : { widthMm: tape.grooveWidthMm, depthMm: tape.grooveDepthMm };
   const groove = tape?.port === true ? { widthMm: tape.grooveWidthMm, depthMm: tape.grooveDepthMm } : undefined;
   // The wall's centre, where the pattern's tiles are centred (Q135).
   const centre: Point = [
     Math.max(0, ...plan.pieces.map((c) => c.xMm + c.widthMm)) / 2,
     Math.max(0, ...plan.pieces.map((c) => c.yMm + c.heightMm)) / 2,
   ];
-  const withPattern = (solid: Manifold, cell: GridLayout['pieces'][number], hoseMm?: number): Manifold => {
+  const withPattern = (solid: Manifold, cell: GridLayout['pieces'][number], hoseMm?: number, cutout?: Rectangle): Manifold => {
     const here = typeof pattern === 'function' ? pattern(cell) : pattern;
     if (here === undefined) return solid;
+    const [xMm, yMm] = [cell.widthMm / 2, cell.heightMm / 2];
+    const around = cutout === undefined ? undefined : rimOuterMm(cutout, lined);
     const keepOut =
-      hoseMm === undefined
-        ? undefined
-        : { xMm: cell.widthMm / 2, yMm: cell.heightMm / 2, radiusMm: collarOuterMm(hoseMm, taped) / 2 + here.borderMm };
+      hoseMm !== undefined
+        ? { xMm, yMm, radiusMm: collarOuterMm(hoseMm, taped) / 2 + here.borderMm }
+        : around !== undefined
+          ? { xMm, yMm, widthMm: around.widthMm + 2 * here.borderMm, heightMm: around.heightMm + 2 * here.borderMm }
+          : undefined;
     const openings = pieceOpenings(engine, here.tile, centre, cell, here.borderMm, keepOut);
     try {
       return patternedPanel(engine, solid, openings, thicknessMm, here.style, here.reliefPct);
@@ -143,6 +208,13 @@ export function buildPieces(
     for (const cell of plan.pieces) {
       const size = { widthMm: cell.widthMm, heightMm: cell.heightMm, thicknessMm };
       const port = ports.find((p) => p.column === cell.column + 1 && p.row === cell.row + 1);
+      const cut = cutouts.find((c) => c.column === cell.column + 1 && c.row === cell.row + 1);
+      if (port === undefined && cut !== undefined) {
+        const cutout = { widthMm: cut.widthMm, heightMm: cut.heightMm };
+        const solid = withPattern(cutoutPanel(engine, size, cutout, lined, seam), cell, undefined, cutout);
+        built.push({ column: cell.column, row: cell.row, cutout, solid });
+        continue;
+      }
       built.push(
         port === undefined
           ? { column: cell.column, row: cell.row, solid: withPattern(plainPanel(engine, size), cell) }

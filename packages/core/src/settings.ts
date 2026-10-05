@@ -28,10 +28,11 @@ const ROLE = ['track', 'sash', 'sill'] as const;
 const YES_NO = ['no', 'yes'] as const;
 
 // The settings that are lists, and the shape of each item: what each field holds.
-export type ListKind = 'ports' | 'pieceFills';
+export type ListKind = 'ports' | 'pieceFills' | 'cutouts';
 export const LIST_ITEMS: Record<ListKind, Record<string, 'number' | 'text'>> = {
   ports: { hoseMm: 'number', column: 'number', row: 'number' },
   pieceFills: { column: 'number', row: 'number', kind: 'text', style: 'text' },
+  cutouts: { widthMm: 'number', heightMm: 'number', column: 'number', row: 'number' },
 };
 
 const axis = (name: 'width' | 'height'): Setting[] => [
@@ -201,6 +202,18 @@ export const SETTINGS: readonly Setting[] = [
       'its fill (sealed or a pattern) and optionally its style; the sizes are the wall’s.',
     list: 'pieceFills',
   },
+  {
+    field: 'cutouts',
+    path: 'cutouts',
+    help:
+      "Measured cutouts: for each, the appliance's outside width and height in mm, seen from the room, and its " +
+      "piece, by column and row from 1 at the bottom left. Without a piece, the bottom row's middle piece. A rim " +
+      'stands round it on the room side, lined with the seal if there is one.',
+    list: 'cutouts',
+  },
+  { field: 'rimDepthMm', path: 'rim.depthMm', help: "How far a cutout's rim stands out on the room side." },
+  { field: 'rimWallMm', path: 'rim.wallMm', help: "The cutout's rim's wall." },
+  { field: 'rimClearanceMm', path: 'rim.clearanceMm', help: 'Clearance per side between the appliance and the rim.' },
 ];
 
 // The value at a dotted path, such as `edges.track.widthMm`; undefined if it is not there.
@@ -238,11 +251,11 @@ function checkShape(value: unknown, shape: unknown, path: string, problems: Sett
       problems.push({ kind: 'shape', path, message: `${path} should be a list` });
       return;
     }
-    const kind: ListKind = path === 'pieceFills' ? 'pieceFills' : 'ports';
+    const kind: ListKind = path === 'pieceFills' ? 'pieceFills' : path === 'cutouts' ? 'cutouts' : 'ports';
     for (const [i, item] of value.entries()) {
       const at = `${path}.${i}`;
       checkShape(item, itemShape(kind), at, problems);
-      if (kind === 'ports' && isObject(item) && 'column' in item !== 'row' in item) {
+      if (kind !== 'pieceFills' && isObject(item) && 'column' in item !== 'row' in item) {
         problems.push({ kind: 'shape', path: at, message: `${at} needs both column and row, or neither` });
       }
     }

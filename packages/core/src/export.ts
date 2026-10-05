@@ -17,6 +17,7 @@ import type { EdgeShape } from './edge.js';
 import type { PartShape } from './joint.js';
 import type { GridPiece } from './layout.js';
 import type { GasketShape, SleeveShape } from './tpu.js';
+import type { FrameShape, Rectangle } from './cutout.js';
 
 export interface MeshData {
   positions: Float32Array; // x, y, z per vertex, in mm
@@ -27,6 +28,7 @@ export interface ExportPiece {
   cell: GridPiece;
   mesh: MeshData;
   hoseMm?: number; // the piece holds a hose port of this size (hose-port, #12)
+  cutout?: Rectangle; // or a cutout for an appliance this size (measured-cutout, #23)
 }
 
 // A strip or cross piece shape, lying as it prints, and how many to print.
@@ -62,24 +64,28 @@ export function meshOf(solid: Manifold): MeshData {
 
 const mm = (n: number) => String(Math.round(n * 10) / 10);
 
-// A piece with a hose port says so, and the hose's size: piece-c2-r1-197.7x198.6-port-150.stl.
+// A piece with a hose port says so, and the hose's size: piece-c2-r1-197.7x198.6-port-150.stl;
+// a piece with a cutout, the appliance's: piece-c2-r1-197.7x198.6-cutout-120x80.stl (C46).
 export function pieceFileName(
   cell: Pick<GridPiece, 'column' | 'row' | 'widthMm' | 'heightMm'>,
   extension: Format,
   hoseMm?: number,
+  cutout?: Rectangle,
 ): string {
   const port = hoseMm === undefined ? '' : `-port-${mm(hoseMm)}`;
-  return `piece-c${cell.column + 1}-r${cell.row + 1}-${mm(cell.widthMm)}x${mm(cell.heightMm)}${port}.${extension}`;
+  const cut = cutout === undefined ? '' : `-cutout-${mm(cutout.widthMm)}x${mm(cutout.heightMm)}`;
+  return `piece-c${cell.column + 1}-r${cell.row + 1}-${mm(cell.widthMm)}x${mm(cell.heightMm)}${port}${cut}.${extension}`;
 }
 
 // Every part beside the pieces: the joints, the edge strips and the TPU seal's parts.
-export type AnyPartShape = PartShape | EdgeShape | GasketShape | SleeveShape;
+export type AnyPartShape = PartShape | EdgeShape | GasketShape | SleeveShape | FrameShape;
 
 // An edge strip's height depends on its track, so it is part of the name; with tape on its
 // sides, so is the track's depth, as two depths can give one size with grooves in different
 // places (Q127). A part printed in TPU says so (C37); a sleeve is named by its hose.
 export function partName(shape: AnyPartShape): string {
   if (shape.kind === 'sleeve') return `sleeve-${mm(shape.hoseMm)}-tpu-print-${shape.count}`;
+  if (shape.kind === 'frame') return `frame-${mm(shape.widthMm)}x${mm(shape.heightMm)}-tpu-print-${shape.count}`;
   const height = shape.kind === 'edge' || shape.kind === 'gasket' ? `x${mm(shape.heightMm)}` : '';
   const side = shape.kind === 'edge' && shape.groove?.side !== undefined ? `-track-${mm(shape.groove.side.trackMm)}` : '';
   const tpu = shape.kind === 'gasket' || (shape.kind !== 'edge' && shape.tpu === true) ? '-tpu' : '';
@@ -182,7 +188,7 @@ export function to3mf(pieces: ExportPiece[], parts: ExportPart[] = []): Uint8Arr
   const alone = pieces.length + parts.reduce((n, p) => n + p.count, 0) === 1;
   pieces.forEach((piece, i) => {
     const id = i + 1;
-    objects.push(objectXml(id, pieceFileName(piece.cell, '3mf', piece.hoseMm).replace(/\.3mf$/, ''), piece.mesh));
+    objects.push(objectXml(id, pieceFileName(piece.cell, '3mf', piece.hoseMm, piece.cutout).replace(/\.3mf$/, ''), piece.mesh));
     const x = alone ? 0 : piece.cell.xMm + piece.cell.column * GAP_MM;
     const y = alone ? 0 : piece.cell.yMm + piece.cell.row * GAP_MM;
     items.push(itemXml(id, x, y));
@@ -248,7 +254,7 @@ export function packageDownload(
   }
   const type = MEDIA_TYPES[choice.format];
   const perPiece = pieces.map((piece) => {
-    const name = pieceFileName(piece.cell, choice.format, piece.hoseMm);
+    const name = pieceFileName(piece.cell, choice.format, piece.hoseMm, piece.cutout);
     const bytes =
       choice.format === 'stl'
         ? toStl(piece.mesh, name.replace(/\.stl$/, ''))

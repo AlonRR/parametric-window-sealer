@@ -20,6 +20,7 @@ import { DEFAULT_JOINT } from '../src/joint.js';
 import { DEFAULT_COLLAR } from '../src/port.js';
 import { NO_SEAL } from '../src/tape.js';
 import { SEALED } from '../src/fill.js';
+import { DEFAULT_RIM } from '../src/cutout.js';
 
 const example = toFormValues(EXAMPLE_PARAMS);
 const read = (over: FormValues) => readParams({ ...example, ...over });
@@ -41,6 +42,8 @@ describe('the starting values', () => {
       seal: NO_SEAL, // Q122
       fill: SEALED, // Q141
       pieceFills: [], // #21
+      cutouts: [], // #23
+      rim: DEFAULT_RIM, // C42
     });
   });
 
@@ -273,6 +276,7 @@ describe('describePlan', () => {
       warnings: [],
       leftovers: [],
       ports: [],
+      cutouts: [],
       seal: 'Seal: none.',
       fill: 'Fill: sealed.',
       pieceFills: [],

@@ -69,6 +69,10 @@ const FIELDS: readonly FieldName[] = [
   'diamondHeightMm',
   'diamondBarMm',
   'pieceFills',
+  'cutouts',
+  'rimDepthMm',
+  'rimWallMm',
+  'rimClearanceMm',
 ];
 
 type Control = HTMLInputElement | HTMLSelectElement | RadioNodeList;
@@ -164,6 +168,28 @@ function portsText(form: HTMLFormElement): { text: string; problem?: string } {
     words.push(size === '' ? '@' : placed);
   });
   const text = words.join(' ');
+  return problem === undefined ? { text } : { text, problem };
+}
+
+// The measured cutout (measured-cutout, #23): one on the page (C45), written into the hidden
+// cutouts field as the command's --cutout takes it (C44), so the library checks it.
+const cutoutBox = (form: HTMLFormElement): HTMLElement | null => form.querySelector<HTMLElement>('[data-testid="cutout"]');
+
+function cutoutsText(form: HTMLFormElement): { text: string; problem?: string } {
+  const appliance = (form.elements.namedItem('appliance') as RadioNodeList | null)?.value;
+  const box = cutoutBox(form);
+  if (appliance !== 'cutout' || !box) return { text: '' };
+  const [width, height, column, rowNumber] = ['cutout-width', 'cutout-height', 'column', 'row'].map(
+    (name) => part(box, name)?.value.trim() ?? '',
+  ) as [string, string, string, string];
+  let problem: string | undefined;
+  if (width === '' || height === '') problem ??= 'Cutout: enter the appliance’s width and height in mm.';
+  if ((column === '') !== (rowNumber === '')) problem ??= 'Cutout: give both its column and its row.';
+  for (const v of [column, rowNumber]) {
+    if (v !== '' && !WHOLE.test(v)) problem ??= 'Cutout: the column and the row are whole numbers from 1.';
+  }
+  const size = `${width}x${height}`;
+  const text = problem !== undefined ? '@' : column === '' ? size : `${size}@${column},${rowNumber}`;
   return problem === undefined ? { text } : { text, problem };
 }
 
@@ -371,6 +397,8 @@ export function mountPanel(
       if (ownLabel) ownLabel.hidden = part(row, 'size')?.value !== 'own';
     }
     if (addPort) addPort.hidden = !hose;
+    const cutoutRow = cutoutBox(form);
+    if (cutoutRow) cutoutRow.hidden = (form.elements.namedItem('appliance') as RadioNodeList | null)?.value !== 'cutout';
     // The seal's size shows with tape or TPU, with the note for the one chosen (C35); its width
     // and thickness only for the user's own.
     const sealKind = (form.elements.namedItem('seal') as RadioNodeList | null)?.value ?? 'none';
@@ -390,6 +418,9 @@ export function mountPanel(
     const ports = portsText(form);
     const portsField = control(form, 'ports');
     if (portsField instanceof HTMLInputElement) portsField.value = ports.text;
+    const cutouts = cutoutsText(form);
+    const cutoutsField = control(form, 'cutouts');
+    if (cutoutsField instanceof HTMLInputElement) cutoutsField.value = cutouts.text;
 
     const values = readForm(form);
     const custom = values.printer === 'custom';
@@ -413,6 +444,16 @@ export function mountPanel(
     onChange(result.ok ? result.params : null);
     const errors = { ...(result.ok ? {} : result.errors) };
     if (ports.problem !== undefined) errors.ports = ports.problem;
+    if (cutouts.problem !== undefined) errors.cutouts = cutouts.problem;
+    // The cutout's piece starts where the plan put it (C47), as the port's does.
+    const cut = cutoutBox(form);
+    const placedCutout = result.ok ? result.params.cutouts[0] : undefined;
+    if (cut && placedCutout && part(cut, 'column')?.value === '' && part(cut, 'row')?.value === '') {
+      const column = part(cut, 'column');
+      const row = part(cut, 'row');
+      if (column) column.value = String(placedCutout.column);
+      if (row) row.value = String(placedCutout.row);
+    }
     // The main port's piece starts where the plan put it (Q105), shown once it is placed.
     const main = portRows(form)[0];
     const placed = result.ok ? result.params.ports[0] : undefined;
@@ -446,6 +487,7 @@ export function mountPanel(
       }
       plan.querySelector('[data-testid="plan-piece-fills"]')?.replaceChildren();
       plan.querySelector('[data-testid="plan-ports"]')?.replaceChildren();
+      plan.querySelector('[data-testid="plan-cutouts"]')?.replaceChildren();
       return;
     }
     const text = describePlan(planWall(result.params), result.params);
@@ -468,6 +510,13 @@ export function mountPanel(
     drawPieceMap(layout.columns.length, layout.rows.length);
     plan.querySelector('[data-testid="plan-ports"]')?.replaceChildren(
       ...text.ports.map((line) => {
+        const li = document.createElement('li');
+        li.textContent = line;
+        return li;
+      }),
+    );
+    plan.querySelector('[data-testid="plan-cutouts"]')?.replaceChildren(
+      ...text.cutouts.map((line) => {
         const li = document.createElement('li');
         li.textContent = line;
         return li;

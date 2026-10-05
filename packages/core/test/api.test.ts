@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import * as api from '../src/index.js';
 import {
   DEFAULT_JOINT,
+  DEFAULT_RIM,
   DEFAULT_TAPE,
   EXAMPLE_PARAMS,
   ParamsError,
@@ -101,6 +102,19 @@ describe('planFiles', () => {
         ...EXAMPLE_PARAMS,
         ports: [{ hoseMm: 150, column: 2, row: 1 }],
         seal: { kind: 'tpu', tape: { ...DEFAULT_TAPE, sides: true, port: true, joints: true } },
+      },
+    ],
+    [
+      'two measured cutouts lined with TPU, beside a hose port',
+      {
+        ...EXAMPLE_PARAMS,
+        ports: [{ hoseMm: 150, column: 2, row: 1 }],
+        cutouts: [
+          { widthMm: 120, heightMm: 80, column: 1, row: 1 },
+          { widthMm: 120, heightMm: 80, column: 3, row: 3 },
+        ],
+        rim: DEFAULT_RIM,
+        seal: { kind: 'tpu', tape: DEFAULT_TAPE },
       },
     ],
   ];

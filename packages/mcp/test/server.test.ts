@@ -156,6 +156,23 @@ describe('window_sealer_plan_wall', () => {
     expect(tape.text).toContain('- seal.tape.joints: Tape does not fit a joint (Q128): choose printed TPU for the joints.');
   });
 
+  it('measured cutouts in the library’s shape, lined with the seal, a TPU frame among the files (C43, C44)', async () => {
+    const { call } = await connect();
+    const r = await call('window_sealer_plan_wall', {
+      settings: { ...OPENING, cutouts: [{ widthMm: 120, heightMm: 80 }], seal: { kind: 'tpu' } },
+    });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['settings'].cutouts).toEqual([{ widthMm: 120, heightMm: 80, column: 2, row: 1 }]);
+    expect(r.data['summary'].cutouts).toEqual([
+      'Cutout: a 120 × 80 mm appliance, in column 2, row 1, through a 122 × 82 mm opening in a 15 mm rim, lined with a TPU frame.',
+    ]);
+    const names = (r.data['files'] as { name: string }[]).map((f) => f.name);
+    expect(names).toContain('frame-120x80-tpu-print-1.stl');
+    const half = await call('window_sealer_plan_wall', { settings: { ...OPENING, cutouts: [{ widthMm: 120, heightMm: 80, column: 2 }] } });
+    expect(half.isError).toBe(true);
+    expect(half.text).toContain('cutouts.0 needs both column and row, or neither');
+  });
+
   it('a grid fill in the library’s shape: grid settings alone mean the grid, in relief to start with (Q141, Q142)', async () => {
     const { call } = await connect();
     const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { grid: { barMm: 2 } } } });

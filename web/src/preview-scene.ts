@@ -6,7 +6,8 @@
 // its own colour, though it is bought, not printed, and so not in the download (Q132). A
 // patterned fill (pattern-grid, #16) is drawn as it is printed. The printed TPU seal (seal-tpu,
 // #22) is drawn where the tape would be, squeezed as the tape is, in a dark grey of its own
-// (C36), and joint strips and cross pieces printed in TPU in the same grey.
+// (C36), and joint strips and cross pieces printed in TPU in the same grey. A measured cutout
+// (#23) is drawn in its piece, lined with the seal.
 //
 // Measured in spikes/viewer-benchmark/: what slows a preview is the number of triangles,
 // not the library. Plain pieces have 12 each; when patterns arrive, drawing them in full
@@ -29,7 +30,8 @@ import { meshOf } from 'parametric-window-sealer';
 import { edgeStripSolid, edgeTapeSolid } from 'parametric-window-sealer';
 import { stripWidthMm } from 'parametric-window-sealer';
 import { crossSolid, stripSolid } from 'parametric-window-sealer';
-import { buildPieces, portTapeSolid } from 'parametric-window-sealer';
+import { buildPieces, cutoutTapeSolid, portTapeSolid } from 'parametric-window-sealer';
+import { linedRim } from 'parametric-window-sealer';
 import { tapeFit, tapedCollar, tpuJoint } from 'parametric-window-sealer';
 import { fillFor, fillPattern } from 'parametric-window-sealer';
 import { planParts } from 'parametric-window-sealer';
@@ -76,7 +78,7 @@ export function buildWallScene(engine: Engine, params: Params): Group {
   const [own, ownLook] = inTpu ? [tpuJoint(joint), TPU] : [joint, JOINT];
   // Each piece's own fill, or the wall's (params-advanced, #21).
   const pattern = (cell: { column: number; row: number }) => fillPattern(fillFor(params, cell.column + 1, cell.row + 1), joint);
-  const built = buildPieces(engine, plan, thicknessMm, params.ports, params.collar, tape, pattern);
+  const built = buildPieces(engine, plan, thicknessMm, params.ports, params.collar, tape, pattern, params.cutouts, params.rim);
   try {
     built.forEach((piece, i) => {
       const cell = plan.pieces[i];
@@ -111,6 +113,16 @@ export function buildWallScene(engine: Engine, params: Params): Group {
         if (!cell) continue;
         const size = { widthMm: cell.widthMm, heightMm: cell.heightMm, thicknessMm };
         add(wall, portTapeSolid(engine, size, port.hoseMm, collar, tape), sealKind, cell.xMm, cell.yMm, seal);
+      }
+    }
+    // A cutout's rim is lined whenever there is a seal (measured-cutout, #23; C43).
+    if (tape) {
+      const rim = linedRim(params.rim, tape);
+      for (const c of params.cutouts) {
+        const cell = plan.pieces.find((p) => p.column === c.column - 1 && p.row === c.row - 1);
+        if (!cell) continue;
+        const size = { widthMm: cell.widthMm, heightMm: cell.heightMm, thicknessMm };
+        add(wall, cutoutTapeSolid(engine, size, c, rim, tape), sealKind, cell.xMm, cell.yMm, seal);
       }
     }
   } catch (error) {

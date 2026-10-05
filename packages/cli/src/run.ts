@@ -79,11 +79,16 @@ function help(): string {
     // A long list of choices (the printers) is named after the hint, so the table stays narrow.
     const long = (f.values?.length ?? 0) > 8;
     const unit = f.field.endsWith('Pct') ? '<%>' : '<mm>'; // a percentage, such as the tape's squeeze
-    const lists = { ports: '<mm[@column,row]>', pieceFills: '<column,row=fill[:style]>' };
+    const lists = {
+      ports: '<mm[@column,row]>',
+      pieceFills: '<column,row=fill[:style]>',
+      cutouts: '<width>x<height>[@column,row]',
+    };
+    const each = { ports: 'port', pieceFills: 'piece', cutouts: 'cutout' };
     const value = f.list ? lists[f.list] : f.values === undefined ? unit : long ? '<id>' : `<${f.values.join('|')}>`;
     const start = f.flag === 'width' || f.flag === 'height' ? '' : starting[f.field];
     const help = f.list
-      ? `${f.help} Give --${f.flag} again for each ${f.list === 'ports' ? 'port' : 'piece'}.`
+      ? `${f.help} Give --${f.flag} again for each ${each[f.list]}.`
       : long
         ? `${f.help} One of: ${f.values?.join(', ')}.`
         : f.help;
@@ -115,7 +120,7 @@ function help(): string {
 
 function summaryLines(summary: PlanText): string[] {
   const lines = [summary.headline, summary.columns, summary.rows, summary.span, summary.joints, summary.edges];
-  lines.push(...summary.ports, summary.seal, summary.fill, ...summary.pieceFills);
+  lines.push(...summary.ports, ...summary.cutouts, summary.seal, summary.fill, ...summary.pieceFills);
   for (const warning of summary.warnings) lines.push(`Warning: ${warning}`);
   for (const leftover of summary.leftovers) {
     lines.push(leftover.message, `  Change it with --${leftover.axis}-leftover:`);
