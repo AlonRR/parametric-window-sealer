@@ -28,7 +28,7 @@ const grid = (over: Partial<FillParams> = {}): FillParams => ({ ...SEALED, kind:
 
 describe('the grid and the fill', () => {
   it('starts sealed; a pattern starts in relief, half the panel deep (Q141, Q142, Q138)', () => {
-    expect(FILL_KINDS).toEqual(['sealed', 'grid', 'hexagon']);
+    expect(FILL_KINDS.slice(0, 2)).toEqual(['sealed', 'grid']);
     expect(EXAMPLE_PARAMS.fill).toEqual(SEALED);
     expect(SEALED).toMatchObject({ kind: 'sealed', style: 'relief', reliefPct: 50, grid: DEFAULT_GRID });
   });
@@ -135,14 +135,14 @@ describe('the files', () => {
 
 describe('settings in the library’s shape', () => {
   it('lists the fill’s settings', () => {
-    expect(SETTINGS.filter((s) => s.path.startsWith('fill')).map((s) => [s.path, s.values ?? null])).toEqual([
-      ['fill.kind', ['sealed', 'grid', 'hexagon']],
+    const fill = SETTINGS.filter((s) => s.path.startsWith('fill'));
+    expect(fill.find((s) => s.path === 'fill.kind')?.values).toEqual(FILL_KINDS);
+    expect(fill.filter((s) => !/^fill\.(hexagon|brick|diamond)\./.test(s.path)).map((s) => [s.path, s.values ?? null])).toEqual([
+      ['fill.kind', FILL_KINDS],
       ['fill.style', ['relief', 'through']],
       ['fill.reliefPct', null],
       ['fill.grid.openingMm', null],
       ['fill.grid.barMm', null],
-      ['fill.hexagon.openingMm', null],
-      ['fill.hexagon.barMm', null],
     ]);
   });
 

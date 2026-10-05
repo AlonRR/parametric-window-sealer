@@ -18,6 +18,7 @@ const GROUPS: Record<string, string> = {
   fill: "The panel fill: sealed, or a pattern, in relief or cut through. A pattern's settings without a kind mean that pattern.",
   'fill.grid': "The grid's square openings and the bars between them, in mm.",
   'fill.hexagon': "The honeycomb's hexagonal openings, across the flats, and the bars between them, in mm.",
+  'fill.brick': "The bricks' openings, width and height, and the bars between them, in mm.",
   'edges.roles': 'What each edge meets. Setting the window type presets all four.',
   'edges.track': "The window's tracks, in mm.",
   'edges.track.depthMm': 'How deep each track is.',

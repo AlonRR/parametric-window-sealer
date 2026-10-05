@@ -84,3 +84,12 @@ test('the hexagon: a honeycomb; under Advanced only its sizes show (C13 to C17)'
   await expect(page.getByLabel('Grid opening (mm)')).toBeVisible();
   await expect(page.getByLabel('Hexagon opening, across the flats (mm)')).toBeHidden();
 });
+
+test('bricks: a running bond, sized by width, height and bar (C18 to C21)', async ({ page }) => {
+  await fill(page).selectOption('brick');
+  await expect(line(page)).toHaveText('Fill: bricks of 30 × 12 mm openings and 3 mm bars, cut 1.5 mm into the room side.');
+  await page.getByText('Advanced: the pattern').click();
+  await expect(page.getByLabel('Hexagon opening, across the flats (mm)')).toBeHidden();
+  await page.getByLabel('Brick height (mm)').fill('10');
+  await expect(line(page)).toHaveText('Fill: bricks of 30 × 10 mm openings and 3 mm bars, cut 1.5 mm into the room side.');
+});

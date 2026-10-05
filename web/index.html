@@ -349,6 +349,7 @@
               <optgroup label="Patterns">
                 <option value="grid">Grid</option>
                 <option value="hexagon">Hexagon</option>
+                <option value="brick">Brick</option>
               </optgroup>
             </select>
           </label>
@@ -497,6 +498,24 @@
             </label>
             <p class="note">The solid between two openings: at least 0.8 mm.</p>
             <span class="error" data-testid="error-hexBarMm"></span>
+          </div>
+          <div data-pattern="brick">
+            <label>
+              Brick width (mm)
+              <input name="brickWidthMm" inputmode="decimal" autocomplete="off" />
+            </label>
+            <span class="error" data-testid="error-brickWidthMm"></span>
+            <label>
+              Brick height (mm)
+              <input name="brickHeightMm" inputmode="decimal" autocomplete="off" />
+            </label>
+            <span class="error" data-testid="error-brickHeightMm"></span>
+            <label>
+              Brick bar (mm)
+              <input name="brickBarMm" inputmode="decimal" autocomplete="off" />
+            </label>
+            <p class="note">The solid between two bricks, as mortar: at least 0.8 mm.</p>
+            <span class="error" data-testid="error-brickBarMm"></span>
           </div>
         </details>
 

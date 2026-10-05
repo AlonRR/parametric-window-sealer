@@ -399,12 +399,11 @@ describe('the panel fill (pattern-grid #16; Q139 to Q143)', () => {
   });
 
   it('a --grid-* flag without --fill means the grid; a bar under 0.8 mm is refused (Q140, Q143)', async () => {
-    expect((await params([...OPENING, '--grid-opening', '12', '--grid-bar', '2'])).fill).toEqual({
+    expect((await params([...OPENING, '--grid-opening', '12', '--grid-bar', '2'])).fill).toMatchObject({
       kind: 'grid',
       style: 'relief',
       reliefPct: 50,
       grid: { openingMm: 12, barMm: 2 },
-      hexagon: { openingMm: 15, barMm: 3 },
     });
     const thin = await cli([...OPENING, '--grid-bar', '0.5']);
     expect(thin.code).toBe(2);
@@ -434,5 +433,18 @@ describe('the hexagon pattern (pattern-hexagon #17; C13 to C16)', () => {
     const thin = await cli([...OPENING, '--hex-bar', '0.5']);
     expect(thin.code).toBe(2);
     expect(thin.err).toContain('--hex-bar: Make it at least 0.8 mm: two lines from a 0.4 mm nozzle.');
+  });
+});
+
+describe('the brick pattern (pattern-brick #18; C18 to C21)', () => {
+  it('--fill brick: a running bond, in relief to start with', async () => {
+    const r = await cli([...OPENING, '--fill', 'brick', '--dry-run']);
+    expect(r.code).toBe(0);
+    expect(r.out).toContain('Fill: bricks of 30 × 12 mm openings and 3 mm bars, cut 1.5 mm into the room side.');
+  });
+
+  it('a --brick-* flag without --fill means the bricks', async () => {
+    const r = await cli([...OPENING, '--brick-width', '40', '--dry-run', '--json']);
+    expect(json(r.out).params.fill).toMatchObject({ kind: 'brick', brick: { widthMm: 40, heightMm: 12, barMm: 3 } });
   });
 });

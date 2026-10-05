@@ -155,7 +155,7 @@ export const SETTINGS: readonly Setting[] = [
   {
     field: 'fill',
     path: 'fill.kind',
-    help: 'The panel fill: sealed, or a pattern: a grid or a hexagon honeycomb.',
+    help: 'The panel fill: sealed, or a pattern: a grid, a hexagon honeycomb or bricks.',
     values: FILL_KINDS,
   },
   {
@@ -173,6 +173,9 @@ export const SETTINGS: readonly Setting[] = [
     help: "The honeycomb's hexagonal openings: across the flats.",
   },
   { field: 'hexBarMm', path: 'fill.hexagon.barMm', help: 'The bars between the hexagons; at least 0.8 mm.' },
+  { field: 'brickWidthMm', path: 'fill.brick.widthMm', help: "The bricks' openings: their width." },
+  { field: 'brickHeightMm', path: 'fill.brick.heightMm', help: "The bricks' openings: their height." },
+  { field: 'brickBarMm', path: 'fill.brick.barMm', help: 'The bars between the bricks; at least 0.8 mm.' },
 ];
 
 // The value at a dotted path, such as `edges.track.widthMm`; undefined if it is not there.
@@ -273,6 +276,7 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
   const fill = input['fill'];
   if (isObject(fill) && !('kind' in fill) && 'grid' in fill) params.fill = { ...params.fill, kind: 'grid' };
   if (isObject(fill) && !('kind' in fill) && 'hexagon' in fill) params.fill = { ...params.fill, kind: 'hexagon' };
+  if (isObject(fill) && !('kind' in fill) && 'brick' in fill) params.fill = { ...params.fill, kind: 'brick' };
 
   const values: FormValues = toFormValues(params);
   const presetWindow = overrides.window;
@@ -291,6 +295,8 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
   if (overrides.fill === undefined && gridOverride) values.fill = 'grid';
   const hexOverride = SETTINGS.some((s) => s.path.startsWith('fill.hexagon.') && overrides[s.field] !== undefined);
   if (overrides.fill === undefined && hexOverride) values.fill = 'hexagon';
+  const brickOverride = SETTINGS.some((s) => s.path.startsWith('fill.brick.') && overrides[s.field] !== undefined);
+  if (overrides.fill === undefined && brickOverride) values.fill = 'brick';
   Object.assign(values, overrides);
 
   const problems: SettingProblem[] = [];

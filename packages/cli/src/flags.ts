@@ -61,6 +61,9 @@ const FLAG_NAMES: Record<FieldName, string> = {
   gridBarMm: 'grid-bar',
   hexOpeningMm: 'hex-opening', // a --hex-* flag without --fill means the hexagon (C16)
   hexBarMm: 'hex-bar',
+  brickWidthMm: 'brick-width', // a --brick-* flag without --fill means the bricks (C21)
+  brickHeightMm: 'brick-height',
+  brickBarMm: 'brick-bar',
 };
 
 export const SETTING_FLAGS: readonly SettingFlag[] = SETTINGS.map((s) => ({ ...s, flag: FLAG_NAMES[s.field] }));

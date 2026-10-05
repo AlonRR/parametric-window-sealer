@@ -59,6 +59,9 @@ const FIELDS: readonly FieldName[] = [
   'gridBarMm',
   'hexOpeningMm',
   'hexBarMm',
+  'brickWidthMm',
+  'brickHeightMm',
+  'brickBarMm',
 ];
 
 type Control = HTMLInputElement | HTMLSelectElement | RadioNodeList;

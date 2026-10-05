@@ -144,12 +144,11 @@ describe('window_sealer_plan_wall', () => {
     const { call } = await connect();
     const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { grid: { barMm: 2 } } } });
     expect(r.isError).toBeFalsy();
-    expect(r.data['settings'].fill).toEqual({
+    expect(r.data['settings'].fill).toMatchObject({
       kind: 'grid',
       style: 'relief',
       reliefPct: 50,
       grid: { openingMm: 15, barMm: 2 },
-      hexagon: { openingMm: 15, barMm: 3 },
     });
     expect(r.data['summary'].fill).toBe('Fill: a grid of 15 mm square openings and 2 mm bars, cut 1.5 mm into the room side.');
     const thin = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { grid: { barMm: 0.5 } } } });
@@ -165,6 +164,14 @@ describe('window_sealer_plan_wall', () => {
     expect(r.data['summary'].fill).toBe(
       'Fill: a honeycomb of hexagonal openings 10 mm across the flats and 3 mm bars, cut through: air passes through the wall.',
     );
+  });
+
+  it('a brick fill: its settings alone mean the bricks (C20)', async () => {
+    const { call } = await connect();
+    const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { brick: { heightMm: 10 } } } });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['settings'].fill).toMatchObject({ kind: 'brick', brick: { widthMm: 30, heightMm: 10, barMm: 3 } });
+    expect(r.data['summary'].fill).toBe('Fill: bricks of 30 × 10 mm openings and 3 mm bars, cut 1.5 mm into the room side.');
   });
 
   it('settings the page refuses are an error with the page’s message for each', async () => {

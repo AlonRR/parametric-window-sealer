@@ -25,7 +25,7 @@ import { PRINTER_IDS } from './printers.js';
 import { DEFAULT_COLLAR, checkPort, collarInnerMm, defaultPortPiece, formatPorts, parsePorts, portHoleMm } from './port.js';
 import type { CollarParams, PortSetting } from './port.js';
 import { DEFAULT_TAPE, NO_SEAL, TAPE_GROOVE_WALL_MM, tapeFit, tapedCollar } from './tape.js';
-import { DEFAULT_GRID, DEFAULT_HEXAGON, FILL_KINDS, MIN_BAR_MM, PATTERN_STYLES, SEALED } from './fill.js';
+import { DEFAULT_BRICK, DEFAULT_GRID, DEFAULT_HEXAGON, FILL_KINDS, MIN_BAR_MM, PATTERN_STYLES, SEALED } from './fill.js';
 import type { FillParams } from './fill.js';
 import { reliefDepthMm } from './pattern.js';
 import type { SealKind, SealParams } from './tape.js';
@@ -121,7 +121,10 @@ export type FieldName =
   | 'gridOpeningMm'
   | 'gridBarMm'
   | 'hexOpeningMm'
-  | 'hexBarMm';
+  | 'hexBarMm'
+  | 'brickWidthMm'
+  | 'brickHeightMm'
+  | 'brickBarMm';
 
 export type FormValues = Partial<Record<FieldName, string>>;
 export type FieldErrors = Partial<Record<FieldName, string>>;
@@ -186,6 +189,9 @@ export function toFormValues(p: Params): FormValues {
     gridBarMm: String(p.fill.grid.barMm),
     hexOpeningMm: String(p.fill.hexagon.openingMm),
     hexBarMm: String(p.fill.hexagon.barMm),
+    brickWidthMm: String(p.fill.brick.widthMm),
+    brickHeightMm: String(p.fill.brick.heightMm),
+    brickBarMm: String(p.fill.brick.barMm),
   };
 }
 
@@ -402,6 +408,7 @@ export function readParams(values: FormValues): ReadResult {
   };
   const barMessage = `Make it at least ${mm(MIN_BAR_MM)} mm: two lines from a 0.4 mm nozzle.`;
   const bar = (n: number) => n >= MIN_BAR_MM - 1e-9;
+  const sizeMessage = 'Enter a size in mm, greater than 0.';
   const fill: FillParams = {
     kind: fillKind,
     style: patterned ? oneOf('fillStyle', PATTERN_STYLES) : PATTERN_STYLES.find((v) => v === values.fillStyle) ?? SEALED.style,
@@ -424,6 +431,11 @@ export function readParams(values: FormValues): ReadResult {
         fillKind === 'hexagon',
       ),
       barMm: fillNumber('hexBarMm', DEFAULT_HEXAGON.barMm, bar, barMessage, fillKind === 'hexagon'),
+    },
+    brick: {
+      widthMm: fillNumber('brickWidthMm', DEFAULT_BRICK.widthMm, positive, sizeMessage, fillKind === 'brick'),
+      heightMm: fillNumber('brickHeightMm', DEFAULT_BRICK.heightMm, positive, sizeMessage, fillKind === 'brick'),
+      barMm: fillNumber('brickBarMm', DEFAULT_BRICK.barMm, bar, barMessage, fillKind === 'brick'),
     },
   };
 
@@ -606,10 +618,13 @@ function describeJoints(joints: JointPlan, joint: JointParams): string {
 function describeFill(params: Params): string {
   const { fill } = params;
   if (fill.kind === 'sealed') return 'Fill: sealed.';
+  const { grid, hexagon, brick } = fill;
   const pattern =
     fill.kind === 'grid'
-      ? `a grid of ${mm(fill.grid.openingMm)} mm square openings and ${mm(fill.grid.barMm)} mm bars`
-      : `a honeycomb of hexagonal openings ${mm(fill.hexagon.openingMm)} mm across the flats and ${mm(fill.hexagon.barMm)} mm bars`;
+      ? `a grid of ${mm(grid.openingMm)} mm square openings and ${mm(grid.barMm)} mm bars`
+      : fill.kind === 'hexagon'
+        ? `a honeycomb of hexagonal openings ${mm(hexagon.openingMm)} mm across the flats and ${mm(hexagon.barMm)} mm bars`
+        : `bricks of ${mm(brick.widthMm)} × ${mm(brick.heightMm)} mm openings and ${mm(brick.barMm)} mm bars`;
   return fill.style === 'through'
     ? `Fill: ${pattern}, cut through: air passes through the wall.`
     : `Fill: ${pattern}, cut ${mm(reliefDepthMm(params.thicknessMm, fill.reliefPct))} mm into the room side.`;

@@ -27,7 +27,7 @@ const R = 15 / Math.sqrt(3); // the corner radius of a hexagon 15 mm across the 
 
 describe('the hexagon tile', () => {
   it('is a choice after the grid, starting at 15 mm across the flats with 3 mm bars (C14)', () => {
-    expect(FILL_KINDS).toEqual(['sealed', 'grid', 'hexagon']);
+    expect(FILL_KINDS.slice(0, 3)).toEqual(['sealed', 'grid', 'hexagon']);
     expect(DEFAULT_HEXAGON).toEqual({ openingMm: 15, barMm: 3 });
     expect(SEALED.hexagon).toEqual(DEFAULT_HEXAGON);
   });
