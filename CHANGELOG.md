@@ -15,10 +15,16 @@ the latest version are listed under Unreleased.
   (not yet on the registry). One call, `makeWall`, takes the same parameters as the page and
   returns the plan, its summary and the files; every step underneath is exported too. It runs
   in Node.js and in browsers, and its README's example is run by CI against the built package.
+- The `window-sealer` command, the npm package `parametric-window-sealer-cli` in `packages/cli`
+  (not yet on the registry). It takes every setting on the page as a flag or from a JSON file,
+  writes the files into one folder named after the wall, and prints the page's summary or,
+  with `--json`, the plan and files for scripts and LLM agents; `--dry-run` writes nothing.
+- `planFiles` in the library: the names of the files a wall needs, without building them.
 
 ### Changed
 
-- The page uses the library like any other user would; the two are one npm workspace.
+- The page uses the library like any other user would; the library, the command and the page
+  are one npm workspace.
 
 ## [0.1.0] - 2026-10-05
 
