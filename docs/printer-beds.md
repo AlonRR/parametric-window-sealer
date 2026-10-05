@@ -1,14 +1,15 @@
 # Printer build volumes
 
-The build volumes behind the default maximum piece size (Q5, Q38), and later the printer
-list (`printer-presets`, #13). Every number was read from the maker's own website on
+The build volumes behind the default maximum piece size (Q5, Q38) and the printer list
+(`printer-presets`, #13; Q115). Every number was read from the maker's own website on
 5 Oct 2026 and is quoted with its address; none is from memory, a retailer or a review.
 
 **Group** is `mini` for the two small-bed printers and `full-size` for the rest. The
 default of **200 × 200 mm** (Q38) fits every `full-size` printer here with at least 10 mm to
-spare on each side of the bed's smallest dimension; the minis need "custom" or, later, their
-entry in the printer list. `web/test/printer.test.ts` reads this table and checks that claim,
-so a change to either one shows up in the tests.
+spare on each side of the bed's smallest dimension; the minis need their entry in the printer
+list, or "custom". `packages/core/test/printer.test.ts` reads this table and checks that claim,
+and `packages/core/test/printers.test.ts` checks that the printer list is this table, row for
+row, so a change to either one shows up in the tests.
 
 ## Build volumes
 

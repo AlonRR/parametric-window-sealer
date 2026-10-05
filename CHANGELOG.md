@@ -12,6 +12,11 @@ under Unreleased.
 
 ### Added
 
+- A printer list: 29 printers, each bed read from its maker's site, grouped by maker under "Your
+  printer". A listed printer's bed, less a margin under Advanced (10 mm to start with), is the
+  largest piece, turned whichever way needs fewer pieces. "Not listed: 200 × 200 mm" stays the
+  default, and "Custom size" stays. The command takes `--printer-model` and `--bed-margin`; the
+  MCP server takes the printer's `id`.
 - A round port for a portable air conditioner's hose: a push-fit collar on the room side of one
   piece, sized to the hose end's outside diameter (150 mm, 130 mm, or your own measurement),
   in the piece you pick, with more ports under Advanced. A piece too small for its port is
