@@ -11,6 +11,7 @@ export * from './joint-geometry.js';
 export * from './layout.js';
 export * from './panel-geometry.js';
 export * from './params.js';
+export * from './port.js';
 export * from './printer.js';
 export * from './settings.js';
 export * from './wall.js';
