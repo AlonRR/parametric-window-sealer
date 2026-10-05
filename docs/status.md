@@ -151,6 +151,12 @@ is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | Q130 | **One tape size for every place**: one width, thickness, groove and squeeze, so one roll does the whole wall | 5 Oct 2026 |
 | Q131 | The walls beside the tape's groove on an edge strip's outer face are **at least 0.8 mm**, two lines from a 0.4 mm nozzle; a tape that leaves them thinner is refused, with a message | 5 Oct 2026 |
 | Q132 | The 3D preview **draws the tape in its own colour**, where it goes; it is not in the downloaded files | 5 Oct 2026 |
+| Q133 | The pattern framework (`patterns-core`, #20) ships **first, in the library alone**, tested with a test tile; the grid (`pattern-grid`, #16) then adds the fill choice to the page, the command and the server, one pull request each (Q29) | 5 Oct 2026 |
+| Q134 | The **solid border** round each piece's pattern is **the slot depth plus 2 mm**: 10 mm with the starting joint, and it follows the joint, as the port's clearance does (Q108), so the pattern stays clear of the strips | 5 Oct 2026 |
+| Q135 | **One pattern across the wall**: the tiles line up across the joints, so the wall reads as one surface. Holes at a border are cut short, and any sliver of hole thinner than the bars between holes is left solid | 5 Oct 2026 |
+| Q136 | A relief pattern is **cut into the room-side face**: it prints flat with no supports, and the outside face stays plain | 5 Oct 2026 |
+| Q137 | On a piece with a hose port, the panel stays **solid out to the border's width beyond the collar's outside**; the pattern carries on past that | 5 Oct 2026 |
+| Q138 | The relief's depth is **a percentage of the panel's thickness, starting at 50**, a setting under Advanced, so it stays half when the thickness changes | 5 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
 | Q32 | The **hosted web API is parked** (`api-hosted`, #48, moved to P3): "I don't have the funding to run a server" | 5 Oct 2026 |
