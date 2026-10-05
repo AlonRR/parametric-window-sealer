@@ -5,6 +5,6 @@ projects:
   - name:     Parametric window sealer
     kind:     build
     state:    not-designed
-    next:     "build measured-cutout (#23), the next P1 item after seal-tpu (#22)"
+    next:     "build window-ac (#24), the next P1 item after measured-cutout (#23)"
     trackers: [docs/status.md, docs/backlog.md]
     review:   2026-10-05

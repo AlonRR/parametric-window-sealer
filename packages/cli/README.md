@@ -77,7 +77,10 @@ window-sealer --width 600 --height 1000 --printer-model prusa-mk4s
 - `--port 150` adds a round port for a portable air conditioner's hose, sized to the hose end's
   outside diameter (150 and 130 mm are common; measure the end that goes in), in the bottom
   row's middle piece; `--port 150@2,1` puts it in column 2, row 1, counted from the bottom left
-  seen from the room. Give `--port` again for each port. `--collar-depth`, `--collar-wall`,
+  seen from the room. Give `--port` again for each port. `--cutout 120x80` cuts an opening for
+  an appliance you measured, 120 mm wide and 80 mm high seen from the room, with a rim round it
+  lined with the seal if there is one; `--cutout 120x80@2,1` places it, and `--rim-depth`,
+  `--rim-wall` and `--rim-clearance` change the rim. `--collar-depth`, `--collar-wall`,
   `--collar-clearance` and `--collar-lip` change the collar the hose end slides into.
 - `--seal tape` adds foam tape in a groove along each edge strip's face that the track, sash or
   sill presses; `--tape-width` and `--tape-thickness` set its size (9 × 4 mm to start with;

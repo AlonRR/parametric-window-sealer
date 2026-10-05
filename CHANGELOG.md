@@ -12,6 +12,14 @@ under Unreleased.
 
 ### Added
 
+- A measured cutout: under "What is in the window?", choose "Something else: a measured cutout"
+  and give the appliance's outside width and height. It is cut through one piece you pick, with
+  a rim round it on the room side (15 mm deep, a 2.4 mm wall and 1 mm clearance a side to start
+  with, under Advanced). With a seal, the rim is lined with it: foam tape in a groove round its
+  inside, or a printed TPU frame. The command takes `--cutout 120x80`, repeatable, and
+  `--rim-*`, the MCP server `cutouts` and `rim`; the piece's file says `-cutout-120x80`. Not
+  yet test printed: the rim's sizes are starting values.
+
 - A printed TPU seal: choose "Printed TPU" under "Seal" for gaskets printed in TPU in place of
   foam tape, in the same grooves and to the same sizes: a base in the groove with two thin fins
   that fold as the wall goes in. Where the tape's places under Advanced say, they also go on the

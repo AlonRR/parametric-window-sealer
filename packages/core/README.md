@@ -61,6 +61,8 @@ Start from `EXAMPLE_PARAMS` and change what differs. Every length is in mm.
 | `edges`                                | The `window` (`'slider'` or `'hung'`), each edge's role (`'track'`, `'sash'` or `'sill'`; `WINDOW_PRESETS`) and the `track`'s width, clearance and depth at each edge                                                   |
 | `ports`                                | Hose ports, none for a plain wall: each `{ hoseMm, column, row }`, the hose end's outside diameter (`COMMON_HOSE_MM`: 150 and 130) and its piece, from 1 at the bottom left seen from the room                     |
 | `collar`                               | The port's collar: `depthMm`, `wallMm`, `clearanceMm`, `lipMm` (`DEFAULT_COLLAR`)                                                                                                                                       |
+| `cutouts`                              | Measured cutouts, none to start with: each `{ widthMm, heightMm, column, row }`, the appliance's outside seen from the room and its piece, from 1 at the bottom left                                                    |
+| `rim`                                  | The rim round each cutout: `depthMm`, `wallMm`, `clearanceMm` (`DEFAULT_RIM`); lined with the seal when there is one                                                                                                   |
 | `seal`                                 | `{ kind: 'none' }`, `'tape'` or `'tpu'` (gaskets printed in TPU to the tape's size), with the `tape`'s `widthMm`, `thicknessMm` (`TAPE_SIZES`), `grooveMm`, `squeezePct`, whether it also goes on the strips' `sides` and in each `port`, and with TPU whether the `joints` are TPU too (`NO_SEAL`, `DEFAULT_TAPE`)   |
 | `fill`                                 | `{ kind: 'sealed' }`, or a pattern: `'grid'`, `'hexagon'`, `'brick'` or `'diamond'` (`FILL_KINDS`), its `style` (`'relief'`, cut into the room side to `reliefPct` of the thickness, or `'through'`), and each pattern's sizes in `grid`, `hexagon`, `brick` and `diamond` (`SEALED` holds the starting ones; bars at least `MIN_BAR_MM`) |
 | `pieceFills`                           | Pieces with a fill of their own, none to start with: each `{ column, row, kind, style? }`, from 1 at the bottom left seen from the room; the sizes stay the wall's (`fillFor` gives a piece's fill) |
@@ -76,7 +78,8 @@ message. `validateParams(params)` gives the same messages without building anyth
   (`piece-c1-r1-197.7x198.6.stl`), and one per strip, cross or edge shape, named by its size
   and how many to print (`strip-182.6x18-print-10.stl`); an edge strip with tape on its
   sides also names its track's depth (`edge-152.5x13x11-track-10-print-8.stl`), and a part
-  printed in TPU says so (`gasket-152.5x9.5x4-tpu-print-8.stl`, `sleeve-150-tpu-print-1.stl`);
+  printed in TPU says so (`gasket-152.5x9.5x4-tpu-print-8.stl`, `sleeve-150-tpu-print-1.stl`),
+  and a piece with a cutout names it (`piece-c2-r1-197.7x198.6-cutout-120x80.stl`);
 - `'zip'`: those files in one ZIP;
 - `'single'`: one 3MF holding every copy (3MF only, since an STL holds one object).
 
@@ -95,7 +98,8 @@ and edges), `describePlan`, `readParams` and `toFormValues` (the page's form val
 and `SETTINGS` (settings in the library's shape, possibly partial, and what each one is),
 `pieceLimit` (the largest piece a wall's printer allows), the
 shapes (`plainPanel`, `portPanel`, `stripSolid`, `crossSolid`, `edgeStripSolid`), the hose
-port's rules (`checkPort`, `parsePorts`, `formatPorts`), the per-piece fills'
+port's rules (`checkPort`, `parsePorts`, `formatPorts`), the measured cutout's (`checkCutout`,
+`parseCutouts`, `formatCutouts`, `linedRim`, `cutoutPanel`, `frameShapes`, `frameSolid`), the per-piece fills'
 (`fillFor`, `parsePieceFills`, `formatPieceFills`), the tape's (`tapeFit`, `tapedCollar`,
 and `edgeTapeSolid` and `portTapeSolid`, the tape itself for a preview), the TPU seal's
 (`gasketShapes`, `gasketSolid`, `sleeveShapes`, `sleeveSolid`, `tpuJoint`), every part's shape
