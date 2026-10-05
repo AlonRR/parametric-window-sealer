@@ -8,9 +8,15 @@ import { mountPanel } from './panel';
 import type { Params } from 'parametric-window-sealer';
 import { mountPreview } from './preview';
 
+// The engine's .wasm: served beside the page, and found by its URL. The offline file (#25) leaves
+// the engine to find its own, which the build has put inside the file as a data URL, so the file
+// holds one copy (C54).
+const engineUrl = import.meta.env.MODE === 'offline' ? undefined : wasmUrl;
+const engine = () => loadEngine(engineUrl);
+
 async function start(status: HTMLElement): Promise<void> {
   try {
-    const part = buildCheckPart(await loadEngine(wasmUrl));
+    const part = buildCheckPart(await engine());
     status.dataset.state = 'ready';
     status.dataset.volumeMm3 = String(Math.round(part.volumeMm3));
     status.textContent = 'Geometry engine ready.';
@@ -25,7 +31,7 @@ const plan = document.querySelector<HTMLElement>('#plan');
 const openButton = document.querySelector<HTMLButtonElement>('#download-open');
 const dialog = document.querySelector<HTMLDialogElement>('#download-dialog');
 const previewBox = document.querySelector<HTMLElement>('#preview');
-const preview = previewBox ? mountPreview(previewBox, () => loadEngine(wasmUrl)) : null;
+const preview = previewBox ? mountPreview(previewBox, engine) : null;
 let current: Params | null = null;
 if (form && plan) {
   mountPanel(form, plan, (params) => {
@@ -39,8 +45,13 @@ if (openButton && dialog) {
     openButton,
     dialog,
     getParams: () => current,
-    getEngine: () => loadEngine(wasmUrl),
+    getEngine: engine,
   });
+}
+
+// Opened from the disk, the page is already the offline file: it does not offer itself (C55).
+if (location.protocol === 'file:') {
+  for (const offer of document.querySelectorAll<HTMLElement>('[data-part="offline"]')) offer.hidden = true;
 }
 
 const status = document.querySelector<HTMLElement>('[data-testid="engine-status"]');
