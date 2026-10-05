@@ -13,54 +13,118 @@
   "results": {
     "plain": {
       "three": {
-        "firstFrameMs": 114,
-        "update25Ms": 32,
-        "update15Ms": 32,
+        "firstFrameMs": 120,
+        "update25Ms": 31,
+        "update15Ms": 31,
+        "orbitFps": 59.6,
         "jsFiles": 1,
-        "jsKiB": 132.4,
-        "totalKiB": 132.7
+        "jsKiB": 132.5,
+        "totalKiB": 132.8
       },
       "babylon": {
-        "firstFrameMs": 294,
+        "firstFrameMs": 304,
         "update25Ms": 32,
-        "update15Ms": 31,
+        "update15Ms": 30,
+        "orbitFps": 59.6,
         "jsFiles": 16,
-        "jsKiB": 280.6,
-        "totalKiB": 281.1
+        "jsKiB": 280.7,
+        "totalKiB": 281.2
       },
       "model-viewer": {
-        "firstFrameMs": 2593,
+        "firstFrameMs": 3045,
         "update25Ms": 65,
         "update15Ms": 65,
+        "orbitFps": 30.8,
         "jsFiles": 1,
-        "jsKiB": 282.2,
-        "totalKiB": 281.8
+        "jsKiB": 282.4,
+        "totalKiB": 281.9
       }
     },
     "pattern": {
       "three": {
-        "firstFrameMs": 161,
-        "update25Ms": 99,
-        "update15Ms": 141,
+        "firstFrameMs": 169,
+        "update25Ms": 91,
+        "update15Ms": 135,
+        "orbitFps": 12.6,
         "jsFiles": 1,
-        "jsKiB": 132.4,
-        "totalKiB": 169.6
+        "jsKiB": 132.5,
+        "totalKiB": 169.7
       },
       "babylon": {
-        "firstFrameMs": 343,
-        "update25Ms": 97,
-        "update15Ms": 146,
+        "firstFrameMs": 354,
+        "update25Ms": 98,
+        "update15Ms": 148,
+        "orbitFps": 11.4,
         "jsFiles": 16,
-        "jsKiB": 280.6,
-        "totalKiB": 318
+        "jsKiB": 280.7,
+        "totalKiB": 318.1
       },
       "model-viewer": {
-        "firstFrameMs": 2855,
-        "update25Ms": 319,
-        "update15Ms": 234,
+        "firstFrameMs": 2910,
+        "update25Ms": 337,
+        "update15Ms": 242,
+        "orbitFps": 6.6,
         "jsFiles": 1,
-        "jsKiB": 282.2,
-        "totalKiB": 318.7
+        "jsKiB": 282.4,
+        "totalKiB": 318.8
+      }
+    },
+    "dense": {
+      "three": {
+        "firstFrameMs": 234,
+        "update25Ms": 298,
+        "update15Ms": 431,
+        "orbitFps": 3.9,
+        "jsFiles": 1,
+        "jsKiB": 132.5,
+        "totalKiB": 276.1
+      },
+      "babylon": {
+        "firstFrameMs": 407,
+        "update25Ms": 300,
+        "update15Ms": 466,
+        "orbitFps": 3.5,
+        "jsFiles": 16,
+        "jsKiB": 280.7,
+        "totalKiB": 424.5
+      },
+      "model-viewer": {
+        "firstFrameMs": 3393,
+        "update25Ms": 916,
+        "update15Ms": 667,
+        "orbitFps": 3,
+        "jsFiles": 1,
+        "jsKiB": 282.4,
+        "totalKiB": 425.1
+      }
+    },
+    "heavy": {
+      "three": {
+        "firstFrameMs": 312,
+        "update25Ms": 629,
+        "update15Ms": 970,
+        "orbitFps": 1.8,
+        "jsFiles": 1,
+        "jsKiB": 132.5,
+        "totalKiB": 452.3
+      },
+      "babylon": {
+        "firstFrameMs": 465,
+        "update25Ms": 663,
+        "update15Ms": 965,
+        "orbitFps": 1.7,
+        "jsFiles": 16,
+        "jsKiB": 280.7,
+        "totalKiB": 600.8
+      },
+      "model-viewer": {
+        "firstFrameMs": 3386,
+        "update25Ms": 1830,
+        "update15Ms": 2828,
+        "orbitFps": 0.8,
+        "jsFiles": 1,
+        "jsKiB": 282.4,
+        "totalKiB": 601.4
       }
     }
   }
