@@ -31,24 +31,21 @@ engine is deliberately undecided until the design questions below are settled.
 | Q2 | Branch: commit to **`main`** | 5 Oct 2026 |
 | Q3 | Build the Pages site now; **the owner publishes it later** (the repo is private, and making it public is his action) | 5 Oct 2026 |
 | Q4 | `.repo-status`: **`publish: not-yet`** | 5 Oct 2026 |
-| Q5 | Printed on **users' own printers**: the maximum piece size is a plain parameter, not tied to one printer. Its default value is still open (Q5 below) | 5 Oct 2026 |
+| Q5 | Printed on **users' own printers**: the maximum piece size is a parameter, not tied to one printer. It is set from a **printer-presets list**, with a **safe default** (one size most mainstream beds fit) selected until the user picks a printer; "custom" stays available. Every preset's bed size is to be verified from the maker's own specification | 5 Oct 2026 |
 | Q6 | **Material-agnostic**: the parts must print well in PLA, PETG and ASA/ABS ("it shouldn't really matter if it's well designed for printing"). Sealing is an option: **printed TPU**, **tape** (its size a parameter), or **none**, because some users do not need a perfect seal | 5 Oct 2026 |
 | Q7 | Patterns are **cut through or relief, chosen per piece** | 5 Oct 2026 |
 | Q8 | **"Open" means a cut-through pattern**, not a separate fill type. So the fills are: sealed (solid), a pattern (through or relief), or an organiser | 5 Oct 2026 |
+| Q9 | Organiser systems: **Honeycomb Storage Wall**, **Skådis**, **Multiboard**, **openGrid**, built so **more can be added later**. "Honeycomb" in the brief is the organiser system | 5 Oct 2026 |
+| Q10 | The fill is set **once for the whole wall by default**, with an **advanced tab for per-piece overrides** | 5 Oct 2026 |
 
 The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-### Printing
-
-- **Q5.** (Partly answered.) What default should the maximum piece size have, given that users
-  print on their own printers?
-
 ### Panels and patterns
 
-- **Q9.** Which organiser systems: Skådis, and which others?
-- **Q10.** One fill type for the whole wall, or a different fill per piece?
+- **Q20.** Which decorative patterns: brick, diamond, grid, and which others? With honeycomb now
+  the organiser system (Q9), is a decorative hexagon pattern wanted as well?
 
 ### Dividing the opening
 
@@ -77,6 +74,12 @@ The first four rows were answered before questions carried IDs.
 
 - **Q18.** The dimensions of your window's open area and of the appliance in it, so the first
   model is tested against a real fit.
+
+### Sessions
+
+- **Q19.** The tools this repo's checks need (pre-commit, reuse) and the commit-identity setup are
+  lost when a new cloud session starts. Persist them with a startup hook committed in the repo,
+  with the cloud environment's setup script, both, or neither?
 
 ## Repository follow-ups
 
