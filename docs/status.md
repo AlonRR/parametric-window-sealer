@@ -74,6 +74,15 @@ is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | Q53 | Strips and cross pieces are downloaded **standing on their flanges**, so they print without supports | 5 Oct 2026 |
 | Q54 | The measuring guide covers **the window opening and track, the appliance, and printed test parts** (calipers) | 5 Oct 2026 |
 | Q55 | The guided test print comes **after the MVP, "at some point"**: P2 | 5 Oct 2026 |
+| Q56 | The plan puts each piece **in the middle of its slide**: 6.5 mm into the strip, so a joint takes the web plus the slide (5 mm) and can close up or spread out by the slide (3 mm). Drawn to scale in the corrected drawing A; the first drawing showed the pieces only 1.5 mm in, a drawing error | 5 Oct 2026 |
+| Q57 | The **cross piece is a square as wide as the strip** (18 mm) with a + shaped web, and **strips stop half the slide (1.5 mm) short of it**, so a joint next to a crossing can close up fully | 5 Oct 2026 |
+| Q58 | Strips and cross pieces download as **one file per shape, with the count in its name** (e.g. `strip-184x18-print-10.stl`); a single 3MF holds every copy. Pieces stay one file each (Q46) | 5 Oct 2026 |
+| Q59 | At the wall's outer edge **a strip runs flush with the pieces**, until `track-edge` (#11) decides how the edge sits in the window track | 5 Oct 2026 |
+| Q60 | When full pieces plus one filler leave **less room than a joint takes** (612 mm with 200 mm pieces leaves 2 mm), the page **warns, with a resolution already chosen that the user can click to change** | 5 Oct 2026 |
+| Q61 | That warning's default is to **spread the pieces**: the full pieces stay and the joints spread within their slide to take up what is left | 5 Oct 2026 |
+| Q62 | The warning offers **all three resolutions**: spread the pieces, equal pieces, or shorten one full piece so a minimum-width filler fits. One that cannot work for the size is greyed out | 5 Oct 2026 |
+| Q63 | When spreading cannot work (no joint, or more than the joints' slide), the default is **equal pieces** | 5 Oct 2026 |
+| Q64 | The page calls it **"Spread the pieces"**; "open the joints" needed explaining | 5 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
 | Q32 | The **hosted web API is parked** (`api-hosted`, #48, moved to P3): "I don't have the funding to run a server" | 5 Oct 2026 |
