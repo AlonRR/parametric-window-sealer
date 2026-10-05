@@ -9,6 +9,17 @@ the latest version are listed under Unreleased.
 
 ## [Unreleased]
 
+### Added
+
+- The geometry as a library, the npm package `parametric-window-sealer` in `packages/core`
+  (not yet on the registry). One call, `makeWall`, takes the same parameters as the page and
+  returns the plan, its summary and the files; every step underneath is exported too. It runs
+  in Node.js and in browsers, and its README's example is run by CI against the built package.
+
+### Changed
+
+- The page uses the library like any other user would; the two are one npm workspace.
+
 ## [0.1.0] - 2026-10-05
 
 ### Added

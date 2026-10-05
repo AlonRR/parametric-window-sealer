@@ -100,6 +100,7 @@ is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | Q79 | The library gets **its own package folder in one npm workspace**; the page imports it like any user would, and the command-line tool and the MCP server will too | 5 Oct 2026 |
 | Q80 | The library offers **one main call plus the steps underneath**: parameters in (the same as the page's form), the plan and the files out; and the layout, joints, edges, shapes and file writers for anyone who wants them | 5 Oct 2026 |
 | Q81 | The library runs in **Node.js and in browsers** | 5 Oct 2026 |
+| Q82 | **Descriptions** go on the GitHub repository's About box and in the npm package's `description`, worded alike: what the panels close off, then for GitHub "Runs in the browser; nothing to install" and for npm "the geometry as a library for Node.js and browsers". Setting the About box is the owner's step (a cloud session's write to the repository settings is refused, HTTP 403) | 5 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
 | Q32 | The **hosted web API is parked** (`api-hosted`, #48, moved to P3): "I don't have the funding to run a server" | 5 Oct 2026 |
@@ -118,5 +119,9 @@ None at the moment.
 
 ## Repository follow-ups
 
+- **Owner's step (Q82):** set the repository's About description on GitHub (the gear beside
+  About on the repository's main page) to: "Parametric, 3D-printable panels that close off the part of a window left open around a window air conditioner, fan or hose. Runs in the browser; nothing to install."
+- Before the first npm publish (Q78): the package holds only `dist/` and its README, so add
+  the MPL-2.0 text and say where the source is (MPL-2.0 section 3.2).
 - The kit also has a `gitleaks.toml` template that is not in its file table. Not adopted; ask
   for it if the secret scanner needs custom rules.

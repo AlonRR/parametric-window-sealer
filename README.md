@@ -24,7 +24,8 @@ issues; what has changed is in [`CHANGELOG.md`](CHANGELOG.md).
 
 Planned next:
 
-- **An API**: the geometry as an npm library, a command-line tool and a local MCP server.
+- **An API**: a command-line tool and a local MCP server, both on the geometry library that is
+  now in [`packages/core`](packages/core/README.md).
 - **Appliances**: a round port for a portable air conditioner's hose, fittings for a window air
   conditioner, and fan mounts.
 - **Panel styles**: organiser patterns (pegboard-style) and decorative patterns such as brick,
@@ -44,8 +45,9 @@ pre-commit run --all-files
 
 The commit hooks check the commit identity and message form; `CLAUDE.md` lists the rules.
 
-The geometry is a library in `packages/core` (published as `parametric-window-sealer`) and
-the page lives in `web/`; they are one npm workspace and need Node.js 22.12 or later:
+The geometry is a library in `packages/core`, the npm package `parametric-window-sealer` (not
+on the registry yet; [its README](packages/core/README.md) says how to use it), and the page
+lives in `web/`; they are one npm workspace and need Node.js 22.12 or later:
 
 ```bash
 npm ci                                              # at the repo root
