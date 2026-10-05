@@ -69,13 +69,20 @@ outside this tree; do not vendor them in. The ones that bite most often here:
 - **A branch and a pull request per backlog item** (owner's decision Q29, replacing Q2's
   commits straight to `main`). Name the branch `<type>/<backlog-key>`, e.g. `feat/page-skeleton`.
   The pull request uses `.github/pull_request_template.md`, says `Closes #<issue>`, and is merged
-  only with CI green. Who merges, and whether documentation-only changes need a pull request,
-  is open (Q30 in `docs/status.md`).
+  only with CI green. **The agent merges it once CI is green** (Q30); documentation-only
+  changes go through a pull request too.
+- **Merge by fast-forwarding `main` to the pull request's head and pushing `main`**, never
+  with GitHub's merge button or API: those make `GitHub <noreply@github.com>` the committer,
+  which the identity check refuses (inferred from PR #44's test merge, which had that
+  committer and failed the check). If `main` has moved, merge it into the branch locally
+  first, wait for CI on the new head, then fast-forward. GitHub marks a pull request merged
+  when its head commit reaches the base branch (inferred; check it after each merge).
 - **Backlog as GitHub issues** (Q29): each row of `docs/backlog.md` has an issue. The file is the
   ranked overview and the issue holds the work; when a priority or estimate changes, change both.
 - **Versions** (Q29): Semantic Versioning, first tag `v0.1.0` when the MVP is complete. Record
   changes in `CHANGELOG.md` under Unreleased. Tags are annotated, `vX.Y.Z`, each with a GitHub
-  release. Who approves a release is open (Q30).
+  release. **The agent tags a release at each planned milestone** (Q30), e.g. `v0.1.0` when
+  every MVP issue is closed.
 - **Identity: author AND committer are
   `Alon A. Rabinowitz <45129051+AlonRR@users.noreply.github.com>`.** A cloud session's default
   identity is wrong for this repo. In a cloud session, `.claude/hooks/session-start.sh` sets it

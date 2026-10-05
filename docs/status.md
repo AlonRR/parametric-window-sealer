@@ -56,21 +56,22 @@ engine is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | Q27 | Before building: **work out the MVP** and keep **a file listing every item by priority and estimated ease** of implementation: [`backlog.md`](backlog.md) | 5 Oct 2026 |
 | Q28 | The **MVP is confirmed as proposed** in [`backlog.md`](backlog.md): a plain sealed wall of joined pieces held in the window track, previewed and downloaded in the browser. The round hose port is first in line after it | 5 Oct 2026 |
 | Q29 | Version control beyond plain commits: **semantic version tags with GitHub releases** and a `CHANGELOG.md` (first version `v0.1.0` when the MVP is complete); **a branch and pull request per backlog item**, merged with CI green; the **backlog mirrored as GitHub issues** (#2 to #43), labelled by priority and ease | 5 Oct 2026 |
+| Q30 | **The agent merges each pull request once CI is green**; the owner reviews whenever he likes. Documentation-only changes go through a pull request too (all three answers offered assumed so). **The agent tags a release at each planned milestone**, starting with `v0.1.0` when every MVP issue is closed | 5 Oct 2026 |
+| Q31 | Issue #1's API and MCP take **all four forms**: an **npm library** (the base the rest call), a **command-line tool**, a **local MCP server** and a **hosted web API**. Priority **P1, right after the MVP**, whose geometry is the library's core. Ranked as `api-library`, `api-cli`, `api-mcp-local`, `api-hosted` (#45 to #48, sub-issues of #1) | 5 Oct 2026 |
 
 The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-### Workflow
+### API
 
-- **Q30.** Who merges pull requests: the agent once CI is green, or the owner after review? Do
-  documentation-only changes (decision records like this file) also need a pull request? And who
-  approves a release?
-
-### New requirement
-
-- **Q31.** The owner's issue #1 asks for "an API and MCP for use by users and LLM agents". What
-  form should they take, who runs them, and what priority do they get against the MVP?
+- **Q32.** The hosted web API (Q31) needs a server, which GitHub Pages is not. Where should it
+  run, who pays for and maintains it, and is a service that receives the user's sizes acceptable
+  next to Q24's "nothing sent to a server" for the page? Until this is answered, `api-hosted`
+  (#48) cannot start; the other three forms do not depend on it.
+- **Q33.** Within P1, the round hose port was first in line after the MVP (Q28), and the API was
+  put "right after the MVP" (Q31). The backlog keeps `hose-port` first and the API rows next.
+  Should the API rows come before `hose-port` instead?
 
 ## Repository follow-ups
 

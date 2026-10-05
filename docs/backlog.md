@@ -22,7 +22,11 @@ row below, and none needs the MVP rebuilt to add it. **Confirmed by the owner as
 
 - **Issue**: the GitHub issue that holds the work and the discussion (Q29). This file stays the
   ranked overview; when a priority or estimate changes, change both.
-- **Priority**: P0 is the MVP, P1 comes next, P2 is planned, P3 is "maybe later".
+- **Priority**: P0 is the MVP, P1 comes next, P2 is planned, P3 is "maybe later". Rows are
+  sorted by priority, then by ease, with one exception: the four API rows (`api-*`, the forms
+  the owner chose for issue #1) come right after `hose-port`, because the owner put them right
+  after the MVP (Q31) and `hose-port` was already first in line (Q28). Whether they should come
+  before `hose-port` is open (Q33).
 - **Ease**, a relative estimate:
   - **S**: one self-contained piece of code or data with its tests; no test print needed.
   - **M**: several parts, a new area of the page, or a shape that needs a test print to tune.
@@ -49,6 +53,10 @@ row below, and none needs the MVP rebuilt to add it. **Confirmed by the owner as
 | `connector-strip` | #10 | Default joint: a tongue on each edge, an H-profile strip between pieces, a cross piece where four meet, a clearance parameter, a few mm of slide | P0 | M | `plain-panel`, `layout` | Q13 | Test print: the clearance that slides yet holds depends on printer and material |
 | `track-edge` | #11 | The edges that sit in the window track and take the sash's clamp; track width and depth as parameters | P0 | M | `plain-panel` | Q14 | Test print; example track sizes only (Q18) |
 | `hose-port` | #12 | A round port for a portable AC's exhaust hose, in one piece, from a list of sizes | P1 | S | `plain-panel` | Q15, Q16 | Spec to verify: hose end sizes |
+| `api-library` | #45 | The geometry code as an importable npm package; the other three API forms call it (part of #1) | P1 | M | `layout`, `plain-panel`, `connector-strip`, `track-edge` | Q31 | How cleanly the geometry separates from the page. Publishing to the npm registry is public, so it is the owner's step (as Q3) |
+| `api-cli` | #46 | A command-line tool that writes the pieces from parameters given as flags or a file (part of #1) | P1 | S | `api-library` | Q31 | None significant: the engine benchmark already runs Manifold under Node.js |
+| `api-mcp-local` | #47 | A local MCP server on the user's own machine, with tools for LLM agents such as "plan the layout" and "generate the pieces" (part of #1) | P1 | M | `api-library` | Q31 | Spec to verify: the MCP specification and SDK version; which tools to offer |
+| `api-hosted` | #48 | A hosted web API, an HTTP service anyone can call (part of #1) | P1 | L | `api-library` | Q31 | Where it runs and who pays for and maintains it, against Q24's nothing sent to a server (Q32) |
 | `printer-presets` | #13 | Printer list that sets the maximum piece size | P1 | S | `printer-default` | Q5 | Spec to verify for every printer listed |
 | `user-guide` | #14 | How to measure the window, the gap and the appliance | P1 | S | | Q18 | |
 | `seal-tape` | #15 | Optional tape seal: a groove or land sized to the tape | P1 | S | `track-edge`, `connector-strip` | Q6, Q17 | Groove or flat land is still open (Q17 left it) |
@@ -81,8 +89,5 @@ row below, and none needs the MVP rebuilt to add it. **Confirmed by the owner as
 | `mesh-import` | #42 | Import STL and similar meshes: repair, and refuse clearly when a mesh cannot be used | P2 | XL | `page-skeleton` | Q25 | Arbitrary user meshes; often not watertight |
 | `other-windows` | #43 | Window types beyond sliders and hung windows | P3 | L | `track-edge` | (none) | Not specified yet |
 
-## Not yet ranked
-
-| Key | Issue | Item | Waiting on |
-|---|---|---|---|
-| `api-mcp` | #1 | An API and an MCP server, so users and LLM agents can generate walls without the page (the owner's issue) | Q31: what form they take, and their priority |
+Issue #1, the owner's request for "an API and MCP for use by users and LLM agents", is the
+parent of the four `api-*` rows (#45 to #48); it closes when they do.
