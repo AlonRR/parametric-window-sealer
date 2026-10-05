@@ -32,6 +32,11 @@ export const stripWidthMm = (j: JointParams): number => 2 * j.slotMm + j.webMm;
 export const stripThicknessMm = (j: JointParams, panelMm: number): number =>
   panelMm + 2 * j.fitMm + 2 * j.flangeMm;
 
+// The smallest piece the joints can hold (min-piece-from-joint, #53): the slot depth the
+// strips take at both edges, plus a strip's width between them, so every strip between
+// two crossings is at least as long as it is wide (Q37, Q76).
+export const minPieceMm = (j: JointParams): number => 2 * j.slotMm + stripWidthMm(j);
+
 export interface StripPlacement {
   axis: 'vertical' | 'horizontal'; // along a joint between two columns, or two rows
   xMm: number; // the strip's lower-left corner, seen from the front

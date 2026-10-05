@@ -14,17 +14,12 @@ import {
   planEdges,
 } from './edge';
 import type { EdgeName, EdgeParams, EdgeRole, EdgeStripPlacement, WindowType } from './edge';
-import { DEFAULT_JOINT, jointWidthMm, partShapes, planJoints } from './joint';
+import { DEFAULT_JOINT, jointWidthMm, minPieceMm, partShapes, planJoints } from './joint';
 import type { JointParams, JointPlan } from './joint';
 import { layoutGrid } from './layout';
 import type { Axis, AxisMode, FillerPosition, GridLayout, Leftover } from './layout';
 import { DEFAULT_MAX_PIECE, maxPieceSize } from './printer';
 import type { PrinterChoice } from './printer';
-
-// The smallest piece the joint can hold is still a placeholder (Q40); the joint's own
-// dimensions replace it (Q37). That replacement is backlog item min-piece-from-joint (#53),
-// part of the MVP, so v0.1.0 cannot ship with this constant still here.
-export const PLACEHOLDER_MIN_PIECE_MM = 30;
 
 export interface AxisChoice {
   mode: AxisMode;
@@ -259,7 +254,7 @@ export function planWall(p: Params): GridLayout {
     heightMm: span.heightMm,
     maxPieceWidthMm: max.widthMm,
     maxPieceHeightMm: max.heightMm,
-    minPieceMm: PLACEHOLDER_MIN_PIECE_MM,
+    minPieceMm: minPieceMm(p.joint), // Q76
     jointMm: jointWidthMm(p.joint),
     jointSpreadMm: p.joint.slideMm, // each piece moves half of it, from the middle (Q56)
     width: p.width,
@@ -353,7 +348,7 @@ function describeLeftover(
         value: 'shorten',
         label: shorten.possible
           ? `Shorten one full piece: ${listed(shorten.pieces)} mm`
-          : `Shorten one full piece: no room for a filler of the ${mm(PLACEHOLDER_MIN_PIECE_MM)} mm minimum`,
+          : `Shorten one full piece: no room for a filler of the ${mm(minPieceMm(joint))} mm the joints need`,
         possible: shorten.possible,
       },
     ],
@@ -387,9 +382,7 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     edges: `Edges: ${plural(parts.edges.length, 'edge strip', 'edge strips')} in ${plural(shapes, 'shape', 'shapes')}.`,
     warnings: plan.warnings.map((w) => {
       const [where, dimension] = w.axis === 'width' ? ['Column', 'wide'] : ['Row', 'high'];
-      const placeholder =
-        w.minPieceMm === PLACEHOLDER_MIN_PIECE_MM ? ' (a placeholder for now)' : '';
-      return `${where} ${w.index + 1} is ${mm(w.lengthMm)} mm ${dimension}, under the ${mm(w.minPieceMm)} mm minimum${placeholder}.`;
+      return `${where} ${w.index + 1} is ${mm(w.lengthMm)} mm ${dimension}, under the ${mm(w.minPieceMm)} mm the joints need.`;
     }),
     leftovers: plan.leftovers.map((note) =>
       describeLeftover(note, note.axis === 'width' ? max.widthMm : max.heightMm, params.joint),

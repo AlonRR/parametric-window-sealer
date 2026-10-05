@@ -1,6 +1,6 @@
 // Backlog item params-basic (#5): the basic parameter panel. The form's values arrive as
 // strings; readParams checks them, planWall divides the opening, describePlan says what
-// the user will get. Defaults: Q39 (3 mm), Q40 (30 mm placeholder minimum), Q41 (all
+// the user will get. Defaults: Q39 (3 mm), Q76 (the smallest piece, from the joint), Q41 (all
 // equal), Q42 (a 600 x 1000 mm example opening), Q51 (the joint's starting dimensions).
 // With connector-strip (#10) each joint takes 5 mm (Q56), and full pieces that leave less
 // than a joint warn with a choice of resolutions (Q60 to Q64). With track-edge (#11) the
@@ -9,7 +9,6 @@
 import { describe, expect, it } from 'vitest';
 import {
   EXAMPLE_PARAMS,
-  PLACEHOLDER_MIN_PIECE_MM,
   describePlan,
   planWall,
   readParams,
@@ -34,7 +33,6 @@ describe('the starting values', () => {
       joint: DEFAULT_JOINT,
       edges: { window: 'slider', roles: WINDOW_PRESETS.slider, track: EXAMPLE_TRACK },
     });
-    expect(PLACEHOLDER_MIN_PIECE_MM).toBe(30);
   });
 
   it('survive a round trip through the form', () => {
@@ -217,7 +215,7 @@ describe('planWall', () => {
     expect(sum(plan.rows) + sum(plan.rowJointsMm)).toBeCloseTo(993, 9);
   });
 
-  it('uses the custom size and the placeholder minimum', () => {
+  it('uses the custom size and the joint’s minimum (Q76)', () => {
     const plan = planWall({
       ...EXAMPLE_PARAMS,
       openingWidthMm: 637, // 640 mm with the edges
@@ -226,7 +224,7 @@ describe('planWall', () => {
     });
     expect(plan.columns).toEqual([200, 200, 200, 25]);
     expect(plan.rows).toEqual([249.5, 249.5, 249.5, 249.5]);
-    expect(plan.warnings).toEqual([{ axis: 'width', index: 3, lengthMm: 25, minPieceMm: 30 }]);
+    expect(plan.warnings).toEqual([{ axis: 'width', index: 3, lengthMm: 25, minPieceMm: 34 }]);
   });
 
   it('the joint sets the width between pieces: no slide leaves just the web', () => {
@@ -284,10 +282,20 @@ describe('describePlan', () => {
     );
   });
 
-  it('words each small-piece warning with its position and the placeholder', () => {
+  it('words each small-piece warning with its position and what the joints need', () => {
     expect(describe_(fillerWidth(637)).warnings).toEqual([
-      'Column 4 is 25 mm wide, under the 30 mm minimum (a placeholder for now).',
+      'Column 4 is 25 mm wide, under the 34 mm the joints need.',
     ]);
+  });
+
+  it('the minimum follows the joint: shallower slots allow narrower pieces', () => {
+    const shallow = { ...fillerWidth(637), joint: { ...DEFAULT_JOINT, slotMm: 4, slideMm: 1 } };
+    // 2 x 4 + (2 x 4 + 2) = 18 mm. The filler here is under the default 34 mm, and
+    // no longer warns.
+    const filler = planWall(shallow).columns.at(-1) ?? 0;
+    expect(filler).toBeGreaterThan(18);
+    expect(filler).toBeLessThan(34);
+    expect(describe_(shallow).warnings).toEqual([]);
   });
 
   it('offers the three resolutions when full pieces leave too little (Q60 to Q64)', () => {
@@ -305,7 +313,7 @@ describe('describePlan', () => {
           { value: 'equal', label: 'Equal pieces: 4 of 149.3 mm', possible: true },
           {
             value: 'shorten',
-            label: 'Shorten one full piece: 200, 200, 167 and 30 mm',
+            label: 'Shorten one full piece: 200, 200, 163 and 34 mm',
             possible: true,
           },
         ],
@@ -322,7 +330,7 @@ describe('describePlan', () => {
     expect(none?.options.map((o) => [o.label, o.possible])).toEqual([
       ['Spread the pieces: there is no joint to spread', false],
       ['Equal pieces: 2 of 99 mm', true],
-      ['Shorten one full piece: 168 and 30 mm', true],
+      ['Shorten one full piece: 164 and 34 mm', true],
     ]);
     const [far] = describe_(fillerWidth(406)).leftovers;
     expect(far?.options[0]).toEqual({

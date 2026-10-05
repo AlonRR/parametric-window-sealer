@@ -66,5 +66,8 @@ complete. Until then every change is listed under Unreleased.
   are a little smaller than before for the same opening.
 - The opening is measured as you see it; the pieces now reach into the window's tracks and
   stop short of the sash, so their sizes change again for the same opening.
+- The smallest piece is now what the joints need, 34 mm with the starting values, instead of
+  a 30 mm placeholder: the slot depth at both edges plus a strip's width between them. It
+  follows the joint settings.
 - The code that defines the pieces' shapes is licensed MPL-2.0 like the rest of the code; the
   documentation stays CERN-OHL-S-2.0.

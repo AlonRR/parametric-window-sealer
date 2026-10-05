@@ -36,7 +36,7 @@ test('follows a change, and warns about a small filler', async ({ page }) => {
   await page.getByLabel('Width division').selectOption('full-plus-filler');
   await expect(headline(page)).toHaveText('20 pieces: 4 across, 5 up, 3 mm thick');
   await expect(page.getByTestId('plan-warnings')).toContainText(
-    'Column 4 is 25 mm wide, under the 30 mm minimum',
+    'Column 4 is 25 mm wide, under the 34 mm the joints need',
   );
 });
 
@@ -101,7 +101,7 @@ test('full pieces that leave too little: a warning, spreading chosen, the others
   );
   const spread = warning.getByLabel('Spread the pieces 1 mm further apart at each joint');
   const equal = warning.getByLabel('Equal pieces: 4 of 149.3 mm');
-  const shorten = warning.getByLabel('Shorten one full piece: 200, 200, 167 and 30 mm');
+  const shorten = warning.getByLabel('Shorten one full piece: 200, 200, 163 and 34 mm');
   await expect(spread).toBeChecked();
   await expect(page.getByTestId('plan-columns')).toHaveText('Widths: 200, 200, 200 mm');
   await equal.check();
@@ -111,7 +111,7 @@ test('full pieces that leave too little: a warning, spreading chosen, the others
   await expect(warning.getByLabel('Equal pieces: 4 of 149.3 mm')).toBeChecked();
   await expect(warning.getByLabel('Equal pieces: 4 of 149.3 mm')).toBeFocused();
   await shorten.check();
-  await expect(page.getByTestId('plan-columns')).toHaveText('Widths: 200, 200, 167, 30 mm');
+  await expect(page.getByTestId('plan-columns')).toHaveText('Widths: 200, 200, 163, 34 mm');
 });
 
 test('when spreading cannot work it is greyed out, and equal pieces is chosen', async ({ page }) => {

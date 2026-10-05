@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_JOINT,
   jointWidthMm,
+  minPieceMm,
   partShapes,
   planJoints,
   stripThicknessMm,
@@ -39,6 +40,20 @@ describe('the joint dimensions (Q51, Q56)', () => {
 
   it('a joint takes the web plus the slide: each piece sits in the middle of its slide', () => {
     expect(jointWidthMm(DEFAULT_JOINT)).toBe(5);
+  });
+
+  it('the smallest piece: two slot depths and a strip’s width between them (Q76)', () => {
+    expect(minPieceMm(DEFAULT_JOINT)).toBe(34);
+    expect(minPieceMm({ ...DEFAULT_JOINT, slotMm: 10, webMm: 3 })).toBe(10 + 10 + 23);
+  });
+
+  it('at the smallest piece, a strip between two crossings is as long as it is wide', () => {
+    const plan = planJoints(
+      grid({ heightMm: 3 * 34 + 2 * 5, maxPieceHeightMm: 34 }),
+      DEFAULT_JOINT,
+    );
+    const middleRow = plan.strips.filter((s) => s.axis === 'vertical')[1];
+    expect(middleRow?.lengthMm).toBeCloseTo(stripWidthMm(DEFAULT_JOINT), 9);
   });
 
   it('the strip is two slots and a web wide, and the panel plus fit and flanges thick', () => {
