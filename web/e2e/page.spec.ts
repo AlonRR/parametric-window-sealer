@@ -22,3 +22,11 @@ test('a page whose engine cannot load says so', async ({ page }) => {
   await expect(status).toHaveAttribute('data-state', 'error', { timeout: 30_000 });
   await expect(status).toContainText('could not start');
 });
+
+// Q36: shown on the page itself, not only in the repository.
+test('the page says the generated files are the user\'s', async ({ page }) => {
+  await page.goto('./');
+  await expect(page.getByTestId('output-statement')).toContainText(
+    'are yours to use, change, share or sell for any purpose, with no conditions from this project.',
+  );
+});

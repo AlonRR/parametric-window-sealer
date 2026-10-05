@@ -1,8 +1,11 @@
 # Licensing per the REUSE specification (https://reuse.software). Check with `reuse lint`.
 #
-# The split, chosen by the owner on 5 Oct 2026:
-#   CERN-OHL-S-2.0  the design (model sources and exported parts) and the documentation
-#   MPL-2.0         code: scripts, hooks, tests, CI and tool configuration
+# The split, chosen by the owner on 5 Oct 2026 (Q1) and settled for the design by Q36:
+#   CERN-OHL-S-2.0  the documentation, and any design file that is not code
+#   MPL-2.0         code: the page, including the code that defines the pieces' shapes (Q36),
+#                   and scripts, hooks, tests, CI and tool configuration
+# Files the tool generates are not part of this repository; they are the user's to do with
+# as they wish (Q36), as the README and the page say.
 #
 # When several annotations match a file, the LAST matching one wins, so the general
 # rule comes first and the narrower code rule after it.

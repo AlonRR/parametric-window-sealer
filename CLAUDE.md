@@ -147,9 +147,13 @@ The repo is private today and built as if public from commit 1.
 ## Licensing
 
 REUSE layout: texts in `LICENSES/`, assignments in `REUSE.toml`; `reuse lint` must pass.
-CERN-OHL-S-2.0 for the design and documentation, MPL-2.0 for code (owner's decision, Q1).
-A new file is covered by `REUSE.toml`'s globs; if it is code, make sure it lands in the MPL-2.0
-list.
+CERN-OHL-S-2.0 for the documentation, MPL-2.0 for code (owner's decisions Q1 and Q36). The code
+that defines the pieces' shapes is code, so MPL-2.0 (Q36). A new file is covered by
+`REUSE.toml`'s globs; if it is code, make sure it lands in the MPL-2.0 list.
+
+**Files the tool generates are the user's** (Q36): STL files and anything printed from them may
+be used, changed, shared or sold for any purpose, with no conditions. The README and the page
+both say so in the same words, and `web/test/statement.test.ts` fails if either loses it.
 
 ## Checks to run
 

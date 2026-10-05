@@ -67,6 +67,7 @@ is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | Q40 | The **placeholder minimum piece width is 30 mm**, shown as a placeholder, until the joint's own size replaces it (Q37). The replacement is its own MVP backlog item, `min-piece-from-joint` (#53), so it is not missed | 5 Oct 2026 |
 | Q41 | Both width and height **start as "all pieces the same size"**; the user can change each | 5 Oct 2026 |
 | Q42 | The page **starts with a 600 × 1000 mm example opening**, labelled as an example (Q18) | 5 Oct 2026 |
+| Q36 | The code that defines the pieces' shapes is **MPL-2.0**, like the rest of the code; CERN-OHL-S-2.0 stays for the documentation (Q1). **Files the tool generates are the user's**: "people can do what they want with the STL output". The README and the page say so in one sentence, checked by a test. Prusa's Open Community License was considered and not chosen: it restricts commercial use and automated use, against this decision and issue #1 | 5 Oct 2026 |
 
 The first four rows were answered before questions carried IDs.
 
@@ -81,14 +82,6 @@ The first four rows were answered before questions carried IDs.
 - **Q33.** Within P1, the round hose port was first in line after the MVP (Q28), and the API was
   put "right after the MVP" (Q31). The backlog keeps `hose-port` first and the API rows next.
   Should the API rows come before `hose-port` instead?
-
-### Licensing
-
-- **Q36.** Q1 put the design under CERN-OHL-S-2.0 and code under MPL-2.0, when the design was
-  expected to be model files. With the engine chosen (Q22) the design is TypeScript: the
-  modules that define the pieces' shapes (from `plain-panel` on) are both the design source
-  and code. Which licence covers them? Until answered, everything in `web/` is MPL-2.0 as code;
-  the skeleton holds no panel geometry yet.
 
 ## Repository follow-ups
 

@@ -51,8 +51,15 @@ npm run build                     # the static site, into web/out/site
 
 ## Licence
 
-- The design and the documentation: [CERN-OHL-S-2.0](LICENSES/CERN-OHL-S-2.0.txt)
-- Code (scripts, hooks, tests, CI and tool configuration): [MPL-2.0](LICENSES/MPL-2.0.txt)
+**Your generated files are yours.** The STL and other files this tool generates, and anything
+you print from them, are yours to use, change, share or sell for any purpose, with no
+conditions from this project.
+
+The repository itself:
+
+- Code, including the code that defines the pieces' shapes, and the scripts, hooks, tests, CI
+  and tool configuration: [MPL-2.0](LICENSES/MPL-2.0.txt)
+- The documentation: [CERN-OHL-S-2.0](LICENSES/CERN-OHL-S-2.0.txt)
 
 Which licence covers which file is recorded in [`REUSE.toml`](REUSE.toml)
 ([REUSE](https://reuse.software) layout).

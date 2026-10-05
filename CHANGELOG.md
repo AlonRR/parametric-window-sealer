@@ -32,3 +32,10 @@ complete. Until then every change is listed under Unreleased.
   how each axis is divided and where the filler goes, and the panel thickness. It shows how
   many pieces of which sizes you will get, warns about pieces under the minimum, and marks
   any value it cannot use.
+- A statement, in the README and on the page, that the files the tool generates and anything
+  printed from them are yours to use, change, share or sell, with no conditions.
+
+### Changed
+
+- The code that defines the pieces' shapes is licensed MPL-2.0 like the rest of the code; the
+  documentation stays CERN-OHL-S-2.0.
