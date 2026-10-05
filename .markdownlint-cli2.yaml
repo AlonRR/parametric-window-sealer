@@ -18,5 +18,5 @@ globs:
 ignores:
   - "reports/**"        # generated scanner output - lint the generator, not its output
   - ".venv/**"
-  - "node_modules/**"
+  - "**/node_modules/**"  # at any depth; "node_modules/**" matched only the root one
   - "**/CHANGELOG.md"   # generated; its format is the tool's, not ours
