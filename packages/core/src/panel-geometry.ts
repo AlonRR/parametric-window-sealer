@@ -12,6 +12,8 @@ import { DEFAULT_COLLAR, collarInnerMm, collarOuterMm, portHoleMm } from './port
 import type { CollarParams, PortSetting } from './port.js';
 import { tapedCollar } from './tape.js';
 import type { TapeFit } from './tape.js';
+import { patternedPanel, pieceOpenings } from './pattern.js';
+import type { PatternChoice, Point } from './pattern.js';
 
 export interface PanelSize {
   widthMm: number;
@@ -102,6 +104,8 @@ export interface BuiltPiece {
 }
 
 // Every piece of the plan; a piece with a port (columns and rows from 1, as in Params) gets it.
+// With a pattern (patterns-core, #20), each piece gets the wall's pattern inside its border,
+// and a port's piece stays solid that far beyond the collar (Q134, Q137).
 export function buildPieces(
   engine: Engine,
   plan: GridLayout,
@@ -109,22 +113,41 @@ export function buildPieces(
   ports: readonly PortSetting[] = [],
   collar: CollarParams = DEFAULT_COLLAR,
   tape?: TapeFit,
+  pattern?: PatternChoice & { borderMm: number },
 ): BuiltPiece[] {
   const built: BuiltPiece[] = [];
   const taped = tapedCollar(collar, tape);
   const groove = tape?.port === true ? { widthMm: tape.grooveWidthMm, depthMm: tape.grooveDepthMm } : undefined;
+  // The wall's centre, where the pattern's tiles are centred (Q135).
+  const centre: Point = [
+    Math.max(0, ...plan.pieces.map((c) => c.xMm + c.widthMm)) / 2,
+    Math.max(0, ...plan.pieces.map((c) => c.yMm + c.heightMm)) / 2,
+  ];
+  const withPattern = (solid: Manifold, cell: GridLayout['pieces'][number], hoseMm?: number): Manifold => {
+    if (pattern === undefined) return solid;
+    const keepOut =
+      hoseMm === undefined
+        ? undefined
+        : { xMm: cell.widthMm / 2, yMm: cell.heightMm / 2, radiusMm: collarOuterMm(hoseMm, taped) / 2 + pattern.borderMm };
+    const openings = pieceOpenings(engine, pattern.tile, centre, cell, pattern.borderMm, keepOut);
+    try {
+      return patternedPanel(engine, solid, openings, thicknessMm, pattern.style, pattern.reliefPct);
+    } finally {
+      openings.delete();
+    }
+  };
   try {
     for (const cell of plan.pieces) {
       const size = { widthMm: cell.widthMm, heightMm: cell.heightMm, thicknessMm };
       const port = ports.find((p) => p.column === cell.column + 1 && p.row === cell.row + 1);
       built.push(
         port === undefined
-          ? { column: cell.column, row: cell.row, solid: plainPanel(engine, size) }
+          ? { column: cell.column, row: cell.row, solid: withPattern(plainPanel(engine, size), cell) }
           : {
               column: cell.column,
               row: cell.row,
               hoseMm: port.hoseMm,
-              solid: portPanel(engine, size, port.hoseMm, taped, groove),
+              solid: withPattern(portPanel(engine, size, port.hoseMm, taped, groove), cell, port.hoseMm),
             },
       );
     }
