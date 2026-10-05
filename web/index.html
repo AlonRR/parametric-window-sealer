@@ -51,6 +51,13 @@
         border-top: 2px solid #ddd;
         margin-top: 1rem;
       }
+      #preview canvas {
+        border: 1px solid #ddd;
+        border-radius: 0.4rem;
+        display: block;
+        max-width: 100%;
+        touch-action: none;
+      }
       button {
         font: inherit;
         padding: 0.4rem 0.9rem;
@@ -164,6 +171,9 @@
 
       <section id="plan" aria-live="polite">
         <h2>What you get</h2>
+        <div id="preview" data-testid="preview" data-state="loading" data-pieces="0">
+          <p class="note" data-testid="preview-message"></p>
+        </div>
         <p data-testid="plan-headline"></p>
         <p data-testid="plan-columns"></p>
         <p data-testid="plan-rows"></p>

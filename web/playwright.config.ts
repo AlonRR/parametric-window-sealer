@@ -11,11 +11,29 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      testIgnore: /no-webgl/,
       use: {
         ...devices['Desktop Chrome'],
         // CI downloads the Chromium build this Playwright version expects. A machine that
         // already has one elsewhere can point at it instead of downloading.
-        launchOptions: { executablePath: process.env.PW_CHROMIUM_PATH || undefined },
+        launchOptions: {
+          executablePath: process.env.PW_CHROMIUM_PATH || undefined,
+          // Headless Chromium has no graphics card; these let it draw WebGL in software
+          // (SwiftShader), so the 3D preview can be tested.
+          args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
+        },
+      },
+    },
+    {
+      // The same browser with 3D switched off, for the page's fallback (preview-3d, #9).
+      name: 'no-webgl',
+      testMatch: /no-webgl/,
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: {
+          executablePath: process.env.PW_CHROMIUM_PATH || undefined,
+          args: ['--disable-webgl', '--disable-webgl2', '--disable-3d-apis'],
+        },
       },
     },
   ],

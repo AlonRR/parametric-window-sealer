@@ -42,6 +42,9 @@ complete. Until then every change is listed under Unreleased.
 - Downloading the pieces: a dialog where you choose STL or 3MF, as separate files, one zip, or
   every piece in one 3MF file. It remembers your last choice in your own browser. Files are
   named by their place in the wall and their size.
+- A 3D preview of the wall, drawn with three.js: the same pieces you download, each outlined,
+  redrawn as you edit; drag to turn it, scroll or pinch to zoom. A browser without WebGL is
+  told so, and the rest of the page still works.
 
 ### Changed
 

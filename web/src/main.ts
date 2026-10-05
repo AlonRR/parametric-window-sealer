@@ -6,6 +6,7 @@ import { mountDownload } from './download-dialog';
 import { buildCheckPart, loadEngine } from './engine';
 import { mountPanel } from './panel';
 import type { Params } from './params';
+import { mountPreview } from './preview';
 
 async function start(status: HTMLElement): Promise<void> {
   try {
@@ -23,11 +24,14 @@ const form = document.querySelector<HTMLFormElement>('#params');
 const plan = document.querySelector<HTMLElement>('#plan');
 const openButton = document.querySelector<HTMLButtonElement>('#download-open');
 const dialog = document.querySelector<HTMLDialogElement>('#download-dialog');
+const previewBox = document.querySelector<HTMLElement>('#preview');
+const preview = previewBox ? mountPreview(previewBox, () => loadEngine(wasmUrl)) : null;
 let current: Params | null = null;
 if (form && plan) {
   mountPanel(form, plan, (params) => {
     current = params;
     if (openButton) openButton.disabled = params === null;
+    preview?.show(params);
   });
 }
 if (openButton && dialog) {
