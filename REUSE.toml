@@ -15,6 +15,7 @@ SPDX-License-Identifier = "CERN-OHL-S-2.0"
 
 [[annotations]]
 path = [
+  ".claude/**",
   ".githooks/**",
   ".github/**",
   "scripts/**",
