@@ -35,3 +35,8 @@ The first entries are choices made before Q144 in work the owner had not been as
 | C23 | `pattern-diamond` (#19) | **20 mm wide and 30 mm tall** across the corners, **with 3 mm bars**, to start with | 20 × 20 mm (square diamonds); 15 × 25 mm |
 | C24 | `pattern-diamond` (#19) | The diamonds have **a width, a height and a bar of their own**, read only when they are chosen | One size, always square |
 | C25 | `pattern-diamond` (#19) | The command's flags are **`--diamond-width`, `--diamond-height` and `--diamond-bar`**, any alone meaning the diamonds; the MCP server's `fill.diamond` | A shared set of size flags for whichever pattern |
+| C26 | `params-advanced` (#21) | A piece's own fill sets its **fill and style**; the pattern's **sizes stay the wall's** | Each piece with sizes of its own |
+| C27 | `params-advanced` (#21) | A piece with its own pattern **stays on the wall's lattice**, so it lines up with its neighbours | Its pattern centred in the piece |
+| C28 | `params-advanced` (#21) | Written as **`column,row=fill[:style]`**, several separated by spaces, as the ports are; the command **repeats `--piece-fill`**; the MCP server takes `pieceFills: [{ column, row, kind, style? }]` | One flag per piece and setting (`--piece-2-1-fill`); a fill for a whole row or column at once |
+| C29 | `params-advanced` (#21) | The page shows **a map of the pieces as seen from the room, top row first**, and **one list for the chosen piece** with its fill and style together ("Grid, relief") | A drawing of the wall to click; a fill list and style buttons apart |
+| C30 | `params-advanced` (#21) | A fill for a piece the wall does not have, as after making the wall smaller, is **refused with a message** | Dropped without a word; kept and ignored |

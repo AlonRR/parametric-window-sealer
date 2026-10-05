@@ -12,6 +12,11 @@ under Unreleased.
 
 ### Added
 
+- A fill for any piece: under "Advanced: piece by piece", click a piece on the map of the wall
+  and give it its own fill, sealed or a pattern, relief or cut through; the rest keep the wall's.
+  The plan lists each one. The command repeats `--piece-fill 2,1=grid:through`, the MCP server
+  takes `pieceFills`.
+
 - A diamond pattern: choose "Diamond" under "Panel fill" for point-up diamonds in a lattice, as
   a leaded window, 20 mm wide and 30 mm tall with 3 mm bars to start with, all three under
   Advanced. The command takes `--fill diamond`, `--diamond-width`, `--diamond-height` and

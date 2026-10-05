@@ -63,6 +63,7 @@ Start from `EXAMPLE_PARAMS` and change what differs. Every length is in mm.
 | `collar`                               | The port's collar: `depthMm`, `wallMm`, `clearanceMm`, `lipMm` (`DEFAULT_COLLAR`)                                                                                                                                       |
 | `seal`                                 | `{ kind: 'none' }` or `'tape'`, with the `tape`'s `widthMm`, `thicknessMm` (`TAPE_SIZES`), `grooveMm`, `squeezePct`, and whether it also goes on the strips' `sides` and in each `port` (`NO_SEAL`, `DEFAULT_TAPE`)   |
 | `fill`                                 | `{ kind: 'sealed' }`, or a pattern: `'grid'`, `'hexagon'`, `'brick'` or `'diamond'` (`FILL_KINDS`), its `style` (`'relief'`, cut into the room side to `reliefPct` of the thickness, or `'through'`), and each pattern's sizes in `grid`, `hexagon`, `brick` and `diamond` (`SEALED` holds the starting ones; bars at least `MIN_BAR_MM`) |
+| `pieceFills`                           | Pieces with a fill of their own, none to start with: each `{ column, row, kind, style? }`, from 1 at the bottom left seen from the room; the sizes stay the wall's (`fillFor` gives a piece's fill) |
 
 Wrong parameters throw a `ParamsError` whose `errors` names every wrong field with the page's
 message. `validateParams(params)` gives the same messages without building anything.
@@ -93,7 +94,8 @@ and edges), `describePlan`, `readParams` and `toFormValues` (the page's form val
 and `SETTINGS` (settings in the library's shape, possibly partial, and what each one is),
 `pieceLimit` (the largest piece a wall's printer allows), the
 shapes (`plainPanel`, `portPanel`, `stripSolid`, `crossSolid`, `edgeStripSolid`), the hose
-port's rules (`checkPort`, `parsePorts`, `formatPorts`), the tape's (`tapeFit`, `tapedCollar`,
+port's rules (`checkPort`, `parsePorts`, `formatPorts`), the per-piece fills'
+(`fillFor`, `parsePieceFills`, `formatPieceFills`), the tape's (`tapeFit`, `tapedCollar`,
 and `edgeTapeSolid` and `portTapeSolid`, the tape itself for a preview), the pattern framework
 (`pieceOpenings`, `patternedPanel`, `patternBorderMm`, and a tile of openings passed to
 `buildPieces`, as `gridTile`, `hexagonTile`, `brickTile`, `diamondTile` and `fillPattern`

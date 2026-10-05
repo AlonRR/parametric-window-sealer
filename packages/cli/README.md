@@ -92,6 +92,9 @@ window-sealer --width 600 --height 1000 --printer-model prusa-mk4s
   a running bond, sized with `--brick-width` (30 mm), `--brick-height` (12 mm) and `--brick-bar`
   (3 mm). `--fill diamond` gives point-up diamonds, sized with `--diamond-width` (20 mm),
   `--diamond-height` (30 mm) and `--diamond-bar` (3 mm).
+- `--piece-fill 2,1=sealed` gives one piece a fill of its own, by column and row from 1 at the
+  bottom left seen from the room: `sealed`, or a pattern with an optional style, as
+  `3,1=grid:through`. Give `--piece-fill` again for each piece.
 
 ### Settings in a file
 

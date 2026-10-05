@@ -69,7 +69,7 @@ Nothing in either has been test printed yet.
 | `pattern-brick` | #18 | Brick pattern: openings in a running bond, 30 × 12 mm with 3 mm bars to start, all three changeable (C18 to C21) | P1 | S | `patterns-core` | Q20, Q144 | |
 | `pattern-diamond` | #19 | Diamond pattern: point-up diamonds in a lattice, 20 × 30 mm with 3 mm bars to start, all three changeable (C22 to C25) | P1 | S | `patterns-core` | Q20, Q144 | |
 | `patterns-core` | #20 | Pattern framework, in the library first (Q133): a tile repeated across the whole wall (Q135), cut through or into the room side (Q136, Q138), inside a solid border of the slot depth plus 2 mm (Q134) and clear of a hose port (Q137) | P1 | M | `plain-panel` | Q7, Q8, Q133 to Q138 | The joint edges stay solid under any tile, as the border is tied to the slot |
-| `params-advanced` | #21 | Advanced tab with per-piece overrides of the fill | P1 | M | `params-basic`, `patterns-core` | Q10 | Page design for picking a piece in a grid |
+| `params-advanced` | #21 | Advanced: a fill for any piece, its fill and style, picked on a map of the pieces (C26 to C30) | P1 | M | `params-basic`, `patterns-core` | Q10, Q144 | |
 | `seal-tpu` | #22 | Optional TPU seal parts: edge strips and seam strips, the seams being where tape does not fit (Q128) | P1 | M | `connector-strip`, `track-edge` | Q6, Q17, Q128 | Test print in TPU |
 | `measured-cutout` | #23 | Appliance cutout sized to measured dimensions, with a gasket (TPU or foam) taking up the last few mm | P1 | M | `plain-panel` | Q16 | Test print |
 | `window-ac` | #24 | Fitting for a window AC: the wall meets the unit's side or top | P1 | M | `measured-cutout` | Q15 | Units differ; example sizes only |

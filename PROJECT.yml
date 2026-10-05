@@ -5,6 +5,6 @@ projects:
   - name:     Parametric window sealer
     kind:     build
     state:    not-designed
-    next:     "build params-advanced (#21), the next P1 item after the patterns (#16 to #20)"
+    next:     "build seal-tpu (#22), the next P1 item after params-advanced (#21)"
     trackers: [docs/status.md, docs/backlog.md]
     review:   2026-10-05

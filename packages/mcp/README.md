@@ -73,7 +73,8 @@ or with its sizes, such as `{ "grid": { "openingMm": 12, "barMm": 2 }, "style": 
 grid settings without a `kind` mean the grid. A honeycomb is `"kind": "hexagon"`, its sizes in
 `fill.hexagon` (`openingMm` across the flats, `barMm`); bricks are `"kind": "brick"`, sized in
 `fill.brick` (`widthMm`, `heightMm`, `barMm`), and diamonds `"kind": "diamond"`, in `fill.diamond`
-(`widthMm` and `heightMm` corner to corner, `barMm`).
+(`widthMm` and `heightMm` corner to corner, `barMm`). A piece with a fill of its own goes in
+`pieceFills`, as `[{ "column": 2, "row": 1, "kind": "sealed" }]`, with an optional `style`.
 
 `window_sealer_make_files` also takes:
 
