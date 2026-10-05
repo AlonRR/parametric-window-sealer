@@ -39,6 +39,9 @@ complete. Until then every change is listed under Unreleased.
   downloadable artifact; it publishes only once the repository owner switches it on.
 - The first piece shape: a plain sealed panel of any size and thickness, built for every cell
   of the plan (`web/src/panel-geometry.ts`), lying flat as it is printed.
+- Downloading the pieces: a dialog where you choose STL or 3MF, as separate files, one zip, or
+  every piece in one 3MF file. It remembers your last choice in your own browser. Files are
+  named by their place in the wall and their size.
 
 ### Changed
 

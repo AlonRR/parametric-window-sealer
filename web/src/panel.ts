@@ -3,7 +3,7 @@
 // form and those functions.
 
 import { EXAMPLE_PARAMS, describePlan, planWall, readParams, toFormValues } from './params';
-import type { FieldName, FormValues } from './params';
+import type { FieldName, FormValues, Params } from './params';
 import { DEFAULT_MAX_PIECE } from './printer';
 
 const FIELDS: readonly FieldName[] = [
@@ -49,7 +49,12 @@ function setText(root: ParentNode, testId: string, text: string): void {
   if (el) el.textContent = text;
 }
 
-export function mountPanel(form: HTMLFormElement, plan: HTMLElement): void {
+// onChange hears the parameters after every edit, or null while a field is wrong.
+export function mountPanel(
+  form: HTMLFormElement,
+  plan: HTMLElement,
+  onChange: (params: Params | null) => void = () => {},
+): void {
   for (const el of form.querySelectorAll('[data-default-size]')) {
     el.textContent = `${DEFAULT_MAX_PIECE.widthMm} × ${DEFAULT_MAX_PIECE.heightMm} mm`;
   }
@@ -70,6 +75,7 @@ export function mountPanel(form: HTMLFormElement, plan: HTMLElement): void {
     }
 
     const result = readParams(values);
+    onChange(result.ok ? result.params : null);
     const errors = result.ok ? {} : result.errors;
     for (const name of FIELDS) {
       const c = control(form, name);

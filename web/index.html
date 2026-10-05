@@ -51,6 +51,22 @@
         border-top: 2px solid #ddd;
         margin-top: 1rem;
       }
+      button {
+        font: inherit;
+        padding: 0.4rem 0.9rem;
+      }
+      dialog {
+        border: 1px solid #c8c8c8;
+        border-radius: 0.5rem;
+        max-width: min(32rem, 92vw);
+      }
+      dialog menu {
+        display: flex;
+        gap: 0.6rem;
+        justify-content: flex-end;
+        margin: 1rem 0 0;
+        padding: 0;
+      }
     </style>
   </head>
   <body>
@@ -152,7 +168,38 @@
         <p data-testid="plan-columns"></p>
         <p data-testid="plan-rows"></p>
         <ul data-testid="plan-warnings"></ul>
+        <p><button type="button" id="download-open">Download the pieces...</button></p>
       </section>
+
+      <dialog id="download-dialog" aria-labelledby="download-title">
+        <form>
+          <h2 id="download-title">Download the pieces</h2>
+          <fieldset>
+            <legend>Format</legend>
+            <label><input type="radio" name="format" value="stl" /> STL</label>
+            <label><input type="radio" name="format" value="3mf" /> 3MF</label>
+          </fieldset>
+          <fieldset>
+            <legend>Files</legend>
+            <label>
+              <input type="radio" name="packaging" value="separate" /> Separate files, one per piece
+            </label>
+            <label><input type="radio" name="packaging" value="zip" /> One zip file</label>
+            <label>
+              <input type="radio" name="packaging" value="single" /> One 3MF file holding every piece
+            </label>
+          </fieldset>
+          <p class="note">
+            The files are yours to use, change, share or sell for any purpose, with no conditions
+            from this project.
+          </p>
+          <p class="note" data-download-status aria-live="polite"></p>
+          <menu>
+            <button type="button" data-download-cancel>Cancel</button>
+            <button type="submit" data-download-go>Download</button>
+          </menu>
+        </form>
+      </dialog>
 
       <p class="note" data-testid="engine-status" data-state="loading">
         Starting the geometry engine...
