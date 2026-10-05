@@ -4,7 +4,7 @@ Parametric, 3D-printable panels that close off the part of a window left open ar
 air conditioner, fan or hose: the geometry as a library for Node.js and browsers. It is the
 same code the project's web page runs.
 
-**Version 0.1.0, not yet test printed.** You give it the opening and a few choices; it plans a
+**Version 0.2.0, not yet test printed.** You give it the opening and a few choices; it plans a
 wall of flat panels joined by H-shaped strips, with cross pieces where four panels meet and
 an edge strip along each side of the opening, and writes the STL or 3MF files to print. The
 joint and track sizes are starting values that a test print still has to confirm.

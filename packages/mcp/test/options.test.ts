@@ -1,4 +1,5 @@
 // The server's own options (Q94, Q96): where it may write, given when it is added to an agent.
+import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -39,7 +40,8 @@ describe('readOptions', () => {
     expect(r.print.replace(/\s+/g, ' ')).toContain(STATEMENT);
   });
 
-  it('--version', () => {
-    expect(readOptions(['--version'], '/work')).toEqual({ print: '0.1.0' });
+  it('--version gives the package’s version', () => {
+    const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as { version: string };
+    expect(readOptions(['--version'], '/work')).toEqual({ print: pkg.version });
   });
 });

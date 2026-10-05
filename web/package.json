@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "manifold-3d": "3.5.4",
-    "parametric-window-sealer": "0.1.0",
+    "parametric-window-sealer": "0.2.0",
     "three": "0.186.1"
   },
   "devDependencies": {

@@ -4,10 +4,13 @@ All notable changes to this project are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (owner's decision Q29).
 
-The first version, `0.1.0`, is the MVP in [`docs/backlog.md`](docs/backlog.md). Changes since
-the latest version are listed under Unreleased.
+The first version, `0.1.0`, is the MVP in [`docs/backlog.md`](docs/backlog.md); `0.2.0` adds the
+API: the library, the command and the MCP server. Changes since the latest version are listed
+under Unreleased.
 
 ## [Unreleased]
+
+## [0.2.0] - 2026-10-05
 
 ### Added
 

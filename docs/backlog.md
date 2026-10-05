@@ -18,8 +18,9 @@ printer-presets list, per-piece overrides, the offline file and mesh import. Eac
 row below, and none needs the MVP rebuilt to add it. **Confirmed by the owner as proposed
 (Q28, 5 Oct 2026)**; the round hose port (`hose-port`) stays first in line after it.
 
-**Released as `v0.1.0` on 5 Oct 2026**: every P0 row below is done. Nothing in it has been
-test printed yet.
+**Released as `v0.1.0` on 5 Oct 2026**: every P0 row below is done. **`v0.2.0`, the same day,
+adds the three API rows that need no server** (`api-library`, `api-cli`, `api-mcp-local`; Q101).
+Nothing in either has been test printed yet.
 
 ## How to read the table
 
