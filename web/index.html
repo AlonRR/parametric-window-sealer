@@ -4,6 +4,54 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Parametric window sealer</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        line-height: 1.4;
+        margin: 0 auto;
+        max-width: 44rem;
+        padding: 1rem;
+      }
+      fieldset {
+        border: 1px solid #c8c8c8;
+        border-radius: 0.4rem;
+        margin: 0 0 1rem;
+        padding: 0.6rem 0.9rem 0.9rem;
+      }
+      legend {
+        font-weight: 600;
+      }
+      label {
+        display: block;
+        margin-top: 0.5rem;
+      }
+      input:not([type='radio']),
+      select {
+        display: block;
+        font: inherit;
+        margin-top: 0.2rem;
+        width: min(100%, 18rem);
+      }
+      [aria-invalid='true'] {
+        border-color: #b00020;
+        outline: 2px solid #b00020;
+      }
+      .note {
+        color: #555;
+        font-size: 0.9rem;
+        margin: 0.2rem 0 0;
+      }
+      .error {
+        color: #b00020;
+        display: block;
+        font-size: 0.9rem;
+        min-height: 1.2em;
+      }
+      #plan {
+        border-top: 2px solid #ddd;
+        margin-top: 1rem;
+      }
+    </style>
   </head>
   <body>
     <main>
@@ -12,7 +60,103 @@
         Printable panels that close off the part of a window left open around an air
         conditioner, a fan or a hose.
       </p>
-      <p data-testid="engine-status" data-state="loading">Starting the geometry engine...</p>
+
+      <form id="params" novalidate>
+        <fieldset>
+          <legend>The opening</legend>
+          <p class="note">Example sizes: measure your own window and enter them here.</p>
+          <label>
+            Opening width (mm)
+            <input name="openingWidthMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <span class="error" data-testid="error-openingWidthMm"></span>
+          <label>
+            Opening height (mm)
+            <input name="openingHeightMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <span class="error" data-testid="error-openingHeightMm"></span>
+        </fieldset>
+
+        <fieldset>
+          <legend>The largest piece your printer can make</legend>
+          <label>
+            <input type="radio" name="printer" value="default" />
+            Default: <span data-default-size></span> (fits most printers)
+          </label>
+          <label><input type="radio" name="printer" value="custom" /> Custom</label>
+          <label>
+            Custom width (mm)
+            <input name="customWidthMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <span class="error" data-testid="error-customWidthMm"></span>
+          <label>
+            Custom height (mm)
+            <input name="customHeightMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <span class="error" data-testid="error-customHeightMm"></span>
+        </fieldset>
+
+        <fieldset>
+          <legend>Dividing the width</legend>
+          <label>
+            Width division
+            <select name="widthMode">
+              <option value="equal">All pieces the same width</option>
+              <option value="full-plus-filler">Full-size pieces plus one filler</option>
+            </select>
+          </label>
+          <label>
+            Width filler
+            <select name="widthFiller">
+              <option value="start">At the left</option>
+              <option value="end">At the right</option>
+              <option value="middle">In the middle</option>
+              <option value="split">Split: half at each side</option>
+            </select>
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Dividing the height</legend>
+          <label>
+            Height division
+            <select name="heightMode">
+              <option value="equal">All pieces the same height</option>
+              <option value="full-plus-filler">Full-size pieces plus one filler</option>
+            </select>
+          </label>
+          <label>
+            Height filler
+            <select name="heightFiller">
+              <option value="start">At the bottom</option>
+              <option value="end">At the top</option>
+              <option value="middle">In the middle</option>
+              <option value="split">Split: half at top and bottom</option>
+            </select>
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>The panel</legend>
+          <label>
+            Panel thickness (mm)
+            <input name="thicknessMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <span class="error" data-testid="error-thicknessMm"></span>
+        </fieldset>
+      </form>
+
+      <section id="plan" aria-live="polite">
+        <h2>What you get</h2>
+        <p data-testid="plan-headline"></p>
+        <p data-testid="plan-columns"></p>
+        <p data-testid="plan-rows"></p>
+        <ul data-testid="plan-warnings"></ul>
+      </section>
+
+      <p class="note" data-testid="engine-status" data-state="loading">
+        Starting the geometry engine...
+      </p>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>

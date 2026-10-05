@@ -28,3 +28,7 @@ complete. Until then every change is listed under Unreleased.
 - A default maximum piece size of 200 × 200 mm, plus a custom size
   (`web/src/printer.ts`), backed by the build volumes of 29 printers read from their makers'
   sites ([`docs/printer-beds.md`](docs/printer-beds.md)).
+- The parameter panel on the page: the opening's size, the largest piece (default or custom),
+  how each axis is divided and where the filler goes, and the panel thickness. It shows how
+  many pieces of which sizes you will get, warns about pieces under the minimum, and marks
+  any value it cannot use.

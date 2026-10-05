@@ -1,8 +1,9 @@
-// The page's entry point. For now it starts the engine and reports a check part, which
-// the browser test reads; the parameter panel and the preview replace this as the MVP
-// items land (docs/backlog.md).
+// The page's entry point: the parameter panel, and the geometry engine started in the
+// background with a check part the browser test reads. The preview and the download join
+// them as the MVP items land (docs/backlog.md).
 import wasmUrl from 'manifold-3d/manifold.wasm?url';
 import { buildCheckPart, loadEngine } from './engine';
+import { mountPanel } from './panel';
 
 async function start(status: HTMLElement): Promise<void> {
   try {
@@ -15,6 +16,10 @@ async function start(status: HTMLElement): Promise<void> {
     status.textContent = `The geometry engine could not start: ${String(error)}`;
   }
 }
+
+const form = document.querySelector<HTMLFormElement>('#params');
+const plan = document.querySelector<HTMLElement>('#plan');
+if (form && plan) mountPanel(form, plan);
 
 const status = document.querySelector<HTMLElement>('[data-testid="engine-status"]');
 if (status) void start(status);

@@ -5,6 +5,6 @@ projects:
   - name:     Parametric window sealer
     kind:     build
     state:    not-designed
-    next:     "build the next MVP item in docs/backlog.md, params-basic (#5)"
+    next:     "build plain-panel (#6), the next MVP item in docs/backlog.md, once Q36 is answered"
     trackers: [docs/status.md, docs/backlog.md]
     review:   2026-10-05
