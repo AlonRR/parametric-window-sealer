@@ -25,6 +25,7 @@ export interface MeshData {
 export interface ExportPiece {
   cell: GridPiece;
   mesh: MeshData;
+  hoseMm?: number; // the piece holds a hose port of this size (hose-port, #12)
 }
 
 // A strip or cross piece shape, lying as it prints, and how many to print.
@@ -60,11 +61,14 @@ export function meshOf(solid: Manifold): MeshData {
 
 const mm = (n: number) => String(Math.round(n * 10) / 10);
 
+// A piece with a hose port says so, and the hose's size: piece-c2-r1-197.7x198.6-port-150.stl.
 export function pieceFileName(
   cell: Pick<GridPiece, 'column' | 'row' | 'widthMm' | 'heightMm'>,
   extension: Format,
+  hoseMm?: number,
 ): string {
-  return `piece-c${cell.column + 1}-r${cell.row + 1}-${mm(cell.widthMm)}x${mm(cell.heightMm)}.${extension}`;
+  const port = hoseMm === undefined ? '' : `-port-${mm(hoseMm)}`;
+  return `piece-c${cell.column + 1}-r${cell.row + 1}-${mm(cell.widthMm)}x${mm(cell.heightMm)}${port}.${extension}`;
 }
 
 // An edge strip's height depends on its track, so it is part of the name.
@@ -169,7 +173,7 @@ export function to3mf(pieces: ExportPiece[], parts: ExportPart[] = []): Uint8Arr
   const alone = pieces.length + parts.reduce((n, p) => n + p.count, 0) === 1;
   pieces.forEach((piece, i) => {
     const id = i + 1;
-    objects.push(objectXml(id, pieceFileName(piece.cell, '3mf').replace(/\.3mf$/, ''), piece.mesh));
+    objects.push(objectXml(id, pieceFileName(piece.cell, '3mf', piece.hoseMm).replace(/\.3mf$/, ''), piece.mesh));
     const x = alone ? 0 : piece.cell.xMm + piece.cell.column * GAP_MM;
     const y = alone ? 0 : piece.cell.yMm + piece.cell.row * GAP_MM;
     items.push(itemXml(id, x, y));
@@ -235,7 +239,7 @@ export function packageDownload(
   }
   const type = MEDIA_TYPES[choice.format];
   const perPiece = pieces.map((piece) => {
-    const name = pieceFileName(piece.cell, choice.format);
+    const name = pieceFileName(piece.cell, choice.format, piece.hoseMm);
     const bytes =
       choice.format === 'stl'
         ? toStl(piece.mesh, name.replace(/\.stl$/, ''))

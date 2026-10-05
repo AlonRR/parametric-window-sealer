@@ -84,6 +84,16 @@ describe('planFiles', () => {
       },
     ],
     ['a single piece', { ...EXAMPLE_PARAMS, openingWidthMm: 150, openingHeightMm: 120 }],
+    [
+      'two hose ports',
+      {
+        ...EXAMPLE_PARAMS,
+        ports: [
+          { hoseMm: 150, column: 2, row: 1 },
+          { hoseMm: 130, column: 1, row: 4 },
+        ],
+      },
+    ],
   ];
   const cases = WALLS.flatMap(([wall, params]) =>
     CHOICES.map((choice) => [wall, `${choice.format} ${choice.packaging}`, params, choice] as const),

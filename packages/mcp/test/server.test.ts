@@ -270,3 +270,34 @@ async function connectWithout() {
     call: async (name: string, args: Record<string, unknown>) => answer(await client.callTool({ name, arguments: args })),
   };
 }
+
+describe('hose ports (hose-port #12; Q114: ports as a list)', () => {
+  it('the schema describes ports as a list of hose sizes and pieces', async () => {
+    const { client } = await connect();
+    const plan = (await client.listTools()).tools.find((t) => t.name === 'window_sealer_plan_wall');
+    const ports = (plan?.inputSchema.properties as Record<string, any>)['settings'].properties.ports;
+    expect(ports.type).toBe('array');
+    expect(Object.keys(ports.items.properties)).toEqual(['hoseMm', 'column', 'row']);
+    expect(ports.items.required).toEqual(['hoseMm']);
+    expect(ports.items.properties.column.type).toBe('integer');
+  });
+
+  it('plans and makes a wall with a port, the port in its own file', async () => {
+    const { call, outRoot } = await connect();
+    const settings = { ...OPENING, ports: [{ hoseMm: 150 }] };
+    const planned = await call('window_sealer_plan_wall', { settings });
+    expect(planned.isError).toBeFalsy();
+    expect(planned.data['summary'].ports).toEqual(['Hose port: a 150 mm hose end, in column 2, row 1.']);
+    expect(planned.data['settings'].ports).toEqual([{ hoseMm: 150, column: 2, row: 1 }]);
+    const made = await call('window_sealer_make_files', { settings: planned.data['settings'] });
+    expect(made.isError).toBeFalsy();
+    expect(listed(join(outRoot, 'window-sealer-600x1000'))).toContain('piece-c2-r1-197.7x198.6-port-150.stl');
+  });
+
+  it('a port the page would refuse is an error with the page’s message', async () => {
+    const { call } = await connect();
+    const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, ports: [{ hoseMm: 150, column: 4, row: 1 }] } });
+    expect(r.isError).toBe(true);
+    expect(r.text).toContain('- ports: Port 1: There is no column 4, row 1: the wall has 3 columns and 5 rows.');
+  });
+});

@@ -268,3 +268,51 @@ describe('usage', () => {
     expect(r.out).toBe(pkg.version);
   });
 });
+
+describe('hose ports (hose-port #12; Q114: --port, repeatable)', () => {
+  const params = async (args: string[], files: Record<string, string> = {}) => {
+    const r = await cli([...args, '--dry-run', '--json'], undefined, files);
+    return json(r.out).params as typeof EXAMPLE_PARAMS;
+  };
+
+  it('--port 150 puts one in the bottom row’s middle piece, and says so', async () => {
+    const r = await cli([...OPENING, '--port', '150', '--dry-run']);
+    expect(r.code).toBe(0);
+    expect(r.out).toContain('Hose port: a 150 mm hose end, in column 2, row 1.');
+    expect(r.out).toContain('  piece-c2-r1-197.7x198.6-port-150.stl');
+  });
+
+  it('--port 150@3,1 names the piece; given again, it adds a port', async () => {
+    expect((await params([...OPENING, '--port', '150@3,1', '--port', '130@1,5'])).ports).toEqual([
+      { hoseMm: 150, column: 3, row: 1 },
+      { hoseMm: 130, column: 1, row: 5 },
+    ]);
+  });
+
+  it('flags replace the file’s ports, as any flag overrides the file', async () => {
+    const file = JSON.stringify({ ...EXAMPLE_PARAMS, ports: [{ hoseMm: 130, column: 1, row: 5 }] });
+    expect((await params(['--params', 'w.json'], { 'w.json': file })).ports).toEqual([{ hoseMm: 130, column: 1, row: 5 }]);
+    expect((await params(['--params', 'w.json', '--port', '150'], { 'w.json': file })).ports).toEqual([
+      { hoseMm: 150, column: 2, row: 1 },
+    ]);
+  });
+
+  it('refuses two ports in one piece, or a --port it cannot read', async () => {
+    const two = await cli([...OPENING, '--port', '150', '--port', '130@2,1']);
+    expect(two.code).toBe(2);
+    expect(two.err).toContain('--port: Ports 1 and 2 are both in column 2, row 1; give each its own piece.');
+    const bad = await cli([...OPENING, '--port', '150@2']);
+    expect(bad.err).toContain("--port: Port 1: write each as the hose end's outside diameter in mm");
+  });
+
+  it('the collar’s sizes have flags too (Q90, Q107)', async () => {
+    const p = await params([...OPENING, '--port', '150', '--collar-depth', '25', '--collar-lip', '4']);
+    expect(p.collar).toEqual({ depthMm: 25, wallMm: 2.4, clearanceMm: 0.5, lipMm: 4 });
+  });
+
+  it('--help shows --port’s form and that it repeats', async () => {
+    const r = await cli(['--help']);
+    expect(r.out).toMatch(/--port <mm\[@column,row\]> +Hose ports/);
+    expect(r.out.replace(/\s+/g, ' ')).toContain('Give --port again for each port.');
+  });
+});

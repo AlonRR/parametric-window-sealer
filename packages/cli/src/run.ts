@@ -76,9 +76,10 @@ function help(): string {
     ...OUTPUT_OPTIONS.map((o): [string, string] => [`--${o.flag}${o.value ? ` ${o.value}` : ''}`, o.help]),
   ];
   const settings: [string, string][] = SETTING_FLAGS.map((f) => {
-    const value = f.values === undefined ? '<mm>' : `<${f.values.join('|')}>`;
+    const value = f.list ? '<mm[@column,row]>' : f.values === undefined ? '<mm>' : `<${f.values.join('|')}>`;
     const start = f.flag === 'width' || f.flag === 'height' ? '' : starting[f.field];
-    return [`--${f.flag} ${value}`, start ? `${f.help} (${start})` : f.help];
+    const help = f.list ? `${f.help} Give --${f.flag} again for each port.` : f.help;
+    return [`--${f.flag} ${value}`, start ? `${help} (${start})` : help];
   });
   const pad = Math.max(...[...rows, ...settings].map(([left]) => left.length)) + 2;
   const table = (list: [string, string][]) =>
@@ -106,6 +107,7 @@ function help(): string {
 
 function summaryLines(summary: PlanText): string[] {
   const lines = [summary.headline, summary.columns, summary.rows, summary.span, summary.joints, summary.edges];
+  lines.push(...summary.ports);
   for (const warning of summary.warnings) lines.push(`Warning: ${warning}`);
   for (const leftover of summary.leftovers) {
     lines.push(leftover.message, `  Change it with --${leftover.axis}-leftover:`);
@@ -145,13 +147,13 @@ export async function run(args: string[], io: Io): Promise<number> {
         json: { type: 'boolean' },
         help: { type: 'boolean', short: 'h' },
         version: { type: 'boolean' },
-        ...Object.fromEntries(SETTING_FLAGS.map((f) => [f.flag, { type: 'string' as const }])),
+        ...Object.fromEntries(SETTING_FLAGS.map((f) => [f.flag, { type: 'string' as const, multiple: f.list === true }])),
       },
     });
   } catch (error) {
     return fail(WRONG_USE, [{ message: `window-sealer: ${(error as Error).message}` }]);
   }
-  const options = parsed.values as Record<string, string | boolean | undefined>;
+  const options = parsed.values as Record<string, string | string[] | boolean | undefined>;
   if (options['help'] === true) {
     io.out(help());
     return DONE;
@@ -160,8 +162,10 @@ export async function run(args: string[], io: Io): Promise<number> {
     io.out(version());
     return DONE;
   }
+  // A repeatable flag (--port) arrives as a list: its values joined as the form writes them.
   const text = (name: string): string | undefined => {
     const value = options[name];
+    if (Array.isArray(value)) return value.join(' ');
     return typeof value === 'string' ? value : undefined;
   };
 

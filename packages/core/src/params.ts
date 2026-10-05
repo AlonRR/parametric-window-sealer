@@ -20,6 +20,8 @@ import { layoutGrid } from './layout.js';
 import type { Axis, AxisMode, FillerPosition, GridLayout, Leftover } from './layout.js';
 import { DEFAULT_MAX_PIECE, maxPieceSize } from './printer.js';
 import type { PrinterChoice } from './printer.js';
+import { DEFAULT_COLLAR, checkPort, defaultPortPiece, formatPorts, parsePorts, portHoleMm } from './port.js';
+import type { CollarParams, PortSetting } from './port.js';
 
 export interface AxisChoice {
   mode: AxisMode;
@@ -36,6 +38,8 @@ export interface Params {
   thicknessMm: number;
   joint: JointParams;
   edges: EdgeParams;
+  ports: Required<PortSetting>[]; // none for a plain wall (Q112); column and row from 1
+  collar: CollarParams;
 }
 
 // The page starts here: an example opening (Q42, labelled as an example, Q18), the default
@@ -51,6 +55,8 @@ export const EXAMPLE_PARAMS: Params = {
   thicknessMm: 3,
   joint: DEFAULT_JOINT,
   edges: { window: 'slider', roles: WINDOW_PRESETS.slider, track: EXAMPLE_TRACK },
+  ports: [],
+  collar: DEFAULT_COLLAR,
 };
 
 export type FieldName =
@@ -81,7 +87,12 @@ export type FieldName =
   | 'bottomDepthMm'
   | 'leftDepthMm'
   | 'rightDepthMm'
-  | 'trackClearanceMm';
+  | 'trackClearanceMm'
+  | 'ports'
+  | 'collarDepthMm'
+  | 'collarWallMm'
+  | 'collarClearanceMm'
+  | 'collarLipMm';
 
 export type FormValues = Partial<Record<FieldName, string>>;
 export type FieldErrors = Partial<Record<FieldName, string>>;
@@ -123,6 +134,11 @@ export function toFormValues(p: Params): FormValues {
     leftDepthMm: String(p.edges.track.depthMm.left),
     rightDepthMm: String(p.edges.track.depthMm.right),
     trackClearanceMm: String(p.edges.track.clearanceMm),
+    ports: formatPorts(p.ports),
+    collarDepthMm: String(p.collar.depthMm),
+    collarWallMm: String(p.collar.wallMm),
+    collarClearanceMm: String(p.collar.clearanceMm),
+    collarLipMm: String(p.collar.lipMm),
   };
 }
 
@@ -232,6 +248,16 @@ export function readParams(values: FormValues): ReadResult {
     }
   }
 
+  // The hose port's collar (Q107): the clearance may be zero, as the joint's fit may.
+  const collar: CollarParams = {
+    depthMm: size('collarDepthMm'),
+    wallMm: size('collarWallMm'),
+    clearanceMm: sizeOrZero('collarClearanceMm'),
+    lipMm: size('collarLipMm'),
+  };
+  const given = parsePorts(values.ports ?? '');
+  if (!given.ok) errors.ports = given.message;
+
   if (Object.keys(errors).length === 0) {
     // The edge strips must leave the pieces something to cover.
     const span = panelSpan(openingWidthMm, openingHeightMm, edges, joint);
@@ -239,11 +265,37 @@ export function readParams(values: FormValues): ReadResult {
     if (span.heightMm <= 0) errors.openingHeightMm = 'Too small for the edge strips.';
   }
 
+  const base = { openingWidthMm, openingHeightMm, printer, width, height, thicknessMm, joint, edges, collar };
+  const ports: Required<PortSetting>[] = [];
+  if (Object.keys(errors).length === 0 && given.ok && given.ports.length > 0) {
+    errors.ports = placePorts({ ...base, ports: [] }, given.ports, ports);
+    if (errors.ports === undefined) delete errors.ports;
+  }
+
   if (Object.keys(errors).length > 0) return { ok: false, errors };
-  return {
-    ok: true,
-    params: { openingWidthMm, openingHeightMm, printer, width, height, thicknessMm, joint, edges },
-  };
+  return { ok: true, params: { ...base, ports } };
+}
+
+// Each port in its piece (Q105, Q110), its lip leaving a hole, the piece there and big enough
+// (Q108), and no two in one piece (Q113). Fills `placed`; returns the first problem, if any.
+function placePorts(params: Params, given: PortSetting[], placed: Required<PortSetting>[]): string | undefined {
+  const plan = planWall(params);
+  const start = defaultPortPiece(plan);
+  for (const [i, port] of given.entries()) {
+    const column = port.column ?? start.column + 1;
+    const row = port.row ?? start.row + 1;
+    if (!(portHoleMm(port.hoseMm, params.collar) > 0)) {
+      return `Port ${i + 1}: the ${mm(params.collar.lipMm)} mm lip would close a ${mm(port.hoseMm)} mm hose’s port; make the lip smaller.`;
+    }
+    const fit = checkPort(plan, { hoseMm: port.hoseMm, column: column - 1, row: row - 1 }, params.collar, params.joint);
+    if (!fit.ok) return `Port ${i + 1}: ${fit.message}`;
+    const other = placed.findIndex((p) => p.column === column && p.row === row);
+    if (other >= 0) {
+      return `Ports ${other + 1} and ${i + 1} are both in column ${column}, row ${row}; give each its own piece.`;
+    }
+    placed.push({ hoseMm: port.hoseMm, column, row });
+  }
+  return undefined;
 }
 
 export function planWall(p: Params): GridLayout {
@@ -298,6 +350,7 @@ export interface PlanText {
   edges: string;
   warnings: string[];
   leftovers: LeftoverText[];
+  ports: string[]; // one line for each hose port
 }
 
 function mm(n: number): string {
@@ -387,5 +440,6 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     leftovers: plan.leftovers.map((note) =>
       describeLeftover(note, note.axis === 'width' ? max.widthMm : max.heightMm, params.joint),
     ),
+    ports: params.ports.map((p) => `Hose port: a ${mm(p.hoseMm)} mm hose end, in column ${p.column}, row ${p.row}.`),
   };
 }

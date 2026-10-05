@@ -12,6 +12,7 @@ const GROUPS: Record<string, string> = {
   height: 'How the height is divided into pieces.',
   joint: 'The strips that join the pieces, in mm. Starting values; a test print confirms them.',
   edges: 'The window and its four edges.',
+  collar: "The hose port's collar, in mm. Starting values; a test print confirms them.",
   'edges.roles': 'What each edge meets. Setting the window type presets all four.',
   'edges.track': "The window's tracks, in mm.",
   'edges.track.depthMm': 'How deep each track is.',
@@ -19,8 +20,16 @@ const GROUPS: Record<string, string> = {
 
 type Tree = { [key: string]: Tree | z.ZodType };
 
-function leaf(help: string, values: readonly string[] | undefined, required: boolean): z.ZodType {
-  const base = values === undefined ? z.number() : z.enum(values as [string, ...string[]]);
+// A port (Q114): the hose end's outside diameter, and its piece counted from 1 at the bottom
+// left seen from the room; without a piece, the first goes in the starting one (Q105).
+const PORT = z.strictObject({
+  hoseMm: z.number().describe("The hose end's outside diameter in mm; 150 and 130 are common."),
+  column: z.number().int().min(1).optional().describe('The column of its piece, from 1 at the left.'),
+  row: z.number().int().min(1).optional().describe('The row of its piece, from 1 at the bottom.'),
+});
+
+function leaf(help: string, values: readonly string[] | undefined, required: boolean, list = false): z.ZodType {
+  const base = list ? z.array(PORT) : values === undefined ? z.number() : z.enum(values as [string, ...string[]]);
   const described = base.describe(help);
   return required ? described : described.optional();
 }
@@ -40,7 +49,7 @@ export function settingsSchema(): z.ZodObject {
     const keys = s.path.split('.');
     let at = tree;
     for (const key of keys.slice(0, -1)) at = (at[key] ??= {}) as Tree;
-    at[keys.at(-1) as string] = leaf(s.help, s.values, REQUIRED.has(s.path));
+    at[keys.at(-1) as string] = leaf(s.help, s.values, REQUIRED.has(s.path), s.list === true);
   }
   return toSchema(tree, '').describe(
     "The window's settings in the library's shape; every length in mm. Only the opening is required; " +

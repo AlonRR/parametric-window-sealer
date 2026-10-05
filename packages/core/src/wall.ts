@@ -22,13 +22,13 @@ export function buildExport(
   params: Params,
 ): { pieces: ExportPiece[]; parts: ExportPart[] } {
   const plan = planWall(params);
-  const built = buildPieces(engine, plan, params.thicknessMm);
+  const built = buildPieces(engine, plan, params.thicknessMm, params.ports, params.collar);
   let pieces: ExportPiece[];
   try {
     pieces = built.map((b, i) => {
       const cell = plan.pieces[i];
       if (!cell) throw new Error('The plan and the built pieces differ');
-      return { cell, mesh: meshOf(b.solid) };
+      return { cell, mesh: meshOf(b.solid), ...(b.hoseMm === undefined ? {} : { hoseMm: b.hoseMm }) };
     });
   } finally {
     for (const b of built) b.solid.delete();
@@ -117,7 +117,10 @@ export function planFiles(params: Params, choice: DownloadChoice): PlannedFile[]
   const { joints, edges } = planParts(params, plan);
   const type = MEDIA_TYPES[choice.format];
   return [
-    ...plan.pieces.map((cell) => ({ name: pieceFileName(cell, choice.format), type })),
+    ...plan.pieces.map((cell) => {
+      const port = params.ports.find((p) => p.column === cell.column + 1 && p.row === cell.row + 1);
+      return { name: pieceFileName(cell, choice.format, port?.hoseMm), type };
+    }),
     ...[...partShapes(joints, params.joint), ...edgeShapes(edges)].map((shape) => ({
       name: `${partName(shape)}.${choice.format}`,
       type,

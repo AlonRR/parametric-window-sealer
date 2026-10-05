@@ -17,6 +17,7 @@ import {
 import type { FormValues } from '../src/params.js';
 import { EXAMPLE_TRACK, WINDOW_PRESETS } from '../src/edge.js';
 import { DEFAULT_JOINT } from '../src/joint.js';
+import { DEFAULT_COLLAR } from '../src/port.js';
 
 const example = toFormValues(EXAMPLE_PARAMS);
 const read = (over: FormValues) => readParams({ ...example, ...over });
@@ -32,6 +33,8 @@ describe('the starting values', () => {
       thicknessMm: 3,
       joint: DEFAULT_JOINT,
       edges: { window: 'slider', roles: WINDOW_PRESETS.slider, track: EXAMPLE_TRACK },
+      ports: [],
+      collar: DEFAULT_COLLAR,
     });
   });
 
@@ -263,6 +266,7 @@ describe('describePlan', () => {
       edges: 'Edges: 18 edge strips in 3 shapes.',
       warnings: [],
       leftovers: [],
+      ports: [],
     });
   });
 

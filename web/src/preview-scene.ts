@@ -60,7 +60,7 @@ export function buildWallScene(engine: Engine, params: Params): Group {
   const { plan, joints, edges } = planParts(params);
   const { joint, thicknessMm } = params;
   const wall = new Group();
-  const built = buildPieces(engine, plan, thicknessMm);
+  const built = buildPieces(engine, plan, thicknessMm, params.ports, params.collar);
   try {
     built.forEach((piece, i) => {
       const cell = plan.pieces[i];

@@ -194,6 +194,46 @@
           <span class="error" data-testid="error-trackWidthMm"></span>
         </fieldset>
 
+        <!-- The hose port (hose-port, #12): an appliance choice starting at none (Q112), the
+          hose end's outside diameter from the listed sizes or the user's own (Q103), and its
+          piece, counted from the bottom left seen from the room (Q105, Q106). -->
+        <fieldset>
+          <legend>What is in the window?</legend>
+          <label><input type="radio" name="appliance" value="none" checked /> None, a plain wall</label>
+          <label><input type="radio" name="appliance" value="hose" /> Portable AC hose</label>
+          <div data-port="1" data-testid="port-1" hidden>
+            <label>
+              Hose end, outside diameter
+              <select data-part="size">
+                <option value="150">150 mm</option>
+                <option value="130">130 mm</option>
+                <option value="own">Your own measurement</option>
+              </select>
+            </label>
+            <label data-part="own-label" hidden>
+              Your measurement (mm)
+              <input data-part="own" inputmode="decimal" autocomplete="off" />
+            </label>
+            <p class="note">
+              Measure across the outside of the end that goes into the port: a fitting on the
+              hose's end can be another size than the hose.
+            </p>
+            <label>
+              Column
+              <input data-part="column" inputmode="numeric" autocomplete="off" />
+            </label>
+            <label>
+              Row
+              <input data-part="row" inputmode="numeric" autocomplete="off" />
+            </label>
+            <p class="note">
+              The piece the port is centred in, counted from 1 at the bottom left, seen from the
+              room. It starts in the bottom row's middle piece.
+            </p>
+          </div>
+          <span class="error" data-testid="error-ports"></span>
+        </fieldset>
+
         <fieldset>
           <legend>The largest piece your printer can make</legend>
           <label>
@@ -318,10 +358,45 @@
           <span class="error" data-testid="error-trackClearanceMm"></span>
         </details>
 
+        <details>
+          <summary>Advanced: the hose port</summary>
+          <p class="note">
+            The collar the hose end slides into, on the room side. These are starting values: a
+            test print shows whether to change them.
+          </p>
+          <label>
+            Collar depth (mm)
+            <input name="collarDepthMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">How far the hose end goes in.</p>
+          <span class="error" data-testid="error-collarDepthMm"></span>
+          <label>
+            Collar wall (mm)
+            <input name="collarWallMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <span class="error" data-testid="error-collarWallMm"></span>
+          <label>
+            Clearance (mm per side)
+            <input name="collarClearanceMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">The gap between the hose end and the collar, so it slides in.</p>
+          <span class="error" data-testid="error-collarClearanceMm"></span>
+          <label>
+            Lip (mm)
+            <input name="collarLipMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">How far the panel reaches in past the collar: the hose end stops on it.</p>
+          <span class="error" data-testid="error-collarLipMm"></span>
+          <div data-testid="extra-ports"></div>
+          <p><button type="button" id="add-port">Add another port</button></p>
+        </details>
+
         <!-- What to do when full pieces leave less room than a joint takes (Q60): set
           from the choice shown in the plan's warning. -->
         <input type="hidden" name="widthLeftover" />
         <input type="hidden" name="heightLeftover" />
+        <!-- Every port, written as the command's --port takes them (Q114). -->
+        <input type="hidden" name="ports" />
       </form>
 
       <section id="plan" aria-live="polite">
@@ -335,6 +410,7 @@
         <p data-testid="plan-span"></p>
         <p data-testid="plan-joints"></p>
         <p data-testid="plan-edges"></p>
+        <ul data-testid="plan-ports"></ul>
         <ul data-testid="plan-warnings"></ul>
         <p><button type="button" id="download-open">Download the pieces...</button></p>
       </section>

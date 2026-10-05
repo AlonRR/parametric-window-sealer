@@ -15,6 +15,7 @@ export interface Setting {
   path: string; // where it sits in the library's shape, as `edges.track.widthMm`
   help: string; // in the page's words
   values?: readonly string[]; // a choice; otherwise a length in mm
+  list?: true; // a list in the shape, written in the form as the command's --port takes it
 }
 
 const DIVISION = ['equal', 'full-plus-filler'] as const;
@@ -91,6 +92,19 @@ export const SETTINGS: readonly Setting[] = [
   depth('left'),
   depth('right'),
   { field: 'trackClearanceMm', path: 'edges.track.clearanceMm', help: 'Clearance in the track, per side.' },
+  {
+    field: 'ports',
+    path: 'ports',
+    help:
+      "Hose ports: none for a plain wall, or for each port the hose end's outside diameter in mm (150 and 130 " +
+      'are common; measure the end that goes in) and its piece, by column and row from 1 at the bottom left ' +
+      "seen from the room. Without a piece, the first goes in the bottom row's middle piece.",
+    list: true,
+  },
+  { field: 'collarDepthMm', path: 'collar.depthMm', help: "How far the hose end goes into the port's collar." },
+  { field: 'collarWallMm', path: 'collar.wallMm', help: "The collar's wall." },
+  { field: 'collarClearanceMm', path: 'collar.clearanceMm', help: 'Clearance per side between the hose end and the collar.' },
+  { field: 'collarLipMm', path: 'collar.lipMm', help: 'The lip the hose end stops against, inside the collar.' },
 ];
 
 // The value at a dotted path, such as `edges.track.widthMm`; undefined if it is not there.
@@ -116,11 +130,25 @@ type Json = Record<string, unknown>;
 const isObject = (value: unknown): value is Json =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
-// The shape an input may have: the library's own, with a custom printer's two sizes.
+// The shape an input may have: the library's own, with a custom printer's two sizes, and
+// each port as PORT_SHAPE.
 const SHAPE: Json = { ...EXAMPLE_PARAMS, printer: { kind: 'custom', widthMm: 0, heightMm: 0 } };
+const PORT_SHAPE: Json = { hoseMm: 0, column: 0, row: 0 };
 
 function checkShape(value: unknown, shape: unknown, path: string, problems: SettingProblem[]): void {
-  if (isObject(shape)) {
+  if (Array.isArray(shape)) {
+    if (!Array.isArray(value)) {
+      problems.push({ kind: 'shape', path, message: `${path} should be a list` });
+      return;
+    }
+    for (const [i, item] of value.entries()) {
+      const at = `${path}.${i}`;
+      checkShape(item, PORT_SHAPE, at, problems);
+      if (isObject(item) && 'column' in item !== 'row' in item) {
+        problems.push({ kind: 'shape', path: at, message: `${at} needs both column and row, or neither` });
+      }
+    }
+  } else if (isObject(shape)) {
     if (!isObject(value)) {
       const message = path === '' ? 'should be one JSON object' : `${path} should be an object`;
       problems.push({ kind: 'shape', path, message });

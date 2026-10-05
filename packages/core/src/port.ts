@@ -6,14 +6,10 @@
 // that a test print confirms (Q107). The port is centred in one piece (Q105) and stays clear
 // of the strips along each edge, or no port is made (Q108).
 //
-// Frame, as every piece: width along X, height along Y, thickness along Z from 0, seen from
+// The solid is portPanel, in panel-geometry.ts with the other pieces. Frame, as every piece: width along X, height along Y, thickness along Z from 0, seen from
 // the room (Q106): column 0 at the left, row 0 at the bottom, the collar towards the viewer.
-import type { Manifold } from 'manifold-3d';
-import type { Engine } from './engine.js';
 import type { JointParams } from './joint.js';
 import type { GridLayout } from './layout.js';
-import { plainPanel } from './panel-geometry.js';
-import type { PanelSize } from './panel-geometry.js';
 
 export interface CollarParams {
   depthMm: number; // how far the hose end goes in
@@ -24,6 +20,49 @@ export interface CollarParams {
 
 export const DEFAULT_COLLAR: CollarParams = { depthMm: 20, wallMm: 2.4, clearanceMm: 0.5, lipMm: 5 };
 
+// The hose sizes the page lists, as outside diameters in mm (Q103): 150 mm from three part
+// listings of two makers, 130 mm from one (docs/status.md has the sources). The user can
+// always give their own measurement instead.
+export const COMMON_HOSE_MM = [150, 130] as const;
+
+// A port as the user gives it: column and row count from 1, at the bottom left seen from the
+// room, as the messages and file names do. Left out, they are the starting piece (Q105).
+export interface PortSetting {
+  hoseMm: number;
+  column?: number;
+  row?: number;
+}
+
+const PORT_FORM = /^([0-9]*\.?[0-9]+)(?:@([0-9]+),([0-9]+))?$/;
+
+// The --port form (Q114): 150, or 150@2,1; several separated by spaces.
+export function parsePorts(text: string): { ok: true; ports: PortSetting[] } | { ok: false; message: string } {
+  const ports: PortSetting[] = [];
+  const words = text.trim() === '' ? [] : text.trim().split(/\s+/);
+  for (const [i, word] of words.entries()) {
+    const m = PORT_FORM.exec(word);
+    const hoseMm = Number(m?.[1]);
+    const column = m?.[2] === undefined ? undefined : Number(m[2]);
+    const row = m?.[3] === undefined ? undefined : Number(m[3]);
+    if (m === null || !(hoseMm > 0) || column === 0 || row === 0) {
+      return {
+        ok: false,
+        message:
+          `Port ${i + 1}: write each as the hose end's outside diameter in mm, ` +
+          'then optionally @column,row, as 150 or 150@2,1.',
+      };
+    }
+    ports.push(column === undefined ? { hoseMm } : { hoseMm, column, row });
+  }
+  return { ok: true, ports };
+}
+
+export function formatPorts(ports: readonly PortSetting[]): string {
+  return ports
+    .map((p) => (p.column === undefined && p.row === undefined ? `${p.hoseMm}` : `${p.hoseMm}@${p.column ?? ''},${p.row ?? ''}`))
+    .join(' ');
+}
+
 export interface HosePort {
   hoseMm: number; // the hose end's outside diameter (Q102)
   column: number; // from 0, the left seen from the room
@@ -32,9 +71,6 @@ export interface HosePort {
 
 // Clear of the strips: the slot depth along each edge, and this much more (Q108).
 export const PORT_EDGE_CLEARANCE_MM = 2;
-
-// Sides of the polygon drawn for each circle: 128 keeps a 150 mm circle within 0.03 mm.
-export const PORT_SEGMENTS = 128;
 
 export const collarInnerMm = (hoseMm: number, c: CollarParams): number => hoseMm + 2 * c.clearanceMm;
 export const collarOuterMm = (hoseMm: number, c: CollarParams): number => collarInnerMm(hoseMm, c) + 2 * c.wallMm;
@@ -73,31 +109,4 @@ export function checkPort(
       `${where} is ${mm(piece.widthMm)} × ${mm(piece.heightMm)} mm. ` +
       'Full-size pieces plus a filler, or a larger printer size, make bigger pieces.',
   };
-}
-
-// The piece with the port: the panel with the hole, and the collar standing on its room side.
-export function portPanel(engine: Engine, size: PanelSize, hoseMm: number, collar: CollarParams): Manifold {
-  const hole = portHoleMm(hoseMm, collar);
-  if (!(hole > 0)) {
-    throw new RangeError(`The lip (${collar.lipMm} mm) closes a ${hoseMm} mm hose's port; make it smaller`);
-  }
-  const { Manifold } = engine;
-  const centre: [number, number, number] = [size.widthMm / 2, size.heightMm / 2, 0];
-  const t = size.thicknessMm;
-  const parts: Manifold[] = [];
-  const keep = <T extends Manifold>(m: T): T => {
-    parts.push(m);
-    return m;
-  };
-  try {
-    const panel = keep(plainPanel(engine, size));
-    const cut = keep(Manifold.cylinder(t + 2, hole / 2, hole / 2, PORT_SEGMENTS).translate([centre[0], centre[1], -1]));
-    const outer = keep(Manifold.cylinder(collar.depthMm, collarOuterMm(hoseMm, collar) / 2, -1, PORT_SEGMENTS));
-    const inner = keep(Manifold.cylinder(collar.depthMm + 2, collarInnerMm(hoseMm, collar) / 2, -1, PORT_SEGMENTS).translate([0, 0, -1]));
-    const ring = keep(outer.subtract(inner).translate([centre[0], centre[1], t]));
-    const holed = keep(panel.subtract(cut));
-    return holed.add(ring);
-  } finally {
-    for (const m of parts) m.delete(); // WebAssembly memory: free everything but the result
-  }
 }

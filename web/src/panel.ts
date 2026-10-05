@@ -37,6 +37,11 @@ const FIELDS: readonly FieldName[] = [
   'leftDepthMm',
   'rightDepthMm',
   'trackClearanceMm',
+  'ports',
+  'collarDepthMm',
+  'collarWallMm',
+  'collarClearanceMm',
+  'collarLipMm',
 ];
 
 type Control = HTMLInputElement | HTMLSelectElement | RadioNodeList;
@@ -62,6 +67,68 @@ function writeForm(form: HTMLFormElement, values: FormValues): void {
     const v = values[name];
     if (c && v !== undefined) c.value = v;
   }
+}
+
+// The hose ports (hose-port, #12): the main form's port and any added under Advanced (Q111,
+// Q113). Their controls are not fields of their own: they are written into the hidden ports
+// field as the command's --port takes them (Q114), so the library checks them all.
+type PortControl = HTMLInputElement | HTMLSelectElement;
+const part = (row: ParentNode, name: string): PortControl | null => row.querySelector<PortControl>(`[data-part="${name}"]`);
+const portRows = (form: HTMLFormElement): HTMLElement[] => [...form.querySelectorAll<HTMLElement>('[data-port]')];
+const WHOLE = /^[1-9][0-9]*$/;
+
+// The ports as text, and the page's own word for what it can tell before the library: what
+// is missing, in plainer terms than the --port form. A problem always leaves text the library
+// refuses, so nothing is planned from it.
+function portsText(form: HTMLFormElement): { text: string; problem?: string } {
+  const appliance = (form.elements.namedItem('appliance') as RadioNodeList | null)?.value;
+  if (appliance !== 'hose') return { text: '' };
+  const words: string[] = [];
+  let problem: string | undefined;
+  portRows(form).forEach((row, i) => {
+    const n = i + 1;
+    const own = part(row, 'size')?.value === 'own';
+    const size = (own ? part(row, 'own')?.value : part(row, 'size')?.value)?.trim() ?? '';
+    const column = part(row, 'column')?.value.trim() ?? '';
+    const rowNumber = part(row, 'row')?.value.trim() ?? '';
+    if (size === '') problem ??= `Port ${n}: enter the hose end's outside diameter in mm.`;
+    if (i > 0 && (column === '' || rowNumber === '')) problem ??= `Port ${n}: choose its piece: column and row.`;
+    if ((column === '') !== (rowNumber === '')) problem ??= `Port ${n}: give both its column and its row.`;
+    for (const v of [column, rowNumber]) {
+      if (v !== '' && !WHOLE.test(v)) problem ??= `Port ${n}: the column and the row are whole numbers from 1.`;
+    }
+    const placed = i === 0 && column === '' && rowNumber === '' ? size : `${size}@${column},${rowNumber}`;
+    words.push(size === '' ? '@' : placed);
+  });
+  const text = words.join(' ');
+  return problem === undefined ? { text } : { text, problem };
+}
+
+// A row for another port, from the main port's controls, without their notes.
+function newPortRow(form: HTMLFormElement): HTMLElement | null {
+  const first = form.querySelector<HTMLElement>('[data-port="1"]');
+  if (!first) return null;
+  const row = first.cloneNode(true) as HTMLElement;
+  for (const note of row.querySelectorAll('.note')) note.remove();
+  for (const name of ['own', 'column', 'row']) {
+    const c = part(row, name);
+    if (c) c.value = '';
+  }
+  const size = part(row, 'size');
+  if (size) size.value = first.querySelector<HTMLSelectElement>('[data-part="size"] option')?.value ?? '';
+  const remove = document.createElement('button');
+  remove.type = 'button';
+  remove.textContent = 'Remove';
+  remove.dataset.part = 'remove';
+  row.append(remove);
+  return row;
+}
+
+function numberPortRows(form: HTMLFormElement): void {
+  portRows(form).forEach((row, i) => {
+    row.dataset.port = String(i + 1);
+    if (i > 0) row.dataset.testid = `extra-port-${i + 1}`;
+  });
 }
 
 function setText(root: ParentNode, testId: string, text: string): void {
@@ -107,7 +174,21 @@ export function mountPanel(
   }
   writeForm(form, toFormValues(EXAMPLE_PARAMS));
 
+  const extras = form.querySelector<HTMLElement>('[data-testid="extra-ports"]');
+  const addPort = form.querySelector<HTMLButtonElement>('#add-port');
+
   const update = (): void => {
+    const hose = (form.elements.namedItem('appliance') as RadioNodeList | null)?.value === 'hose';
+    for (const row of portRows(form)) {
+      row.hidden = !hose;
+      const ownLabel = row.querySelector<HTMLElement>('[data-part="own-label"]');
+      if (ownLabel) ownLabel.hidden = part(row, 'size')?.value !== 'own';
+    }
+    if (addPort) addPort.hidden = !hose;
+    const ports = portsText(form);
+    const portsField = control(form, 'ports');
+    if (portsField instanceof HTMLInputElement) portsField.value = ports.text;
+
     const values = readForm(form);
     const custom = values.printer === 'custom';
     for (const name of ['customWidthMm', 'customHeightMm'] as const) {
@@ -128,7 +209,17 @@ export function mountPanel(
 
     const result = readParams(values);
     onChange(result.ok ? result.params : null);
-    const errors = result.ok ? {} : result.errors;
+    const errors = { ...(result.ok ? {} : result.errors) };
+    if (ports.problem !== undefined) errors.ports = ports.problem;
+    // The main port's piece starts where the plan put it (Q105), shown once it is placed.
+    const main = portRows(form)[0];
+    const placed = result.ok ? result.params.ports[0] : undefined;
+    if (main && placed && part(main, 'column')?.value === '' && part(main, 'row')?.value === '') {
+      const column = part(main, 'column');
+      const row = part(main, 'row');
+      if (column) column.value = String(placed.column);
+      if (row) row.value = String(placed.row);
+    }
     for (const name of FIELDS) {
       const c = control(form, name);
       if (c instanceof HTMLInputElement || c instanceof HTMLSelectElement) {
@@ -151,6 +242,7 @@ export function mountPanel(
       for (const id of ['plan-columns', 'plan-rows', 'plan-span', 'plan-joints', 'plan-edges']) {
         setText(plan, id, '');
       }
+      plan.querySelector('[data-testid="plan-ports"]')?.replaceChildren();
       return;
     }
     const text = describePlan(planWall(result.params), result.params);
@@ -160,6 +252,13 @@ export function mountPanel(
     setText(plan, 'plan-span', text.span);
     setText(plan, 'plan-joints', text.joints);
     setText(plan, 'plan-edges', text.edges);
+    plan.querySelector('[data-testid="plan-ports"]')?.replaceChildren(
+      ...text.ports.map((line) => {
+        const li = document.createElement('li');
+        li.textContent = line;
+        return li;
+      }),
+    );
     for (const leftover of text.leftovers) {
       const hidden = control(form, `${leftover.axis}Leftover`);
       warnings?.append(
@@ -189,6 +288,20 @@ export function mountPanel(
       }
     });
   }
+  addPort?.addEventListener('click', () => {
+    const row = newPortRow(form);
+    if (!row || !extras) return;
+    extras.append(row);
+    numberPortRows(form);
+    update();
+  });
+  extras?.addEventListener('click', (event) => {
+    const button = event.target instanceof HTMLElement ? event.target.closest('[data-part="remove"]') : null;
+    if (!button) return;
+    button.closest('[data-port]')?.remove();
+    numberPortRows(form);
+    update();
+  });
   form.addEventListener('input', update);
   form.addEventListener('change', update);
   update();

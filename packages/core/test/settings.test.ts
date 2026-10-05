@@ -2,10 +2,20 @@
 // api-mcp-local #47; Q85, Q99): what each setting is, and how a partial object becomes the
 // page's parameters, checked by the page's rules.
 import { describe, expect, it } from 'vitest';
-import { EXAMPLE_PARAMS, SETTINGS, WINDOW_PRESETS, readParams, readSettings, settingAt, toFormValues } from '../src/index.js';
+import {
+  EXAMPLE_PARAMS,
+  SETTINGS,
+  WINDOW_PRESETS,
+  formatPorts,
+  readParams,
+  readSettings,
+  settingAt,
+  toFormValues,
+} from '../src/index.js';
 import type { Params } from '../src/index.js';
 
 const CUSTOM_PRINTER: Params = { ...EXAMPLE_PARAMS, printer: { kind: 'custom', widthMm: 250, heightMm: 210 } };
+const WITH_PORTS: Params = { ...EXAMPLE_PARAMS, ports: [{ hoseMm: 150, column: 2, row: 1 }] };
 const OPENING = { openingWidthMm: 600, openingHeightMm: 1000 };
 const ok = (input: unknown, overrides = {}) => {
   const read = readSettings(input, overrides);
@@ -23,8 +33,9 @@ describe('SETTINGS: every setting on the page', () => {
   });
 
   it.each(SETTINGS.map((s) => [s.path, s] as const))('%s holds the value the page shows', (_path, s) => {
-    const params = s.field.startsWith('custom') ? CUSTOM_PRINTER : EXAMPLE_PARAMS;
-    expect(String(settingAt(params, s.path))).toBe(toFormValues(params)[s.field]);
+    const params = s.field.startsWith('custom') ? CUSTOM_PRINTER : s.list ? WITH_PORTS : EXAMPLE_PARAMS;
+    const value = settingAt(params, s.path);
+    expect(s.list ? formatPorts(value as []) : String(value)).toBe(toFormValues(params)[s.field]);
   });
 
   it.each(SETTINGS.filter((s) => s.values).map((s) => [s.path, s] as const))(
@@ -109,6 +120,31 @@ describe('readSettings', () => {
         field: 'slideMm',
         path: 'joint.slideMm',
         message: 'Make it less than the slot depth, so a piece always stays in its slot.',
+      },
+    ]);
+  });
+
+  it('ports as a list in the library’s shape (Q114), each checked as the page checks it', () => {
+    expect(ok({ ...OPENING, ports: [{ hoseMm: 150 }] }).ports).toEqual([{ hoseMm: 150, column: 2, row: 1 }]);
+    expect(ok({ ...OPENING, ports: [{ hoseMm: 130, column: 3, row: 2 }] }).ports).toEqual([{ hoseMm: 130, column: 3, row: 2 }]);
+    expect(problems({ ...OPENING, ports: 150 })).toEqual([{ kind: 'shape', path: 'ports', message: 'ports should be a list' }]);
+    expect(problems({ ...OPENING, ports: [{ hoseMm: '150' }] })).toEqual([
+      { kind: 'shape', path: 'ports.0.hoseMm', message: 'ports.0.hoseMm should be a number' },
+    ]);
+    expect(problems({ ...OPENING, ports: [{ size: 150 }] })).toContainEqual({
+      kind: 'shape',
+      path: 'ports.0.size',
+      message: 'ports.0.size is not a setting',
+    });
+    expect(problems({ ...OPENING, ports: [{ hoseMm: 150, column: 2 }] })).toEqual([
+      { kind: 'shape', path: 'ports.0', message: 'ports.0 needs both column and row, or neither' },
+    ]);
+    expect(problems({ ...OPENING, ports: [{ hoseMm: 150, column: 4, row: 1 }] })).toEqual([
+      {
+        kind: 'value',
+        field: 'ports',
+        path: 'ports',
+        message: 'Port 1: There is no column 4, row 1: the wall has 3 columns and 5 rows.',
       },
     ]);
   });

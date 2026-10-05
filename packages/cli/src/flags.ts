@@ -40,6 +40,11 @@ const FLAG_NAMES: Record<FieldName, string> = {
   leftDepthMm: 'left-depth',
   rightDepthMm: 'right-depth',
   trackClearanceMm: 'track-clearance',
+  ports: 'port', // repeatable: one --port for each port (Q114)
+  collarDepthMm: 'collar-depth',
+  collarWallMm: 'collar-wall',
+  collarClearanceMm: 'collar-clearance',
+  collarLipMm: 'collar-lip',
 };
 
 export const SETTING_FLAGS: readonly SettingFlag[] = SETTINGS.map((s) => ({ ...s, flag: FLAG_NAMES[s.field] }));

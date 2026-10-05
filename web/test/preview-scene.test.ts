@@ -118,3 +118,15 @@ describe('disposeWall', () => {
     expect(wall.children).toHaveLength(0);
   });
 });
+
+describe('a wall with a hose port (hose-port, #12)', () => {
+  it('draws the port’s piece with its collar standing on the room side', async () => {
+    const engine = await loadEngine();
+    const wall = buildWallScene(engine, { ...EXAMPLE_PARAMS, ports: [{ hoseMm: 150, column: 2, row: 1 }] });
+    const pieces = solidsOf(wall, 'piece');
+    const depths = pieces.map((p) => new Box3().setFromObject(p).max.z);
+    expect(depths.filter((z) => Math.abs(z - 23) < 1e-3)).toHaveLength(1); // 3 mm panel + 20 mm collar
+    expect(depths.filter((z) => Math.abs(z - 3) < 1e-3)).toHaveLength(14);
+    disposeWall(wall);
+  });
+});
