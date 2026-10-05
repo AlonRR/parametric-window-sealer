@@ -109,7 +109,11 @@ outside this tree; do not vendor them in. The ones that bite most often here:
   dedicated key when the environment holds `WINDOW_SEALER_SIGNING_KEY_B64` (the private key
   in base64, one line); the key lives in the clone's `.git`, never the work tree. Without it
   the platform signs, and GitHub shows those commits as unverified. A cloud session cannot
-  push tags (HTTP 403, verified 5 Oct 2026): tagging a release is the owner's step there.
+  push tags (HTTP 403, verified 5 Oct 2026). **Tags and releases there go to the owner's own
+  machine (Q123):** once the release commit is on `main`, message the session on his machine
+  that he names for it (by the remote-session `send_message` tool, with the commit, the tag
+  command and the release notes), then check GitHub for the tag and the release. Its name is
+  not kept in the repo; ask him if it is not in the conversation.
 - **Subject: `type(scope): summary`. The scope is required; a bare `type: summary` is
   forbidden.** Lowercase type, at most 72 characters, line 2 blank, detail in the body.
   `.githooks/commit-msg` enforces this (tightened from the kit, which made the scope optional).
