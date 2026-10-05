@@ -129,6 +129,10 @@ is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | Q109 | **No cap** for the port for now; one can be a later backlog item | 5 Oct 2026 |
 | Q110 | With an even number of columns the port starts in **the middle piece left of centre**, seen from the room | 5 Oct 2026 |
 | Q111 | **One port per wall** on the main form, and **several under Advanced**, each in its own piece. How the main form shows it is Q112 | 5 Oct 2026 |
+| Q103 | The page lists **150 mm and 130 mm, or the user's own measurement**, for the hose end's outside diameter, with a note to measure the end that goes in. Sources, checked 5 Oct 2026 (relayed: dealers quoting the maker's part number): 150 mm outside for De'Longhi part 5515110881 (pgservice.cc) and TL2829 (baldiassistenza.com) and for Electrolux/AEG/Frigidaire part 4055349213 (huoltopalvelu.com); 130 mm outside for De'Longhi NE2211 (pgservice.cc). Window-end fittings can differ: 120 to 155 mm on De'Longhi models | 5 Oct 2026 |
+| Q112 | The main form offers the port as **an appliance choice**, "What is in the window?": None (a plain wall) or Portable AC hose; the window AC and the fan join it when they are built (Q15) | 5 Oct 2026 |
+| Q113 | Under Advanced, **an "Add another port" button** adds a row with its own hose size, column and row, and a Remove button; each port is checked on its own (Q108), and two ports cannot share a piece | 5 Oct 2026 |
+| Q114 | The command takes ports as **`--port`, repeatable**: `--port 150` in the starting piece, `--port 150@2,1` in column 2, row 1. A `--params` file and the MCP server take `ports: [{ hoseMm, column, row }]` | 5 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
 | Q32 | The **hosted web API is parked** (`api-hosted`, #48, moved to P3): "I don't have the funding to run a server" | 5 Oct 2026 |
@@ -143,13 +147,7 @@ The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-- **Q103.** Which hose sizes the page lists. The port must fit the hose end's outside diameter, but hoses
-  are usually sold by their inside diameter, and sellers' figures disagree (100, 125, 130 and 150 mm).
-  The owner asked for outside diameters from makers' own manuals and part listings, with a source
-  for each, to approve before they go in; the page also takes the user's own measurement.
-- **Q112.** How the main form offers the one port (Q111): as an appliance choice ("None" or
-  "Portable AC hose", with the window AC and the fan added later, as Q15 lists them), or as a
-  tick box.
+None at the moment.
 
 ## Repository follow-ups
 
