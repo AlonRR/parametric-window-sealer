@@ -68,6 +68,7 @@ is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | Q41 | Both width and height **start as "all pieces the same size"**; the user can change each | 5 Oct 2026 |
 | Q42 | The page **starts with a 600 × 1000 mm example opening**, labelled as an example (Q18) | 5 Oct 2026 |
 | Q43 | The site is **built on every push**; it is **published only when the owner sets the repository variable `PAGES_PUBLISH` to `true`** (after setting the Pages source to GitHub Actions). Until then the deploy job is skipped. The steps are in the README | 5 Oct 2026 |
+| Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
 | Q32 | The **hosted web API is parked** (`api-hosted`, #48, moved to P3): "I don't have the funding to run a server" | 5 Oct 2026 |
 | Q48 | The three API forms that need no server, the **npm library, the command-line tool and the local MCP server** (#45, #46, #47), **stay at P1** right after the MVP | 5 Oct 2026 |
 | Q44 | The **user chooses the download format**, STL or 3MF | 5 Oct 2026 |
@@ -80,11 +81,13 @@ The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-### API
+### Preview
 
-- **Q33.** Within P1, the round hose port was first in line after the MVP (Q28), and the API was
-  put "right after the MVP" (Q31). The backlog keeps `hose-port` first and the API rows next.
-  Should the API rows come before `hose-port` instead?
+- **Q49.** Which library draws the 3D preview (`preview-3d`, #9): three.js, Babylon.js or
+  model-viewer? Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md):
+  three.js is the smallest download (132 KiB against about 281 KiB) and draws the first frame
+  2.1 to 2.6× sooner than Babylon.js; redraws tie. The owner asked how they compare as the
+  model grows more complex; that measurement is under way.
 
 ## Repository follow-ups
 
