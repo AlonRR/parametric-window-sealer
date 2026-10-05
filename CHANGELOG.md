@@ -12,6 +12,14 @@ under Unreleased.
 
 ### Added
 
+- A tape seal: choose "Foam tape" under "Seal" (none to start with) and a size from the four
+  sold by most makers (9 × 4, 9.5 × 4.8, 9 × 6 and 9.5 × 6.4 mm) or your own. Each edge strip
+  gets a 1 mm groove for it on the face the track, the sash or the sill presses, and the wall
+  leaves the tape room to be squeezed to half its thickness. Under Advanced the tape can also go
+  on the strips' sides in a track and inside each hose port's collar. The plan says how much
+  tape the wall takes; the preview shows it in orange. The command takes `--seal` and
+  `--tape-*`, the MCP server `seal`. Not yet test printed: the groove and squeeze are starting
+  values.
 - A printer list: 29 printers, each bed read from its maker's site, grouped by maker under "Your
   printer". A listed printer's bed, less a margin under Advanced (10 mm to start with), is the
   largest piece, turned whichever way needs fewer pieces. "Not listed: 200 × 200 mm" stays the

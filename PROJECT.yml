@@ -5,6 +5,6 @@ projects:
   - name:     Parametric window sealer
     kind:     build
     state:    not-designed
-    next:     "build seal-tape (#15), the next P1 item after printer-presets (#13)"
+    next:     "build patterns-core (#20), which pattern-grid (#16), the next P1 item after seal-tape (#15), needs"
     trackers: [docs/status.md, docs/backlog.md]
     review:   2026-10-05

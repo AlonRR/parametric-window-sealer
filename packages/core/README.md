@@ -61,6 +61,7 @@ Start from `EXAMPLE_PARAMS` and change what differs. Every length is in mm.
 | `edges`                                | The `window` (`'slider'` or `'hung'`), each edge's role (`'track'`, `'sash'` or `'sill'`; `WINDOW_PRESETS`) and the `track`'s width, clearance and depth at each edge                                                   |
 | `ports`                                | Hose ports, none for a plain wall: each `{ hoseMm, column, row }`, the hose end's outside diameter (`COMMON_HOSE_MM`: 150 and 130) and its piece, from 1 at the bottom left seen from the room                     |
 | `collar`                               | The port's collar: `depthMm`, `wallMm`, `clearanceMm`, `lipMm` (`DEFAULT_COLLAR`)                                                                                                                                       |
+| `seal`                                 | `{ kind: 'none' }` or `'tape'`, with the `tape`'s `widthMm`, `thicknessMm` (`TAPE_SIZES`), `grooveMm`, `squeezePct`, and whether it also goes on the strips' `sides` and in each `port` (`NO_SEAL`, `DEFAULT_TAPE`)   |
 
 Wrong parameters throw a `ParamsError` whose `errors` names every wrong field with the page's
 message. `validateParams(params)` gives the same messages without building anything.
@@ -71,7 +72,8 @@ message. `validateParams(params)` gives the same messages without building anyth
 
 - `'separate'`: one file per panel, named by its column, row and size
   (`piece-c1-r1-197.7x198.6.stl`), and one per strip, cross or edge shape, named by its size
-  and how many to print (`strip-182.6x18-print-10.stl`);
+  and how many to print (`strip-182.6x18-print-10.stl`); an edge strip with tape on its
+  sides also names its track's depth (`edge-152.5x13x11-track-10-print-8.stl`);
 - `'zip'`: those files in one ZIP;
 - `'single'`: one 3MF holding every copy (3MF only, since an STL holds one object).
 
@@ -90,7 +92,8 @@ and edges), `describePlan`, `readParams` and `toFormValues` (the page's form val
 and `SETTINGS` (settings in the library's shape, possibly partial, and what each one is),
 `pieceLimit` (the largest piece a wall's printer allows), the
 shapes (`plainPanel`, `portPanel`, `stripSolid`, `crossSolid`, `edgeStripSolid`), the hose
-port's rules (`checkPort`, `parsePorts`, `formatPorts`) and the file writers
+port's rules (`checkPort`, `parsePorts`, `formatPorts`), the tape's (`tapeFit`, `tapedCollar`,
+and `edgeTapeSolid` and `portTapeSolid`, the tape itself for a preview) and the file writers
 (`toStl`, `to3mf`, `packageDownload`), with `planFiles`, which names the files without
 building them. The types are in the package.
 

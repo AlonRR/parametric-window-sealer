@@ -79,6 +79,11 @@ window-sealer --width 600 --height 1000 --printer-model prusa-mk4s
   row's middle piece; `--port 150@2,1` puts it in column 2, row 1, counted from the bottom left
   seen from the room. Give `--port` again for each port. `--collar-depth`, `--collar-wall`,
   `--collar-clearance` and `--collar-lip` change the collar the hose end slides into.
+- `--seal tape` adds foam tape in a groove along each edge strip's face that the track, sash or
+  sill presses; `--tape-width` and `--tape-thickness` set its size (9 × 4 mm to start with;
+  any `--tape-*` flag alone means tape). `--tape-sides yes` puts it on the strips' sides in a
+  track too, and `--tape-port yes` inside each hose port's collar; `--tape-groove` and
+  `--tape-squeeze` change how deep its groove is and how far it is squeezed.
 
 ### Settings in a file
 

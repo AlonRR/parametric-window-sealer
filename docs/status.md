@@ -149,6 +149,8 @@ is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | Q128 | **Tape in the joints between pieces is left for later**: the joint's slot (8 mm deep, 3.4 mm wide) is narrower than any listed tape is wide. It goes to the printed TPU seal (`seal-tpu`, #22), which can be shaped to fit | 5 Oct 2026 |
 | Q129 | Tape around the hose port sits **in a groove inside the collar, and the collar's wall grows behind it** so 2.4 mm stays; the tape replaces the clearance round the hose | 5 Oct 2026 |
 | Q130 | **One tape size for every place**: one width, thickness, groove and squeeze, so one roll does the whole wall | 5 Oct 2026 |
+| Q131 | The walls beside the tape's groove on an edge strip's outer face are **at least 0.8 mm**, two lines from a 0.4 mm nozzle; a tape that leaves them thinner is refused, with a message | 5 Oct 2026 |
+| Q132 | The 3D preview **draws the tape in its own colour**, where it goes; it is not in the downloaded files | 5 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
 | Q32 | The **hosted web API is parked** (`api-hosted`, #48, moved to P3): "I don't have the funding to run a server" | 5 Oct 2026 |
