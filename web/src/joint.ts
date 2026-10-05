@@ -5,7 +5,8 @@
 // (Q13, Q50). The plan puts each piece in the middle of its slide (Q56), so a joint takes
 // the web plus the slide. A cross piece, a square as wide as the strip, sits where four
 // pieces meet; strips stop half the slide short of it, so a joint next to a crossing can
-// still close up (Q57). At the wall's outer edge a strip runs flush with the pieces (Q59).
+// still close up (Q57). At the wall's outer edge a strip stops short of the edge strip
+// (Q74), or runs flush with the pieces when there is none (Q59).
 
 import type { GridLayout } from './layout';
 
@@ -67,25 +68,33 @@ function runs(lengths: number[], joints: number[]) {
 
 // The pieces along one joint, each with a strip from crossing to crossing. Next to a
 // crossing the strip stops the cross piece's half width plus half the slide from the
-// crossing's centre; at the wall's edge it runs to the edge.
-function stripSpans(lengths: number[], starts: number[], crossings: number[], j: JointParams) {
+// crossing's centre; at the wall's edge it stops the inset short of the edge (Q59, Q74).
+function stripSpans(
+  lengths: number[],
+  starts: number[],
+  crossings: number[],
+  j: JointParams,
+  insetMm: number,
+) {
   const reach = stripWidthMm(j) / 2 + j.slideMm / 2;
   return lengths.flatMap((length, i) => {
     const before = crossings[i - 1];
     const after = crossings[i];
-    const from = before === undefined ? (starts[i] ?? 0) : before + reach;
-    const to = after === undefined ? (starts[i] ?? 0) + length : after - reach;
+    const from = before === undefined ? (starts[i] ?? 0) + insetMm : before + reach;
+    const to = after === undefined ? (starts[i] ?? 0) + length - insetMm : after - reach;
     return to - from > 0 ? [{ from, length: to - from }] : [];
   });
 }
 
-export function planJoints(layout: GridLayout, joint: JointParams): JointPlan {
+// edgeInsetMm: how far short of the wall's outer edge a strip stops; with edge strips
+// (track-edge, #11) that is jointStripInsetMm in edge.ts.
+export function planJoints(layout: GridLayout, joint: JointParams, edgeInsetMm = 0): JointPlan {
   const half = stripWidthMm(joint) / 2;
   const cols = runs(layout.columns, layout.columnJointsMm);
   const rows = runs(layout.rows, layout.rowJointsMm);
   const strips: StripPlacement[] = [
     ...cols.centres.flatMap((x) =>
-      stripSpans(layout.rows, rows.starts, rows.centres, joint).map((s) => ({
+      stripSpans(layout.rows, rows.starts, rows.centres, joint, edgeInsetMm).map((s) => ({
         axis: 'vertical' as const,
         xMm: x - half,
         yMm: s.from,
@@ -93,7 +102,7 @@ export function planJoints(layout: GridLayout, joint: JointParams): JointPlan {
       })),
     ),
     ...rows.centres.flatMap((y) =>
-      stripSpans(layout.columns, cols.starts, cols.centres, joint).map((s) => ({
+      stripSpans(layout.columns, cols.starts, cols.centres, joint, edgeInsetMm).map((s) => ({
         axis: 'horizontal' as const,
         xMm: s.from,
         yMm: y - half,

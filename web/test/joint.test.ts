@@ -112,6 +112,18 @@ describe('planJoints, other walls', () => {
     ]);
   });
 
+  it('with edge strips, a strip stops a slot depth from the outer edge (Q74)', () => {
+    const plan = planJoints(grid({ heightMm: 150 }), DEFAULT_JOINT, 8);
+    expect(plan.strips.map((s) => [s.yMm, s.lengthMm])).toEqual([
+      [8, 134],
+      [8, 134],
+    ]);
+    const rows = planJoints(grid(), DEFAULT_JOINT, 8);
+    const columnStrips = vertical(rows.strips);
+    expect(Math.min(...columnStrips.map((s) => s.yMm))).toBe(8);
+    expect(Math.max(...horizontal(rows.strips).map((s) => s.xMm + s.lengthMm))).toBeCloseTo(592, 9);
+  });
+
   it('one piece: no joint, no strip, no cross piece', () => {
     expect(planJoints(grid({ widthMm: 150, heightMm: 150 }), DEFAULT_JOINT)).toEqual({
       strips: [],
