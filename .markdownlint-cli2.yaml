@@ -9,9 +9,10 @@ config:
   MD024:
     siblings_only: true   # repeated headings are fine across sections, not within one
   MD060: false   # table pipe spacing: compact tables are deliberate here
-  MD049: false   # emphasis style: the mandated disclosure line is underscore-italic
-                  # ("_Parts of this repository were drafted with the help of an LLM agent..._"),
-                  # and that string is fixed by the house rules, so the rule loses.
+  # emphasis style: the mandated disclosure line is underscore-italic
+  # ("_Parts of this repository were drafted with the help of an LLM agent..._"),
+  # and that string is fixed by the house rules, so the rule loses.
+  MD049: false
 globs:
   - "**/*.md"
 ignores:

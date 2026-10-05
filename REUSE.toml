@@ -25,6 +25,7 @@ path = [
   ".markdownlint-cli2.yaml",
   ".pre-commit-config.yaml",
   ".repo-status",
+  ".yamllint.yaml",
   "PROJECT.yml",
   "REUSE.toml",
 ]

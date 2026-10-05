@@ -125,14 +125,10 @@ repos:
         stages: [commit-msg]
 
   # ---------------------------------------------------------------------------
-  # Language profiles, picked by what this repo tracks. Adopted: shell (the hooks,
-  # scripts/ and tests/) and docs (Markdown, configured by .markdownlint-cli2.yaml,
-  # the kit's template). NOT adopted:
-  #   yaml - yamllint --strict on its default rules refuses this file, the
-  #          workflow and PROJECT.yml (80-column lines, no `---`, aligned colons),
-  #          measured 5 Oct 2026. The kit has no yamllint config (confirmed by its
-  #          owner's admin session, 5 Oct 2026), so adopting it means writing that
-  #          policy first. check-yaml above still validates syntax.
+  # Language profiles, picked by what this repo tracks: shell (the hooks, scripts/
+  # and tests/), docs (Markdown, configured by .markdownlint-cli2.yaml) and yaml
+  # (configured by .yamllint.yaml; tests/test-yamllint.sh holds that config to
+  # both directions). Both configs are the kit's templates.
   # ---------------------------------------------------------------------------
 
   # shell
@@ -156,3 +152,10 @@ repos:
     rev: v0.19.0
     hooks:
       - id: markdownlint-cli2
+
+  # yaml
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.38.0
+    hooks:
+      - id: yamllint
+        args: [--strict]
