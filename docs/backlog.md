@@ -68,7 +68,7 @@ Nothing in either has been test printed yet.
 | `pattern-hexagon` | #17 | Decorative hexagon pattern | P1 | S | `patterns-core` | Q20 | The benchmark panel already builds this shape |
 | `pattern-brick` | #18 | Brick pattern | P1 | S | `patterns-core` | Q20 | |
 | `pattern-diamond` | #19 | Diamond pattern | P1 | S | `patterns-core` | Q20 | |
-| `patterns-core` | #20 | Pattern framework: a tile repeated across a piece, cut through or in relief, inside a solid border | P1 | M | `plain-panel` | Q7, Q8 | Keeping the joint edges solid under any tile |
+| `patterns-core` | #20 | Pattern framework, in the library first (Q133): a tile repeated across the whole wall (Q135), cut through or into the room side (Q136, Q138), inside a solid border of the slot depth plus 2 mm (Q134) and clear of a hose port (Q137) | P1 | M | `plain-panel` | Q7, Q8, Q133 to Q138 | The joint edges stay solid under any tile, as the border is tied to the slot |
 | `params-advanced` | #21 | Advanced tab with per-piece overrides of the fill | P1 | M | `params-basic`, `patterns-core` | Q10 | Page design for picking a piece in a grid |
 | `seal-tpu` | #22 | Optional TPU seal parts: edge strips and seam strips, the seams being where tape does not fit (Q128) | P1 | M | `connector-strip`, `track-edge` | Q6, Q17, Q128 | Test print in TPU |
 | `measured-cutout` | #23 | Appliance cutout sized to measured dimensions, with a gasket (TPU or foam) taking up the last few mm | P1 | M | `plain-panel` | Q16 | Test print |

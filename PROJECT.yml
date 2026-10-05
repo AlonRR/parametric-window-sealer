@@ -5,6 +5,6 @@ projects:
   - name:     Parametric window sealer
     kind:     build
     state:    not-designed
-    next:     "build patterns-core (#20), which pattern-grid (#16), the next P1 item after seal-tape (#15), needs"
+    next:     "build pattern-grid (#16) on patterns-core (#20), adding the fill choice everywhere (Q133)"
     trackers: [docs/status.md, docs/backlog.md]
     review:   2026-10-05

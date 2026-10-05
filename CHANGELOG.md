@@ -12,6 +12,12 @@ under Unreleased.
 
 ### Added
 
+- A pattern framework in the library, for the patterns to come (the grid first): a tile of
+  openings repeated across the whole wall so it lines up across the joints, inside a solid
+  border on each piece (the slot depth plus 2 mm) and clear of a hose port's collar, cut
+  through or into the room side. `pieceOpenings`, `patternedPanel` and a pattern argument to
+  `buildPieces`; the page offers it once the grid is built.
+
 - A tape seal: choose "Foam tape" under "Seal" (none to start with) and a size from the four
   sold by most makers (9 × 4, 9.5 × 4.8, 9 × 6 and 9.5 × 6.4 mm) or your own. Each edge strip
   gets a 1 mm groove for it on the face the track, the sash or the sill presses, and the wall
