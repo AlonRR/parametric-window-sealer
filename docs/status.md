@@ -139,9 +139,16 @@ is chosen (Q22) and measured in `spikes/engine-benchmark/`.
 | Q118 | Downloads keep **the time they are made** inside their ZIP and 3MF files, so the same wall downloaded twice differs only there; no fixed time | 5 Oct 2026 |
 | Q119 | Tape goes on **the edge strips' outer face** by default: the face against the track's floor, the closed sash or the sill. **Under Advanced** it can also go on the edge strips' sides, along the joints between pieces, and around the hose port | 5 Oct 2026 |
 | Q120 | The tape sits **in a groove**: the tape's width, and part of its thickness deep, so it sits where it should and stands proud by the rest | 5 Oct 2026 |
-| Q121 | The tape's width and thickness are settings whose **starting values come from makers' own listings**, sourced, for the owner to approve (as with the hose sizes, Q103) | 5 Oct 2026 |
+| Q121 | The tape's width and thickness are settings, and the page lists **four sizes from makers' own listings, starting at 9 × 4 mm**: 9 × 4, 9.5 × 4.8, 9 × 6 and 9.5 × 6.4 mm, or the user's own. Six makers sell a 9 to 9.5 mm width; 4 to 5 mm and 6 to 6.4 mm thick are equally common. Sources in [`tape-sizes.md`](tape-sizes.md) | 5 Oct 2026 |
 | Q122 | The page offers **a seal choice starting at none**: None or Tape, with printed TPU joining it when `seal-tpu` (#22) is built (Q6) | 5 Oct 2026 |
 | Q123 | **Tags and releases are made by a session on the owner's own machine**, asked by message once the release commit is on `main`, since a cloud session cannot push tags. The session is the one the owner names; its name is not kept in the repo | 5 Oct 2026 |
+| Q124 | The tape's **groove is 1 mm deep**, a setting, and the tape's width plus 0.5 mm wide, so a 9 mm and a 9.5 mm tape both fit | 5 Oct 2026 |
+| Q125 | The tape is **squeezed to half its thickness** when the wall is in, a setting under Advanced starting at 50 %; half falls inside every maker's stated gap range. In a track the panel stays where it is and the strip is shorter; at a sash or a sill the wall is smaller by the squeezed tape | 5 Oct 2026 |
+| Q126 | **2 mm stays over the groove** (the base of Q69): the edge strip grows by the groove's depth where it has to, in a shallow track or at a sash or a sill | 5 Oct 2026 |
+| Q127 | Tape on an edge strip's sides **replaces the clearance**: the strip is narrower by the squeezed tape standing out of its groove, the groove centred on the part of the side inside the track. A track shallower than the tape is wide is refused, with a message | 5 Oct 2026 |
+| Q128 | **Tape in the joints between pieces is left for later**: the joint's slot (8 mm deep, 3.4 mm wide) is narrower than any listed tape is wide. It goes to the printed TPU seal (`seal-tpu`, #22), which can be shaped to fit | 5 Oct 2026 |
+| Q129 | Tape around the hose port sits **in a groove inside the collar, and the collar's wall grows behind it** so 2.4 mm stays; the tape replaces the clearance round the hose | 5 Oct 2026 |
+| Q130 | **One tape size for every place**: one width, thickness, groove and squeeze, so one roll does the whole wall | 5 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
 | Q32 | The **hosted web API is parked** (`api-hosted`, #48, moved to P3): "I don't have the funding to run a server" | 5 Oct 2026 |
@@ -156,8 +163,7 @@ The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-- **Q121 (the list).** Which tape sizes to start from: being sourced from makers' own listings, to
-  bring to the owner for approval before they go in.
+None.
 
 ## Repository follow-ups
 
