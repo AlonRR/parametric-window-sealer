@@ -1,7 +1,7 @@
 # Extending the window sealer
 
-For contributors: where a new setting, plan line or part of the page goes, and which test fails
-if a step is missed. The library (`packages/core`) holds every rule and every shape; the
+For contributors: where a new setting, pattern, plan line or part of the page goes, and which
+test fails if a step is missed. The library (`packages/core`) holds every rule and every shape; the
 command (`packages/cli`), the MCP server (`packages/mcp`) and the page (`web/`) only move values
 to and from it, so most additions start in the library and reach the other three with little or
 no code of their own.
@@ -55,6 +55,29 @@ What fails if a step is missed:
 The command prints every line in `PlanText`'s order, and the MCP server returns the whole plan,
 so neither needs a change. `web/test/page-wiring.test.ts` fails if the page has no place for a
 line, or a place for a line the plan does not have.
+
+## A new pattern
+
+A pattern for the panel fill is one file in `packages/core/src/patterns/` and one entry in
+`PATTERNS` (`patterns/index.ts`), whose order is the page's. Declare it with `definePattern`, as
+`grid.ts` does:
+
+- `kind`, its name in the library's shape (`fill.kind`) and the command's `--fill`; `name`, on the
+  page; `words`, among the patterns in a sentence ("a grid"); and `group`, the MCP server's
+  description of its sizes;
+- `sizes`: for each, its `key` in the library's shape (`fill.<kind>.<key>`), the page's `field`,
+  the command's `flag`, the page's `label` and `note`, the settings' `help`, its `start`, and
+  `bar: true` for the solid between openings, which must be at least 0.8 mm;
+- `tile(size)`, the cell repeated across the wall, and `describe(size)`, its words in the plan,
+  each reading its sizes by name: `size('openingMm')`.
+
+Nothing else changes. The settings list, the command's flags and help, the MCP server's schema,
+the page's fill list, its sizes under Advanced, the piece-by-piece list and the plan all take the
+pattern from `PATTERNS`, and a pattern's sizes given without a kind mean that pattern.
+`packages/core/test/patterns.test.ts` holds every pattern in the list to the same rules (its own
+fields and flags, its settings, its starting tile, its reading, checking and words), and
+`web/e2e/page-wiring.spec.ts` finds its controls on the running page; give the pattern a test file
+of its own for its tile's shape, as `grid.test.ts` has.
 
 ## A part of the page that shows for some answers
 
