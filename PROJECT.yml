@@ -5,6 +5,6 @@ projects:
   - name:     Parametric window sealer
     kind:     build
     state:    not-designed
-    next:     "release v0.3.0 (C48): every P1 issue is closed once user-guide (#14) merges"
+    next:     "make the code easy to extend before P2 (Q145): #94, #95, #96 and #97"
     trackers: [docs/status.md, docs/backlog.md]
-    review:   2026-10-05
+    review:   2026-10-06

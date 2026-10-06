@@ -21,7 +21,8 @@ row below, and none needs the MVP rebuilt to add it. **Confirmed by the owner as
 **Released as `v0.1.0` on 5 Oct 2026**: every P0 row below is done. **`v0.2.0`, the same day,
 adds the three API rows that need no server** (`api-library`, `api-cli`, `api-mcp-local`; Q101),
 and **`v0.3.0`, the same day again, every P1 row** (C48). Nothing in any of them has been test
-printed yet.
+printed yet. After `v0.3.0`, four rows were added at P1, ahead of P2, to make the code easy to
+extend (Q145): `code-tooling`, `code-params-page`, `fill-registry` and `fitting-registry`.
 
 ## How to read the table
 
@@ -76,6 +77,10 @@ printed yet.
 | `window-ac` | #24 | Fitting for a window AC: the wall meets the unit's side or top, as an edge's fourth role, set from where the unit is (C49 to C53) | P1 | M | `measured-cutout` | Q15, Q144 | Units differ; example sizes only |
 | `offline-file` | #25 | The page as one self-contained file that works offline, `window-sealer.html`, built with the site and saved from a link on the page (C54 to C57) | P1 | M | `page-skeleton` | Q24, Q144 | Inlining the engine adds about a third to its size (inferred) |
 | `user-guide` | #14 | A measuring guide with pictures, simple steps and input fields that fill the form: the window opening and track, the appliance, and printed test parts measured with calipers, which give the fit (C58 to C62) | P1 | M | `params-basic` | Q18, Q51, Q54, Q144 | Pictures drawn for this project; example sizes only (Q18) |
+| `code-tooling` | #94 | A linter and a formatter for the TypeScript, run in CI: oxlint with type-checked rules, and Prettier (C66 to C70) | P1 | S | | Q145 | How many findings the type-checked rules raise in code written without them |
+| `code-params-page` | #95 | A new setting slots in: the settings reader split into one reader per section, the page's fields from the library, what shows said in the page's HTML, and a contributor's guide, `docs/extending.md` | P1 | M | `code-tooling` | Q145 | The page's checks run on every keystroke, so the split must keep their order |
+| `fill-registry` | #96 | Each pattern declared once, in one file: its sizes, starting values, limits, help, flags and tile; the settings, flags, MCP schema, page controls and plan words come from it. The in-code half of `pattern-plugins` | P1 | M | `code-params-page` | Q145 | Keeping the types exact for fields declared at run time |
+| `fitting-registry` | #97 | The hose port and the measured cutout behind one fitting interface, so the fan mount, clamps, sliding insert and imported appliance each add a fitting | P1 | M | `code-params-page` | Q145 | The two fittings differ in shape, so the interface must not assume either |
 | `pattern-plugins` | #26 | Pattern files contributed to the repo appear in the list | P2 | M | `patterns-core` | Q21 | Plugin format |
 | `svg-tile` | #27 | Upload an SVG tile as a pattern | P2 | M | `patterns-core` | Q21 | Arbitrary SVG: curves, holes, units |
 | `fan-mount` | #28 | Fan mounts with screw patterns from a list | P2 | M | `measured-cutout` | Q15, Q16 | Spec to verify per fan size |
