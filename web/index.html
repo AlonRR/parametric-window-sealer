@@ -562,12 +562,8 @@
             Fill
             <select name="fill">
               <option value="sealed">Sealed</option>
-              <optgroup label="Patterns">
-                <option value="grid">Grid</option>
-                <option value="hexagon">Hexagon</option>
-                <option value="brick">Brick</option>
-                <option value="diamond">Diamond</option>
-              </optgroup>
+              <!-- The library's patterns, filled in by the page (fill-registry, #96). -->
+              <optgroup label="Patterns" data-part="pattern-list"></optgroup>
             </select>
           </label>
           <div data-testid="fill-style" data-show-when="fill!=sealed" hidden>
@@ -712,70 +708,9 @@
             <input name="reliefPct" inputmode="decimal" autocomplete="off" />
           </label>
           <span class="error" data-testid="error-reliefPct"></span>
-          <!-- Only the chosen pattern's sizes show (C17). -->
-          <div data-show-when="fill=grid">
-            <label>
-              Grid opening (mm)
-              <input name="gridOpeningMm" inputmode="decimal" autocomplete="off" />
-            </label>
-            <p class="note">Each square opening's side.</p>
-            <span class="error" data-testid="error-gridOpeningMm"></span>
-            <label>
-              Grid bar (mm)
-              <input name="gridBarMm" inputmode="decimal" autocomplete="off" />
-            </label>
-            <p class="note">The solid between two openings: at least 0.8 mm.</p>
-            <span class="error" data-testid="error-gridBarMm"></span>
-          </div>
-          <div data-show-when="fill=hexagon">
-            <label>
-              Hexagon opening, across the flats (mm)
-              <input name="hexOpeningMm" inputmode="decimal" autocomplete="off" />
-            </label>
-            <span class="error" data-testid="error-hexOpeningMm"></span>
-            <label>
-              Hexagon bar (mm)
-              <input name="hexBarMm" inputmode="decimal" autocomplete="off" />
-            </label>
-            <p class="note">The solid between two openings: at least 0.8 mm.</p>
-            <span class="error" data-testid="error-hexBarMm"></span>
-          </div>
-          <div data-show-when="fill=brick">
-            <label>
-              Brick width (mm)
-              <input name="brickWidthMm" inputmode="decimal" autocomplete="off" />
-            </label>
-            <span class="error" data-testid="error-brickWidthMm"></span>
-            <label>
-              Brick height (mm)
-              <input name="brickHeightMm" inputmode="decimal" autocomplete="off" />
-            </label>
-            <span class="error" data-testid="error-brickHeightMm"></span>
-            <label>
-              Brick bar (mm)
-              <input name="brickBarMm" inputmode="decimal" autocomplete="off" />
-            </label>
-            <p class="note">The solid between two bricks, as mortar: at least 0.8 mm.</p>
-            <span class="error" data-testid="error-brickBarMm"></span>
-          </div>
-          <div data-show-when="fill=diamond">
-            <label>
-              Diamond width, corner to corner (mm)
-              <input name="diamondWidthMm" inputmode="decimal" autocomplete="off" />
-            </label>
-            <span class="error" data-testid="error-diamondWidthMm"></span>
-            <label>
-              Diamond height, corner to corner (mm)
-              <input name="diamondHeightMm" inputmode="decimal" autocomplete="off" />
-            </label>
-            <span class="error" data-testid="error-diamondHeightMm"></span>
-            <label>
-              Diamond bar (mm)
-              <input name="diamondBarMm" inputmode="decimal" autocomplete="off" />
-            </label>
-            <p class="note">The solid between two diamonds: at least 0.8 mm.</p>
-            <span class="error" data-testid="error-diamondBarMm"></span>
-          </div>
+          <!-- Each pattern's sizes, made by the page from the library's patterns; only the chosen
+            pattern's show (C17). -->
+          <div data-part="pattern-sizes"></div>
         </details>
 
         <!-- Per-piece fills (params-advanced, #21): a map of the pieces as seen from the room and a

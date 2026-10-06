@@ -11,6 +11,7 @@ import type { FieldErrors, Params } from 'parametric-window-sealer';
 import { readForm, setValue, showErrors, valueOf, writeForm } from './form-fields';
 import type { FormPart } from './form-part';
 import { hosePorts, measuredCutout } from './fittings';
+import { mountPatternControls } from './pattern-controls';
 import { pieceMap } from './piece-map';
 import { showPlan } from './plan-view';
 import { printerChoice } from './printer-choice';
@@ -51,6 +52,7 @@ export function mountPanel(
     (p): p is FormPart => p !== null,
   );
   const pieces = pieceMap(form, update);
+  mountPatternControls(form);
   writeForm(form, toFormValues(EXAMPLE_PARAMS));
   for (const p of parts) p.load?.();
   mountWindowRoles(form);

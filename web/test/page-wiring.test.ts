@@ -4,7 +4,7 @@
 // here, not in a user's browser.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { EXAMPLE_PARAMS, FIELD_NAMES, describePlan, planWall } from 'parametric-window-sealer';
+import { EXAMPLE_PARAMS, FIELD_NAMES, PATTERN_FIELDS, describePlan, planWall } from 'parametric-window-sealer';
 import { holds, parseCondition } from '../src/show-when';
 
 const page = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
@@ -13,8 +13,13 @@ const all = (pattern: RegExp): string[] => [...page.matchAll(pattern)].map((m) =
 describe("the page's controls", () => {
   const names = all(/\bname="([A-Za-z]+)"/g);
 
+  // The patterns' controls are made by the page from the library's PATTERNS (pattern-controls.ts):
+  // the page holds their places, and the browser test counts every control once the page runs.
   it('one control for each field the library reads (radios share one name)', () => {
-    for (const field of FIELD_NAMES) {
+    expect(page).toContain('data-part="pattern-list"');
+    expect(page).toContain('data-part="pattern-sizes"');
+    const made = new Set<string>(PATTERN_FIELDS);
+    for (const field of FIELD_NAMES.filter((f) => !made.has(f))) {
       const radios = all(new RegExp(`<input type="radio" name="${field}"`, 'g')).length;
       const count = names.filter((n) => n === field).length;
       expect(count === 1 || (radios > 1 && count === radios), `${field}: ${count} controls`).toBe(true);

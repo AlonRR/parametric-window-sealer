@@ -1,24 +1,18 @@
 // Per-piece fills (params-advanced, #21): one list for a piece, its fill and style together (C29),
 // and the map of the wall's pieces, the top row first as the wall is seen. The choice is written
 // into the hidden pieceFills field as the command's --piece-fill takes it (C28).
-import { FILL_KINDS, PATTERN_STYLES, formatPieceFills, parsePieceFills } from 'parametric-window-sealer';
-import type { FillKind, PatternStyle, PieceFill } from 'parametric-window-sealer';
+import { PATTERNS, PATTERN_STYLES, formatPieceFills, parsePieceFills } from 'parametric-window-sealer';
+import type { PatternStyle, PieceFill } from 'parametric-window-sealer';
 import { option, setValue, valueOf } from './form-fields';
 
-const KIND_NAMES: Record<FillKind, string> = {
-  sealed: 'Sealed',
-  grid: 'Grid',
-  hexagon: 'Hexagon',
-  brick: 'Brick',
-  diamond: 'Diamond',
-};
 const STYLE_NAMES: Record<PatternStyle, string> = { relief: 'relief', through: 'cut through' };
 
+// Sealed, then each of the library's patterns in each style.
 function fillChoices(choice: HTMLSelectElement): void {
   const options = [option('', 'As the wall'), option('sealed', 'Sealed')];
-  for (const kind of FILL_KINDS.filter((k) => k !== 'sealed')) {
+  for (const pattern of PATTERNS) {
     for (const style of PATTERN_STYLES) {
-      options.push(option(`${kind}:${style}`, `${KIND_NAMES[kind]}, ${STYLE_NAMES[style]}`));
+      options.push(option(`${pattern.kind}:${style}`, `${pattern.name}, ${STYLE_NAMES[style]}`));
     }
   }
   choice.replaceChildren(...options);
