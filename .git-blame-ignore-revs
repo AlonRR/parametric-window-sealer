@@ -1,0 +1,5 @@
+# Commits `git blame` skips: changes of layout only, nothing else. GitHub reads this file by
+# name; locally, `git config blame.ignoreRevsFile .git-blame-ignore-revs`.
+
+# style(format): format the TypeScript and JavaScript with Prettier (code-tooling, #94)
+a3736f7361aa3ab8b8689aa1baf374c49cd8d1b0

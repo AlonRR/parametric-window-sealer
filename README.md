@@ -55,6 +55,7 @@ The page lives in `web/`. The four are one npm workspace and need Node.js 22.12 
 ```bash
 npm ci                                              # at the repo root
 npm run lint                                        # oxlint, with type-checked rules (.oxlintrc.jsonc)
+npm run format                                      # Prettier; CI runs npm run format:check
 npm test --workspaces                               # unit tests: library, command, server, page
 npm run dev -w parametric-window-sealer-web         # the page, reloading as you edit
 npm run build -w parametric-window-sealer-web       # the static site and the offline file, into web/out/site
