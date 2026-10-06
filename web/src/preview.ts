@@ -145,7 +145,7 @@ export function mountPreview(container: HTMLElement, getEngine: () => Promise<En
       while (pending !== undefined) {
         const next = pending;
         pending = undefined;
-        await apply(next);
+        await apply(next); // oxlint-disable-line eslint/no-await-in-loop -- only the latest, one at a time
       }
     } catch (error) {
       container.dataset.state = 'error';

@@ -263,10 +263,10 @@ describe('describePlan', () => {
     openingWidthMm,
     width: { mode: 'full-plus-filler' as const, filler: 'end' as const, leftover: 'spread' as const },
   });
-  const describe_ = (p: typeof EXAMPLE_PARAMS) => describePlan(planWall(p), p);
+  const planText = (p: typeof EXAMPLE_PARAMS) => describePlan(planWall(p), p);
 
   it('summarises the example, joints and edges included', () => {
-    expect(describe_(EXAMPLE_PARAMS)).toEqual({
+    expect(planText(EXAMPLE_PARAMS)).toEqual({
       headline: '15 pieces: 3 across, 5 up, 3 mm thick',
       columns: 'Widths: 197.7, 197.7, 197.7 mm',
       rows: 'Heights: 198.6, 198.6, 198.6, 198.6, 198.6 mm',
@@ -285,23 +285,23 @@ describe('describePlan', () => {
   });
 
   it('rounds to 0.1 mm and uses the singular for one', () => {
-    const row = describe_({ ...EXAMPLE_PARAMS, openingWidthMm: 1000, openingHeightMm: 150 });
+    const row = planText({ ...EXAMPLE_PARAMS, openingWidthMm: 1000, openingHeightMm: 150 });
     expect(row.columns).toBe('Widths: 196.6, 196.6, 196.6, 196.6, 196.6 mm');
     expect(row.joints).toBe('Joints: 4 strips in 1 length; each joint 5 mm wide.');
-    const one = describe_({ ...EXAMPLE_PARAMS, openingWidthMm: 100, openingHeightMm: 150 });
+    const one = planText({ ...EXAMPLE_PARAMS, openingWidthMm: 100, openingHeightMm: 150 });
     expect(one.headline).toBe('1 piece: 1 across, 1 up, 3 mm thick');
     expect(one.joints).toBe('No joints: the wall is one piece.');
     expect(one.edges).toBe('Edges: 4 edge strips in 3 shapes.');
-    expect(describe_({ ...EXAMPLE_PARAMS, openingWidthMm: 700 }).columns).toBe(
+    expect(planText({ ...EXAMPLE_PARAMS, openingWidthMm: 700 }).columns).toBe(
       'Widths: 172, 172, 172, 172 mm',
     );
-    expect(describe_({ ...EXAMPLE_PARAMS, openingWidthMm: 500 }).columns).toBe(
+    expect(planText({ ...EXAMPLE_PARAMS, openingWidthMm: 500 }).columns).toBe(
       'Widths: 164.3, 164.3, 164.3 mm',
     );
   });
 
   it('words each small-piece warning with its position and what the joints need', () => {
-    expect(describe_(fillerWidth(637)).warnings).toEqual([
+    expect(planText(fillerWidth(637)).warnings).toEqual([
       'Column 4 is 25 mm wide, under the 34 mm the joints need.',
     ]);
   });
@@ -313,11 +313,11 @@ describe('describePlan', () => {
     const filler = planWall(shallow).columns.at(-1) ?? 0;
     expect(filler).toBeGreaterThan(18);
     expect(filler).toBeLessThan(34);
-    expect(describe_(shallow).warnings).toEqual([]);
+    expect(planText(shallow).warnings).toEqual([]);
   });
 
   it('offers the three resolutions when full pieces leave too little (Q60 to Q64)', () => {
-    expect(describe_(fillerWidth(609)).leftovers).toEqual([
+    expect(planText(fillerWidth(609)).leftovers).toEqual([
       {
         axis: 'width',
         message: 'Width: 3 full 200 mm pieces leave 2 mm, too little for another joint and a filler.',
@@ -340,7 +340,7 @@ describe('describePlan', () => {
   });
 
   it('says why spreading cannot work, and uses equal pieces instead (Q63)', () => {
-    const [none] = describe_(fillerWidth(200)).leftovers;
+    const [none] = planText(fillerWidth(200)).leftovers;
     expect(none?.message).toBe(
       'Width: 1 full 200 mm piece leaves 3 mm, too little for another joint and a filler.',
     );
@@ -350,7 +350,7 @@ describe('describePlan', () => {
       ['Equal pieces: 2 of 99 mm', true],
       ['Shorten one full piece: 164 and 34 mm', true],
     ]);
-    const [far] = describe_(fillerWidth(406)).leftovers;
+    const [far] = planText(fillerWidth(406)).leftovers;
     expect(far?.options[0]).toEqual({
       value: 'spread',
       label: 'Spread the pieces: each joint would spread 4 mm, more than the 3 mm it can',
@@ -359,7 +359,7 @@ describe('describePlan', () => {
   });
 
   it('names the height axis for a leftover in the rows', () => {
-    const [rows] = describe_({
+    const [rows] = planText({
       ...EXAMPLE_PARAMS,
       openingHeightMm: 599, // 612 mm with the edges
       height: { mode: 'full-plus-filler', filler: 'end', leftover: 'spread' },

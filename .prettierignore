@@ -1,0 +1,3 @@
+# Prettier formats the TypeScript and JavaScript (code-tooling, #94); it reads .gitignore too.
+# Measurement code kept to reproduce a decision, not shipped.
+spikes/

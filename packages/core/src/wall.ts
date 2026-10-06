@@ -92,6 +92,10 @@ export function buildExport(
         return sleeveSolid(engine, shape);
       case 'frame':
         return frameSolid(engine, shape);
+      default: {
+        const unknown: never = shape;
+        throw new Error(`No part of kind ${(unknown as AnyPartShape).kind}`);
+      }
     }
   };
   const parts = wallPartShapes(params, plan).map((shape) => {

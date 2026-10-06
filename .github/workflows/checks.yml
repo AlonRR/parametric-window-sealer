@@ -56,7 +56,7 @@ jobs:
 
   web:
     # The library, the command, the MCP server and the page (Q22, Q34, Q79, Q83, Q91): one
-    # npm workspace, installed from the root. Type check and unit tests for all four; the
+    # npm workspace, installed from the root. Type check, lint and unit tests for all four; the
     # library built and loaded by name as a user gets it (#45); the command built, packed with
     # the library and installed into an empty project as its README says (#46); the server
     # built, installed with -g as its README says and started from its README's agent
@@ -76,6 +76,8 @@ jobs:
         run: npm ci
       - name: Type check
         run: npm run typecheck --workspaces
+      - name: Lint (oxlint, with type-checked rules; .oxlintrc.jsonc)
+        run: npm run lint
       - name: Unit tests
         run: npm test --workspaces
       - name: Build the library

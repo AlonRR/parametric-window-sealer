@@ -39,6 +39,10 @@ function placed(engine: Engine, boxes: Box[], pose: EdgePose, height: number, ac
         return [flip(v), u, w];
       case 'print':
         return [u, [w[0] - across[0], w[1] - across[0]], v];
+      default: {
+        const unknown: never = pose;
+        throw new Error(`No pose ${String(unknown)}`);
+      }
     }
   };
   const parts = boxes.map((b) => {

@@ -14,8 +14,10 @@ import type {
 } from 'parametric-window-sealer';
 
 export const STORAGE_KEY = 'parametric-window-sealer.download-choice.v1';
-const FORMATS: readonly Format[] = ['stl', '3mf'];
-const PACKAGINGS: readonly Packaging[] = ['separate', 'zip', 'single'];
+const FORMATS: ReadonlySet<unknown> = new Set<Format>(['stl', '3mf']);
+const PACKAGINGS: ReadonlySet<unknown> = new Set<Packaging>(['separate', 'zip', 'single']);
+const isFormat = (v: unknown): v is Format => FORMATS.has(v);
+const isPackaging = (v: unknown): v is Packaging => PACKAGINGS.has(v);
 
 // STL holds one object, so "one file holding every piece" exists only for 3MF.
 export function isValidChoice(choice: DownloadChoice): boolean {
@@ -34,10 +36,8 @@ export function readStoredChoice(stored: string | null): DownloadChoice | null {
   }
   if (typeof value !== 'object' || value === null || Array.isArray(value)) return null;
   const { format, packaging } = value as Record<string, unknown>;
-  if (!FORMATS.includes(format as Format) || !PACKAGINGS.includes(packaging as Packaging)) {
-    return null;
-  }
-  const choice = { format: format as Format, packaging: packaging as Packaging };
+  if (!isFormat(format) || !isPackaging(packaging)) return null;
+  const choice = { format, packaging };
   return isValidChoice(choice) ? choice : null;
 }
 
@@ -95,9 +95,9 @@ export function mountDownload({ openButton, dialog, getParams, getEngine }: Down
     form.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value;
 
   const choice = (): DownloadChoice | null => {
-    const format = chosen('format') as Format | undefined;
-    const packaging = chosen('packaging') as Packaging | undefined;
-    if (!format || !packaging) return null;
+    const format = chosen('format');
+    const packaging = chosen('packaging');
+    if (!isFormat(format) || !isPackaging(packaging)) return null;
     const c = { format, packaging };
     return isValidChoice(c) ? c : null;
   };
@@ -137,7 +137,8 @@ export function mountDownload({ openButton, dialog, getParams, getEngine }: Down
         saveChoice(c);
         dialog.close();
         for (const [i, file] of files.entries()) {
-          if (i > 0) await pause(150); // one at a time, so the browser keeps up
+          // oxlint-disable-next-line eslint/no-await-in-loop -- one at a time, so the browser keeps up
+          if (i > 0) await pause(150);
           saveFile(file);
         }
       } catch (error) {

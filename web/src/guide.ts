@@ -9,6 +9,7 @@ import { EDGES, FIT_TARGET_MM, fitFromMeasured, measuredPlayMm } from 'parametri
 type Field = HTMLInputElement | HTMLSelectElement;
 
 const mm = (n: number) => String(Math.round(n * 100) / 100);
+const inside = (box: HTMLElement | null, part: string) => box?.querySelector<Field>(`[data-part="${part}"]`) ?? null;
 
 export function mountGuide(form: HTMLFormElement): void {
   const guide = form.querySelector<HTMLDetailsElement>('[data-testid="guide"]');
@@ -25,7 +26,6 @@ export function mountGuide(form: HTMLFormElement): void {
   const appliance = () => (field('appliance') as RadioNodeList | null)?.value ?? 'none';
   const port = () => form.querySelector<HTMLElement>('[data-port="1"]');
   const cutout = () => form.querySelector<HTMLElement>('[data-testid="cutout"]');
-  const inside = (box: HTMLElement | null, part: string) => box?.querySelector<Field>(`[data-part="${part}"]`) ?? null;
   const tracks = () => EDGES.filter((e) => value(`${e}Edge`) === 'track');
 
   // Into the form: each guide field to the form's field, or the rows a hose or a cutout uses.

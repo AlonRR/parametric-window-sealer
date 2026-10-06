@@ -72,9 +72,10 @@ function wrap(text: string, width: number): string[] {
 
 function help(): string {
   const starting = toFormValues(EXAMPLE_PARAMS);
-  const rows: [string, string][] = [
-    ...OUTPUT_OPTIONS.map((o): [string, string] => [`--${o.flag}${o.value ? ` ${o.value}` : ''}`, o.help]),
-  ];
+  const rows: [string, string][] = OUTPUT_OPTIONS.map((o): [string, string] => [
+    `--${o.flag}${o.value ? ` ${o.value}` : ''}`,
+    o.help,
+  ]);
   const settings: [string, string][] = SETTING_FLAGS.map((f) => {
     // A long list of choices (the printers) is named after the hint, so the table stays narrow.
     const long = (f.values?.length ?? 0) > 8;
@@ -87,12 +88,12 @@ function help(): string {
     const each = { ports: 'port', pieceFills: 'piece', cutouts: 'cutout' };
     const value = f.list ? lists[f.list] : f.values === undefined ? unit : long ? '<id>' : `<${f.values.join('|')}>`;
     const start = f.flag === 'width' || f.flag === 'height' ? '' : starting[f.field];
-    const help = f.list
+    const text = f.list
       ? `${f.help} Give --${f.flag} again for each ${each[f.list]}.`
       : long
         ? `${f.help} One of: ${f.values?.join(', ')}.`
         : f.help;
-    return [`--${f.flag} ${value}`, start ? `${help} (${start})` : help];
+    return [`--${f.flag} ${value}`, start ? `${text} (${start})` : text];
   });
   const pad = Math.max(...[...rows, ...settings].map(([left]) => left.length)) + 2;
   const table = (list: [string, string][]) =>
@@ -248,6 +249,7 @@ export async function run(args: string[], io: Io): Promise<number> {
   const wall = await makeWall(params, choice);
   try {
     await mkdir(outDir, { recursive: true });
+    // oxlint-disable-next-line eslint/no-await-in-loop -- one at a time: the first failure stops the rest
     for (const f of wall.files) await writeFile(join(outDir, f.name), f.bytes);
   } catch (error) {
     return fail(COULD_NOT_WRITE, [{ message: `cannot write to ${shown}: ${(error as Error).message}` }]);

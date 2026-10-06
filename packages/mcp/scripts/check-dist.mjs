@@ -21,6 +21,9 @@ const check = (label, ok) => {
   console.log(`  ${ok ? 'ok  ' : 'FAIL'}  ${label}`);
 };
 
+const byText = (a, b) => a.localeCompare(b);
+const text = (r) => r.content.find((c) => c.type === 'text')?.text ?? '';
+
 console.log('the package as published:');
 const pkg = JSON.parse(readFileSync(join(here, 'package.json'), 'utf8'));
 const pack = JSON.parse(execFileSync('npm', ['pack', '--dry-run', '--json'], { cwd: here }).toString());
@@ -46,7 +49,7 @@ try {
   const tarballs = installStep.split(' ').slice(3);
   check(
     `the tarballs are the ones it names (${tarballs.join(', ')})`,
-    JSON.stringify(packed.map((p) => `./${p.filename}`).sort()) === JSON.stringify([...tarballs].sort()),
+    JSON.stringify(packed.map((p) => `./${p.filename}`).sort(byText)) === JSON.stringify([...tarballs].sort(byText)),
   );
   // -g with --prefix: a global install that stays in the temporary folder. The install comes
   // from npm's cache where it can (CI's `npm ci` has just filled it).
@@ -102,7 +105,6 @@ try {
   check(`its four tools (${tools.length})`, tools.length === 4);
   const settings = JSON.parse(readme.match(/```json\n([\s\S]*?)```/g)?.[1]?.slice(8, -3) ?? '{}').settings;
   check("the README's example settings", settings?.openingWidthMm === 812.5);
-  const text = (r) => r.content.find((c) => c.type === 'text')?.text ?? '';
   const plan = await client.callTool({ name: 'window_sealer_plan_wall', arguments: { settings } });
   check(`window_sealer_plan_wall: ${plan.structuredContent?.summary?.headline}`, !plan.isError && plan.structuredContent?.files?.length > 0);
   const made = await client.callTool({ name: 'window_sealer_make_files', arguments: { settings } });

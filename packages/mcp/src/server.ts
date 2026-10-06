@@ -212,6 +212,7 @@ export function createServer(options: ServerOptions): McpServer {
       if (toFolder && dir !== undefined) {
         try {
           await mkdir(dir, { recursive: true });
+          // oxlint-disable-next-line eslint/no-await-in-loop -- one at a time: the first failure stops the rest
           for (const f of wall.files) await writeFile(join(dir, f.name), f.bytes);
         } catch (error) {
           return failure([`Could not write to ${dir}: ${(error as Error).message}`]);

@@ -190,7 +190,7 @@ describe('planEdges with tape', () => {
     expect(new Set(names).size).toBe(names.length);
     // Top and bottom are the same size, 11 mm tall, but their side grooves differ by the depth.
     const across = shapes.filter((s) => s.heightMm === 11 && s.widthMm === 13);
-    expect(across.map((s) => s.groove?.side?.trackMm).sort()).toEqual(expect.arrayContaining([11, 12]));
+    expect(across.map((s) => s.groove?.side?.trackMm)).toEqual(expect.arrayContaining([11, 12]));
     expect(names.some((n) => /^edge-[0-9.]+x13x11-track-12-print-[0-9]+$/.test(n))).toBe(true);
     // Without side grooves the names stay as they were.
     const plain = edgeShapes(planEdges(599, 1009, slider, DEFAULT_JOINT, 200, fit)).map(partName);

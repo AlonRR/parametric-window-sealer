@@ -17,6 +17,7 @@ export default defineConfig({
         // CI downloads the Chromium build this Playwright version expects. A machine that
         // already has one elsewhere can point at it instead of downloading.
         launchOptions: {
+          // oxlint-disable-next-line typescript/prefer-nullish-coalescing -- an empty variable means unset
           executablePath: process.env.PW_CHROMIUM_PATH || undefined,
           // Headless Chromium has no graphics card; these let it draw WebGL in software
           // (SwiftShader), so the 3D preview can be tested.
@@ -31,6 +32,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         launchOptions: {
+          // oxlint-disable-next-line typescript/prefer-nullish-coalescing -- an empty variable means unset
           executablePath: process.env.PW_CHROMIUM_PATH || undefined,
           args: ['--disable-webgl', '--disable-webgl2', '--disable-3d-apis'],
         },

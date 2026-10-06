@@ -138,8 +138,8 @@ export function countOf(wall: Group, kind: PartKind): number {
 
 // Graphics memory is not freed by the garbage collector: each redraw frees the last wall.
 export function disposeWall(wall: Group): void {
-  for (const child of [...wall.children]) {
-    if (child instanceof Mesh || child instanceof LineSegments) child.geometry.dispose();
-    wall.remove(child);
+  for (const child of wall.children) {
+    if (child instanceof Mesh || child instanceof LineSegments) (child.geometry as BufferGeometry).dispose();
   }
+  wall.clear();
 }

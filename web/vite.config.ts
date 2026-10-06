@@ -10,8 +10,10 @@ export const OFFLINE_FILE = 'window-sealer.html';
 // After the bundle is made: the entry script and any stylesheet go into the HTML, and the HTML
 // is written under the offline file's name. The engine is already inside the script, as a data
 // URL (assetsInlineLimit below), so the file needs nothing beside it.
+// A script or stylesheet inside the HTML must not close its own tag early.
+const inline = (text: string, tag: 'script' | 'style') => text.replace(new RegExp(`</${tag}`, 'gi'), `<\\/${tag}`);
+
 function oneFile(name: string): Plugin {
-  const inline = (text: string, tag: 'script' | 'style') => text.replace(new RegExp(`</${tag}`, 'gi'), `<\\/${tag}`);
   return {
     name: 'window-sealer-one-file',
     enforce: 'post',

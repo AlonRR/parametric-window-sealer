@@ -190,6 +190,7 @@ page, `web/` (Q34, Q35), are one npm workspace. After `npm ci` at the repo root:
 
 ```bash
 npm run typecheck --workspaces    # tsc over all four: sources, tests and configs
+npm run lint                      # oxlint over all four, type-checked rules (.oxlintrc.jsonc)
 npm test --workspaces             # unit tests (Vitest), in Node
 npm run build -w parametric-window-sealer        # the library, into packages/core/dist
 npm run test:dist -w parametric-window-sealer    # that build, loaded by name; the README's example

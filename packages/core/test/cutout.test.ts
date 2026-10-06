@@ -133,7 +133,7 @@ describe('the piece with a cutout (C41, C42)', () => {
     const pattern = fillPattern({ ...p.fill, kind: 'grid', style: 'through' }, p.joint);
     const piece = (withPattern: boolean) => {
       const built = buildPieces(engine, plan, 3, [], p.collar, undefined, withPattern ? pattern : undefined, p.cutouts, p.rim);
-      const [mine] = built.filter((b) => b.cutout !== undefined);
+      const mine = built.find((b) => b.cutout !== undefined);
       for (const b of built) if (b !== mine) b.solid.delete();
       if (!mine) throw new Error('the cutout’s piece expected');
       return mine.solid;

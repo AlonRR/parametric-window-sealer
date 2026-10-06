@@ -106,17 +106,19 @@ function writeForm(form: HTMLFormElement, values: FormValues): void {
   }
 }
 
+// An option for a list on the page.
+function option(value: string, text: string): HTMLOptionElement {
+  const o = document.createElement('option');
+  o.value = value;
+  o.textContent = text;
+  return o;
+}
+
 // The tape's size (Q121): the listed sizes, or the user's own. A listed size is written into
 // the width and thickness fields, and read back from them.
 const tapeSize = (widthMm: string | number, thicknessMm: string | number) => `${widthMm}x${thicknessMm}`;
 
 function fillTapeSizes(choice: HTMLSelectElement): void {
-  const option = (value: string, text: string) => {
-    const o = document.createElement('option');
-    o.value = value;
-    o.textContent = text;
-    return o;
-  };
   choice.replaceChildren(
     ...TAPE_SIZES.map((t) => option(tapeSize(t.widthMm, t.thicknessMm), `${t.widthMm} × ${t.thicknessMm} mm`)),
     option('own', 'Your own size'),
@@ -225,12 +227,6 @@ function numberPortRows(form: HTMLFormElement): void {
 // A listed printer's option is model:<id>; the choice is written into the hidden printer and
 // printerModel fields, and read back from them.
 function fillPrinters(choice: HTMLSelectElement): void {
-  const option = (value: string, text: string) => {
-    const o = document.createElement('option');
-    o.value = value;
-    o.textContent = text;
-    return o;
-  };
   choice.replaceChildren(option('default', `Not listed: ${DEFAULT_MAX_PIECE.widthMm} × ${DEFAULT_MAX_PIECE.heightMm} mm`));
   const groups = new Map<string, HTMLOptGroupElement>();
   for (const p of PRINTERS) {
@@ -266,12 +262,6 @@ const KIND_NAMES: Record<string, string> = { sealed: 'Sealed', grid: 'Grid', hex
 const STYLE_NAMES: Record<string, string> = { relief: 'relief', through: 'cut through' };
 
 function fillPieceChoice(choice: HTMLSelectElement): void {
-  const option = (value: string, text: string) => {
-    const o = document.createElement('option');
-    o.value = value;
-    o.textContent = text;
-    return o;
-  };
   const options = [option('', "As the wall"), option('sealed', 'Sealed')];
   for (const kind of FILL_KINDS.filter((k) => k !== 'sealed')) {
     for (const style of PATTERN_STYLES) options.push(option(`${kind}:${style}`, `${KIND_NAMES[kind]}, ${STYLE_NAMES[style]}`));
@@ -308,16 +298,16 @@ function leftoverWarning(text: LeftoverText, choose: (value: string) => void): H
   const legend = document.createElement('legend');
   legend.textContent = text.message;
   choices.append(legend);
-  for (const option of text.options) {
+  for (const choice of text.options) {
     const label = document.createElement('label');
     const input = document.createElement('input');
     input.type = 'radio';
     input.name = `leftover-${text.axis}`;
-    input.value = option.value;
-    input.checked = option.value === text.used;
-    input.disabled = !option.possible;
-    input.addEventListener('change', () => choose(option.value));
-    label.append(input, ` ${option.label}`);
+    input.value = choice.value;
+    input.checked = choice.value === text.used;
+    input.disabled = !choice.possible;
+    input.addEventListener('change', () => choose(choice.value));
+    label.append(input, ` ${choice.label}`);
     choices.append(label);
   }
   li.append(choices);

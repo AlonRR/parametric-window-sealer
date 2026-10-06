@@ -233,6 +233,11 @@ export function toFormValues(p: Params): FormValues {
   };
 }
 
+const positive = (n: number) => n > 0;
+// A pattern's bar is no thinner than two lines from a 0.4 mm nozzle (Q143).
+const barFits = (n: number) => n >= MIN_BAR_MM - 1e-9;
+const sum = (lengths: number[]) => lengths.reduce((n, l) => n + l, 0);
+
 export function readParams(values: FormValues): ReadResult {
   const errors: FieldErrors = {};
 
@@ -331,7 +336,6 @@ export function readParams(values: FormValues): ReadResult {
     errors[field] = message;
     return Number.NaN;
   };
-  const positive = (n: number) => n > 0;
   const tape = {
     widthMm: tapeNumber('tapeWidthMm', DEFAULT_TAPE.widthMm, positive, 'Enter a size in mm, greater than 0.'),
     thicknessMm: tapeNumber('tapeThicknessMm', DEFAULT_TAPE.thicknessMm, positive, 'Enter a size in mm, greater than 0.'),
@@ -463,7 +467,8 @@ export function readParams(values: FormValues): ReadResult {
   const givenFills = parsePieceFills(values.pieceFills ?? '');
   if (!givenFills.ok) errors.pieceFills = givenFills.message;
   // A pattern's sizes are read when the wall or any piece uses it.
-  const used = (kind: FillKind) => fillKind === kind || (givenFills.ok && givenFills.fills.some((f) => f.kind === kind));
+  const used = (pattern: FillKind) =>
+    fillKind === pattern || (givenFills.ok && givenFills.fills.some((f) => f.kind === pattern));
   const patterned = FILL_KINDS.some((k) => k !== 'sealed' && used(k));
   // Each pattern's own sizes are read only when it is the one chosen (C15).
   const fillNumber = (
@@ -480,7 +485,6 @@ export function readParams(values: FormValues): ReadResult {
     return Number.NaN;
   };
   const barMessage = `Make it at least ${mm(MIN_BAR_MM)} mm: two lines from a 0.4 mm nozzle.`;
-  const bar = (n: number) => n >= MIN_BAR_MM - 1e-9;
   const sizeMessage = 'Enter a size in mm, greater than 0.';
   const fill: FillParams = {
     kind: fillKind,
@@ -493,7 +497,7 @@ export function readParams(values: FormValues): ReadResult {
     ),
     grid: {
       openingMm: fillNumber('gridOpeningMm', DEFAULT_GRID.openingMm, positive, 'Enter a size in mm, greater than 0.', used('grid')),
-      barMm: fillNumber('gridBarMm', DEFAULT_GRID.barMm, bar, barMessage, used('grid')),
+      barMm: fillNumber('gridBarMm', DEFAULT_GRID.barMm, barFits, barMessage, used('grid')),
     },
     hexagon: {
       openingMm: fillNumber(
@@ -503,17 +507,17 @@ export function readParams(values: FormValues): ReadResult {
         'Enter a size in mm, greater than 0.',
         used('hexagon'),
       ),
-      barMm: fillNumber('hexBarMm', DEFAULT_HEXAGON.barMm, bar, barMessage, used('hexagon')),
+      barMm: fillNumber('hexBarMm', DEFAULT_HEXAGON.barMm, barFits, barMessage, used('hexagon')),
     },
     brick: {
       widthMm: fillNumber('brickWidthMm', DEFAULT_BRICK.widthMm, positive, sizeMessage, used('brick')),
       heightMm: fillNumber('brickHeightMm', DEFAULT_BRICK.heightMm, positive, sizeMessage, used('brick')),
-      barMm: fillNumber('brickBarMm', DEFAULT_BRICK.barMm, bar, barMessage, used('brick')),
+      barMm: fillNumber('brickBarMm', DEFAULT_BRICK.barMm, barFits, barMessage, used('brick')),
     },
     diamond: {
       widthMm: fillNumber('diamondWidthMm', DEFAULT_DIAMOND.widthMm, positive, sizeMessage, used('diamond')),
       heightMm: fillNumber('diamondHeightMm', DEFAULT_DIAMOND.heightMm, positive, sizeMessage, used('diamond')),
-      barMm: fillNumber('diamondBarMm', DEFAULT_DIAMOND.barMm, bar, barMessage, used('diamond')),
+      barMm: fillNumber('diamondBarMm', DEFAULT_DIAMOND.barMm, barFits, barMessage, used('diamond')),
     },
   };
 
@@ -618,10 +622,10 @@ function layoutFor(p: Params, max: PieceSize): GridLayout {
 // The largest piece the plan uses. A listed printer's bed is turned where that needs fewer
 // pieces, as a piece can be turned on the bed; on a tie it stays as listed (Q116).
 export function pieceLimit(p: Params): PieceSize {
-  const listed = maxPieceSize(p.printer, p.bedMarginMm);
-  if (p.printer.kind !== 'model' || listed.widthMm === listed.heightMm) return listed;
-  const turned = { widthMm: listed.heightMm, heightMm: listed.widthMm };
-  return layoutFor(p, turned).pieces.length < layoutFor(p, listed).pieces.length ? turned : listed;
+  const asListed = maxPieceSize(p.printer, p.bedMarginMm);
+  if (p.printer.kind !== 'model' || asListed.widthMm === asListed.heightMm) return asListed;
+  const turned = { widthMm: asListed.heightMm, heightMm: asListed.widthMm };
+  return layoutFor(p, turned).pieces.length < layoutFor(p, asListed).pieces.length ? turned : asListed;
 }
 
 export function planWall(p: Params): GridLayout {
@@ -766,7 +770,6 @@ function describeSeal(params: Params, parts: WallParts): string {
   const fit = tapeFit(params.seal);
   if (fit === undefined) return 'Seal: none.';
   const { tape } = params.seal;
-  const sum = (lengths: number[]) => lengths.reduce((n, l) => n + l, 0);
   const outer = sum(parts.edges.map((s) => s.lengthMm));
   const sides = fit.sides ? 2 * sum(parts.edges.filter((s) => params.edges.roles[s.edge] === 'track').map((s) => s.lengthMm)) : 0;
   const ports = fit.port ? params.ports : [];

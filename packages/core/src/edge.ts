@@ -148,6 +148,9 @@ function segments(fromMm: number, lengthMm: number, maxMm: number): [number, num
   return Array.from({ length: count }, (_, i) => [fromMm + i * each, each]);
 }
 
+// How far an edge's squeezed tape stands out from its strip; nothing without tape.
+const standOutMm = (profile: EdgeProfile): number => profile.tape?.standOutMm ?? 0;
+
 export function planEdges(
   spanWidthMm: number,
   spanHeightMm: number,
@@ -179,16 +182,21 @@ export function planEdges(
   ) =>
     segments(from ?? 0, (to ?? 0) - (from ?? 0), maxLengthMm).map(([at, lengthMm]) => {
       const [xMm, yMm] = place(at);
-      const out = profile.tape?.standOutMm ?? 0;
-      const strip: EdgeStripPlacement = { edge, xMm, yMm, lengthMm, widthMm: profile.widthMm, heightMm: profile.heightMm - out };
+      const strip: EdgeStripPlacement = {
+        edge,
+        xMm,
+        yMm,
+        lengthMm,
+        widthMm: profile.widthMm,
+        heightMm: profile.heightMm - standOutMm(profile),
+      };
       return profile.tape === undefined ? strip : { ...strip, tape: profile.tape };
     });
   // The bottom and left strips start past their tape; the top and right ones at the mouth.
-  const out = (profile: EdgeProfile) => profile.tape?.standOutMm ?? 0;
   return [
-    ...run('bottom', bottom, across, (x) => [x, outer.bottom + out(bottom)]),
+    ...run('bottom', bottom, across, (x) => [x, outer.bottom + standOutMm(bottom)]),
     ...run('top', top, across, (x) => [x, mouth.top]),
-    ...run('left', left, up, (y) => [outer.left + out(left), y]),
+    ...run('left', left, up, (y) => [outer.left + standOutMm(left), y]),
     ...run('right', right, up, (y) => [mouth.right, y]),
   ];
 }

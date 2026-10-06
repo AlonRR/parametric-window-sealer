@@ -39,7 +39,7 @@ const listed = (folder: string) => readdirSync(folder).sort();
 function answer(result: unknown) {
   const r = result as ToolAnswer;
   const text = r.content.find((c) => c.type === 'text')?.text ?? '';
-  return { ...r, text, data: (r.structuredContent ?? {}) as Record<string, any> };
+  return { ...r, text, data: r.structuredContent ?? {} };
 }
 
 describe('the server', () => {
@@ -55,7 +55,8 @@ describe('the server', () => {
   it('describes every setting in its input schema, in the library’s shape (Q99)', async () => {
     const { client } = await connect();
     const plan = (await client.listTools()).tools.find((t) => t.name === 'window_sealer_plan_wall');
-    const settings = (plan?.inputSchema.properties as Record<string, any>)['settings'];
+    if (!plan) throw new Error('window_sealer_plan_wall expected');
+    const settings = (plan.inputSchema.properties as Record<string, any>)['settings'];
     for (const s of SETTINGS) {
       const node = s.path.split('.').reduce((at: any, key: string) => at?.properties?.[key], settings);
       expect(node, s.path).toBeDefined();
@@ -386,7 +387,8 @@ describe('hose ports (hose-port #12; Q114: ports as a list)', () => {
   it('the schema describes ports as a list of hose sizes and pieces', async () => {
     const { client } = await connect();
     const plan = (await client.listTools()).tools.find((t) => t.name === 'window_sealer_plan_wall');
-    const ports = (plan?.inputSchema.properties as Record<string, any>)['settings'].properties.ports;
+    if (!plan) throw new Error('window_sealer_plan_wall expected');
+    const ports = (plan.inputSchema.properties as Record<string, any>)['settings'].properties.ports;
     expect(ports.type).toBe('array');
     expect(Object.keys(ports.items.properties)).toEqual(['hoseMm', 'column', 'row']);
     expect(ports.items.required).toEqual(['hoseMm']);
@@ -417,7 +419,8 @@ describe('a printer from the list (printer-presets #13)', () => {
   it('the schema lists the 29 printers; a wall plans on one, by id alone', async () => {
     const { client, call } = await connect();
     const plan = (await client.listTools()).tools.find((t) => t.name === 'window_sealer_plan_wall');
-    const printer = (plan?.inputSchema.properties as Record<string, any>)['settings'].properties.printer;
+    if (!plan) throw new Error('window_sealer_plan_wall expected');
+    const printer = (plan.inputSchema.properties as Record<string, any>)['settings'].properties.printer;
     expect(printer.properties.id.enum).toHaveLength(29);
     expect(printer.properties.kind.enum).toEqual(['default', 'custom', 'model']);
     const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, printer: { id: 'bambu-lab-a1-mini' } } });
