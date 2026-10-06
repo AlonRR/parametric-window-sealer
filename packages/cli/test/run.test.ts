@@ -159,6 +159,31 @@ describe('--dry-run (Q89)', () => {
     }
   });
 
+  it("prints the plan's lines in the library's order", async () => {
+    const every = ['--port', '150@1,1', '--cutout', '120x80@3,1', '--seal', 'tape', '--fill', 'grid'];
+    const r = await cli([...OPENING, ...every, '--piece-fill', '2,2=sealed', '--bottom-edge', 'unit', '--dry-run']);
+    expect(r.code).toBe(0);
+    expect(
+      r.out
+        .split('\n')
+        .slice(0, 12)
+        .map((line) => line.split(':')[0]),
+    ).toEqual([
+      '15 pieces',
+      'Widths',
+      'Heights',
+      'Pieces and joints',
+      'Joints',
+      'Edges',
+      'Hose port',
+      'Cutout',
+      'Window AC',
+      'Seal',
+      'Fill',
+      'Column 2, row 2',
+    ]);
+  });
+
   it('says when the real run would need --force', async () => {
     const first = await cli(OPENING);
     const r = await cli([...OPENING, '--dry-run'], first.cwd);

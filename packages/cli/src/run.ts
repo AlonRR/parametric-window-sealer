@@ -121,11 +121,13 @@ function help(): string {
   ].join('\n');
 }
 
+// Every line of the plan in the library's order, so a line the library adds is printed too; then
+// the warnings, and the ways out where full pieces leave too little for a joint.
 function summaryLines(summary: PlanText): string[] {
-  const lines = [summary.headline, summary.columns, summary.rows, summary.span, summary.joints, summary.edges];
-  lines.push(...summary.ports, ...summary.cutouts, ...summary.units, summary.seal, summary.fill, ...summary.pieceFills);
-  for (const warning of summary.warnings) lines.push(`Warning: ${warning}`);
-  for (const leftover of summary.leftovers) {
+  const { warnings, leftovers, ...plan } = summary;
+  const lines = Object.values(plan).flatMap((line) => (typeof line === 'string' ? [line] : line));
+  for (const warning of warnings) lines.push(`Warning: ${warning}`);
+  for (const leftover of leftovers) {
     lines.push(leftover.message, `  Change it with --${leftover.axis}-leftover:`);
     const pad = Math.max(...leftover.options.map((o) => o.value.length)) + 2;
     for (const o of leftover.options) {
