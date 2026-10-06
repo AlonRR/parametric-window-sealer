@@ -184,10 +184,10 @@
           </section>
           <section data-step="appliance">
             <h3>3. What passes through the wall</h3>
-            <div data-for="none">
+            <div data-show-when="appliance=none">
               <p>Nothing passes through a plain wall. If something does, choose it under What is in the window?</p>
             </div>
-            <div data-for="hose" hidden>
+            <div data-show-when="appliance=hose" hidden>
               <svg class="guide-drawing" role="img" aria-label="The end of a hose seen from the side, its outside diameter marked with an arrow" viewBox="0 0 240 150" width="240" height="150" fill="none" stroke="currentColor" font-size="12" font-family="inherit">
               <defs><marker id="guide-arrow-3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor" /></marker></defs>
               <path d="M30 40H170M30 110H170" stroke-width="2" />
@@ -203,7 +203,7 @@
                 <input data-fills="hose" inputmode="decimal" autocomplete="off" />
               </label>
             </div>
-            <div data-for="cutout" hidden>
+            <div data-show-when="appliance=cutout" hidden>
               <svg class="guide-drawing" role="img" aria-label="An appliance seen from the room, its outside width and height marked with arrows" viewBox="0 0 240 155" width="240" height="155" fill="none" stroke="currentColor" font-size="12" font-family="inherit">
               <defs><marker id="guide-arrow-4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor" /></marker></defs>
               <rect x="40" y="25" width="140" height="90" stroke-width="3" />
@@ -223,7 +223,7 @@
                 <input data-fills="cutout-height" inputmode="decimal" autocomplete="off" />
               </label>
             </div>
-            <div data-for="ac" hidden>
+            <div data-show-when="appliance=ac" hidden>
               <p>Measure the opening left open around the unit, in step 1; the unit's own size is not needed.</p>
             </div>
           </section>
@@ -301,7 +301,7 @@
           </label>
           <label>
             Top track depth (mm)
-            <input name="topDepthMm" inputmode="decimal" autocomplete="off" />
+            <input name="topDepthMm" inputmode="decimal" autocomplete="off" data-enable-when="topEdge=track" />
           </label>
           <span class="error" data-testid="error-topDepthMm"></span>
           <label>
@@ -315,7 +315,7 @@
           </label>
           <label>
             Bottom track depth (mm)
-            <input name="bottomDepthMm" inputmode="decimal" autocomplete="off" />
+            <input name="bottomDepthMm" inputmode="decimal" autocomplete="off" data-enable-when="bottomEdge=track" />
           </label>
           <span class="error" data-testid="error-bottomDepthMm"></span>
           <label>
@@ -329,7 +329,7 @@
           </label>
           <label>
             Left track depth (mm)
-            <input name="leftDepthMm" inputmode="decimal" autocomplete="off" />
+            <input name="leftDepthMm" inputmode="decimal" autocomplete="off" data-enable-when="leftEdge=track" />
           </label>
           <span class="error" data-testid="error-leftDepthMm"></span>
           <label>
@@ -343,7 +343,7 @@
           </label>
           <label>
             Right track depth (mm)
-            <input name="rightDepthMm" inputmode="decimal" autocomplete="off" />
+            <input name="rightDepthMm" inputmode="decimal" autocomplete="off" data-enable-when="rightEdge=track" />
           </label>
           <span class="error" data-testid="error-rightDepthMm"></span>
           <label>
@@ -368,7 +368,7 @@
           </label>
           <!-- A window AC (window-ac, #24): the edge facing the unit meets it (C49, C50). -->
           <label><input type="radio" name="appliance" value="ac" /> Window air conditioner</label>
-          <div data-testid="ac" hidden>
+          <div data-testid="ac" data-show-when="appliance=ac" hidden>
             <label>
               Where is the unit, seen from the room?
               <select data-part="ac-place">
@@ -383,7 +383,7 @@
               make one wall for each, with the unit on its right, then on its left.
             </p>
           </div>
-          <div data-port="1" data-testid="port-1" hidden>
+          <div data-port="1" data-testid="port-1" data-show-when="appliance=hose" hidden>
             <label>
               Hose end, outside diameter
               <select data-part="size">
@@ -414,7 +414,7 @@
             </p>
           </div>
           <span class="error" data-testid="error-ports"></span>
-          <div data-testid="cutout" hidden>
+          <div data-testid="cutout" data-show-when="appliance=cutout" hidden>
             <label>
               Appliance width (mm)
               <input data-part="cutout-width" inputmode="decimal" autocomplete="off" />
@@ -452,12 +452,12 @@
           <label><input type="radio" name="seal" value="none" checked /> None</label>
           <label><input type="radio" name="seal" value="tape" /> Foam tape</label>
           <label><input type="radio" name="seal" value="tpu" /> Printed TPU</label>
-          <div data-testid="tape" hidden>
+          <div data-testid="tape" data-show-when="seal!=none" hidden>
             <label>
               Seal size, width × thickness
-              <select data-part="tape-size"></select>
+              <select name="tapeSize" data-part="tape-size"></select>
             </label>
-            <div data-part="tape-own" hidden>
+            <div data-part="tape-own" data-show-when="tapeSize=own" hidden>
               <label>
                 Width (mm)
                 <input name="tapeWidthMm" inputmode="decimal" autocomplete="off" />
@@ -469,11 +469,11 @@
             </div>
             <span class="error" data-testid="error-tapeWidthMm"></span>
             <span class="error" data-testid="error-tapeThicknessMm"></span>
-            <p class="note" data-seal="tape">
+            <p class="note" data-show-when="seal=tape">
               Self-adhesive foam weather-seal tape. It goes in a groove along each edge strip's
               outer face, where the track, the sash or the sill presses on it.
             </p>
-            <p class="note" data-seal="tpu" hidden>
+            <p class="note" data-show-when="seal=tpu" hidden>
               Gaskets printed in TPU, in place of tape of this size: each sits in the tape's groove
               with two fins that fold as the wall goes in. Print them in TPU and the rest as usual.
             </p>
@@ -495,12 +495,12 @@
           <span class="error" data-testid="error-printerModel"></span>
           <label>
             Custom width (mm)
-            <input name="customWidthMm" inputmode="decimal" autocomplete="off" />
+            <input name="customWidthMm" inputmode="decimal" autocomplete="off" data-enable-when="printer=custom" />
           </label>
           <span class="error" data-testid="error-customWidthMm"></span>
           <label>
             Custom height (mm)
-            <input name="customHeightMm" inputmode="decimal" autocomplete="off" />
+            <input name="customHeightMm" inputmode="decimal" autocomplete="off" data-enable-when="printer=custom" />
           </label>
           <span class="error" data-testid="error-customHeightMm"></span>
         </fieldset>
@@ -516,7 +516,7 @@
           </label>
           <label>
             Width filler
-            <select name="widthFiller">
+            <select name="widthFiller" data-enable-when="widthMode=full-plus-filler">
               <option value="start">At the left</option>
               <option value="end">At the right</option>
               <option value="middle">In the middle</option>
@@ -536,7 +536,7 @@
           </label>
           <label>
             Height filler
-            <select name="heightFiller">
+            <select name="heightFiller" data-enable-when="heightMode=full-plus-filler">
               <option value="start">At the bottom</option>
               <option value="end">At the top</option>
               <option value="middle">In the middle</option>
@@ -570,7 +570,7 @@
               </optgroup>
             </select>
           </label>
-          <div data-testid="fill-style" hidden>
+          <div data-testid="fill-style" data-show-when="fill!=sealed" hidden>
             <label><input type="radio" name="fillStyle" value="relief" /> Relief</label>
             <p class="note">Cut into the face you see from the room; the wall stays sealed.</p>
             <label><input type="radio" name="fillStyle" value="through" /> Cut through</label>
@@ -677,7 +677,7 @@
           <p class="note">How far the panel reaches in past the collar: the hose end stops on it.</p>
           <span class="error" data-testid="error-collarLipMm"></span>
           <div data-testid="extra-ports"></div>
-          <p><button type="button" id="add-port">Add another port</button></p>
+          <p><button type="button" id="add-port" data-show-when="appliance=hose">Add another port</button></p>
         </details>
 
         <details>
@@ -713,7 +713,7 @@
           </label>
           <span class="error" data-testid="error-reliefPct"></span>
           <!-- Only the chosen pattern's sizes show (C17). -->
-          <div data-pattern="grid">
+          <div data-show-when="fill=grid">
             <label>
               Grid opening (mm)
               <input name="gridOpeningMm" inputmode="decimal" autocomplete="off" />
@@ -727,7 +727,7 @@
             <p class="note">The solid between two openings: at least 0.8 mm.</p>
             <span class="error" data-testid="error-gridBarMm"></span>
           </div>
-          <div data-pattern="hexagon">
+          <div data-show-when="fill=hexagon">
             <label>
               Hexagon opening, across the flats (mm)
               <input name="hexOpeningMm" inputmode="decimal" autocomplete="off" />
@@ -740,7 +740,7 @@
             <p class="note">The solid between two openings: at least 0.8 mm.</p>
             <span class="error" data-testid="error-hexBarMm"></span>
           </div>
-          <div data-pattern="brick">
+          <div data-show-when="fill=brick">
             <label>
               Brick width (mm)
               <input name="brickWidthMm" inputmode="decimal" autocomplete="off" />
@@ -758,7 +758,7 @@
             <p class="note">The solid between two bricks, as mortar: at least 0.8 mm.</p>
             <span class="error" data-testid="error-brickBarMm"></span>
           </div>
-          <div data-pattern="diamond">
+          <div data-show-when="fill=diamond">
             <label>
               Diamond width, corner to corner (mm)
               <input name="diamondWidthMm" inputmode="decimal" autocomplete="off" />
@@ -863,19 +863,19 @@
         <div id="preview" data-testid="preview" data-state="loading" data-pieces="0">
           <p class="note" data-testid="preview-message"></p>
         </div>
-        <p data-testid="plan-headline"></p>
-        <p data-testid="plan-columns"></p>
-        <p data-testid="plan-rows"></p>
-        <p data-testid="plan-span"></p>
-        <p data-testid="plan-joints"></p>
-        <p data-testid="plan-edges"></p>
-        <ul data-testid="plan-ports"></ul>
-        <ul data-testid="plan-cutouts"></ul>
-        <ul data-testid="plan-units"></ul>
-        <p data-testid="plan-seal"></p>
-        <p data-testid="plan-fill"></p>
-        <ul data-testid="plan-piece-fills"></ul>
-        <ul data-testid="plan-warnings"></ul>
+        <p data-testid="plan-headline" data-plan="headline" data-plan-wrong="Fix the marked fields to see the plan."></p>
+        <p data-testid="plan-columns" data-plan="columns"></p>
+        <p data-testid="plan-rows" data-plan="rows"></p>
+        <p data-testid="plan-span" data-plan="span"></p>
+        <p data-testid="plan-joints" data-plan="joints"></p>
+        <p data-testid="plan-edges" data-plan="edges"></p>
+        <ul data-testid="plan-ports" data-plan="ports"></ul>
+        <ul data-testid="plan-cutouts" data-plan="cutouts"></ul>
+        <ul data-testid="plan-units" data-plan="units"></ul>
+        <p data-testid="plan-seal" data-plan="seal"></p>
+        <p data-testid="plan-fill" data-plan="fill"></p>
+        <ul data-testid="plan-piece-fills" data-plan="pieceFills"></ul>
+        <ul data-testid="plan-warnings" data-plan="warnings"></ul>
         <p><button type="button" id="download-open">Download the pieces...</button></p>
         <!-- The offline file (offline-file, #25): the page as one file, offered here (C55). -->
         <p class="note" data-part="offline">
