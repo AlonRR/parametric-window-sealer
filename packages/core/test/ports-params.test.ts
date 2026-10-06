@@ -56,7 +56,8 @@ describe('parsePorts and formatPorts', () => {
   });
 
   it('refuse anything else, naming the port', () => {
-    const wrong = "write each as the hose end's outside diameter in mm, then optionally @column,row, as 150 or 150@2,1.";
+    const wrong =
+      "write each as the hose end's outside diameter in mm, then optionally @column,row, as 150 or 150@2,1.";
     expect(parsePorts('150@2')).toEqual({ ok: false, message: `Port 1: ${wrong}` });
     expect(parsePorts('150 abc')).toEqual({ ok: false, message: `Port 2: ${wrong}` });
     expect(parsePorts('150@0,1')).toEqual({ ok: false, message: `Port 1: ${wrong}` });
@@ -77,12 +78,18 @@ describe('readParams with ports', () => {
   });
 
   it('two ports in one piece are refused', () => {
-    expect(errorOf({ ports: '150@2,1 130@2,1' })).toBe('Ports 1 and 2 are both in column 2, row 1; give each its own piece.');
-    expect(errorOf({ ports: '150 130@2,1' })).toBe('Ports 1 and 2 are both in column 2, row 1; give each its own piece.');
+    expect(errorOf({ ports: '150@2,1 130@2,1' })).toBe(
+      'Ports 1 and 2 are both in column 2, row 1; give each its own piece.',
+    );
+    expect(errorOf({ ports: '150 130@2,1' })).toBe(
+      'Ports 1 and 2 are both in column 2, row 1; give each its own piece.',
+    );
   });
 
   it('a piece that is not there, or too small for the port, as checkPort says (Q108)', () => {
-    expect(errorOf({ ports: '150@4,1' })).toBe('Port 1: There is no column 4, row 1: the wall has 3 columns and 5 rows.');
+    expect(errorOf({ ports: '150@4,1' })).toBe(
+      'Port 1: There is no column 4, row 1: the wall has 3 columns and 5 rows.',
+    );
     expect(errorOf({ ports: '150', openingWidthMm: '405' })).toBe(
       'Port 1: A 150 mm hose port needs a piece at least 175.8 × 175.8 mm; column 2, row 1 is 132.7 × 198.6 mm. ' +
         'Full-size pieces plus a filler, or a larger printer size, make bigger pieces.',

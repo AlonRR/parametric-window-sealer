@@ -37,7 +37,9 @@ test('foam tape: 9 × 4 mm to start, a listed size or your own (Q121)', async ({
   ]);
   await expect(seal(page)).toHaveText('Seal: 9 × 4 mm foam tape along the edge strips’ outer faces: 3.2 m in all.');
   // The tape and its groove take 2 mm at each track and at the sash (Q125, Q126).
-  await expect(page.getByTestId('plan-span')).toHaveText('Pieces and joints: 599 × 1009 mm, for a 600 × 1000 mm opening.');
+  await expect(page.getByTestId('plan-span')).toHaveText(
+    'Pieces and joints: 599 × 1009 mm, for a 600 × 1000 mm opening.',
+  );
   await expect(page.getByLabel('Width (mm)', { exact: true })).toBeHidden();
 
   await size(page).selectOption('9.5x4.8');
@@ -110,10 +112,14 @@ test('the preview draws the tape; the download has the grooved strips, and no ta
   expect(names.some((n) => n.includes('tape'))).toBe(false);
 });
 
-test('printed TPU: gaskets to the seal’s size, and its joints in TPU under Advanced (C34, C35, C38)', async ({ page }) => {
+test('printed TPU: gaskets to the seal’s size, and its joints in TPU under Advanced (C34, C35, C38)', async ({
+  page,
+}) => {
   await tpu(page).check();
   await expect(size(page)).toHaveValue('9x4');
-  await expect(seal(page)).toHaveText('Seal: printed TPU, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all.');
+  await expect(seal(page)).toHaveText(
+    'Seal: printed TPU, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all.',
+  );
   await expect(page.getByText('Gaskets printed in TPU')).toBeVisible();
   await expect(page.getByText('Self-adhesive foam weather-seal tape')).toBeHidden();
   await page.getByText('Advanced: the seal').click();

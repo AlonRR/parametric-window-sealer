@@ -45,7 +45,11 @@ export function formatPieceFills(fills: readonly PieceFill[]): string {
 }
 
 // The fill of the piece in a column and row, from 1: its own kind and style if it has one.
-export function fillFor(params: { fill: FillParams; pieceFills: readonly PieceFill[] }, column: number, row: number): FillParams {
+export function fillFor(
+  params: { fill: FillParams; pieceFills: readonly PieceFill[] },
+  column: number,
+  row: number,
+): FillParams {
   const own = params.pieceFills.find((f) => f.column === column && f.row === row);
   if (own === undefined) return params.fill;
   return { ...params.fill, kind: own.kind, style: own.style ?? params.fill.style };

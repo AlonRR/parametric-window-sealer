@@ -91,9 +91,9 @@ describe('edgeStripSolid', () => {
 
   it('refuses a strip too narrow to keep walls as thick as the joint’s flanges', async () => {
     const engine = await loadEngine();
-    expect(() =>
-      edgeStripSolid(engine, L, { widthMm: 6.5, heightMm: 10 }, DEFAULT_JOINT, T, 'print'),
-    ).toThrow(RangeError);
+    expect(() => edgeStripSolid(engine, L, { widthMm: 6.5, heightMm: 10 }, DEFAULT_JOINT, T, 'print')).toThrow(
+      RangeError,
+    );
     expect(() => edgeStripSolid(engine, 0, PROFILE, DEFAULT_JOINT, T, 'print')).toThrow(RangeError);
   });
 });

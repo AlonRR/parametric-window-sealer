@@ -38,10 +38,13 @@ export function settingsFrom(start: FromFile | undefined, flags: Flags): { param
   if (read.ok) return { params: read.params };
   return {
     problems: read.problems.map((p): Problem => {
-      if (p.kind === 'shape' || p.field === undefined) return { message: `${start?.name ?? 'the input'}: ${p.message}` };
+      if (p.kind === 'shape' || p.field === undefined)
+        return { message: `${start?.name ?? 'the input'}: ${p.message}` };
       const flag = flagFor(p.field);
       const message =
-        p.kind === 'required' ? `${p.message.replace(/\.$/, '')}, as ${flag} or as ${p.path} in a --params file.` : p.message;
+        p.kind === 'required'
+          ? `${p.message.replace(/\.$/, '')}, as ${flag} or as ${p.path} in a --params file.`
+          : p.message;
       return { flag, setting: p.path, message };
     }),
   };

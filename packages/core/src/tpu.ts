@@ -66,7 +66,13 @@ export function gasketShapes(strips: readonly EdgeStripPlacement[], fit: TapeFit
   }
   return [...counts]
     .sort(([a], [b]) => b - a)
-    .map(([lengthMm, count]) => ({ kind: 'gasket' as const, lengthMm, widthMm: tenth(fit.grooveWidthMm), heightMm, count }));
+    .map(([lengthMm, count]) => ({
+      kind: 'gasket' as const,
+      lengthMm,
+      widthMm: tenth(fit.grooveWidthMm),
+      heightMm,
+      count,
+    }));
 }
 
 // A gasket lying as it prints: along X from 0, its base from y = 0 across the groove's width and

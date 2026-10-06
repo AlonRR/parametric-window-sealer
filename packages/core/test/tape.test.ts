@@ -121,7 +121,11 @@ describe('edgeProfile with tape on the outer face (Q119, Q125, Q126)', () => {
   });
 
   it('at the sash: the strip grows by the groove and the wall is smaller by the squeezed tape', () => {
-    expect(edgeProfile('right', slider, DEFAULT_JOINT, fit)).toMatchObject({ widthMm: 15, heightMm: 12, reachMm: -5.5 });
+    expect(edgeProfile('right', slider, DEFAULT_JOINT, fit)).toMatchObject({
+      widthMm: 15,
+      heightMm: 12,
+      reachMm: -5.5,
+    });
   });
 
   it('the span: 599 × 1009 mm for the example 600 × 1000 mm opening, against 603 × 1013 mm bare', () => {
@@ -183,7 +187,10 @@ describe('planEdges with tape', () => {
 
   it('edgeShapes keeps the groove; with side grooves the track depth is in the file name', () => {
     const sides = tapeFit(tape({ sides: true }));
-    const mixed: EdgeParams = { ...slider, track: { ...EXAMPLE_TRACK, depthMm: { top: 11, bottom: 12, left: 10, right: 10 } } };
+    const mixed: EdgeParams = {
+      ...slider,
+      track: { ...EXAMPLE_TRACK, depthMm: { top: 11, bottom: 12, left: 10, right: 10 } },
+    };
     const span = panelSpan(600, 1000, mixed, DEFAULT_JOINT, sides);
     const shapes = edgeShapes(planEdges(span.widthMm, span.heightMm, mixed, DEFAULT_JOINT, 200, sides));
     const names = shapes.map(partName);
@@ -306,7 +313,8 @@ describe('the form (Q122, Q124 to Q127, Q129)', () => {
     expect(read({ seal: 'tape', tapeSqueezePct: '25' })).toMatchObject({
       ok: false,
       errors: {
-        tapeSqueezePct: 'Squeezed to 1 mm, the tape would sit inside its 1 mm groove; squeeze it less or make the groove shallower.',
+        tapeSqueezePct:
+          'Squeezed to 1 mm, the tape would sit inside its 1 mm groove; squeeze it less or make the groove shallower.',
       },
     });
   });
@@ -315,7 +323,8 @@ describe('the form (Q122, Q124 to Q127, Q129)', () => {
     expect(read({ seal: 'tape', tapeSides: 'yes', leftDepthMm: '8' })).toMatchObject({
       ok: false,
       errors: {
-        tapeSides: 'The left track is 8 mm deep, less than the 9 mm tape is wide, so the tape cannot go on the edge strips’ sides.',
+        tapeSides:
+          'The left track is 8 mm deep, less than the 9 mm tape is wide, so the tape cannot go on the edge strips’ sides.',
       },
     });
     // The right edge is at the sash: its depth is not read.
@@ -400,7 +409,11 @@ describe('the plan text', () => {
 
 describe('settings in the library’s shape', () => {
   it('lists every tape setting, the places as yes or no', () => {
-    const paths = SETTINGS.filter((s) => s.path.startsWith('seal')).map((s) => [s.path, s.values ?? null, s.onOff ?? false]);
+    const paths = SETTINGS.filter((s) => s.path.startsWith('seal')).map((s) => [
+      s.path,
+      s.values ?? null,
+      s.onOff ?? false,
+    ]);
     expect(paths).toEqual([
       ['seal.kind', ['none', 'tape', 'tpu'], false],
       ['seal.tape.widthMm', null, false],
@@ -416,7 +429,9 @@ describe('settings in the library’s shape', () => {
   it('tape settings without a kind mean tape, as a printer size means a custom printer', () => {
     const r = readSettings({ openingWidthMm: 600, openingHeightMm: 1000, seal: { tape: { sides: true } } });
     expect(r).toMatchObject({ ok: true, params: { seal: { kind: 'tape', tape: { ...DEFAULT_TAPE, sides: true } } } });
-    expect(readSettings({ openingWidthMm: 600, openingHeightMm: 1000, seal: { kind: 'none', tape: { widthMm: 12 } } })).toMatchObject({
+    expect(
+      readSettings({ openingWidthMm: 600, openingHeightMm: 1000, seal: { kind: 'none', tape: { widthMm: 12 } } }),
+    ).toMatchObject({
       ok: true,
       params: { seal: { kind: 'none' } },
     });
@@ -433,7 +448,11 @@ describe('settings in the library’s shape', () => {
 describe('the files', () => {
   it('a taped wall makes its files, the edge strips grooved', async () => {
     const engine = await loadEngine();
-    const files = makeFiles(engine, { ...EXAMPLE_PARAMS, seal: tape({ sides: true }) }, { format: 'stl', packaging: 'separate' });
+    const files = makeFiles(
+      engine,
+      { ...EXAMPLE_PARAMS, seal: tape({ sides: true }) },
+      { format: 'stl', packaging: 'separate' },
+    );
     const edges = files.filter((f) => f.name.startsWith('edge-'));
     expect(edges.length).toBeGreaterThan(0);
     for (const f of edges) expect(f.name).toMatch(/-track-10-print-|x15x11-print-/);

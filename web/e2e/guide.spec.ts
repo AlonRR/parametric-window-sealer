@@ -35,7 +35,8 @@ test('four steps, each with a drawing, filling the form as you type (C58, C59, C
 
 test('one track depth for every edge in a track (C61)', async ({ page }) => {
   await guide(page).getByLabel('Track depth (mm)').fill('12');
-  for (const edge of ['Top', 'Bottom', 'Left']) await expect(page.getByLabel(`${edge} track depth (mm)`)).toHaveValue('12');
+  for (const edge of ['Top', 'Bottom', 'Left'])
+    await expect(page.getByLabel(`${edge} track depth (mm)`)).toHaveValue('12');
   // On the example slider the right edge meets the sash: its depth is not used and stays.
   await expect(page.getByLabel('Right track depth (mm)')).toHaveValue('10');
 });

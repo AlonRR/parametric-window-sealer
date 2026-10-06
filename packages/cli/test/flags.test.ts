@@ -22,7 +22,11 @@ describe('the setting flags (Q90)', () => {
   it.each(SETTING_FLAGS.map((f) => [f.flag, f] as const))(
     '--%s: its place in a --params file holds the value the page shows',
     (_flag, f) => {
-      const params = f.field.startsWith('custom') ? CUSTOM_PRINTER : f.field === 'printerModel' ? LISTED_PRINTER : EXAMPLE_PARAMS;
+      const params = f.field.startsWith('custom')
+        ? CUSTOM_PRINTER
+        : f.field === 'printerModel'
+          ? LISTED_PRINTER
+          : EXAMPLE_PARAMS;
       const value = settingAt(params, f.path);
       // A place for the tape is true or false in the file, yes or no as a flag.
       expect(f.onOff ? (value === true ? 'yes' : 'no') : String(value)).toBe(toFormValues(params)[f.field]);

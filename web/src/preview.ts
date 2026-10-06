@@ -4,16 +4,7 @@
 // loop, so an idle page costs nothing. A browser without WebGL gets a message instead; the
 // rest of the page does not depend on the preview.
 
-import {
-  AmbientLight,
-  Box3,
-  Color,
-  DirectionalLight,
-  PerspectiveCamera,
-  Scene,
-  Vector3,
-  WebGLRenderer,
-} from 'three';
+import { AmbientLight, Box3, Color, DirectionalLight, PerspectiveCamera, Scene, Vector3, WebGLRenderer } from 'three';
 import type { Group } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import type { Engine } from 'parametric-window-sealer';

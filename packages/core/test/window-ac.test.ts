@@ -41,7 +41,10 @@ describe('an edge against the unit (C49)', () => {
   const example = toFormValues(EXAMPLE_PARAMS);
   const read = (over: FormValues) => readParams({ ...example, ...over });
   const onUnit: Params = { ...EXAMPLE_PARAMS, edges: { ...EXAMPLE_PARAMS.edges, roles: unitRoles('slider', 'below') } };
-  const onSill: Params = { ...EXAMPLE_PARAMS, edges: { ...EXAMPLE_PARAMS.edges, roles: { ...onUnit.edges.roles, bottom: 'sill' } } };
+  const onSill: Params = {
+    ...EXAMPLE_PARAMS,
+    edges: { ...EXAMPLE_PARAMS.edges, roles: { ...onUnit.edges.roles, bottom: 'sill' } },
+  };
 
   it('is a role the form reads and writes back, and the settings list', () => {
     const r = read({ bottomEdge: 'unit' });
@@ -71,7 +74,10 @@ describe('an edge against the unit (C49)', () => {
     const lines = (p: Params) => describePlan(planWall(p), p).units;
     expect(lines(EXAMPLE_PARAMS)).toEqual([]);
     expect(lines(onUnit)).toEqual(['Window AC: the bottom edge stands on the unit’s top.']);
-    const beside: Params = { ...EXAMPLE_PARAMS, edges: { ...EXAMPLE_PARAMS.edges, window: 'hung', roles: unitRoles('hung', 'right') } };
+    const beside: Params = {
+      ...EXAMPLE_PARAMS,
+      edges: { ...EXAMPLE_PARAMS.edges, window: 'hung', roles: unitRoles('hung', 'right') },
+    };
     expect(lines(beside)).toEqual(['Window AC: the right edge meets the unit’s side.']);
   });
 

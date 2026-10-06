@@ -126,7 +126,11 @@ export const SETTINGS: readonly Setting[] = [
   },
   { field: 'collarDepthMm', path: 'collar.depthMm', help: "How far the hose end goes into the port's collar." },
   { field: 'collarWallMm', path: 'collar.wallMm', help: "The collar's wall." },
-  { field: 'collarClearanceMm', path: 'collar.clearanceMm', help: 'Clearance per side between the hose end and the collar.' },
+  {
+    field: 'collarClearanceMm',
+    path: 'collar.clearanceMm',
+    help: 'Clearance per side between the hose end and the collar.',
+  },
   { field: 'collarLipMm', path: 'collar.lipMm', help: 'The lip the hose end stops against, inside the collar.' },
   {
     field: 'seal',
@@ -149,7 +153,7 @@ export const SETTINGS: readonly Setting[] = [
   {
     field: 'tapeSides',
     path: 'seal.tape.sides',
-    help: "Tape on the sides of the edge strips in a track too: yes or no.",
+    help: 'Tape on the sides of the edge strips in a track too: yes or no.',
     values: YES_NO,
     onOff: true,
   },
@@ -198,7 +202,7 @@ export const SETTINGS: readonly Setting[] = [
     field: 'pieceFills',
     path: 'pieceFills',
     help:
-      "Pieces with a fill of their own: for each, its column and row from 1 at the bottom left seen from the room, " +
+      'Pieces with a fill of their own: for each, its column and row from 1 at the bottom left seen from the room, ' +
       'its fill (sealed or a pattern) and optionally its style; the sizes are the wall’s.',
     list: 'pieceFills',
   },

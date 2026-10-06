@@ -43,9 +43,7 @@ describe('divideAxis, full pieces plus one filler', () => {
   });
 
   it('middle with an odd count puts the filler after the first half, rounded down', () => {
-    expect(divideAxis(axis({ lengthMm: 1300, filler: 'middle' })).pieces).toEqual([
-      400, 100, 400, 400,
-    ]);
+    expect(divideAxis(axis({ lengthMm: 1300, filler: 'middle' })).pieces).toEqual([400, 100, 400, 400]);
   });
 
   it('an exact multiple has no filler, whatever its position', () => {
@@ -59,9 +57,7 @@ describe('divideAxis, full pieces plus one filler', () => {
   });
 
   it('floating-point dust is not a filler: 3 x 400.1 mm is exactly 1200.3 mm', () => {
-    expect(divideAxis(axis({ lengthMm: 1200.3, maxPieceMm: 400.1 })).pieces).toEqual([
-      400.1, 400.1, 400.1,
-    ]);
+    expect(divideAxis(axis({ lengthMm: 1200.3, maxPieceMm: 400.1 })).pieces).toEqual([400.1, 400.1, 400.1]);
   });
 });
 

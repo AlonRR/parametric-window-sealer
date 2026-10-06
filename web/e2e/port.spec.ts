@@ -65,7 +65,9 @@ test('the collar and more ports under Advanced (Q107, Q113)', async ({ page }) =
   );
   await extra.getByLabel('Row').fill('1');
   await extra.getByLabel('Column').fill('2');
-  await expect(page.getByTestId('error-ports')).toHaveText('Ports 1 and 2 are both in column 2, row 1; give each its own piece.');
+  await expect(page.getByTestId('error-ports')).toHaveText(
+    'Ports 1 and 2 are both in column 2, row 1; give each its own piece.',
+  );
   await extra.getByRole('button', { name: 'Remove' }).click();
   await expect(ports(page)).toHaveText('Hose port: a 150 mm hose end, in column 2, row 1.');
 });

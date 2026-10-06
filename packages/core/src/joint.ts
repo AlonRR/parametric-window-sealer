@@ -29,8 +29,7 @@ export const DEFAULT_JOINT: JointParams = {
 
 export const jointWidthMm = (j: JointParams): number => j.webMm + j.slideMm;
 export const stripWidthMm = (j: JointParams): number => 2 * j.slotMm + j.webMm;
-export const stripThicknessMm = (j: JointParams, panelMm: number): number =>
-  panelMm + 2 * j.fitMm + 2 * j.flangeMm;
+export const stripThicknessMm = (j: JointParams, panelMm: number): number => panelMm + 2 * j.fitMm + 2 * j.flangeMm;
 
 // The smallest piece the joints can hold (min-piece-from-joint, #53): the slot depth the
 // strips take at both edges, plus a strip's width between them, so every strip between
@@ -74,13 +73,7 @@ function runs(lengths: number[], joints: number[]) {
 // The pieces along one joint, each with a strip from crossing to crossing. Next to a
 // crossing the strip stops the cross piece's half width plus half the slide from the
 // crossing's centre; at the wall's edge it stops the inset short of the edge (Q59, Q74).
-function stripSpans(
-  lengths: number[],
-  starts: number[],
-  crossings: number[],
-  j: JointParams,
-  insetMm: number,
-) {
+function stripSpans(lengths: number[], starts: number[], crossings: number[], j: JointParams, insetMm: number) {
   const reach = stripWidthMm(j) / 2 + j.slideMm / 2;
   return lengths.flatMap((length, i) => {
     const before = crossings[i - 1];
@@ -142,8 +135,6 @@ export function partShapes(plan: JointPlan, joint: JointParams): PartShape[] {
     .sort(([a], [b]) => b - a)
     .map(([lengthMm, count]) => ({ kind: 'strip' as const, lengthMm, widthMm, count }));
   const crosses =
-    plan.crosses.length > 0
-      ? [{ kind: 'cross' as const, lengthMm: widthMm, widthMm, count: plan.crosses.length }]
-      : [];
+    plan.crosses.length > 0 ? [{ kind: 'cross' as const, lengthMm: widthMm, widthMm, count: plan.crosses.length }] : [];
   return [...strips, ...crosses];
 }

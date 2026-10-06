@@ -8,7 +8,11 @@ import { EXAMPLE_PARAMS, WINDOW_PRESETS, makeWall, planFiles } from 'parametric-
 import { SETTING_FLAGS } from '../src/flags.js';
 import { run } from '../src/run.js';
 
-async function cli(args: string[], cwd = mkdtempSync(join(tmpdir(), 'window-sealer-')), files: Record<string, string> = {}) {
+async function cli(
+  args: string[],
+  cwd = mkdtempSync(join(tmpdir(), 'window-sealer-')),
+  files: Record<string, string> = {},
+) {
   for (const [name, text] of Object.entries(files)) writeFileSync(join(cwd, name), text);
   const out: string[] = [];
   const err: string[] = [];
@@ -102,7 +106,11 @@ describe('what it prints (Q87)', () => {
     expect(r.code).toBe(2);
     const result = json(r.out);
     expect(result.ok).toBe(false);
-    expect(result.errors).toContainEqual({ flag: '--width', setting: 'openingWidthMm', message: expect.stringMatching(/^Required:/) });
+    expect(result.errors).toContainEqual({
+      flag: '--width',
+      setting: 'openingWidthMm',
+      message: expect.stringMatching(/^Required:/),
+    });
     expect(result.errors).toContainEqual({
       flag: '--slide',
       setting: 'joint.slideMm',
@@ -291,7 +299,9 @@ describe('hose ports (hose-port #12; Q114: --port, repeatable)', () => {
 
   it('flags replace the file’s ports, as any flag overrides the file', async () => {
     const file = JSON.stringify({ ...EXAMPLE_PARAMS, ports: [{ hoseMm: 130, column: 1, row: 5 }] });
-    expect((await params(['--params', 'w.json'], { 'w.json': file })).ports).toEqual([{ hoseMm: 130, column: 1, row: 5 }]);
+    expect((await params(['--params', 'w.json'], { 'w.json': file })).ports).toEqual([
+      { hoseMm: 130, column: 1, row: 5 },
+    ]);
     expect((await params(['--params', 'w.json', '--port', '150'], { 'w.json': file })).ports).toEqual([
       { hoseMm: 150, column: 2, row: 1 },
     ]);
@@ -318,7 +328,8 @@ describe('hose ports (hose-port #12; Q114: --port, repeatable)', () => {
 });
 
 describe('a printer from the list (printer-presets #13; Q115 to Q117)', () => {
-  const params = async (args: string[]) => json((await cli([...args, '--dry-run', '--json'])).out).params as typeof EXAMPLE_PARAMS;
+  const params = async (args: string[]) =>
+    json((await cli([...args, '--dry-run', '--json'])).out).params as typeof EXAMPLE_PARAMS;
 
   it('--printer-model alone makes the printer a listed one; --bed-margin changes the margin', async () => {
     const p = await params([...OPENING, '--printer-model', 'prusa-mk4s', '--bed-margin', '15']);
@@ -445,7 +456,10 @@ describe('the printed TPU seal (seal-tpu #22; C31 to C39)', () => {
   });
 
   it('--tpu-joints yes without --seal means the TPU seal, its strips and cross pieces named -tpu', async () => {
-    expect((await params([...OPENING, '--tpu-joints', 'yes'])).seal).toMatchObject({ kind: 'tpu', tape: { joints: true } });
+    expect((await params([...OPENING, '--tpu-joints', 'yes'])).seal).toMatchObject({
+      kind: 'tpu',
+      tape: { joints: true },
+    });
     const r = await cli([...OPENING, '--tpu-joints', 'yes', '--dry-run']);
     expect(r.out).toMatch(/ {2}strip-[0-9.]+x18-tpu-print-[0-9]+\.stl/);
     expect(r.out).toMatch(/ {2}cross-18x18-tpu-print-[0-9]+\.stl/);
@@ -533,22 +547,38 @@ describe('the diamond pattern (pattern-diamond #19; C22 to C25)', () => {
     const r = await cli([...OPENING, '--fill', 'diamond', '--dry-run']);
     expect(r.out).toContain('Fill: diamonds 20 mm wide and 30 mm tall and 3 mm bars, cut 1.5 mm into the room side.');
     const alone = await cli([...OPENING, '--diamond-height', '20', '--dry-run', '--json']);
-    expect(json(alone.out).params.fill).toMatchObject({ kind: 'diamond', diamond: { widthMm: 20, heightMm: 20, barMm: 3 } });
+    expect(json(alone.out).params.fill).toMatchObject({
+      kind: 'diamond',
+      diamond: { widthMm: 20, heightMm: 20, barMm: 3 },
+    });
   });
 });
 
 describe('per-piece fills (params-advanced #21; C26 to C28)', () => {
   it('--piece-fill gives a piece its own fill; given again, another', async () => {
-    const r = await cli([...OPENING, '--fill', 'grid', '--piece-fill', '2,1=sealed', '--piece-fill', '3,1=diamond:through', '--dry-run']);
+    const r = await cli([
+      ...OPENING,
+      '--fill',
+      'grid',
+      '--piece-fill',
+      '2,1=sealed',
+      '--piece-fill',
+      '3,1=diamond:through',
+      '--dry-run',
+    ]);
     expect(r.code).toBe(0);
     expect(r.out).toContain('Column 2, row 1: sealed.');
-    expect(r.out).toContain('Column 3, row 1: diamonds 20 mm wide and 30 mm tall and 3 mm bars, cut through: air passes through the wall.');
+    expect(r.out).toContain(
+      'Column 3, row 1: diamonds 20 mm wide and 30 mm tall and 3 mm bars, cut through: air passes through the wall.',
+    );
   });
 
   it('refuses a piece the wall does not have, naming the flag; --help shows the form', async () => {
     const r = await cli([...OPENING, '--piece-fill', '4,1=grid']);
     expect(r.code).toBe(2);
-    expect(r.err).toContain('--piece-fill: Piece fill 1: there is no column 4, row 1: the wall has 3 columns and 5 rows.');
+    expect(r.err).toContain(
+      '--piece-fill: Piece fill 1: there is no column 4, row 1: the wall has 3 columns and 5 rows.',
+    );
     const help = await cli(['--help']);
     expect(help.out).toMatch(/--piece-fill <column,row=fill\[:style\]> +/);
     expect(help.out.replace(/\s+/g, ' ')).toContain('Give --piece-fill again for each piece.');

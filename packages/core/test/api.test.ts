@@ -33,7 +33,9 @@ describe('makeWall', () => {
   it('one 3MF holding everything', async () => {
     const wall = await makeWall(EXAMPLE_PARAMS, { format: '3mf', packaging: 'single' });
     expect(wall.files.map((f) => f.name)).toEqual(['window-sealer-600x1000.3mf']);
-    const model = strFromU8(unzipSync(wall.files[0]?.bytes ?? new Uint8Array())['3D/3dModel.model'] ?? new Uint8Array());
+    const model = strFromU8(
+      unzipSync(wall.files[0]?.bytes ?? new Uint8Array())['3D/3dModel.model'] ?? new Uint8Array(),
+    );
     expect([...model.matchAll(/<item /g)]).toHaveLength(15 + 22 + 8 + 18);
   });
 
@@ -52,15 +54,14 @@ describe('makeWall', () => {
       slideMm: 'Make it less than the slot depth, so a piece always stays in its slot.',
     });
     expect((error as ParamsError).message).toContain('slideMm');
-    const tiny = await makeWall({ ...EXAMPLE_PARAMS, openingWidthMm: -5 }, { format: 'stl', packaging: 'zip' })
-      .catch((e: unknown) => e);
+    const tiny = await makeWall({ ...EXAMPLE_PARAMS, openingWidthMm: -5 }, { format: 'stl', packaging: 'zip' }).catch(
+      (e: unknown) => e,
+    );
     expect((tiny as ParamsError).errors).toHaveProperty('openingWidthMm');
   });
 
   it('refuses "one file" for STL, which holds a single object', async () => {
-    await expect(makeWall(EXAMPLE_PARAMS, { format: 'stl', packaging: 'single' })).rejects.toThrow(
-      RangeError,
-    );
+    await expect(makeWall(EXAMPLE_PARAMS, { format: 'stl', packaging: 'single' })).rejects.toThrow(RangeError);
   });
 });
 
@@ -135,9 +136,7 @@ describe('planFiles', () => {
   });
 
   it('refuses what makeWall refuses', () => {
-    expect(() => planFiles({ ...EXAMPLE_PARAMS, thicknessMm: 0 }, CHOICES[0] as DownloadChoice)).toThrow(
-      ParamsError,
-    );
+    expect(() => planFiles({ ...EXAMPLE_PARAMS, thicknessMm: 0 }, CHOICES[0] as DownloadChoice)).toThrow(ParamsError);
     expect(() => planFiles(EXAMPLE_PARAMS, { format: 'stl', packaging: 'single' })).toThrow(
       'Only 3MF holds every piece in one file; STL holds one object',
     );

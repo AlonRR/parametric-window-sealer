@@ -63,7 +63,10 @@ describe('the form (C20)', () => {
   it('its own width, height and bar, and back through the form', () => {
     expect(example).toMatchObject({ brickWidthMm: '30', brickHeightMm: '12', brickBarMm: '3' });
     const r = read({ fill: 'brick', brickWidthMm: '40', brickHeightMm: '10', brickBarMm: '2' });
-    expect(r).toMatchObject({ ok: true, params: { fill: { kind: 'brick', brick: { widthMm: 40, heightMm: 10, barMm: 2 } } } });
+    expect(r).toMatchObject({
+      ok: true,
+      params: { fill: { kind: 'brick', brick: { widthMm: 40, heightMm: 10, barMm: 2 } } },
+    });
     if (r.ok) expect(readParams(toFormValues(r.params))).toEqual(r);
   });
 
@@ -100,7 +103,10 @@ describe('settings in the library’s shape', () => {
 
   it('brick settings without a kind mean the bricks', () => {
     const r = readSettings({ openingWidthMm: 600, openingHeightMm: 1000, fill: { brick: { widthMm: 40 } } });
-    expect(r).toMatchObject({ ok: true, params: { fill: { kind: 'brick', brick: { widthMm: 40, heightMm: 12, barMm: 3 } } } });
+    expect(r).toMatchObject({
+      ok: true,
+      params: { fill: { kind: 'brick', brick: { widthMm: 40, heightMm: 12, barMm: 3 } } },
+    });
     expect(readSettings({ openingWidthMm: 600, openingHeightMm: 1000 }, { brickBarMm: '2' })).toMatchObject({
       ok: true,
       params: { fill: { kind: 'brick' } },

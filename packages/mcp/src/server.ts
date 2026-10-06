@@ -40,8 +40,7 @@ function version(): string {
 }
 
 type Content =
-  | { type: 'text'; text: string }
-  | { type: 'resource'; resource: { uri: string; mimeType: string; blob: string } };
+  { type: 'text'; text: string } | { type: 'resource'; resource: { uri: string; mimeType: string; blob: string } };
 
 interface Result {
   [key: string]: unknown;
@@ -84,7 +83,9 @@ const FORMAT = z.enum(['stl', '3mf']).optional().describe('File format. Starts a
 const PACKAGING = z
   .enum(['separate', 'zip', 'single'])
   .optional()
-  .describe('One file per panel and per strip, cross or edge shape; those in one ZIP; or one 3MF holding every copy. Starts at separate.');
+  .describe(
+    'One file per panel and per strip, cross or edge shape; those in one ZIP; or one 3MF holding every copy. Starts at separate.',
+  );
 
 export function createServer(options: ServerOptions): McpServer {
   const server = new McpServer({ name: 'window-sealer', version: version() }, { instructions: INSTRUCTIONS });
@@ -96,7 +97,7 @@ export function createServer(options: ServerOptions): McpServer {
       title: 'List the settings',
       description:
         'Every setting: where it goes in the settings object, what it means, the value it starts at, and its choices. ' +
-        "The opening has no starting value: ask the user for the width and height of the opening they can see, in mm.",
+        'The opening has no starting value: ask the user for the width and height of the opening they can see, in mm.',
       annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
     },
     () => {
@@ -191,7 +192,9 @@ export function createServer(options: ServerOptions): McpServer {
       const how = delivery ?? (outRoot === undefined ? 'reply' : 'folder');
       const name = folder ?? wallLabel(read.params.openingWidthMm, read.params.openingHeightMm);
       if (!FOLDER_NAME.test(name)) {
-        return failure([`folder must be a plain name such as kitchen (letters, digits, dot, dash, underscore), not ${JSON.stringify(name)}.`]);
+        return failure([
+          `folder must be a plain name such as kitchen (letters, digits, dot, dash, underscore), not ${JSON.stringify(name)}.`,
+        ]);
       }
       const toFolder = how === 'folder' || how === 'both';
       if (toFolder && outRoot === undefined) {

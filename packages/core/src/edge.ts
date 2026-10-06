@@ -174,12 +174,7 @@ export function planEdges(
   // One strip runs through each corner, by window type (Q71).
   const across = edges.window === 'slider' ? [outer.left, outer.right] : [mouth.left, mouth.right];
   const up = edges.window === 'slider' ? [mouth.bottom, mouth.top] : [outer.bottom, outer.top];
-  const run = (
-    edge: EdgeName,
-    profile: EdgeProfile,
-    [from, to]: number[],
-    place: (at: number) => [number, number],
-  ) =>
+  const run = (edge: EdgeName, profile: EdgeProfile, [from, to]: number[], place: (at: number) => [number, number]) =>
     segments(from ?? 0, (to ?? 0) - (from ?? 0), maxLengthMm).map(([at, lengthMm]) => {
       const [xMm, yMm] = place(at);
       const strip: EdgeStripPlacement = {

@@ -30,7 +30,8 @@ async function connect(outRoot = mkdtempSync(join(tmpdir(), 'window-sealer-mcp-'
   const client = new Client({ name: 'test', version: '0' });
   const [a, b] = InMemoryTransport.createLinkedPair();
   await Promise.all([server.connect(a), client.connect(b)]);
-  const call = async (name: string, args: Record<string, unknown> = {}) => answer(await client.callTool({ name, arguments: args }));
+  const call = async (name: string, args: Record<string, unknown> = {}) =>
+    answer(await client.callTool({ name, arguments: args }));
   return { client, call, outRoot };
 }
 
@@ -48,7 +49,8 @@ describe('the server', () => {
     const { tools } = await client.listTools();
     expect(tools.map((t) => t.name)).toEqual(TOOLS);
     const hints = Object.fromEntries(tools.map((t) => [t.name, t.annotations]));
-    for (const name of TOOLS.slice(0, 3)) expect(hints[name]).toMatchObject({ readOnlyHint: true, openWorldHint: false });
+    for (const name of TOOLS.slice(0, 3))
+      expect(hints[name]).toMatchObject({ readOnlyHint: true, openWorldHint: false });
     expect(hints['window_sealer_make_files']).toMatchObject({ readOnlyHint: false, openWorldHint: false });
   });
 
@@ -61,7 +63,8 @@ describe('the server', () => {
       const node = s.path.split('.').reduce((at: any, key: string) => at?.properties?.[key], settings);
       expect(node, s.path).toBeDefined();
       expect(node.description).toBe(s.help);
-      if (s.onOff) expect(node.type).toBe('boolean'); // a place for the tape: true or false
+      if (s.onOff)
+        expect(node.type).toBe('boolean'); // a place for the tape: true or false
       else if (s.values) expect(node.enum).toEqual([...s.values]);
     }
     expect(settings.required).toEqual(['openingWidthMm', 'openingHeightMm']);
@@ -81,14 +84,23 @@ describe('window_sealer_list_settings', () => {
     expect(r.isError).toBeFalsy();
     const settings = r.data['settings'] as { path: string; help: string; startsAt: unknown; choices?: string[] }[];
     expect(settings.map((s) => s.path)).toEqual(SETTINGS.map((s) => s.path));
-    expect(settings.find((s) => s.path === 'seal.tape.sides')).toMatchObject({ startsAt: false, choices: [false, true] });
-    expect(settings.find((s) => s.path === 'seal.kind')).toMatchObject({ startsAt: 'none', choices: ['none', 'tape', 'tpu'] });
+    expect(settings.find((s) => s.path === 'seal.tape.sides')).toMatchObject({
+      startsAt: false,
+      choices: [false, true],
+    });
+    expect(settings.find((s) => s.path === 'seal.kind')).toMatchObject({
+      startsAt: 'none',
+      choices: ['none', 'tape', 'tpu'],
+    });
     expect(settings.find((s) => s.path === 'joint.slotMm')).toEqual({
       path: 'joint.slotMm',
       help: 'How deep a piece can go into a strip.',
       startsAt: 8,
     });
-    expect(settings.find((s) => s.path === 'edges.window')).toMatchObject({ startsAt: 'slider', choices: ['slider', 'hung'] });
+    expect(settings.find((s) => s.path === 'edges.window')).toMatchObject({
+      startsAt: 'slider',
+      choices: ['slider', 'hung'],
+    });
     expect(settings.find((s) => s.path === 'openingWidthMm')?.startsAt).toBeNull();
     expect(JSON.parse(r.text)).toEqual(r.data);
   });
@@ -109,7 +121,9 @@ describe('window_sealer_check_settings', () => {
     expect(r.isError).toBeFalsy();
     expect(r.data).toEqual({
       ok: false,
-      problems: [{ path: 'joint.slideMm', message: 'Make it less than the slot depth, so a piece always stays in its slot.' }],
+      problems: [
+        { path: 'joint.slideMm', message: 'Make it less than the slot depth, so a piece always stays in its slot.' },
+      ],
     });
   });
 });
@@ -134,7 +148,9 @@ describe('window_sealer_plan_wall', () => {
       kind: 'tape',
       tape: { widthMm: 9, thicknessMm: 4, grooveMm: 1, squeezePct: 50, sides: true, port: false, joints: false },
     });
-    expect(r.data['summary'].seal).toBe('Seal: 9 × 4 mm foam tape along the edge strips’ outer faces and sides: 7.6 m in all.');
+    expect(r.data['summary'].seal).toBe(
+      'Seal: 9 × 4 mm foam tape along the edge strips’ outer faces and sides: 7.6 m in all.',
+    );
     const names = (r.data['files'] as { name: string }[]).map((f) => f.name);
     expect(names.some((n) => /^edge-[0-9.]+x13x11-track-10-print-[0-9]+\.stl$/.test(n))).toBe(true);
     const yes = await call('window_sealer_plan_wall', { settings: { ...OPENING, seal: { tape: { sides: 'yes' } } } });
@@ -152,9 +168,13 @@ describe('window_sealer_plan_wall', () => {
     const names = (r.data['files'] as { name: string }[]).map((f) => f.name);
     expect(names.some((n) => /^gasket-[0-9.]+x9\.5x4-tpu-print-[0-9]+\.stl$/.test(n))).toBe(true);
     expect(names.some((n) => /^cross-18x18-tpu-print-[0-9]+\.stl$/.test(n))).toBe(true);
-    const tape = await call('window_sealer_plan_wall', { settings: { ...OPENING, seal: { kind: 'tape', tape: { joints: true } } } });
+    const tape = await call('window_sealer_plan_wall', {
+      settings: { ...OPENING, seal: { kind: 'tape', tape: { joints: true } } },
+    });
     expect(tape.isError).toBe(true);
-    expect(tape.text).toContain('- seal.tape.joints: Tape does not fit a joint (Q128): choose printed TPU for the joints.');
+    expect(tape.text).toContain(
+      '- seal.tape.joints: Tape does not fit a joint (Q128): choose printed TPU for the joints.',
+    );
   });
 
   it('measured cutouts in the library’s shape, lined with the seal, a TPU frame among the files (C43, C44)', async () => {
@@ -169,7 +189,9 @@ describe('window_sealer_plan_wall', () => {
     ]);
     const names = (r.data['files'] as { name: string }[]).map((f) => f.name);
     expect(names).toContain('frame-120x80-tpu-print-1.stl');
-    const half = await call('window_sealer_plan_wall', { settings: { ...OPENING, cutouts: [{ widthMm: 120, heightMm: 80, column: 2 }] } });
+    const half = await call('window_sealer_plan_wall', {
+      settings: { ...OPENING, cutouts: [{ widthMm: 120, heightMm: 80, column: 2 }] },
+    });
     expect(half.isError).toBe(true);
     expect(half.text).toContain('cutouts.0 needs both column and row, or neither');
   });
@@ -194,7 +216,9 @@ describe('window_sealer_plan_wall', () => {
       reliefPct: 50,
       grid: { openingMm: 15, barMm: 2 },
     });
-    expect(r.data['summary'].fill).toBe('Fill: a grid of 15 mm square openings and 2 mm bars, cut 1.5 mm into the room side.');
+    expect(r.data['summary'].fill).toBe(
+      'Fill: a grid of 15 mm square openings and 2 mm bars, cut 1.5 mm into the room side.',
+    );
     const thin = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { grid: { barMm: 0.5 } } } });
     expect(thin.isError).toBe(true);
     expect(thin.text).toContain('- fill.grid.barMm: Make it at least 0.8 mm: two lines from a 0.4 mm nozzle.');
@@ -202,9 +226,15 @@ describe('window_sealer_plan_wall', () => {
 
   it('a hexagon fill: its settings alone mean the hexagon (C15)', async () => {
     const { call } = await connect();
-    const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { hexagon: { openingMm: 10 }, style: 'through' } } });
+    const r = await call('window_sealer_plan_wall', {
+      settings: { ...OPENING, fill: { hexagon: { openingMm: 10 }, style: 'through' } },
+    });
     expect(r.isError).toBeFalsy();
-    expect(r.data['settings'].fill).toMatchObject({ kind: 'hexagon', style: 'through', hexagon: { openingMm: 10, barMm: 3 } });
+    expect(r.data['settings'].fill).toMatchObject({
+      kind: 'hexagon',
+      style: 'through',
+      hexagon: { openingMm: 10, barMm: 3 },
+    });
     expect(r.data['summary'].fill).toBe(
       'Fill: a honeycomb of hexagonal openings 10 mm across the flats and 3 mm bars, cut through: air passes through the wall.',
     );
@@ -215,14 +245,18 @@ describe('window_sealer_plan_wall', () => {
     const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { brick: { heightMm: 10 } } } });
     expect(r.isError).toBeFalsy();
     expect(r.data['settings'].fill).toMatchObject({ kind: 'brick', brick: { widthMm: 30, heightMm: 10, barMm: 3 } });
-    expect(r.data['summary'].fill).toBe('Fill: bricks of 30 × 10 mm openings and 3 mm bars, cut 1.5 mm into the room side.');
+    expect(r.data['summary'].fill).toBe(
+      'Fill: bricks of 30 × 10 mm openings and 3 mm bars, cut 1.5 mm into the room side.',
+    );
   });
 
   it('a diamond fill: its settings alone mean the diamonds (C24)', async () => {
     const { call } = await connect();
     const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { diamond: { barMm: 2 } } } });
     expect(r.isError).toBeFalsy();
-    expect(r.data['summary'].fill).toBe('Fill: diamonds 20 mm wide and 30 mm tall and 2 mm bars, cut 1.5 mm into the room side.');
+    expect(r.data['summary'].fill).toBe(
+      'Fill: diamonds 20 mm wide and 30 mm tall and 2 mm bars, cut 1.5 mm into the room side.',
+    );
   });
 
   it('pieces with fills of their own (#21)', async () => {
@@ -236,7 +270,9 @@ describe('window_sealer_plan_wall', () => {
 
   it('settings the page refuses are an error with the page’s message for each', async () => {
     const { call } = await connect();
-    const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, thicknessMm: 0, joint: { slideMm: 8 } } });
+    const r = await call('window_sealer_plan_wall', {
+      settings: { ...OPENING, thicknessMm: 0, joint: { slideMm: 8 } },
+    });
     expect(r.isError).toBe(true);
     expect(r.text).toContain('- thicknessMm: Enter a size in mm, greater than 0.');
     expect(r.text).toContain('- joint.slideMm: Make it less than the slot depth, so a piece always stays in its slot.');
@@ -291,14 +327,18 @@ describe('window_sealer_make_files', () => {
     expect(r.isError).toBeFalsy();
     expect(listed(outRoot)).toEqual([]);
     const wall = await makeWall(EXAMPLE_PARAMS, { format: '3mf', packaging: 'single' });
-    const resources = r.content.filter((c) => c.type === 'resource') as { resource: { uri: string; mimeType: string; blob: string } }[];
+    const resources = r.content.filter((c) => c.type === 'resource') as {
+      resource: { uri: string; mimeType: string; blob: string };
+    }[];
     expect(resources).toHaveLength(1);
     expect(resources[0]?.resource.uri).toBe('window-sealer:///window-sealer-600x1000/window-sealer-600x1000.3mf');
     expect(resources[0]?.resource.mimeType).toBe('model/3mf');
     // A 3MF is a ZIP, and each entry carries the time it was made, so two made a second apart
     // differ in their bytes: compare what is inside.
     const inside = (bytes: Uint8Array) => unzipSync(bytes);
-    expect(inside(Buffer.from(resources[0]?.resource.blob ?? '', 'base64'))).toEqual(inside(wall.files[0]?.bytes ?? new Uint8Array()));
+    expect(inside(Buffer.from(resources[0]?.resource.blob ?? '', 'base64'))).toEqual(
+      inside(wall.files[0]?.bytes ?? new Uint8Array()),
+    );
     expect(r.data['folder']).toBeUndefined();
   });
 
@@ -347,7 +387,9 @@ describe('window_sealer_make_files', () => {
 
   it('takes the settings another tool returned', async () => {
     const { call, outRoot } = await connect();
-    const planned = await call('window_sealer_plan_wall', { settings: { ...OPENING, edges: { window: 'hung' }, thicknessMm: 4 } });
+    const planned = await call('window_sealer_plan_wall', {
+      settings: { ...OPENING, edges: { window: 'hung' }, thicknessMm: 4 },
+    });
     const made = await call('window_sealer_make_files', { settings: planned.data['settings'], packaging: 'zip' });
     expect(made.isError).toBeFalsy();
     expect(made.data['settings']).toEqual(planned.data['settings']);
@@ -379,7 +421,8 @@ async function connectWithout() {
   const [a, b] = InMemoryTransport.createLinkedPair();
   await Promise.all([server.connect(a), client.connect(b)]);
   return {
-    call: async (name: string, args: Record<string, unknown>) => answer(await client.callTool({ name, arguments: args })),
+    call: async (name: string, args: Record<string, unknown>) =>
+      answer(await client.callTool({ name, arguments: args })),
   };
 }
 
@@ -409,7 +452,9 @@ describe('hose ports (hose-port #12; Q114: ports as a list)', () => {
 
   it('a port the page would refuse is an error with the page’s message', async () => {
     const { call } = await connect();
-    const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, ports: [{ hoseMm: 150, column: 4, row: 1 }] } });
+    const r = await call('window_sealer_plan_wall', {
+      settings: { ...OPENING, ports: [{ hoseMm: 150, column: 4, row: 1 }] },
+    });
     expect(r.isError).toBe(true);
     expect(r.text).toContain('- ports: Port 1: There is no column 4, row 1: the wall has 3 columns and 5 rows.');
   });

@@ -22,10 +22,14 @@ function oneFile(name: string): Plugin {
       if (page === undefined || page.type !== 'asset') throw new Error('The offline build has no index.html');
       let html = String(page.source);
       for (const [fileName, item] of Object.entries(bundle)) {
-        const at = new RegExp(`<(script|link)\\b[^>]*(?:src|href)="\\./${fileName.replace(/[.$]/g, '\\$&')}"[^>]*>(?:</script>)?`);
+        const at = new RegExp(
+          `<(script|link)\\b[^>]*(?:src|href)="\\./${fileName.replace(/[.$]/g, '\\$&')}"[^>]*>(?:</script>)?`,
+        );
         if (!at.test(html)) continue;
         const code = item.type === 'chunk' ? item.code : String(item.source);
-        const tag = fileName.endsWith('.css') ? `<style>${inline(code, 'style')}</style>` : `<script type="module">${inline(code, 'script')}</script>`;
+        const tag = fileName.endsWith('.css')
+          ? `<style>${inline(code, 'style')}</style>`
+          : `<script type="module">${inline(code, 'script')}</script>`;
         html = html.replace(at, () => tag);
         delete bundle[fileName];
       }

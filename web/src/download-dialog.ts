@@ -4,14 +4,7 @@
 // (Q47), remembered in the user's own browser only.
 
 import { makeFiles } from 'parametric-window-sealer';
-import type {
-  DownloadChoice,
-  DownloadFile,
-  Engine,
-  Format,
-  Packaging,
-  Params,
-} from 'parametric-window-sealer';
+import type { DownloadChoice, DownloadFile, Engine, Format, Packaging, Params } from 'parametric-window-sealer';
 
 export const STORAGE_KEY = 'parametric-window-sealer.download-choice.v1';
 const FORMATS: ReadonlySet<unknown> = new Set<Format>(['stl', '3mf']);

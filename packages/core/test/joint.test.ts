@@ -48,10 +48,7 @@ describe('the joint dimensions (Q51, Q56)', () => {
   });
 
   it('at the smallest piece, a strip between two crossings is as long as it is wide', () => {
-    const plan = planJoints(
-      grid({ heightMm: 3 * 34 + 2 * 5, maxPieceHeightMm: 34 }),
-      DEFAULT_JOINT,
-    );
+    const plan = planJoints(grid({ heightMm: 3 * 34 + 2 * 5, maxPieceHeightMm: 34 }), DEFAULT_JOINT);
     const middleRow = plan.strips.filter((s) => s.axis === 'vertical')[1];
     expect(middleRow?.lengthMm).toBeCloseTo(stripWidthMm(DEFAULT_JOINT), 9);
   });

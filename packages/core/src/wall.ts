@@ -40,10 +40,7 @@ export function wallPartShapes(params: Params, plan: GridLayout = planWall(param
 
 // Every piece in its cell, and one strip, cross piece or edge strip per shape, lying as it
 // prints (Q53, Q58).
-export function buildExport(
-  engine: Engine,
-  params: Params,
-): { pieces: ExportPiece[]; parts: ExportPart[] } {
+export function buildExport(engine: Engine, params: Params): { pieces: ExportPiece[]; parts: ExportPart[] } {
   const plan = planWall(params);
   // Each piece's own fill, or the wall's (#21).
   const pattern = (cell: { column: number; row: number }) =>
@@ -144,11 +141,7 @@ export interface MakeWallOptions {
 }
 
 // The choice of format and packaging is required, as in the page's dialog (Q47).
-export async function makeWall(
-  params: Params,
-  choice: DownloadChoice,
-  options: MakeWallOptions = {},
-): Promise<Wall> {
+export async function makeWall(params: Params, choice: DownloadChoice, options: MakeWallOptions = {}): Promise<Wall> {
   const errors = validateParams(params);
   if (Object.keys(errors).length > 0) throw new ParamsError(errors);
   const engine = options.engine ?? (await loadEngine(options.wasmUrl));

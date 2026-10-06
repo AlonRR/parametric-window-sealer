@@ -14,7 +14,7 @@ const GROUPS: Record<string, string> = {
   joint: 'The strips that join the pieces, in mm. Starting values; a test print confirms them.',
   edges: 'The window and its four edges.',
   collar: "The hose port's collar, in mm. Starting values; a test print confirms them.",
-  rim: "The rim round each measured cutout, in mm. Starting values; a test print confirms them.",
+  rim: 'The rim round each measured cutout, in mm. Starting values; a test print confirms them.',
   seal:
     'The seal: none, foam tape, or gaskets printed in TPU to the tape’s size. Tape settings without a kind mean tape; ' +
     'joints in TPU, the TPU seal.',
@@ -46,7 +46,10 @@ const PIECE_FILL = z.strictObject({
   column: z.number().int().min(1).describe('The column of the piece, from 1 at the left.'),
   row: z.number().int().min(1).describe('The row of the piece, from 1 at the bottom.'),
   kind: z.enum(FILL_KINDS as [string, ...string[]]).describe('Its fill: sealed or a pattern.'),
-  style: z.enum(PATTERN_STYLES as [string, ...string[]]).optional().describe("Its style; the wall's if left out."),
+  style: z
+    .enum(PATTERN_STYLES as [string, ...string[]])
+    .optional()
+    .describe("Its style; the wall's if left out."),
 });
 
 // A measured cutout (#23; C44): the appliance's outside, seen from the room, and its piece as a
@@ -60,7 +63,13 @@ const CUTOUT = z.strictObject({
 
 const ITEMS: Record<ListKind, z.ZodType> = { ports: PORT, pieceFills: PIECE_FILL, cutouts: CUTOUT };
 
-function leaf(help: string, values: readonly string[] | undefined, required: boolean, list?: ListKind, onOff = false): z.ZodType {
+function leaf(
+  help: string,
+  values: readonly string[] | undefined,
+  required: boolean,
+  list?: ListKind,
+  onOff = false,
+): z.ZodType {
   const base = list
     ? z.array(ITEMS[list])
     : onOff
@@ -76,7 +85,12 @@ function toSchema(tree: Tree, path: string): z.ZodObject {
   const shape: Record<string, z.ZodType> = {};
   for (const [key, node] of Object.entries(tree)) {
     const at = path === '' ? key : `${path}.${key}`;
-    shape[key] = node instanceof z.ZodType ? node : toSchema(node, at).describe(GROUPS[at] ?? at).optional();
+    shape[key] =
+      node instanceof z.ZodType
+        ? node
+        : toSchema(node, at)
+            .describe(GROUPS[at] ?? at)
+            .optional();
   }
   return z.strictObject(shape);
 }

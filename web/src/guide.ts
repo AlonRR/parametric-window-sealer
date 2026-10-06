@@ -63,7 +63,8 @@ export function mountGuide(form: HTMLFormElement): void {
     input.addEventListener('input', () => fill(input.dataset.fills ?? '', input.value));
   }
   const showAppliance = () => {
-    for (const part of guide.querySelectorAll<HTMLElement>('[data-for]')) part.hidden = part.dataset.for !== appliance();
+    for (const part of guide.querySelectorAll<HTMLElement>('[data-for]'))
+      part.hidden = part.dataset.for !== appliance();
   };
   guide.addEventListener('toggle', () => {
     if (!guide.open) return;

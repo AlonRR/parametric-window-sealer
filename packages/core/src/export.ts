@@ -87,7 +87,8 @@ export function partName(shape: AnyPartShape): string {
   if (shape.kind === 'sleeve') return `sleeve-${mm(shape.hoseMm)}-tpu-print-${shape.count}`;
   if (shape.kind === 'frame') return `frame-${mm(shape.widthMm)}x${mm(shape.heightMm)}-tpu-print-${shape.count}`;
   const height = shape.kind === 'edge' || shape.kind === 'gasket' ? `x${mm(shape.heightMm)}` : '';
-  const side = shape.kind === 'edge' && shape.groove?.side !== undefined ? `-track-${mm(shape.groove.side.trackMm)}` : '';
+  const side =
+    shape.kind === 'edge' && shape.groove?.side !== undefined ? `-track-${mm(shape.groove.side.trackMm)}` : '';
   const tpu = shape.kind === 'gasket' || (shape.kind !== 'edge' && shape.tpu === true) ? '-tpu' : '';
   return `${shape.kind}-${mm(shape.lengthMm)}x${mm(shape.widthMm)}${height}${side}${tpu}-print-${shape.count}`;
 }
@@ -109,11 +110,7 @@ export function toStl(mesh: MeshData, name: string): Uint8Array {
   view.setUint32(80, count, true);
   const p = mesh.positions;
   for (let t = 0; t < count; t++) {
-    const [a, b, c] = [0, 1, 2].map((k) => (mesh.triangles[t * 3 + k] ?? 0) * 3) as [
-      number,
-      number,
-      number,
-    ];
+    const [a, b, c] = [0, 1, 2].map((k) => (mesh.triangles[t * 3 + k] ?? 0) * 3) as [number, number, number];
     const u = [0, 1, 2].map((k) => (p[b + k] ?? 0) - (p[a + k] ?? 0));
     const w = [0, 1, 2].map((k) => (p[c + k] ?? 0) - (p[a + k] ?? 0));
     const n = [
@@ -157,7 +154,12 @@ function footprint(mesh: MeshData) {
       max[k] = Math.max(max[k] ?? x, x);
     }
   }
-  return { minX: min[0] ?? 0, minY: min[1] ?? 0, width: (max[0] ?? 0) - (min[0] ?? 0), depth: (max[1] ?? 0) - (min[1] ?? 0) };
+  return {
+    minX: min[0] ?? 0,
+    minY: min[1] ?? 0,
+    width: (max[0] ?? 0) - (min[0] ?? 0),
+    depth: (max[1] ?? 0) - (min[1] ?? 0),
+  };
 }
 
 function objectXml(id: number, name: string, mesh: MeshData): string {
@@ -188,7 +190,9 @@ export function to3mf(pieces: ExportPiece[], parts: ExportPart[] = []): Uint8Arr
   const alone = pieces.length + parts.reduce((n, p) => n + p.count, 0) === 1;
   pieces.forEach((piece, i) => {
     const id = i + 1;
-    objects.push(objectXml(id, pieceFileName(piece.cell, '3mf', piece.hoseMm, piece.cutout).replace(/\.3mf$/, ''), piece.mesh));
+    objects.push(
+      objectXml(id, pieceFileName(piece.cell, '3mf', piece.hoseMm, piece.cutout).replace(/\.3mf$/, ''), piece.mesh),
+    );
     const x = alone ? 0 : piece.cell.xMm + piece.cell.column * GAP_MM;
     const y = alone ? 0 : piece.cell.yMm + piece.cell.row * GAP_MM;
     items.push(itemXml(id, x, y));
@@ -255,10 +259,7 @@ export function packageDownload(
   const type = MEDIA_TYPES[choice.format];
   const perPiece = pieces.map((piece) => {
     const name = pieceFileName(piece.cell, choice.format, piece.hoseMm, piece.cutout);
-    const bytes =
-      choice.format === 'stl'
-        ? toStl(piece.mesh, name.replace(/\.stl$/, ''))
-        : to3mf([piece]);
+    const bytes = choice.format === 'stl' ? toStl(piece.mesh, name.replace(/\.stl$/, '')) : to3mf([piece]);
     return { name, type, bytes };
   });
   // One copy in each file; the name says how many to print.

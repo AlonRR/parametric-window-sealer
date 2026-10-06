@@ -31,7 +31,10 @@ const files = pack[0].files.map((f) => f.path);
 check('holds dist/cli.js and the README', files.includes('dist/cli.js') && files.includes('README.md'));
 check('holds no source or tests', !files.some((f) => f.startsWith('src/') || f.startsWith('test/')));
 check('its command is window-sealer-mcp (Q91)', pkg.bin?.['window-sealer-mcp'] === './dist/cli.js');
-check('which starts as a Node script', readFileSync(join(here, 'dist/cli.js'), 'utf8').startsWith('#!/usr/bin/env node\n'));
+check(
+  'which starts as a Node script',
+  readFileSync(join(here, 'dist/cli.js'), 'utf8').startsWith('#!/usr/bin/env node\n'),
+);
 
 console.log("installed as the README's steps say:");
 const readme = readFileSync(join(here, 'README.md'), 'utf8');
@@ -39,12 +42,22 @@ const prefix = mkdtempSync(join(tmpdir(), 'window-sealer-mcp-global-'));
 const home = mkdtempSync(join(tmpdir(), 'window-sealer-mcp-home-'));
 let client;
 try {
-  const steps = readme.split('## Getting it')[1]?.match(/```bash\n([\s\S]*?)```/)?.[1].trim().split('\n') ?? [];
+  const steps =
+    readme
+      .split('## Getting it')[1]
+      ?.match(/```bash\n([\s\S]*?)```/)?.[1]
+      .trim()
+      .split('\n') ?? [];
   const packStep = steps.find((s) => s.startsWith('npm pack '));
   const installStep = steps.find((s) => s.startsWith('npm install -g '));
-  check('the README packs both packages and installs them with -g', packStep !== undefined && installStep !== undefined);
+  check(
+    'the README packs both packages and installs them with -g',
+    packStep !== undefined && installStep !== undefined,
+  );
   const packed = JSON.parse(
-    execFileSync('npm', [...packStep.split(' ').slice(1), '--json', '--pack-destination', prefix], { cwd: repo }).toString(),
+    execFileSync('npm', [...packStep.split(' ').slice(1), '--json', '--pack-destination', prefix], {
+      cwd: repo,
+    }).toString(),
   );
   const tarballs = installStep.split(' ').slice(3);
   check(
@@ -53,10 +66,14 @@ try {
   );
   // -g with --prefix: a global install that stays in the temporary folder. The install comes
   // from npm's cache where it can (CI's `npm ci` has just filled it).
-  execFileSync('npm', ['install', '-g', '--prefix', prefix, ...tarballs, '--prefer-offline', '--no-audit', '--no-fund'], {
-    cwd: prefix,
-    stdio: 'ignore',
-  });
+  execFileSync(
+    'npm',
+    ['install', '-g', '--prefix', prefix, ...tarballs, '--prefer-offline', '--no-audit', '--no-fund'],
+    {
+      cwd: prefix,
+      stdio: 'ignore',
+    },
+  );
   const bin = join(prefix, 'bin');
   const library = join(prefix, 'lib', 'node_modules', 'parametric-window-sealer');
   check('the library is a copy from its tarball, not a link to the workspace', !lstatSync(library).isSymbolicLink());
@@ -85,13 +102,15 @@ try {
   await answered;
   raw.kill();
   const lines = out.split('\n').filter((line) => line !== '');
-  const protocolOnly = lines.length > 0 && lines.every((line) => {
-    try {
-      return JSON.parse(line).jsonrpc === '2.0';
-    } catch {
-      return false;
-    }
-  });
+  const protocolOnly =
+    lines.length > 0 &&
+    lines.every((line) => {
+      try {
+        return JSON.parse(line).jsonrpc === '2.0';
+      } catch {
+        return false;
+      }
+    });
   check(`stdout holds only JSON-RPC messages (${lines.length} line${lines.length === 1 ? '' : 's'})`, protocolOnly);
 
   console.log("started from the README's agent configuration, over stdio:");
@@ -106,7 +125,10 @@ try {
   const settings = JSON.parse(readme.match(/```json\n([\s\S]*?)```/g)?.[1]?.slice(8, -3) ?? '{}').settings;
   check("the README's example settings", settings?.openingWidthMm === 812.5);
   const plan = await client.callTool({ name: 'window_sealer_plan_wall', arguments: { settings } });
-  check(`window_sealer_plan_wall: ${plan.structuredContent?.summary?.headline}`, !plan.isError && plan.structuredContent?.files?.length > 0);
+  check(
+    `window_sealer_plan_wall: ${plan.structuredContent?.summary?.headline}`,
+    !plan.isError && plan.structuredContent?.files?.length > 0,
+  );
   const made = await client.callTool({ name: 'window_sealer_make_files', arguments: { settings } });
   const folder = join(home, 'window-sealer', 'window-sealer-812.5x455');
   const written = existsSync(folder) ? readdirSync(folder).length : 0;

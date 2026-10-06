@@ -27,7 +27,10 @@ check('holds no source or tests', !files.some((f) => f.startsWith('src/') || f.s
 
 console.log('loaded by name, as a user would:');
 const api = await import('parametric-window-sealer');
-check('resolves to the built dist, not the source', import.meta.resolve('parametric-window-sealer').endsWith('/dist/index.js'));
+check(
+  'resolves to the built dist, not the source',
+  import.meta.resolve('parametric-window-sealer').endsWith('/dist/index.js'),
+);
 check('exports makeWall', typeof api.makeWall === 'function');
 const wall = await api.makeWall(api.EXAMPLE_PARAMS, { format: '3mf', packaging: 'single' });
 check('makes the example wall: 15 pieces', wall.plan.pieces.length === 15);

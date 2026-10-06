@@ -59,7 +59,9 @@ export function parsePorts(text: string): { ok: true; ports: PortSetting[] } | {
 
 export function formatPorts(ports: readonly PortSetting[]): string {
   return ports
-    .map((p) => (p.column === undefined && p.row === undefined ? `${p.hoseMm}` : `${p.hoseMm}@${p.column ?? ''},${p.row ?? ''}`))
+    .map((p) =>
+      p.column === undefined && p.row === undefined ? `${p.hoseMm}` : `${p.hoseMm}@${p.column ?? ''},${p.row ?? ''}`,
+    )
     .join(' ');
 }
 

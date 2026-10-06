@@ -143,7 +143,8 @@ function tapeFromForm(form: HTMLFormElement, choice: HTMLSelectElement): void {
 // Q113). Their controls are not fields of their own: they are written into the hidden ports
 // field as the command's --port takes them (Q114), so the library checks them all.
 type PortControl = HTMLInputElement | HTMLSelectElement;
-const part = (row: ParentNode, name: string): PortControl | null => row.querySelector<PortControl>(`[data-part="${name}"]`);
+const part = (row: ParentNode, name: string): PortControl | null =>
+  row.querySelector<PortControl>(`[data-part="${name}"]`);
 const portRows = (form: HTMLFormElement): HTMLElement[] => [...form.querySelectorAll<HTMLElement>('[data-port]')];
 const WHOLE = /^[1-9][0-9]*$/;
 
@@ -176,7 +177,8 @@ function portsText(form: HTMLFormElement): { text: string; problem?: string } {
 
 // The measured cutout (measured-cutout, #23): one on the page (C45), written into the hidden
 // cutouts field as the command's --cutout takes it (C44), so the library checks it.
-const cutoutBox = (form: HTMLFormElement): HTMLElement | null => form.querySelector<HTMLElement>('[data-testid="cutout"]');
+const cutoutBox = (form: HTMLFormElement): HTMLElement | null =>
+  form.querySelector<HTMLElement>('[data-testid="cutout"]');
 
 function cutoutsText(form: HTMLFormElement): { text: string; problem?: string } {
   const appliance = (form.elements.namedItem('appliance') as RadioNodeList | null)?.value;
@@ -227,7 +229,9 @@ function numberPortRows(form: HTMLFormElement): void {
 // A listed printer's option is model:<id>; the choice is written into the hidden printer and
 // printerModel fields, and read back from them.
 function fillPrinters(choice: HTMLSelectElement): void {
-  choice.replaceChildren(option('default', `Not listed: ${DEFAULT_MAX_PIECE.widthMm} × ${DEFAULT_MAX_PIECE.heightMm} mm`));
+  choice.replaceChildren(
+    option('default', `Not listed: ${DEFAULT_MAX_PIECE.widthMm} × ${DEFAULT_MAX_PIECE.heightMm} mm`),
+  );
   const groups = new Map<string, HTMLOptGroupElement>();
   for (const p of PRINTERS) {
     let group = groups.get(p.maker);
@@ -258,13 +262,20 @@ function printerFromForm(form: HTMLFormElement, choice: HTMLSelectElement): void
 
 // Per-piece fills (#21): one list for a piece, its fill and style together (C29), and the map of
 // the wall's pieces, the top row first as the wall is seen.
-const KIND_NAMES: Record<string, string> = { sealed: 'Sealed', grid: 'Grid', hexagon: 'Hexagon', brick: 'Brick', diamond: 'Diamond' };
+const KIND_NAMES: Record<string, string> = {
+  sealed: 'Sealed',
+  grid: 'Grid',
+  hexagon: 'Hexagon',
+  brick: 'Brick',
+  diamond: 'Diamond',
+};
 const STYLE_NAMES: Record<string, string> = { relief: 'relief', through: 'cut through' };
 
 function fillPieceChoice(choice: HTMLSelectElement): void {
-  const options = [option('', "As the wall"), option('sealed', 'Sealed')];
+  const options = [option('', 'As the wall'), option('sealed', 'Sealed')];
   for (const kind of FILL_KINDS.filter((k) => k !== 'sealed')) {
-    for (const style of PATTERN_STYLES) options.push(option(`${kind}:${style}`, `${KIND_NAMES[kind]}, ${STYLE_NAMES[style]}`));
+    for (const style of PATTERN_STYLES)
+      options.push(option(`${kind}:${style}`, `${KIND_NAMES[kind]}, ${STYLE_NAMES[style]}`));
   }
   choice.replaceChildren(...options);
 }
@@ -368,7 +379,12 @@ export function mountPanel(
     if (chosen && pieceChoice && pieceName && key !== shownFor) {
       const own = fills.find((f) => f.column === chosen?.column && f.row === chosen.row);
       pieceName.textContent = `Fill of column ${chosen.column}, row ${chosen.row}`;
-      pieceChoice.value = own === undefined ? '' : own.kind === 'sealed' ? 'sealed' : `${own.kind}:${own.style ?? control(form, 'fillStyle')?.value ?? 'relief'}`;
+      pieceChoice.value =
+        own === undefined
+          ? ''
+          : own.kind === 'sealed'
+            ? 'sealed'
+            : `${own.kind}:${own.style ?? control(form, 'fillStyle')?.value ?? 'relief'}`;
     }
     shownFor = key;
   };
@@ -391,7 +407,8 @@ export function mountPanel(
     const acRow = form.querySelector<HTMLElement>('[data-testid="ac"]');
     if (acRow) acRow.hidden = (form.elements.namedItem('appliance') as RadioNodeList | null)?.value !== 'ac';
     const cutoutRow = cutoutBox(form);
-    if (cutoutRow) cutoutRow.hidden = (form.elements.namedItem('appliance') as RadioNodeList | null)?.value !== 'cutout';
+    if (cutoutRow)
+      cutoutRow.hidden = (form.elements.namedItem('appliance') as RadioNodeList | null)?.value !== 'cutout';
     // The seal's size shows with tape or TPU, with the note for the one chosen (C35); its width
     // and thickness only for the user's own.
     const sealKind = (form.elements.namedItem('seal') as RadioNodeList | null)?.value ?? 'none';
@@ -475,7 +492,15 @@ export function mountPanel(
     warnings?.replaceChildren();
     if (!result.ok) {
       setText(plan, 'plan-headline', 'Fix the marked fields to see the plan.');
-      for (const id of ['plan-columns', 'plan-rows', 'plan-span', 'plan-joints', 'plan-edges', 'plan-seal', 'plan-fill']) {
+      for (const id of [
+        'plan-columns',
+        'plan-rows',
+        'plan-span',
+        'plan-joints',
+        'plan-edges',
+        'plan-seal',
+        'plan-fill',
+      ]) {
         setText(plan, id, '');
       }
       plan.querySelector('[data-testid="plan-piece-fills"]')?.replaceChildren();
@@ -558,7 +583,8 @@ export function mountPanel(
   function presetRoles(): void {
     const kind = control(form, 'window')?.value as WindowType;
     if (!WINDOW_PRESETS[kind]) return;
-    const roles = applianceNow() === 'ac' && acPlace ? unitRoles(kind, acPlace.value as UnitPlace) : WINDOW_PRESETS[kind];
+    const roles =
+      applianceNow() === 'ac' && acPlace ? unitRoles(kind, acPlace.value as UnitPlace) : WINDOW_PRESETS[kind];
     for (const edge of EDGES) {
       const role = control(form, `${edge}Edge`);
       if (role instanceof HTMLSelectElement) role.value = roles[edge];

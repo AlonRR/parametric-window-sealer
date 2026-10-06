@@ -68,7 +68,13 @@ describe('the form', () => {
   const read = (over: FormValues) => readParams({ ...example, ...over });
 
   it('starts sealed, the pattern’s fields at their starting values', () => {
-    expect(example).toMatchObject({ fill: 'sealed', fillStyle: 'relief', reliefPct: '50', gridOpeningMm: '15', gridBarMm: '3' });
+    expect(example).toMatchObject({
+      fill: 'sealed',
+      fillStyle: 'relief',
+      reliefPct: '50',
+      gridOpeningMm: '15',
+      gridBarMm: '3',
+    });
   });
 
   it('a grid, and back through the form', () => {
@@ -81,7 +87,10 @@ describe('the form', () => {
   });
 
   it('sealed, the pattern’s fields not filled in are no problem', () => {
-    expect(read({ gridBarMm: '', reliefPct: 'x', fillStyle: '' })).toMatchObject({ ok: true, params: { fill: SEALED } });
+    expect(read({ gridBarMm: '', reliefPct: 'x', fillStyle: '' })).toMatchObject({
+      ok: true,
+      params: { fill: SEALED },
+    });
   });
 
   it('refuses a bar under 0.8 mm, an opening of nothing and a relief of the whole panel (Q143)', () => {
@@ -137,7 +146,9 @@ describe('settings in the library’s shape', () => {
   it('lists the fill’s settings', () => {
     const fill = SETTINGS.filter((s) => s.path.startsWith('fill'));
     expect(fill.find((s) => s.path === 'fill.kind')?.values).toEqual(FILL_KINDS);
-    expect(fill.filter((s) => !/^fill\.(hexagon|brick|diamond)\./.test(s.path)).map((s) => [s.path, s.values ?? null])).toEqual([
+    expect(
+      fill.filter((s) => !/^fill\.(hexagon|brick|diamond)\./.test(s.path)).map((s) => [s.path, s.values ?? null]),
+    ).toEqual([
       ['fill.kind', FILL_KINDS],
       ['fill.style', ['relief', 'through']],
       ['fill.reliefPct', null],

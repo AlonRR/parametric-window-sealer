@@ -66,12 +66,18 @@ export function parseCutouts(text: string): { ok: true; cutouts: CutoutSetting[]
 
 export function formatCutouts(cutouts: readonly CutoutSetting[]): string {
   return cutouts
-    .map((c) => `${c.widthMm}x${c.heightMm}${c.column === undefined && c.row === undefined ? '' : `@${c.column ?? ''},${c.row ?? ''}`}`)
+    .map(
+      (c) =>
+        `${c.widthMm}x${c.heightMm}${c.column === undefined && c.row === undefined ? '' : `@${c.column ?? ''},${c.row ?? ''}`}`,
+    )
     .join(' ');
 }
 
 const round = (n: number) => Math.round(n * 1e6) / 1e6;
-const grown = (r: Rectangle, by: number): Rectangle => ({ widthMm: round(r.widthMm + 2 * by), heightMm: round(r.heightMm + 2 * by) });
+const grown = (r: Rectangle, by: number): Rectangle => ({
+  widthMm: round(r.widthMm + 2 * by),
+  heightMm: round(r.heightMm + 2 * by),
+});
 
 // The opening: the appliance and the clearance each side.
 export const rimInnerMm = (c: Rectangle, rim: RimParams): Rectangle => grown(c, rim.clearanceMm);
@@ -99,7 +105,10 @@ export function checkCutout(
   const where = `column ${cutout.column + 1}, row ${cutout.row + 1}`;
   const piece = plan.pieces.find((p) => p.column === cutout.column && p.row === cutout.row);
   if (piece === undefined) {
-    return { ok: false, message: `there is no ${where}: the wall has ${plan.columns.length} columns and ${plan.rows.length} rows.` };
+    return {
+      ok: false,
+      message: `there is no ${where}: the wall has ${plan.columns.length} columns and ${plan.rows.length} rows.`,
+    };
   }
   const needs = cutoutPieceMm(cutout, rim, joint);
   if (piece.widthMm >= needs.widthMm - 1e-9 && piece.heightMm >= needs.heightMm - 1e-9) return { ok: true };
@@ -165,7 +174,9 @@ export function frameSolid(engine: Engine, shape: FrameShape): Manifold {
   const outer = { widthMm: shape.outerWidthMm, heightMm: shape.outerHeightMm };
   const inner = { widthMm: shape.innerWidthMm, heightMm: shape.innerHeightMm };
   if (!(inner.widthMm > 0 && inner.heightMm > 0 && outer.widthMm > inner.widthMm && outer.heightMm > inner.heightMm)) {
-    throw new RangeError(`A frame from ${inner.widthMm} × ${inner.heightMm} to ${outer.widthMm} × ${outer.heightMm} mm has no wall`);
+    throw new RangeError(
+      `A frame from ${inner.widthMm} × ${inner.heightMm} to ${outer.widthMm} × ${outer.heightMm} mm has no wall`,
+    );
   }
   return rectangularRing(engine, outer, inner, shape.depthMm);
 }

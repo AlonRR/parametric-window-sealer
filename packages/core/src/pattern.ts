@@ -50,7 +50,8 @@ export interface PieceArea {
 
 // Kept solid round a port: a circle in the piece's frame; round a cutout's rim, a rectangle
 // centred there (measured-cutout, #23).
-export type KeepOut = { xMm: number; yMm: number; radiusMm: number } | { xMm: number; yMm: number; widthMm: number; heightMm: number };
+export type KeepOut =
+  { xMm: number; yMm: number; radiusMm: number } | { xMm: number; yMm: number; widthMm: number; heightMm: number };
 
 const CIRCLE_SEGMENTS = 128; // as the port is drawn (PORT_SEGMENTS)
 const MITER_LIMIT = 10; // keeps sharp corners sharp when an opening is shrunk and grown back

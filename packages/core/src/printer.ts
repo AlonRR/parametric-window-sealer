@@ -20,9 +20,7 @@ export const DEFAULT_MAX_PIECE: Readonly<PieceSize> = Object.freeze({ widthMm: 2
 export const DEFAULT_BED_MARGIN_MM = 10;
 
 export type PrinterChoice =
-  | { kind: 'default' }
-  | { kind: 'custom'; widthMm: number; heightMm: number }
-  | { kind: 'model'; id: string }; // from the printer list (Q115)
+  { kind: 'default' } | { kind: 'custom'; widthMm: number; heightMm: number } | { kind: 'model'; id: string }; // from the printer list (Q115)
 
 function requirePositive(name: string, value: number): void {
   if (!Number.isFinite(value) || value <= 0) {

@@ -24,7 +24,7 @@ test('a page whose engine cannot load says so', async ({ page }) => {
 });
 
 // Q36: shown on the page itself, not only in the repository.
-test('the page says the generated files are the user\'s', async ({ page }) => {
+test("the page says the generated files are the user's", async ({ page }) => {
   await page.goto('./');
   await expect(page.getByTestId('output-statement')).toContainText(
     'are yours to use, change, share or sell for any purpose, with no conditions from this project.',

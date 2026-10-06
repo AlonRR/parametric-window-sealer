@@ -60,18 +60,14 @@ test('a bad value is marked, and nothing is planned from it', async ({ page }) =
   const width = page.getByLabel('Opening width (mm)');
   await width.fill('wide');
   await expect(width).toHaveAttribute('aria-invalid', 'true');
-  await expect(page.getByTestId('error-openingWidthMm')).toHaveText(
-    'Enter a size in mm, greater than 0.',
-  );
+  await expect(page.getByTestId('error-openingWidthMm')).toHaveText('Enter a size in mm, greater than 0.');
   await expect(headline(page)).toHaveText('Fix the marked fields to see the plan.');
   await width.fill('600');
   await expect(width).not.toHaveAttribute('aria-invalid', 'true');
   await expect(headline(page)).toHaveText('15 pieces: 3 across, 5 up, 3 mm thick');
 });
 
-test('the joint is under advanced, starts from the owner’s numbers, and sets the joints', async ({
-  page,
-}) => {
+test('the joint is under advanced, starts from the owner’s numbers, and sets the joints', async ({ page }) => {
   const slide = page.getByLabel('Slide (mm)');
   await expect(slide).toBeHidden();
   await page.getByText('Advanced: the joint between pieces').click();
@@ -90,9 +86,7 @@ test('the joint is under advanced, starts from the owner’s numbers, and sets t
   await expect(headline(page)).toHaveText('Fix the marked fields to see the plan.');
 });
 
-test('full pieces that leave too little: a warning, spreading chosen, the others a click away', async ({
-  page,
-}) => {
+test('full pieces that leave too little: a warning, spreading chosen, the others a click away', async ({ page }) => {
   await page.getByLabel('Opening width (mm)').fill('609'); // 612 mm with the edges
   await page.getByLabel('Width division').selectOption('full-plus-filler');
   const warning = page.getByTestId('leftover-width');
@@ -105,9 +99,7 @@ test('full pieces that leave too little: a warning, spreading chosen, the others
   await expect(spread).toBeChecked();
   await expect(page.getByTestId('plan-columns')).toHaveText('Widths: 200, 200, 200 mm');
   await equal.check();
-  await expect(page.getByTestId('plan-columns')).toHaveText(
-    'Widths: 149.3, 149.3, 149.3, 149.3 mm',
-  );
+  await expect(page.getByTestId('plan-columns')).toHaveText('Widths: 149.3, 149.3, 149.3, 149.3 mm');
   await expect(warning.getByLabel('Equal pieces: 4 of 149.3 mm')).toBeChecked();
   await expect(warning.getByLabel('Equal pieces: 4 of 149.3 mm')).toBeFocused();
   await shorten.check();
@@ -144,9 +136,7 @@ test('the window type presets each edge, and any edge can be changed (Q66)', asy
   );
 });
 
-test('a deeper track takes the pieces no further, and a too-narrow track is marked', async ({
-  page,
-}) => {
+test('a deeper track takes the pieces no further, and a too-narrow track is marked', async ({ page }) => {
   await page.getByLabel('Left track depth (mm)').fill('25');
   // The strip fills the deeper track; the panel still sits 6.5 mm into it (Q69).
   await expect(page.getByTestId('plan-span')).toHaveText(

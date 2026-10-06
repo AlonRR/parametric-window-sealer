@@ -4,15 +4,7 @@
 // Form values arrive as strings. readParams checks every field at once and names each one
 // that is wrong, so the page can mark them all; nothing is generated from a bad value.
 
-import {
-  EDGES,
-  EXAMPLE_TRACK,
-  WINDOW_PRESETS,
-  edgeShapes,
-  jointStripInsetMm,
-  panelSpan,
-  planEdges,
-} from './edge.js';
+import { EDGES, EXAMPLE_TRACK, WINDOW_PRESETS, edgeShapes, jointStripInsetMm, panelSpan, planEdges } from './edge.js';
 import type { EdgeName, EdgeParams, EdgeRole, EdgeStripPlacement, WindowType } from './edge.js';
 import { DEFAULT_JOINT, jointWidthMm, minPieceMm, partShapes, planJoints } from './joint.js';
 import type { JointParams, JointPlan } from './joint.js';
@@ -22,7 +14,15 @@ import { DEFAULT_MAX_PIECE, maxPieceSize } from './printer.js';
 import type { PieceSize, PrinterChoice } from './printer.js';
 import { DEFAULT_BED_MARGIN_MM } from './printer.js';
 import { PRINTER_IDS } from './printers.js';
-import { DEFAULT_COLLAR, checkPort, collarInnerMm, defaultPortPiece, formatPorts, parsePorts, portHoleMm } from './port.js';
+import {
+  DEFAULT_COLLAR,
+  checkPort,
+  collarInnerMm,
+  defaultPortPiece,
+  formatPorts,
+  parsePorts,
+  portHoleMm,
+} from './port.js';
 import type { CollarParams, PortSetting } from './port.js';
 import { DEFAULT_RIM, checkCutout, formatCutouts, linedRim, parseCutouts, rimInnerMm } from './cutout.js';
 import type { CutoutSetting, RimParams } from './cutout.js';
@@ -338,7 +338,12 @@ export function readParams(values: FormValues): ReadResult {
   };
   const tape = {
     widthMm: tapeNumber('tapeWidthMm', DEFAULT_TAPE.widthMm, positive, 'Enter a size in mm, greater than 0.'),
-    thicknessMm: tapeNumber('tapeThicknessMm', DEFAULT_TAPE.thicknessMm, positive, 'Enter a size in mm, greater than 0.'),
+    thicknessMm: tapeNumber(
+      'tapeThicknessMm',
+      DEFAULT_TAPE.thicknessMm,
+      positive,
+      'Enter a size in mm, greater than 0.',
+    ),
     grooveMm: tapeNumber('tapeGrooveMm', DEFAULT_TAPE.grooveMm, (n) => n >= 0, 'Enter a size in mm, 0 or more.'),
     squeezePct: tapeNumber(
       'tapeSqueezePct',
@@ -404,9 +409,7 @@ export function readParams(values: FormValues): ReadResult {
     }
     // Its groove on the outer face leaves the strip walls of at least 0.8 mm (Q131).
     const widths = EDGES.map((e) =>
-      roles[e] !== 'track'
-        ? track.widthMm
-        : track.widthMm - 2 * (sideTape ? fit.standOutMm : track.clearanceMm),
+      roles[e] !== 'track' ? track.widthMm : track.widthMm - 2 * (sideTape ? fit.standOutMm : track.clearanceMm),
     );
     const walls = (Math.min(...widths) - fit.grooveWidthMm) / 2;
     if (walls < TAPE_GROOVE_WALL_MM - 1e-9) {
@@ -451,7 +454,12 @@ export function readParams(values: FormValues): ReadResult {
   };
   const givenCutouts = parseCutouts(values.cutouts ?? '');
   if (!givenCutouts.ok) errors.cutouts = givenCutouts.message;
-  if (fit !== undefined && givenCutouts.ok && givenCutouts.cutouts.length > 0 && rim.depthMm < fit.grooveWidthMm - 1e-9) {
+  if (
+    fit !== undefined &&
+    givenCutouts.ok &&
+    givenCutouts.cutouts.length > 0 &&
+    rim.depthMm < fit.grooveWidthMm - 1e-9
+  ) {
     errors.rimDepthMm = `Make it at least ${mm(fit.grooveWidthMm)} mm, so the seal’s groove fits inside the rim.`;
   }
 
@@ -488,7 +496,9 @@ export function readParams(values: FormValues): ReadResult {
   const sizeMessage = 'Enter a size in mm, greater than 0.';
   const fill: FillParams = {
     kind: fillKind,
-    style: patterned ? oneOf('fillStyle', PATTERN_STYLES) : PATTERN_STYLES.find((v) => v === values.fillStyle) ?? SEALED.style,
+    style: patterned
+      ? oneOf('fillStyle', PATTERN_STYLES)
+      : (PATTERN_STYLES.find((v) => v === values.fillStyle) ?? SEALED.style),
     reliefPct: fillNumber(
       'reliefPct',
       SEALED.reliefPct,
@@ -496,7 +506,13 @@ export function readParams(values: FormValues): ReadResult {
       'Enter a percentage greater than 0 and less than 100.',
     ),
     grid: {
-      openingMm: fillNumber('gridOpeningMm', DEFAULT_GRID.openingMm, positive, 'Enter a size in mm, greater than 0.', used('grid')),
+      openingMm: fillNumber(
+        'gridOpeningMm',
+        DEFAULT_GRID.openingMm,
+        positive,
+        'Enter a size in mm, greater than 0.',
+        used('grid'),
+      ),
       barMm: fillNumber('gridBarMm', DEFAULT_GRID.barMm, barFits, barMessage, used('grid')),
     },
     hexagon: {
@@ -521,7 +537,20 @@ export function readParams(values: FormValues): ReadResult {
     },
   };
 
-  const base = { openingWidthMm, openingHeightMm, printer, bedMarginMm, width, height, thicknessMm, joint, edges, collar, seal, fill };
+  const base = {
+    openingWidthMm,
+    openingHeightMm,
+    printer,
+    bedMarginMm,
+    width,
+    height,
+    thicknessMm,
+    joint,
+    edges,
+    collar,
+    seal,
+    fill,
+  };
   const ports: Required<PortSetting>[] = [];
   if (Object.keys(errors).length === 0 && given.ok && given.ports.length > 0) {
     errors.ports = placePorts({ ...base, ports: [], pieceFills: [], cutouts: [], rim }, given.ports, ports);
@@ -594,7 +623,8 @@ function placeCutouts(params: Params, given: CutoutSetting[], placed: Required<C
     const fit = checkCutout(plan, { ...cutout, column: column - 1, row: row - 1 }, rim, params.joint);
     if (!fit.ok) return `Cutout ${i + 1}: ${fit.message}`;
     const port = params.ports.findIndex((p) => p.column === column && p.row === row);
-    if (port >= 0) return `Cutout ${i + 1} and port ${port + 1} are both in column ${column}, row ${row}; give each its own piece.`;
+    if (port >= 0)
+      return `Cutout ${i + 1} and port ${port + 1} are both in column ${column}, row ${row}; give each its own piece.`;
     const other = placed.findIndex((c) => c.column === column && c.row === row);
     if (other >= 0) {
       return `Cutouts ${other + 1} and ${i + 1} are both in column ${column}, row ${row}; give each its own piece.`;
@@ -692,11 +722,7 @@ function listed(lengths: number[]): string {
   return words.length > 0 ? `${words.join(', ')} and ${last}` : (last ?? '');
 }
 
-function describeLeftover(
-  note: GridLayout['leftovers'][number],
-  maxPieceMm: number,
-  joint: JointParams,
-): LeftoverText {
+function describeLeftover(note: GridLayout['leftovers'][number], maxPieceMm: number, joint: JointParams): LeftoverText {
   const label = note.axis === 'width' ? 'Width' : 'Height';
   const full = plural(note.fullPieces, `full ${mm(maxPieceMm)} mm piece`, `full ${mm(maxPieceMm)} mm pieces`);
   const verb = note.fullPieces === 1 ? 'leaves' : 'leave';
@@ -740,9 +766,7 @@ function describeJoints(joints: JointPlan, joint: JointParams): string {
   }
   const lengths = partShapes(joints, joint).filter((s) => s.kind === 'strip').length;
   const crosses =
-    joints.crosses.length > 0
-      ? `, and ${plural(joints.crosses.length, 'cross piece', 'cross pieces')}`
-      : '';
+    joints.crosses.length > 0 ? `, and ${plural(joints.crosses.length, 'cross piece', 'cross pieces')}` : '';
   return `Joints: ${plural(joints.strips.length, 'strip', 'strips')} in ${plural(lengths, 'length', 'lengths')}${crosses}; each joint ${mm(jointWidthMm(joint))} mm wide.`;
 }
 
@@ -771,7 +795,9 @@ function describeSeal(params: Params, parts: WallParts): string {
   if (fit === undefined) return 'Seal: none.';
   const { tape } = params.seal;
   const outer = sum(parts.edges.map((s) => s.lengthMm));
-  const sides = fit.sides ? 2 * sum(parts.edges.filter((s) => params.edges.roles[s.edge] === 'track').map((s) => s.lengthMm)) : 0;
+  const sides = fit.sides
+    ? 2 * sum(parts.edges.filter((s) => params.edges.roles[s.edge] === 'track').map((s) => s.lengthMm))
+    : 0;
   const ports = fit.port ? params.ports : [];
   const collar = tapedCollar(params.collar, fit);
   const faces = fit.sides ? 'outer faces and sides' : 'outer faces';
@@ -799,7 +825,10 @@ function describeSeal(params: Params, parts: WallParts): string {
       return 2 * (floor.widthMm + floor.heightMm) + 8 * fit.grooveDepthMm;
     }),
   );
-  const places = [...(ports.length === 0 ? [] : [`inside ${each}`]), ...(cutouts.length === 0 ? [] : [`round ${eachRim}`])];
+  const places = [
+    ...(ports.length === 0 ? [] : [`inside ${each}`]),
+    ...(cutouts.length === 0 ? [] : [`round ${eachRim}`]),
+  ];
   const inPorts = places.length === 0 ? '' : `, and ${places.join(' and ')}`;
   const metres = Math.round((outer + sides + round + rims) / 100) / 10;
   return `Seal: ${mm(tape.widthMm)} × ${mm(tape.thicknessMm)} mm foam tape along the edge strips’ ${faces}${inPorts}: ${metres} m in all.`;
@@ -822,7 +851,13 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
   const count = plan.pieces.length;
   const max = pieceLimit(params);
   const parts = planParts(params, plan);
-  const span = panelSpan(params.openingWidthMm, params.openingHeightMm, params.edges, params.joint, tapeFit(params.seal));
+  const span = panelSpan(
+    params.openingWidthMm,
+    params.openingHeightMm,
+    params.edges,
+    params.joint,
+    tapeFit(params.seal),
+  );
   const shapes = edgeShapes(parts.edges).length;
   return {
     headline: `${count} ${count === 1 ? 'piece' : 'pieces'}: ${plan.columns.length} across, ${plan.rows.length} up, ${mm(params.thicknessMm)} mm thick`,
@@ -841,7 +876,8 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     ports: params.ports.map((p) => `Hose port: a ${mm(p.hoseMm)} mm hose end, in column ${p.column}, row ${p.row}.`),
     cutouts: describeCutouts(params),
     units: EDGES.filter((e) => params.edges.roles[e] === 'unit').map(
-      (e) => `Window AC: the ${e} edge ${e === 'bottom' ? 'stands on the unit’s top' : e === 'top' ? 'meets the unit’s underside' : 'meets the unit’s side'}.`,
+      (e) =>
+        `Window AC: the ${e} edge ${e === 'bottom' ? 'stands on the unit’s top' : e === 'top' ? 'meets the unit’s underside' : 'meets the unit’s side'}.`,
     ),
     seal: describeSeal(params, parts),
     fill: `Fill: ${fillWords(params.fill, params.thicknessMm)}`,

@@ -26,24 +26,38 @@ check('holds dist/cli.js', files.includes('dist/cli.js'));
 check('holds the README', files.includes('README.md'));
 check('holds no source or tests', !files.some((f) => f.startsWith('src/') || f.startsWith('test/')));
 check('its command is window-sealer, at dist/cli.js (Q84)', pkg.bin?.['window-sealer'] === './dist/cli.js');
-check('which starts as a Node script', readFileSync(join(here, 'dist/cli.js'), 'utf8').startsWith('#!/usr/bin/env node\n'));
+check(
+  'which starts as a Node script',
+  readFileSync(join(here, 'dist/cli.js'), 'utf8').startsWith('#!/usr/bin/env node\n'),
+);
 
 console.log("installed as the README's steps say, into an empty project:");
 const readme = readFileSync(join(here, 'README.md'), 'utf8');
 const project = mkdtempSync(join(tmpdir(), 'window-sealer-user-'));
 const work = mkdtempSync(join(tmpdir(), 'window-sealer-run-'));
 try {
-  const steps = readme.split('## Getting it')[1]?.match(/```bash\n([\s\S]*?)```/)?.[1].trim().split('\n') ?? [];
+  const steps =
+    readme
+      .split('## Getting it')[1]
+      ?.match(/```bash\n([\s\S]*?)```/)?.[1]
+      .trim()
+      .split('\n') ?? [];
   const packStep = steps.find((s) => s.startsWith('npm pack '));
   const installStep = steps.find((s) => s.startsWith('npm install '));
   check('the README packs and installs both packages', packStep !== undefined && installStep !== undefined);
   // The build is CI's step before this; the packing and installing are run as written,
   // the install from npm's cache where it can (CI's `npm ci` has just filled it).
   const packed = JSON.parse(
-    execFileSync('npm', [...packStep.split(' ').slice(1), '--json', '--pack-destination', project], { cwd: repo }).toString(),
+    execFileSync('npm', [...packStep.split(' ').slice(1), '--json', '--pack-destination', project], {
+      cwd: repo,
+    }).toString(),
   );
   const tarballs = packed.map((p) => p.filename).sort();
-  const named = installStep.split(' ').slice(2).map((t) => t.replace('./', '')).sort();
+  const named = installStep
+    .split(' ')
+    .slice(2)
+    .map((t) => t.replace('./', ''))
+    .sort();
   check(`the tarballs are the ones it names (${named.join(', ')})`, JSON.stringify(tarballs) === JSON.stringify(named));
   writeFileSync(join(project, 'package.json'), '{ "private": true }\n');
   execFileSync('npm', ['install', ...installStep.split(' ').slice(2), '--prefer-offline', '--no-audit', '--no-fund'], {
@@ -68,7 +82,11 @@ try {
   }
 
   console.log("the README's sample output, line by line:");
-  const sample = readme.match(/```text\n([\s\S]*?)```/)?.[1].split('\n').filter((l) => l !== '' && l.trim() !== '...') ?? [];
+  const sample =
+    readme
+      .match(/```text\n([\s\S]*?)```/)?.[1]
+      .split('\n')
+      .filter((l) => l !== '' && l.trim() !== '...') ?? [];
   const first = sealer(['--width', '600', '--height', '1000']);
   const printed = first.stdout.split('\n');
   check(`${sample.length} sample lines, all printed`, sample.length > 10 && sample.every((l) => printed.includes(l)));

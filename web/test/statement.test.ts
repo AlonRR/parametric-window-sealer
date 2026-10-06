@@ -8,10 +8,9 @@ export const OUTPUT_STATEMENT =
   'The STL and other files this tool generates, and anything you print from them, are yours ' +
   'to use, change, share or sell for any purpose, with no conditions from this project.';
 
-const read = (path: string) =>
-  readFileSync(new URL(path, import.meta.url), 'utf8').replace(/\s+/g, ' ');
+const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8').replace(/\s+/g, ' ');
 
-describe('the statement that generated files are the user\'s (Q36)', () => {
+describe("the statement that generated files are the user's (Q36)", () => {
   it('is in the README', () => {
     expect(read('../../README.md')).toContain(OUTPUT_STATEMENT);
   });

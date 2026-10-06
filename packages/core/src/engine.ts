@@ -12,12 +12,10 @@ export type Engine = ManifoldToplevel;
 let started: Promise<Engine> | undefined;
 
 export function loadEngine(wasmUrl?: string): Promise<Engine> {
-  started ??= Module(wasmUrl === undefined ? undefined : { locateFile: () => wasmUrl }).then(
-    (engine) => {
-      engine.setup();
-      return engine;
-    },
-  );
+  started ??= Module(wasmUrl === undefined ? undefined : { locateFile: () => wasmUrl }).then((engine) => {
+    engine.setup();
+    return engine;
+  });
   return started;
 }
 

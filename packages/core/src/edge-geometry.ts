@@ -74,9 +74,7 @@ export function edgeStripSolid(
   const slot: Range = [-joint.fitMm, panelMm + joint.fitMm];
   // The walls either side of the slot are kept at least as thick as the joint's flanges.
   if ((width - (slot[1] - slot[0])) / 2 < joint.flangeMm - 1e-9) {
-    throw new RangeError(
-      `An edge strip ${width} mm wide leaves walls thinner than the ${joint.flangeMm} mm flanges`,
-    );
+    throw new RangeError(`An edge strip ${width} mm wide leaves walls thinner than the ${joint.flangeMm} mm flanges`);
   }
   if (height <= joint.slotMm) {
     throw new RangeError(`An edge strip ${height} mm tall has no base under its slot`);

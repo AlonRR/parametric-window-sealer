@@ -51,23 +51,17 @@ test('follows the form: a wider opening shows more pieces', async ({ page }) => 
   expect(await drawnShare(page)).toBeGreaterThan(0.05);
 });
 
-test('a bad value empties the preview and says why (the control for the pixel count)', async ({
-  page,
-}) => {
+test('a bad value empties the preview and says why (the control for the pixel count)', async ({ page }) => {
   await page.getByLabel('Opening width (mm)').fill('wide');
   await expect(preview(page)).toHaveAttribute('data-pieces', '0');
-  await expect(page.getByTestId('preview-message')).toHaveText(
-    'Fix the marked fields to see the preview.',
-  );
+  await expect(page.getByTestId('preview-message')).toHaveText('Fix the marked fields to see the preview.');
   expect(await drawnShare(page)).toBeLessThan(0.001);
   await page.getByLabel('Opening width (mm)').fill('600');
   await expect(preview(page)).toHaveAttribute('data-pieces', '15');
   expect(await drawnShare(page)).toBeGreaterThan(0.05);
 });
 
-test('redrawing frees the old pieces: graphics memory holds only the current wall', async ({
-  page,
-}) => {
+test('redrawing frees the old pieces: graphics memory holds only the current wall', async ({ page }) => {
   const width = page.getByLabel('Opening width (mm)');
   const steps = [
     ['700', '20'],

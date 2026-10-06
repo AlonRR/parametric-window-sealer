@@ -167,7 +167,11 @@ describe('the tape in the preview', () => {
 // panels (C34).
 describe('the printed TPU seal in the preview', () => {
   const tpu = { widthMm: 9, thicknessMm: 4, grooveMm: 1, squeezePct: 50, sides: false, port: true, joints: true };
-  const params = { ...EXAMPLE_PARAMS, ports: [{ hoseMm: 150, column: 2, row: 1 }], seal: { kind: 'tpu' as const, tape: tpu } };
+  const params = {
+    ...EXAMPLE_PARAMS,
+    ports: [{ hoseMm: 150, column: 2, row: 1 }],
+    seal: { kind: 'tpu' as const, tape: tpu },
+  };
   const colour = (m: Mesh) => (m.material as MeshPhongMaterial).color.getHex();
   const thickness = (m: Mesh) => {
     const box = new Box3().setFromObject(m);
@@ -188,7 +192,10 @@ describe('the printed TPU seal in the preview', () => {
   it('TPU strips and cross pieces in the same grey, 0.4 mm thinner across the panel', async () => {
     const engine = await loadEngine();
     const wall = buildWallScene(engine, params);
-    const loose = buildWallScene(engine, { ...params, seal: { kind: 'tpu' as const, tape: { ...tpu, joints: false } } });
+    const loose = buildWallScene(engine, {
+      ...params,
+      seal: { kind: 'tpu' as const, tape: { ...tpu, joints: false } },
+    });
     for (const kind of ['strip', 'cross']) {
       const [inTpu, inPla] = [solidsOf(wall, kind)[0] as Mesh, solidsOf(loose, kind)[0] as Mesh];
       expect(colour(inTpu)).toBe(TPU_COLOUR);

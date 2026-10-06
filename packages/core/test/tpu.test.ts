@@ -150,7 +150,10 @@ describe('the form', () => {
       ok: true,
       params: { seal: { kind: 'tpu', tape: { joints: true } } },
     });
-    expect(readSettings({ ...opening, seal: { tape: { joints: false } } })).toMatchObject({ ok: true, params: { seal: { kind: 'tape' } } });
+    expect(readSettings({ ...opening, seal: { tape: { joints: false } } })).toMatchObject({
+      ok: true,
+      params: { seal: { kind: 'tape' } },
+    });
     expect(readSettings(opening, { tpuJoints: 'yes' })).toMatchObject({ ok: true, params: { seal: { kind: 'tpu' } } });
     expect(readSettings(opening, { tapePort: 'yes' })).toMatchObject({ ok: true, params: { seal: { kind: 'tape' } } });
   });
@@ -163,7 +166,11 @@ describe('the form', () => {
 
 describe('the plan and the files', () => {
   it('the plan names the TPU parts', () => {
-    const p: Params = { ...EXAMPLE_PARAMS, seal: tpu({ port: true, joints: true }), ports: [{ hoseMm: 150, column: 2, row: 1 }] };
+    const p: Params = {
+      ...EXAMPLE_PARAMS,
+      seal: tpu({ port: true, joints: true }),
+      ports: [{ hoseMm: 150, column: 2, row: 1 }],
+    };
     expect(describePlan(planWall(p), p).seal).toBe(
       'Seal: printed TPU, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all, a sleeve inside the hose port’s collar, and the joint strips and cross pieces in TPU.',
     );
@@ -189,19 +196,29 @@ describe('the plan and the files', () => {
   });
 
   it('the download holds the gaskets, the sleeve and the TPU joints, named -tpu (C37)', () => {
-    const p: Params = { ...EXAMPLE_PARAMS, seal: tpu({ port: true, joints: true }), ports: [{ hoseMm: 150, column: 2, row: 1 }] };
+    const p: Params = {
+      ...EXAMPLE_PARAMS,
+      seal: tpu({ port: true, joints: true }),
+      ports: [{ hoseMm: 150, column: 2, row: 1 }],
+    };
     const names = planFiles(p, { format: 'stl', packaging: 'separate' }).map((f) => f.name);
     expect(names.filter((n) => n.startsWith('gasket-')).length).toBeGreaterThan(0);
     expect(names).toContain('sleeve-150-tpu-print-1.stl');
     for (const n of names.filter((x) => /^(strip|cross)-/.test(x))) expect(n).toMatch(/-tpu-print-[0-9]+\.stl$/);
-    const bare = planFiles({ ...EXAMPLE_PARAMS, seal: tpu() }, { format: 'stl', packaging: 'separate' }).map((f) => f.name);
+    const bare = planFiles({ ...EXAMPLE_PARAMS, seal: tpu() }, { format: 'stl', packaging: 'separate' }).map(
+      (f) => f.name,
+    );
     for (const n of bare.filter((x) => /^(strip|cross)-/.test(x))) expect(n).not.toMatch(/-tpu-/);
     expect(bare.some((n) => n.startsWith('sleeve-'))).toBe(false);
   });
 
   it('builds them: the TPU strips 0.4 mm thinner across the panel, the gaskets and the sleeve as drawn', async () => {
     const engine = await loadEngine();
-    const p: Params = { ...EXAMPLE_PARAMS, seal: tpu({ port: true, joints: true }), ports: [{ hoseMm: 150, column: 2, row: 1 }] };
+    const p: Params = {
+      ...EXAMPLE_PARAMS,
+      seal: tpu({ port: true, joints: true }),
+      ports: [{ hoseMm: 150, column: 2, row: 1 }],
+    };
     const across = (name: string, parts: { name: string; mesh: { positions: Float32Array } }[]) => {
       const part = parts.find((x) => x.name.startsWith(name));
       if (!part) throw new Error(`${name} expected`);

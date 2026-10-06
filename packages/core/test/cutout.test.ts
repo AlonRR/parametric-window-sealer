@@ -85,7 +85,9 @@ describe('the piece with a cutout (C41, C42)', () => {
     const rim = 126.8 * 86.8 - 122 * 82;
     expect(solid.volume()).toBeCloseTo(200 * 200 * 3 - 122 * 82 * 3 + rim * 15, 3);
     const b = solid.boundingBox();
-    expect([...Array.from(b.min), ...Array.from(b.max)].map((v) => Math.round(v * 1e4) / 1e4)).toEqual([0, 0, 0, 200, 200, 18]);
+    expect([...Array.from(b.min), ...Array.from(b.max)].map((v) => Math.round(v * 1e4) / 1e4)).toEqual([
+      0, 0, 0, 200, 200, 18,
+    ]);
     // Open where the appliance goes: nothing at the centre, through the panel and the rim.
     const probe = engine.Manifold.cube([1, 1, 30]).translate([99.5, 99.5, -5]);
     const left = solid.intersect(probe);
@@ -103,7 +105,9 @@ describe('the piece with a cutout (C41, C42)', () => {
     const groove = (124 * 84 - 122 * 82) * 9.5;
     expect(solid.volume()).toBeCloseTo(200 * 200 * 3 - 122 * 82 * 3 + walls * 15 - groove, 3);
     solid.delete();
-    expect(() => cutoutPanel(engine, size, BOX, { ...rim, depthMm: 9 }, { widthMm: 9.5, depthMm: 1 })).toThrow(RangeError);
+    expect(() => cutoutPanel(engine, size, BOX, { ...rim, depthMm: 9 }, { widthMm: 9.5, depthMm: 1 })).toThrow(
+      RangeError,
+    );
   });
 
   it('buildPieces cuts it in its piece, and a pattern keeps clear of the rim and a border', async () => {
@@ -115,7 +119,20 @@ describe('the piece with a cutout (C41, C42)', () => {
     expect(withCutout.map((b) => [b.column, b.row, b.cutout])).toEqual([[1, 0, BOX]]);
     for (const b of built) b.solid.delete();
     // The keep-out is the rim's outside and the border, centred in the piece.
-    const tile = { pitchXMm: 18, pitchYMm: 18, rowShiftMm: 0, barMm: 3, openings: [[[-7.5, -7.5], [7.5, -7.5], [7.5, 7.5], [-7.5, 7.5]]] as [number, number][][] };
+    const tile = {
+      pitchXMm: 18,
+      pitchYMm: 18,
+      rowShiftMm: 0,
+      barMm: 3,
+      openings: [
+        [
+          [-7.5, -7.5],
+          [7.5, -7.5],
+          [7.5, 7.5],
+          [-7.5, 7.5],
+        ],
+      ] as [number, number][][],
+    };
     const piece = { xMm: 0, yMm: 0, widthMm: 200, heightMm: 200 };
     const keepOut = { xMm: 100, yMm: 100, widthMm: 126.8 + 20, heightMm: 86.8 + 20 };
     const openings = pieceOpenings(engine, tile, [100, 100], piece, 10, keepOut);
@@ -132,7 +149,17 @@ describe('the piece with a cutout (C41, C42)', () => {
     const plan = planWall(p);
     const pattern = fillPattern({ ...p.fill, kind: 'grid', style: 'through' }, p.joint);
     const piece = (withPattern: boolean) => {
-      const built = buildPieces(engine, plan, 3, [], p.collar, undefined, withPattern ? pattern : undefined, p.cutouts, p.rim);
+      const built = buildPieces(
+        engine,
+        plan,
+        3,
+        [],
+        p.collar,
+        undefined,
+        withPattern ? pattern : undefined,
+        p.cutouts,
+        p.rim,
+      );
       const mine = built.find((b) => b.cutout !== undefined);
       for (const b of built) if (b !== mine) b.solid.delete();
       if (!mine) throw new Error('the cutout’s piece expected');
@@ -161,8 +188,28 @@ describe('the TPU frame (C43)', () => {
     const rim = linedRim(DEFAULT_RIM, fit);
     const shapes = frameShapes([BOX, { ...BOX, column: 1, row: 1 }, { widthMm: 60, heightMm: 60 }], rim, fit);
     expect(shapes).toEqual([
-      { kind: 'frame', widthMm: 120, heightMm: 80, outerWidthMm: 124, outerHeightMm: 84, innerWidthMm: 119, innerHeightMm: 79, depthMm: 9, count: 2 },
-      { kind: 'frame', widthMm: 60, heightMm: 60, outerWidthMm: 64, outerHeightMm: 64, innerWidthMm: 59, innerHeightMm: 59, depthMm: 9, count: 1 },
+      {
+        kind: 'frame',
+        widthMm: 120,
+        heightMm: 80,
+        outerWidthMm: 124,
+        outerHeightMm: 84,
+        innerWidthMm: 119,
+        innerHeightMm: 79,
+        depthMm: 9,
+        count: 2,
+      },
+      {
+        kind: 'frame',
+        widthMm: 60,
+        heightMm: 60,
+        outerWidthMm: 64,
+        outerHeightMm: 64,
+        innerWidthMm: 59,
+        innerHeightMm: 59,
+        depthMm: 9,
+        count: 1,
+      },
     ]);
     const [first] = shapes;
     if (!first) throw new Error('a frame expected');
@@ -238,7 +285,11 @@ describe('the form (C44, C47)', () => {
 });
 
 describe('the plan and the files (C46)', () => {
-  const at = (seal: SealParams = EXAMPLE_PARAMS.seal): Params => ({ ...EXAMPLE_PARAMS, seal, cutouts: [{ ...BOX, column: 2, row: 1 }] });
+  const at = (seal: SealParams = EXAMPLE_PARAMS.seal): Params => ({
+    ...EXAMPLE_PARAMS,
+    seal,
+    cutouts: [{ ...BOX, column: 2, row: 1 }],
+  });
 
   it('a line for each cutout, saying what lines it', () => {
     const line = (p: Params) => describePlan(planWall(p), p).cutouts;

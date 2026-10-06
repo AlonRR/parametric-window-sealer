@@ -40,7 +40,11 @@ const OUTPUT_STATEMENT =
 
 const OUTPUT_OPTIONS = [
   { flag: 'format', value: '<stl|3mf>', help: 'File format. (stl)' },
-  { flag: 'packaging', value: '<separate|zip|single>', help: 'One file per shape, one ZIP, or one 3MF holding every copy. (separate)' },
+  {
+    flag: 'packaging',
+    value: '<separate|zip|single>',
+    help: 'One file per shape, one ZIP, or one 3MF holding every copy. (separate)',
+  },
   { flag: 'out', value: '<folder>', help: 'Where to write. (window-sealer-<width>x<height>)' },
   { flag: 'force', value: '', help: 'Write into a folder that exists, replacing the files it writes.' },
   { flag: 'dry-run', value: '', help: 'Print the plan and the files it would write; write nothing.' },
@@ -161,7 +165,9 @@ export async function run(args: string[], io: Io): Promise<number> {
         json: { type: 'boolean' },
         help: { type: 'boolean', short: 'h' },
         version: { type: 'boolean' },
-        ...Object.fromEntries(SETTING_FLAGS.map((f) => [f.flag, { type: 'string' as const, multiple: f.list !== undefined }])),
+        ...Object.fromEntries(
+          SETTING_FLAGS.map((f) => [f.flag, { type: 'string' as const, multiple: f.list !== undefined }]),
+        ),
       },
     });
   } catch (error) {
@@ -236,7 +242,11 @@ export async function run(args: string[], io: Io): Promise<number> {
       io.out(JSON.stringify({ ok: true, dryRun: true, params, summary, plan, out: shown, files }, null, 2));
       return DONE;
     }
-    const lines = [...summaryLines(summary), '', `Would write ${files.length} ${files.length === 1 ? 'file' : 'files'} to ${shown}:`];
+    const lines = [
+      ...summaryLines(summary),
+      '',
+      `Would write ${files.length} ${files.length === 1 ? 'file' : 'files'} to ${shown}:`,
+    ];
     lines.push(...files.map((f) => `  ${f.name}`));
     if (exists && !force) lines.push('', `${shown} already exists: writing needs --force, or another --out <folder>.`);
     io.out(lines.join('\n'));
@@ -244,7 +254,9 @@ export async function run(args: string[], io: Io): Promise<number> {
   }
 
   if (exists && !force) {
-    return fail(COULD_NOT_WRITE, [{ message: `${shown} already exists; use --force to overwrite, or --out <folder>.` }]);
+    return fail(COULD_NOT_WRITE, [
+      { message: `${shown} already exists; use --force to overwrite, or --out <folder>.` },
+    ]);
   }
   const wall = await makeWall(params, choice);
   try {

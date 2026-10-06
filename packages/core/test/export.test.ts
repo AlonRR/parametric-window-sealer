@@ -7,15 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { loadEngine } from '../src/engine.js';
 import type { Engine } from '../src/engine.js';
 import { buildExport } from '../src/wall.js';
-import {
-  meshOf,
-  packageDownload,
-  partFileName,
-  pieceFileName,
-  to3mf,
-  toStl,
-  wallLabel,
-} from '../src/export.js';
+import { meshOf, packageDownload, partFileName, pieceFileName, to3mf, toStl, wallLabel } from '../src/export.js';
 import type { ExportPart, ExportPiece } from '../src/export.js';
 import { DEFAULT_JOINT } from '../src/joint.js';
 import { stripSolid } from '../src/joint-geometry.js';
@@ -57,10 +49,7 @@ function readModel(xml: string) {
 
 // widthMm x heightMm is what the pieces and joints span. On the example slider the edges
 // add 3 mm across and 13 mm up to the opening (track-edge, #11), so the opening is less.
-async function exampleDownload(
-  widthMm = 400,
-  heightMm = 200,
-): Promise<{ pieces: ExportPiece[]; parts: ExportPart[] }> {
+async function exampleDownload(widthMm = 400, heightMm = 200): Promise<{ pieces: ExportPiece[]; parts: ExportPart[] }> {
   const engine = await loadEngine();
   return buildExport(engine, {
     ...EXAMPLE_PARAMS,
@@ -69,14 +58,11 @@ async function exampleDownload(
   });
 }
 
-const examplePieces = async (widthMm = 400, heightMm = 200) =>
-  (await exampleDownload(widthMm, heightMm)).pieces;
+const examplePieces = async (widthMm = 400, heightMm = 200) => (await exampleDownload(widthMm, heightMm)).pieces;
 
 describe('names', () => {
   it('names a piece by its column and row, counted from 1 at the left and the bottom, and its size', () => {
-    expect(pieceFileName({ column: 0, row: 0, widthMm: 200, heightMm: 200 }, 'stl')).toBe(
-      'piece-c1-r1-200x200.stl',
-    );
+    expect(pieceFileName({ column: 0, row: 0, widthMm: 200, heightMm: 200 }, 'stl')).toBe('piece-c1-r1-200x200.stl');
     expect(pieceFileName({ column: 2, row: 4, widthMm: 166.66667, heightMm: 75 }, '3mf')).toBe(
       'piece-c3-r5-166.7x75.3mf',
     );
@@ -86,12 +72,10 @@ describe('names', () => {
     expect(partFileName({ kind: 'strip', lengthMm: 188.7, widthMm: 18, count: 8 }, 'stl')).toBe(
       'strip-188.7x18-print-8.stl',
     );
-    expect(partFileName({ kind: 'cross', lengthMm: 18, widthMm: 18, count: 1 }, '3mf')).toBe(
-      'cross-18x18-print-1.3mf',
+    expect(partFileName({ kind: 'cross', lengthMm: 18, widthMm: 18, count: 1 }, '3mf')).toBe('cross-18x18-print-1.3mf');
+    expect(partFileName({ kind: 'edge', lengthMm: 152.5, widthMm: 14, heightMm: 10, count: 8 }, 'stl')).toBe(
+      'edge-152.5x14x10-print-8.stl',
     );
-    expect(
-      partFileName({ kind: 'edge', lengthMm: 152.5, widthMm: 14, heightMm: 10, count: 8 }, 'stl'),
-    ).toBe('edge-152.5x14x10-print-8.stl');
   });
 
   it('names the wall by the opening', () => {
@@ -146,14 +130,10 @@ describe('3MF', () => {
   it('is a 3MF package: content types, the relationship and a model in millimetres', async () => {
     const pieces = await examplePieces();
     const files = unzipSync(to3mf(pieces));
-    expect(Object.keys(files).sort()).toEqual(
-      ['3D/3dModel.model', '[Content_Types].xml', '_rels/.rels'].sort(),
-    );
+    expect(Object.keys(files).sort()).toEqual(['3D/3dModel.model', '[Content_Types].xml', '_rels/.rels'].sort());
     const types = strFromU8(files['[Content_Types].xml'] ?? new Uint8Array());
     expect(types).toContain('Extension="model" ContentType="application/vnd.ms-package.3dmodel+xml"');
-    expect(types).toContain(
-      'Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"',
-    );
+    expect(types).toContain('Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"');
     const rels = strFromU8(files['_rels/.rels'] ?? new Uint8Array());
     expect(rels).toContain('Target="/3D/3dModel.model"');
     expect(rels).toContain('Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"');
@@ -167,26 +147,20 @@ describe('3MF', () => {
     const pieces = await examplePieces(500, 200); // 3 x 1: 166.7 mm pieces
     const model = strFromU8(unzipSync(to3mf(pieces))['3D/3dModel.model'] ?? new Uint8Array());
     const objects = readModel(model);
-    expect(objects.map((o) => o.name)).toEqual(
-      pieces.map((p) => pieceFileName(p.cell, '3mf').replace(/\.3mf$/, '')),
-    );
+    expect(objects.map((o) => o.name)).toEqual(pieces.map((p) => pieceFileName(p.cell, '3mf').replace(/\.3mf$/, '')));
     for (const [i, o] of objects.entries()) {
       const solid = solidFromTriangles(engine, o.positions, o.triangles);
       const cell = pieces[i]?.cell;
       expect(solid.volume()).toBeCloseTo((cell?.widthMm ?? 0) * (cell?.heightMm ?? 0) * 3, 1);
       solid.delete();
     }
-    expect([...model.matchAll(/<item objectid="(\d+)" transform="([^"]+)"\/>/g)]).toHaveLength(
-      pieces.length,
-    );
+    expect([...model.matchAll(/<item objectid="(\d+)" transform="([^"]+)"\/>/g)]).toHaveLength(pieces.length);
   });
 
   it('places the pieces apart, as the wall laid out with a 10 mm gap, so none overlap', async () => {
     const pieces = await examplePieces(400, 400); // 2 x 2
     const model = strFromU8(unzipSync(to3mf(pieces))['3D/3dModel.model'] ?? new Uint8Array());
-    const moves = [...model.matchAll(/transform="([^"]+)"/g)].map((m) =>
-      (m[1] ?? '').split(' ').map(Number).slice(9),
-    );
+    const moves = [...model.matchAll(/transform="([^"]+)"/g)].map((m) => (m[1] ?? '').split(' ').map(Number).slice(9));
     // 197.5 mm pieces with a 5 mm joint between them, then the 10 mm gap.
     expect(moves.slice(0, 4)).toEqual([
       [0, 0, 0],
@@ -213,9 +187,10 @@ describe('3MF', () => {
       ...pieces.map((p) => pieceFileName(p.cell, '3mf').replace(/\.3mf$/, '')),
       ...parts.map((p) => p.name),
     ]);
-    const items = [...model.matchAll(/<item objectid="(\d+)" transform="([^"]+)"\/>/g)].map(
-      ([, id, t]) => ({ id: Number(id), move: (t ?? '').split(' ').map(Number).slice(9) }),
-    );
+    const items = [...model.matchAll(/<item objectid="(\d+)" transform="([^"]+)"\/>/g)].map(([, id, t]) => ({
+      id: Number(id),
+      move: (t ?? '').split(' ').map(Number).slice(9),
+    }));
     expect(items).toHaveLength(15 + 12 + 10 + 8 + 5 + 5 + 8);
     // Each copy's box on the plate, from its object's vertices moved by its transform.
     const boxes = items.map(({ id, move }) => {
@@ -240,7 +215,11 @@ describe('3MF', () => {
     // The parts sit below the wall, and each is the solid it says it is.
     for (const box of boxes.slice(15)) expect(box.y[1]).toBeLessThan(0);
     const strip = objects[15];
-    const solid = solidFromTriangles(engine, strip?.positions ?? new Float32Array(), strip?.triangles ?? new Uint32Array());
+    const solid = solidFromTriangles(
+      engine,
+      strip?.positions ?? new Float32Array(),
+      strip?.triangles ?? new Uint32Array(),
+    );
     const expected = stripSolid(engine, 180.7, DEFAULT_JOINT, 3, 'print');
     expect(solid.volume()).toBeCloseTo(expected.volume(), 2);
     solid.delete();
@@ -304,8 +283,6 @@ describe('packageDownload', () => {
 
   it('refuses "one file" for STL, which holds a single object', async () => {
     const { pieces, parts } = await exampleDownload();
-    expect(() =>
-      packageDownload(pieces, parts, { format: 'stl', packaging: 'single' }, 400, 200),
-    ).toThrow(RangeError);
+    expect(() => packageDownload(pieces, parts, { format: 'stl', packaging: 'single' }, 400, 200)).toThrow(RangeError);
   });
 });

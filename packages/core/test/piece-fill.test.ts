@@ -33,15 +33,24 @@ describe('the --piece-fill form (C28)', () => {
         { column: 3, row: 1, kind: 'grid', style: 'through' },
       ],
     });
-    expect(formatPieceFills([{ column: 3, row: 1, kind: 'grid', style: 'through' }, { column: 2, row: 1, kind: 'sealed' }])).toBe(
-      '3,1=grid:through 2,1=sealed',
-    );
+    expect(
+      formatPieceFills([
+        { column: 3, row: 1, kind: 'grid', style: 'through' },
+        { column: 2, row: 1, kind: 'sealed' },
+      ]),
+    ).toBe('3,1=grid:through 2,1=sealed');
   });
 
   it('refuses what it cannot read, naming the form', () => {
     const message =
       'Piece fill 2: write each as column,row=fill, then optionally :style, as 2,1=sealed or 2,1=grid:through.';
-    for (const bad of ['2,1=sealed 2=grid', '2,1=sealed 0,1=grid', '2,1=sealed 2,1=plaid', '2,1=sealed 2,1=grid:sideways', '2,1=sealed 2,1=sealed:through']) {
+    for (const bad of [
+      '2,1=sealed 2=grid',
+      '2,1=sealed 0,1=grid',
+      '2,1=sealed 2,1=plaid',
+      '2,1=sealed 2,1=grid:sideways',
+      '2,1=sealed 2,1=sealed:through',
+    ]) {
       expect(parsePieceFills(bad)).toEqual({ ok: false, message });
     }
   });
@@ -49,7 +58,11 @@ describe('the --piece-fill form (C28)', () => {
 
 describe('fillFor', () => {
   it('the wall’s fill, or a piece’s own kind and style with the wall’s sizes (C26)', () => {
-    const p: Params = { ...EXAMPLE_PARAMS, fill: grid, pieceFills: [{ column: 2, row: 1, kind: 'hexagon', style: 'through' }] };
+    const p: Params = {
+      ...EXAMPLE_PARAMS,
+      fill: grid,
+      pieceFills: [{ column: 2, row: 1, kind: 'hexagon', style: 'through' }],
+    };
     expect(fillFor(p, 1, 1)).toEqual(grid);
     expect(fillFor(p, 2, 1)).toEqual({ ...grid, kind: 'hexagon', style: 'through' });
     const sealedHere: Params = { ...p, pieceFills: [{ column: 2, row: 1, kind: 'sealed' }] };
@@ -67,7 +80,12 @@ describe('the form', () => {
     const r = read({ fill: 'grid', pieceFills: '2,1=sealed 1,5=diamond:through' });
     expect(r).toMatchObject({
       ok: true,
-      params: { pieceFills: [{ column: 2, row: 1, kind: 'sealed' }, { column: 1, row: 5, kind: 'diamond', style: 'through' }] },
+      params: {
+        pieceFills: [
+          { column: 2, row: 1, kind: 'sealed' },
+          { column: 1, row: 5, kind: 'diamond', style: 'through' },
+        ],
+      },
     });
     if (r.ok) expect(readParams(toFormValues(r.params))).toEqual(r);
   });
@@ -114,7 +132,11 @@ describe('the files', () => {
   it('each piece is built with its own fill; the rest with the wall’s (C27)', async () => {
     const engine = await loadEngine();
     const wall = buildExport(engine, { ...EXAMPLE_PARAMS, fill: grid });
-    const one = buildExport(engine, { ...EXAMPLE_PARAMS, fill: grid, pieceFills: [{ column: 2, row: 1, kind: 'sealed' }] });
+    const one = buildExport(engine, {
+      ...EXAMPLE_PARAMS,
+      fill: grid,
+      pieceFills: [{ column: 2, row: 1, kind: 'sealed' }],
+    });
     const tris = (e: typeof wall) => e.pieces.map((p) => p.mesh.triangles.length);
     const [a, b] = [tris(wall), tris(one)];
     const at = one.pieces.findIndex((p) => p.cell.column === 1 && p.cell.row === 0);
@@ -127,9 +149,19 @@ describe('settings in the library’s shape', () => {
   it('a list setting, each item { column, row, kind, style? }', () => {
     expect(SETTINGS.find((s) => s.field === 'pieceFills')).toMatchObject({ path: 'pieceFills', list: 'pieceFills' });
     expect(SETTINGS.find((s) => s.field === 'ports')).toMatchObject({ list: 'ports' });
-    const r = readSettings({ openingWidthMm: 600, openingHeightMm: 1000, pieceFills: [{ column: 2, row: 1, kind: 'grid' }] });
+    const r = readSettings({
+      openingWidthMm: 600,
+      openingHeightMm: 1000,
+      pieceFills: [{ column: 2, row: 1, kind: 'grid' }],
+    });
     expect(r).toMatchObject({ ok: true, params: { pieceFills: [{ column: 2, row: 1, kind: 'grid' }] } });
-    expect(readSettings({ openingWidthMm: 600, openingHeightMm: 1000, pieceFills: [{ column: 'two', row: 1, kind: 'grid' }] })).toEqual({
+    expect(
+      readSettings({
+        openingWidthMm: 600,
+        openingHeightMm: 1000,
+        pieceFills: [{ column: 'two', row: 1, kind: 'grid' }],
+      }),
+    ).toEqual({
       ok: false,
       problems: [{ kind: 'shape', path: 'pieceFills.0.column', message: 'pieceFills.0.column should be a number' }],
     });

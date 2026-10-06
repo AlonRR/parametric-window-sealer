@@ -91,7 +91,10 @@ describe('the form (C15)', () => {
   it('its own sizes, and back through the form', () => {
     expect(example).toMatchObject({ hexOpeningMm: '15', hexBarMm: '3' });
     const r = read({ fill: 'hexagon', hexOpeningMm: '10', hexBarMm: '2' });
-    expect(r).toMatchObject({ ok: true, params: { fill: { kind: 'hexagon', hexagon: { openingMm: 10, barMm: 2 }, grid: { openingMm: 15 } } } });
+    expect(r).toMatchObject({
+      ok: true,
+      params: { fill: { kind: 'hexagon', hexagon: { openingMm: 10, barMm: 2 }, grid: { openingMm: 15 } } },
+    });
     if (r.ok) expect(readParams(toFormValues(r.params))).toEqual(r);
   });
 

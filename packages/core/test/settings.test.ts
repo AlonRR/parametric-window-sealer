@@ -18,7 +18,10 @@ import type { Params } from '../src/index.js';
 const CUSTOM_PRINTER: Params = { ...EXAMPLE_PARAMS, printer: { kind: 'custom', widthMm: 250, heightMm: 210 } };
 const LISTED_PRINTER: Params = { ...EXAMPLE_PARAMS, printer: { kind: 'model', id: 'prusa-mk4s' } };
 const WITH_PORTS: Params = { ...EXAMPLE_PARAMS, ports: [{ hoseMm: 150, column: 2, row: 1 }] };
-const WITH_PIECE_FILLS: Params = { ...EXAMPLE_PARAMS, pieceFills: [{ column: 2, row: 1, kind: 'grid', style: 'through' }] };
+const WITH_PIECE_FILLS: Params = {
+  ...EXAMPLE_PARAMS,
+  pieceFills: [{ column: 2, row: 1, kind: 'grid', style: 'through' }],
+};
 const OPENING = { openingWidthMm: 600, openingHeightMm: 1000 };
 const ok = (input: unknown, overrides = {}) => {
   const read = readSettings(input, overrides);
@@ -44,7 +47,7 @@ describe('SETTINGS: every setting on the page', () => {
           ? WITH_PORTS
           : s.list === 'pieceFills'
             ? WITH_PIECE_FILLS
-          : EXAMPLE_PARAMS;
+            : EXAMPLE_PARAMS;
     const value = settingAt(params, s.path);
     const list = s.list === 'pieceFills' ? formatPieceFills : formatPorts;
     const shown = s.list ? list(value as []) : s.onOff ? (value === true ? 'yes' : 'no') : String(value);
@@ -84,8 +87,18 @@ describe('readSettings', () => {
 
   it('the opening is required', () => {
     expect(problems({})).toEqual([
-      { kind: 'required', field: 'openingWidthMm', path: 'openingWidthMm', message: "Required: the opening's width in mm." },
-      { kind: 'required', field: 'openingHeightMm', path: 'openingHeightMm', message: "Required: the opening's height in mm." },
+      {
+        kind: 'required',
+        field: 'openingWidthMm',
+        path: 'openingWidthMm',
+        message: "Required: the opening's width in mm.",
+      },
+      {
+        kind: 'required',
+        field: 'openingHeightMm',
+        path: 'openingHeightMm',
+        message: "Required: the opening's height in mm.",
+      },
     ]);
     expect(ok({}, { openingWidthMm: '600', openingHeightMm: '1000' })).toEqual(EXAMPLE_PARAMS);
   });
@@ -109,7 +122,10 @@ describe('readSettings', () => {
     expect(ok({ ...OPENING, thicknessMm: 4 }, { thicknessMm: '5' }).thicknessMm).toBe(5);
     const file = { ...OPENING, edges: { window: 'hung', roles: { top: 'track' } } };
     expect(ok(file, { window: 'slider' }).edges.roles).toEqual(WINDOW_PRESETS.slider);
-    expect(ok(file, { window: 'slider', leftEdge: 'sash' }).edges.roles).toEqual({ ...WINDOW_PRESETS.slider, left: 'sash' });
+    expect(ok(file, { window: 'slider', leftEdge: 'sash' }).edges.roles).toEqual({
+      ...WINDOW_PRESETS.slider,
+      left: 'sash',
+    });
   });
 
   it('a printer size makes the printer custom, in the input or as an override', () => {
@@ -150,8 +166,12 @@ describe('readSettings', () => {
 
   it('ports as a list in the library’s shape (Q114), each checked as the page checks it', () => {
     expect(ok({ ...OPENING, ports: [{ hoseMm: 150 }] }).ports).toEqual([{ hoseMm: 150, column: 2, row: 1 }]);
-    expect(ok({ ...OPENING, ports: [{ hoseMm: 130, column: 3, row: 2 }] }).ports).toEqual([{ hoseMm: 130, column: 3, row: 2 }]);
-    expect(problems({ ...OPENING, ports: 150 })).toEqual([{ kind: 'shape', path: 'ports', message: 'ports should be a list' }]);
+    expect(ok({ ...OPENING, ports: [{ hoseMm: 130, column: 3, row: 2 }] }).ports).toEqual([
+      { hoseMm: 130, column: 3, row: 2 },
+    ]);
+    expect(problems({ ...OPENING, ports: 150 })).toEqual([
+      { kind: 'shape', path: 'ports', message: 'ports should be a list' },
+    ]);
     expect(problems({ ...OPENING, ports: [{ hoseMm: '150' }] })).toEqual([
       { kind: 'shape', path: 'ports.0.hoseMm', message: 'ports.0.hoseMm should be a number' },
     ]);

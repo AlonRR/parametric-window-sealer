@@ -86,9 +86,20 @@ export function portPanel(
 // The squeezed tape inside a port's collar, for the preview only (Q132): a ring from the hose
 // out to its groove's floor, as tall as the tape is wide, centred on the collar's depth. The
 // collar given is the taped one.
-export function portTapeSolid(engine: Engine, size: PanelSize, hoseMm: number, collar: CollarParams, tape: TapeFit): Manifold {
+export function portTapeSolid(
+  engine: Engine,
+  size: PanelSize,
+  hoseMm: number,
+  collar: CollarParams,
+  tape: TapeFit,
+): Manifold {
   const { Manifold } = engine;
-  const outer = Manifold.cylinder(tape.widthMm, collarInnerMm(hoseMm, collar) / 2 + tape.grooveDepthMm, -1, PORT_SEGMENTS);
+  const outer = Manifold.cylinder(
+    tape.widthMm,
+    collarInnerMm(hoseMm, collar) / 2 + tape.grooveDepthMm,
+    -1,
+    PORT_SEGMENTS,
+  );
   const inner = Manifold.cylinder(tape.widthMm + 2, hoseMm / 2, -1, PORT_SEGMENTS);
   const moved = inner.translate([0, 0, -1]);
   const ring = outer.subtract(moved);
@@ -140,7 +151,13 @@ export function cutoutPanel(
 // The seal lining a cutout's rim, for the preview only, as the tape in a collar is: a ring from
 // the appliance out to the groove's floor, as tall as the tape is wide, centred on the rim's
 // depth. The rim given is the lined one.
-export function cutoutTapeSolid(engine: Engine, size: PanelSize, cutout: Rectangle, rim: RimParams, tape: TapeFit): Manifold {
+export function cutoutTapeSolid(
+  engine: Engine,
+  size: PanelSize,
+  cutout: Rectangle,
+  rim: RimParams,
+  tape: TapeFit,
+): Manifold {
   const inner = rimInnerMm(cutout, rim);
   const floor = { widthMm: inner.widthMm + 2 * tape.grooveDepthMm, heightMm: inner.heightMm + 2 * tape.grooveDepthMm };
   const ring = rectangularRing(engine, floor, cutout, tape.widthMm);
@@ -186,7 +203,12 @@ export function buildPieces(
     Math.max(0, ...plan.pieces.map((c) => c.xMm + c.widthMm)) / 2,
     Math.max(0, ...plan.pieces.map((c) => c.yMm + c.heightMm)) / 2,
   ];
-  const withPattern = (solid: Manifold, cell: GridLayout['pieces'][number], hoseMm?: number, cutout?: Rectangle): Manifold => {
+  const withPattern = (
+    solid: Manifold,
+    cell: GridLayout['pieces'][number],
+    hoseMm?: number,
+    cutout?: Rectangle,
+  ): Manifold => {
     const here = typeof pattern === 'function' ? pattern(cell) : pattern;
     if (here === undefined) return solid;
     const [xMm, yMm] = [cell.widthMm / 2, cell.heightMm / 2];

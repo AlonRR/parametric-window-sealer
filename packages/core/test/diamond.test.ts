@@ -49,7 +49,13 @@ describe('the diamond tile', () => {
 
   it('every opening is a bar’s width from each neighbour, along the diagonals too', async () => {
     const engine = await loadEngine();
-    const o = pieceOpenings(engine, diamondTile(DEFAULT_DIAMOND), [100, 100], { xMm: 0, yMm: 0, widthMm: 200, heightMm: 200 }, 10);
+    const o = pieceOpenings(
+      engine,
+      diamondTile(DEFAULT_DIAMOND),
+      [100, 100],
+      { xMm: 0, yMm: 0, widthMm: 200, heightMm: 200 },
+      10,
+    );
     const area = (20 * 30) / 2;
     const whole = o.toPolygons().filter((ring) => {
       let a = 0;
@@ -87,7 +93,10 @@ describe('the form (C24)', () => {
   it('its own width, height and bar, and back through the form', () => {
     expect(example).toMatchObject({ diamondWidthMm: '20', diamondHeightMm: '30', diamondBarMm: '3' });
     const r = read({ fill: 'diamond', diamondWidthMm: '20', diamondHeightMm: '20', diamondBarMm: '2' });
-    expect(r).toMatchObject({ ok: true, params: { fill: { kind: 'diamond', diamond: { widthMm: 20, heightMm: 20, barMm: 2 } } } });
+    expect(r).toMatchObject({
+      ok: true,
+      params: { fill: { kind: 'diamond', diamond: { widthMm: 20, heightMm: 20, barMm: 2 } } },
+    });
     if (r.ok) expect(readParams(toFormValues(r.params))).toEqual(r);
   });
 
@@ -115,7 +124,10 @@ describe('the plan text and the settings', () => {
       'diamondBarMm',
     ]);
     const r = readSettings({ openingWidthMm: 600, openingHeightMm: 1000, fill: { diamond: { heightMm: 20 } } });
-    expect(r).toMatchObject({ ok: true, params: { fill: { kind: 'diamond', diamond: { widthMm: 20, heightMm: 20 } } } });
+    expect(r).toMatchObject({
+      ok: true,
+      params: { fill: { kind: 'diamond', diamond: { widthMm: 20, heightMm: 20 } } },
+    });
     expect(readSettings({ openingWidthMm: 600, openingHeightMm: 1000 }, { diamondBarMm: '2' })).toMatchObject({
       ok: true,
       params: { fill: { kind: 'diamond' } },

@@ -7,13 +7,7 @@
 // pieces span the opening plus each edge's reach: on the example slider 6.5 mm into each
 // of three tracks and 3.5 mm short of the sash, so 603 x 1013 mm (Q66, Q67, Q75).
 import { describe, expect, it } from 'vitest';
-import {
-  EXAMPLE_PARAMS,
-  describePlan,
-  planWall,
-  readParams,
-  toFormValues,
-} from '../src/params.js';
+import { EXAMPLE_PARAMS, describePlan, planWall, readParams, toFormValues } from '../src/params.js';
 import type { FormValues } from '../src/params.js';
 import { EXAMPLE_TRACK, WINDOW_PRESETS } from '../src/edge.js';
 import { DEFAULT_JOINT } from '../src/joint.js';
@@ -188,10 +182,7 @@ describe('readParams', () => {
 
   it('reads the leftover choice per axis, and refuses one not on the list', () => {
     const r = read({ widthLeftover: 'shorten', heightLeftover: 'equal' });
-    expect(r.ok && [r.params.width.leftover, r.params.height.leftover]).toEqual([
-      'shorten',
-      'equal',
-    ]);
+    expect(r.ok && [r.params.width.leftover, r.params.height.leftover]).toEqual(['shorten', 'equal']);
     const bad = read({ widthLeftover: 'squeeze' });
     expect(bad.ok).toBe(false);
     if (!bad.ok) expect(Object.keys(bad.errors)).toEqual(['widthLeftover']);
@@ -292,18 +283,12 @@ describe('describePlan', () => {
     expect(one.headline).toBe('1 piece: 1 across, 1 up, 3 mm thick');
     expect(one.joints).toBe('No joints: the wall is one piece.');
     expect(one.edges).toBe('Edges: 4 edge strips in 3 shapes.');
-    expect(planText({ ...EXAMPLE_PARAMS, openingWidthMm: 700 }).columns).toBe(
-      'Widths: 172, 172, 172, 172 mm',
-    );
-    expect(planText({ ...EXAMPLE_PARAMS, openingWidthMm: 500 }).columns).toBe(
-      'Widths: 164.3, 164.3, 164.3 mm',
-    );
+    expect(planText({ ...EXAMPLE_PARAMS, openingWidthMm: 700 }).columns).toBe('Widths: 172, 172, 172, 172 mm');
+    expect(planText({ ...EXAMPLE_PARAMS, openingWidthMm: 500 }).columns).toBe('Widths: 164.3, 164.3, 164.3 mm');
   });
 
   it('words each small-piece warning with its position and what the joints need', () => {
-    expect(planText(fillerWidth(637)).warnings).toEqual([
-      'Column 4 is 25 mm wide, under the 34 mm the joints need.',
-    ]);
+    expect(planText(fillerWidth(637)).warnings).toEqual(['Column 4 is 25 mm wide, under the 34 mm the joints need.']);
   });
 
   it('the minimum follows the joint: shallower slots allow narrower pieces', () => {
@@ -341,9 +326,7 @@ describe('describePlan', () => {
 
   it('says why spreading cannot work, and uses equal pieces instead (Q63)', () => {
     const [none] = planText(fillerWidth(200)).leftovers;
-    expect(none?.message).toBe(
-      'Width: 1 full 200 mm piece leaves 3 mm, too little for another joint and a filler.',
-    );
+    expect(none?.message).toBe('Width: 1 full 200 mm piece leaves 3 mm, too little for another joint and a filler.');
     expect(none?.used).toBe('equal');
     expect(none?.options.map((o) => [o.label, o.possible])).toEqual([
       ['Spread the pieces: there is no joint to spread', false],

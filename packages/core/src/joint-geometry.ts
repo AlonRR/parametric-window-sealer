@@ -26,11 +26,7 @@ function requirePositive(name: string, value: number): void {
 function solidOf(engine: Engine, boxes: Frame[], place: (f: Frame) => [Range, Range, Range]) {
   const parts = boxes.map((f) => {
     const [x, y, z] = place(f);
-    return engine.Manifold.cube([x[1] - x[0], y[1] - y[0], z[1] - z[0]]).translate([
-      x[0],
-      y[0],
-      z[0],
-    ]);
+    return engine.Manifold.cube([x[1] - x[0], y[1] - y[0], z[1] - z[0]]).translate([x[0], y[0], z[0]]);
   });
   const solid = engine.Manifold.union(parts);
   for (const p of parts) p.delete();
@@ -71,12 +67,7 @@ export function stripSolid(
   });
 }
 
-export function crossSolid(
-  engine: Engine,
-  joint: JointParams,
-  panelMm: number,
-  pose: CrossPose,
-): Manifold {
+export function crossSolid(engine: Engine, joint: JointParams, panelMm: number, pose: CrossPose): Manifold {
   const { width, thick, web, inner, below } = dimensions(joint, panelMm);
   const all: Range = [0, width];
   // Here u and v are the two directions in the wall's plane.
@@ -86,7 +77,5 @@ export function crossSolid(
     { u: web, v: all, w: inner },
     { u: all, v: web, w: inner },
   ];
-  return solidOf(engine, boxes, ({ u, v, w }) =>
-    pose === 'wall' ? [u, v, [w[0] - below, w[1] - below]] : [u, w, v],
-  );
+  return solidOf(engine, boxes, ({ u, v, w }) => (pose === 'wall' ? [u, v, [w[0] - below, w[1] - below]] : [u, w, v]));
 }

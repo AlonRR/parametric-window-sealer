@@ -152,9 +152,7 @@ export function divideAxis(input: AxisSpec): AxisLayout {
     throw new RangeError(`minPieceMm must be zero or more mm, got ${spec.minPieceMm}`);
   }
   if (!Number.isFinite(spec.jointMm) || spec.jointMm < 0 || spec.jointMm >= spec.maxPieceMm) {
-    throw new RangeError(
-      `jointMm must be zero or more mm and less than the largest piece, got ${spec.jointMm}`,
-    );
+    throw new RangeError(`jointMm must be zero or more mm and less than the largest piece, got ${spec.jointMm}`);
   }
   if (!Number.isFinite(spec.jointSpreadMm) || spec.jointSpreadMm < 0) {
     throw new RangeError(`jointSpreadMm must be zero or more mm, got ${spec.jointSpreadMm}`);

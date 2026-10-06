@@ -77,8 +77,19 @@ export function buildWallScene(engine: Engine, params: Params): Group {
   const inTpu = params.seal.kind === 'tpu' && params.seal.tape.joints;
   const [own, ownLook] = inTpu ? [tpuJoint(joint), TPU] : [joint, JOINT];
   // Each piece's own fill, or the wall's (params-advanced, #21).
-  const pattern = (cell: { column: number; row: number }) => fillPattern(fillFor(params, cell.column + 1, cell.row + 1), joint);
-  const built = buildPieces(engine, plan, thicknessMm, params.ports, params.collar, tape, pattern, params.cutouts, params.rim);
+  const pattern = (cell: { column: number; row: number }) =>
+    fillPattern(fillFor(params, cell.column + 1, cell.row + 1), joint);
+  const built = buildPieces(
+    engine,
+    plan,
+    thicknessMm,
+    params.ports,
+    params.collar,
+    tape,
+    pattern,
+    params.cutouts,
+    params.rim,
+  );
   try {
     built.forEach((piece, i) => {
       const cell = plan.pieces[i];

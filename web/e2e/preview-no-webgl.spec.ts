@@ -2,9 +2,7 @@
 // browser cannot draw in 3D is told so, and everything else on the page still works.
 import { expect, test } from '@playwright/test';
 
-test('without WebGL the page says so, and the plan and the download still work', async ({
-  page,
-}) => {
+test('without WebGL the page says so, and the plan and the download still work', async ({ page }) => {
   await page.goto('./');
   const preview = page.getByTestId('preview');
   await expect(preview).toHaveAttribute('data-state', 'unavailable', { timeout: 30_000 });
