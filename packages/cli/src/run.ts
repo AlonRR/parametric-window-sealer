@@ -16,6 +16,7 @@ import {
   wallLabel,
 } from 'parametric-window-sealer';
 import type { DownloadChoice, Format, Packaging, PlanText } from 'parametric-window-sealer';
+import { messageOf, version } from './about.js';
 import { SETTING_FLAGS } from './flags.js';
 import { readParamsFile, settingsFrom } from './settings.js';
 import type { FromFile, Problem } from './settings.js';
@@ -32,6 +33,8 @@ const WRONG_USE = 2;
 
 const FORMATS: readonly Format[] = ['stl', '3mf'];
 const PACKAGINGS: readonly Packaging[] = ['separate', 'zip', 'single'];
+const isFormat = (v: string): v is Format => FORMATS.some((f) => f === v);
+const isPackaging = (v: string): v is Packaging => PACKAGINGS.some((p) => p === v);
 
 // The statement in the README and on the page (Q36), word for word.
 const OUTPUT_STATEMENT =
@@ -53,11 +56,6 @@ const OUTPUT_OPTIONS = [
   { flag: 'help', value: '', help: 'This text.' },
   { flag: 'version', value: '', help: 'The version.' },
 ];
-
-function version(): string {
-  const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as { version: string };
-  return pkg.version;
-}
 
 const WIDTH = 120;
 
@@ -171,7 +169,7 @@ export async function run(args: string[], io: Io): Promise<number> {
       },
     });
   } catch (error) {
-    return fail(WRONG_USE, [{ message: `window-sealer: ${(error as Error).message}` }]);
+    return fail(WRONG_USE, [{ message: `window-sealer: ${messageOf(error)}` }]);
   }
   const options = parsed.values as Record<string, string | string[] | boolean | undefined>;
   if (options['help'] === true) {
@@ -192,10 +190,10 @@ export async function run(args: string[], io: Io): Promise<number> {
   const problems: Problem[] = [];
   const format = text('format') ?? 'stl';
   const packaging = text('packaging') ?? 'separate';
-  if (!(FORMATS as readonly string[]).includes(format)) {
+  if (!isFormat(format)) {
     problems.push({ flag: '--format', message: `Choose one of: ${FORMATS.join(', ')}` });
   }
-  if (!(PACKAGINGS as readonly string[]).includes(packaging)) {
+  if (!isPackaging(packaging)) {
     problems.push({ flag: '--packaging', message: `Choose one of: ${PACKAGINGS.join(', ')}` });
   }
 
@@ -206,7 +204,7 @@ export async function run(args: string[], io: Io): Promise<number> {
     try {
       fileText = readFileSync(resolve(io.cwd, paramsFile), 'utf8');
     } catch (error) {
-      problems.push({ flag: '--params', message: `cannot read ${paramsFile}: ${(error as Error).message}` });
+      problems.push({ flag: '--params', message: `cannot read ${paramsFile}: ${messageOf(error)}` });
     }
     if (fileText !== undefined) {
       const read = readParamsFile(fileText, paramsFile);
@@ -221,11 +219,13 @@ export async function run(args: string[], io: Io): Promise<number> {
   if ('problems' in settings) return fail(WRONG_USE, settings.problems);
   const { params } = settings;
 
-  const choice = { format, packaging } as DownloadChoice;
+  // Both were checked above; a wrong one has already been reported.
+  if (!isFormat(format) || !isPackaging(packaging)) return fail(WRONG_USE, problems);
+  const choice: DownloadChoice = { format, packaging };
   try {
     checkChoice(choice);
   } catch (error) {
-    return fail(WRONG_USE, [{ flag: '--packaging', message: (error as Error).message }]);
+    return fail(WRONG_USE, [{ flag: '--packaging', message: messageOf(error) }]);
   }
 
   const outDir = resolve(io.cwd, text('out') ?? wallLabel(params.openingWidthMm, params.openingHeightMm));
@@ -264,7 +264,7 @@ export async function run(args: string[], io: Io): Promise<number> {
     // oxlint-disable-next-line eslint/no-await-in-loop -- one at a time: the first failure stops the rest
     for (const f of wall.files) await writeFile(join(outDir, f.name), f.bytes);
   } catch (error) {
-    return fail(COULD_NOT_WRITE, [{ message: `cannot write to ${shown}: ${(error as Error).message}` }]);
+    return fail(COULD_NOT_WRITE, [{ message: `cannot write to ${shown}: ${messageOf(error)}` }]);
   }
   if (asJson) {
     const files = wall.files.map((f) => ({ name: f.name, type: f.type, bytes: f.bytes.length }));

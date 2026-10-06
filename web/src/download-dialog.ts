@@ -28,7 +28,8 @@ export function readStoredChoice(stored: string | null): DownloadChoice | null {
     return null;
   }
   if (typeof value !== 'object' || value === null || Array.isArray(value)) return null;
-  const { format, packaging } = value as Record<string, unknown>;
+  const format = 'format' in value ? value.format : undefined;
+  const packaging = 'packaging' in value ? value.packaging : undefined;
   if (!isFormat(format) || !isPackaging(packaging)) return null;
   const choice = { format, packaging };
   return isValidChoice(choice) ? choice : null;

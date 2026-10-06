@@ -5,7 +5,7 @@
 // page's form values (the command's flags). Setting the window type presets the four edges
 // (Q66); edges given with it, or after it, change them. A printer size means a custom
 // printer, and a tape setting means tape, or the TPU seal when it is its joints in TPU. The opening has no starting value: it is required.
-import { WINDOW_PRESETS } from './edge.js';
+import { EDGES, WINDOW_PRESETS } from './edge.js';
 import type { WindowType } from './edge.js';
 import { EXAMPLE_PARAMS, readParams, toFormValues } from './params.js';
 import { PRINTER_IDS } from './printers.js';
@@ -225,7 +225,8 @@ export function settingAt(value: unknown, path: string): unknown {
   let at: unknown = value;
   for (const key of path.split('.')) {
     if (typeof at !== 'object' || at === null) return undefined;
-    at = (at as Record<string, unknown>)[key];
+    const next: unknown = Reflect.get(at, key);
+    at = next;
   }
   return at;
 }
@@ -301,6 +302,9 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
   if (shape.length > 0 || !isObject(input)) return { ok: false, problems: shape };
 
   // merge copies every object the input touches, so neither the input nor EXAMPLE_PARAMS changes.
+  // checkShape has held every key and value in the input to EXAMPLE_PARAMS' own, so the result
+  // has its shape; readParams then checks every value as the page does.
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the shape is checked above
   const params = merge(EXAMPLE_PARAMS, input) as Params;
   const window = settingAt(input, 'edges.window');
   if (isWindow(window)) {
@@ -309,11 +313,18 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
   }
   // A printer size without a kind means a custom printer; a printer id, a listed one.
   const printer = input['printer'];
+  // A size or id missing reads as not a number or as no printer, and the page's checks say so.
+  const given = (key: string) => (isObject(printer) ? printer[key] : undefined);
+  const size = (key: string) => {
+    const v = given(key);
+    return typeof v === 'number' ? v : Number.NaN;
+  };
   if (isObject(printer) && !('kind' in printer) && ('widthMm' in printer || 'heightMm' in printer)) {
-    params.printer = { ...params.printer, kind: 'custom' } as Params['printer'];
+    params.printer = { kind: 'custom', widthMm: size('widthMm'), heightMm: size('heightMm') };
   }
   if (isObject(printer) && !('kind' in printer) && 'id' in printer) {
-    params.printer = { ...params.printer, kind: 'model' } as Params['printer'];
+    const id = given('id');
+    params.printer = { kind: 'model', id: typeof id === 'string' ? id : '' };
   }
   const seal = input['seal'];
   if (isObject(seal) && !('kind' in seal) && 'tape' in seal) {
@@ -330,9 +341,7 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
   const values: FormValues = toFormValues(params);
   const presetWindow = overrides.window;
   if (isWindow(presetWindow)) {
-    for (const [edgeName, role] of Object.entries(WINDOW_PRESETS[presetWindow])) {
-      values[`${edgeName}Edge` as FieldName] = role;
-    }
+    for (const side of EDGES) values[`${side}Edge` as const] = WINDOW_PRESETS[presetWindow][side];
   }
   if (overrides.printer === undefined && (overrides.customWidthMm ?? overrides.customHeightMm) !== undefined) {
     values.printer = 'custom';

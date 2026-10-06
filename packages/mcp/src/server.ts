@@ -1,6 +1,6 @@
 // The MCP server (backlog item api-mcp-local, #47; the owner's decisions Q91 to Q100): four
 // tools on the library, for an LLM agent on the user's own machine.
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
@@ -18,6 +18,7 @@ import {
 } from 'parametric-window-sealer';
 import type { DownloadChoice, Params, SettingProblem } from 'parametric-window-sealer';
 import * as z from 'zod';
+import { messageOf, version } from './about.js';
 import { settingsSchema } from './schema.js';
 
 export interface ServerOptions {
@@ -34,10 +35,6 @@ const INSTRUCTIONS = [
 ].join(' ');
 
 const FOLDER_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/;
-
-function version(): string {
-  return (JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as { version: string }).version;
-}
 
 type Content =
   { type: 'text'; text: string } | { type: 'resource'; resource: { uri: string; mimeType: string; blob: string } };
@@ -74,7 +71,7 @@ function choiceOf(
     checkChoice(choice);
     return { choice };
   } catch (error) {
-    return { error: failure([(error as Error).message]) };
+    return { error: failure([messageOf(error)]) };
   }
 }
 
@@ -218,7 +215,7 @@ export function createServer(options: ServerOptions): McpServer {
           // oxlint-disable-next-line eslint/no-await-in-loop -- one at a time: the first failure stops the rest
           for (const f of wall.files) await writeFile(join(dir, f.name), f.bytes);
         } catch (error) {
-          return failure([`Could not write to ${dir}: ${(error as Error).message}`]);
+          return failure([`Could not write to ${dir}: ${messageOf(error)}`]);
         }
       }
       const files = wall.files.map((f) => ({

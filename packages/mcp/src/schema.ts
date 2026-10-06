@@ -33,6 +33,13 @@ const GROUPS: Record<string, string> = {
 
 type Tree = { [key: string]: Tree | z.ZodType };
 
+// A list of choices as zod takes it: at least one.
+function choices(values: readonly string[]) {
+  const [first, ...rest] = values;
+  if (first === undefined) throw new Error('A choice needs at least one value');
+  return z.enum([first, ...rest]);
+}
+
 // A port (Q114): the hose end's outside diameter, and its piece counted from 1 at the bottom
 // left seen from the room; without a piece, the first goes in the starting one (Q105).
 const PORT = z.strictObject({
@@ -45,11 +52,8 @@ const PORT = z.strictObject({
 const PIECE_FILL = z.strictObject({
   column: z.number().int().min(1).describe('The column of the piece, from 1 at the left.'),
   row: z.number().int().min(1).describe('The row of the piece, from 1 at the bottom.'),
-  kind: z.enum(FILL_KINDS as [string, ...string[]]).describe('Its fill: sealed or a pattern.'),
-  style: z
-    .enum(PATTERN_STYLES as [string, ...string[]])
-    .optional()
-    .describe("Its style; the wall's if left out."),
+  kind: choices(FILL_KINDS).describe('Its fill: sealed or a pattern.'),
+  style: choices(PATTERN_STYLES).optional().describe("Its style; the wall's if left out."),
 });
 
 // A measured cutout (#23; C44): the appliance's outside, seen from the room, and its piece as a
@@ -70,13 +74,7 @@ function leaf(
   list?: ListKind,
   onOff = false,
 ): z.ZodType {
-  const base = list
-    ? z.array(ITEMS[list])
-    : onOff
-      ? z.boolean()
-      : values === undefined
-        ? z.number()
-        : z.enum(values as [string, ...string[]]);
+  const base = list ? z.array(ITEMS[list]) : onOff ? z.boolean() : values === undefined ? z.number() : choices(values);
   const described = base.describe(help);
   return required ? described : described.optional();
 }
@@ -99,9 +97,15 @@ export function settingsSchema(): z.ZodObject {
   const tree: Tree = {};
   for (const s of SETTINGS) {
     const keys = s.path.split('.');
+    const last = keys.pop();
+    if (last === undefined) continue;
     let at = tree;
-    for (const key of keys.slice(0, -1)) at = (at[key] ??= {}) as Tree;
-    at[keys.at(-1) as string] = leaf(s.help, s.values, REQUIRED.has(s.path), s.list, s.onOff === true);
+    for (const key of keys) {
+      const next = at[key] ?? {};
+      if (next instanceof z.ZodType) throw new Error(`${s.path} sits inside the setting ${key}`);
+      at = at[key] = next;
+    }
+    at[last] = leaf(s.help, s.values, REQUIRED.has(s.path), s.list, s.onOff === true);
   }
   return toSchema(tree, '').describe(
     "The window's settings in the library's shape; every length in mm. Only the opening is required; " +

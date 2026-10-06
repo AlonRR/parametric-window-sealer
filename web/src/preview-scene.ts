@@ -23,7 +23,7 @@ import {
   Mesh,
   MeshPhongMaterial,
 } from 'three';
-import type { Material } from 'three';
+import type { Material, Object3D } from 'three';
 import type { Manifold } from 'manifold-3d';
 import type { Engine } from 'parametric-window-sealer';
 import { meshOf } from 'parametric-window-sealer';
@@ -148,9 +148,9 @@ export function countOf(wall: Group, kind: PartKind): number {
 }
 
 // Graphics memory is not freed by the garbage collector: each redraw frees the last wall.
+const hasGeometry = (o: Object3D): o is Mesh | LineSegments => o instanceof Mesh || o instanceof LineSegments;
+
 export function disposeWall(wall: Group): void {
-  for (const child of wall.children) {
-    if (child instanceof Mesh || child instanceof LineSegments) (child.geometry as BufferGeometry).dispose();
-  }
+  for (const child of wall.children) if (hasGeometry(child)) child.geometry.dispose();
   wall.clear();
 }

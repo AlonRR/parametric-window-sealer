@@ -4,6 +4,7 @@
 // the flag, the setting's place in the file, and the file's name.
 import { readSettings } from 'parametric-window-sealer';
 import type { FormValues, Params } from 'parametric-window-sealer';
+import { messageOf } from './about.js';
 import { SETTING_FLAGS, flagFor } from './flags.js';
 
 export interface Problem {
@@ -21,7 +22,7 @@ export function readParamsFile(text: string, name: string): FromFile | { problem
   try {
     return { name, input: JSON.parse(text) };
   } catch (error) {
-    return { problems: [{ message: `${name} is not valid JSON: ${(error as Error).message}` }] };
+    return { problems: [{ message: `${name} is not valid JSON: ${messageOf(error)}` }] };
   }
 }
 

@@ -93,7 +93,7 @@ export function pieceOpenings(
   keepOut?: KeepOut,
 ): CrossSection {
   const { CrossSection } = engine;
-  const inner = [piece.widthMm - 2 * borderMm, piece.heightMm - 2 * borderMm];
+  const inner: [number, number] = [piece.widthMm - 2 * borderMm, piece.heightMm - 2 * borderMm];
   if (!((inner[0] ?? 0) > 0 && (inner[1] ?? 0) > 0)) return CrossSection.compose([]); // empty
   const made: CrossSection[] = [];
   const keep = (cs: CrossSection): CrossSection => {
@@ -101,7 +101,7 @@ export function pieceOpenings(
     return cs;
   };
   try {
-    let allowed = keep(CrossSection.square(inner as [number, number]).translate([borderMm, borderMm]));
+    let allowed = keep(CrossSection.square(inner).translate([borderMm, borderMm]));
     if (keepOut !== undefined) {
       const shape =
         'radiusMm' in keepOut

@@ -1,9 +1,10 @@
 // The server's command line: where it may write (Q94), set once when it is added to an agent.
 // Without --out-root it still runs, with files only in the reply (Q96).
-import { readFileSync } from 'node:fs';
+
 import { homedir } from 'node:os';
 import { isAbsolute, join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
+import { messageOf, version } from './about.js';
 import type { ServerOptions } from './server.js';
 
 // Ends with the statement in the README and on the page (Q36), word for word.
@@ -33,10 +34,6 @@ to use, change, share or sell for any purpose, with no conditions from this proj
 
 export type Options = { run: ServerOptions } | { print: string } | { error: string };
 
-function version(): string {
-  return (JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as { version: string }).version;
-}
-
 export function readOptions(args: string[], cwd: string): Options {
   let values;
   try {
@@ -47,7 +44,7 @@ export function readOptions(args: string[], cwd: string): Options {
       options: { 'out-root': { type: 'string' }, help: { type: 'boolean', short: 'h' }, version: { type: 'boolean' } },
     }));
   } catch (error) {
-    return { error: `window-sealer-mcp: ${(error as Error).message}\nRun window-sealer-mcp --help for the options.` };
+    return { error: `window-sealer-mcp: ${messageOf(error)}\nRun window-sealer-mcp --help for the options.` };
   }
   if (values.help === true) return { print: HELP };
   if (values.version === true) return { print: version() };

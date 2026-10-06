@@ -30,9 +30,9 @@
     "unicorn/no-array-sort": "off",
     // Copying each item with a spread keeps the lists immutable; they hold tens of items.
     "oxc/no-map-spread": "off",
-    // Turned on for the sources once the page reads its controls without casts
-    // (code-params-page, #95).
-    "typescript/no-unsafe-type-assertion": "off"
+    // A cast says "trust me" to the type checker: the sources narrow with checks instead, and an
+    // exception says why beside it (code-params-page, #95).
+    "typescript/no-unsafe-type-assertion": "error"
   },
   "overrides": [
     {
@@ -45,7 +45,8 @@
         "unicorn/consistent-function-scoping": "off",
         // A test takes its steps in order on purpose.
         "eslint/no-await-in-loop": "off",
-        // Tests walk JSON and tool output as it comes back.
+        // Tests walk JSON and tool output as it comes back, and cast what they made themselves.
+        "typescript/no-unsafe-type-assertion": "off",
         "typescript/no-explicit-any": "off",
         "typescript/no-non-null-assertion": "off",
         "typescript/no-unsafe-argument": "off",

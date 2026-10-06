@@ -110,7 +110,8 @@ export function toStl(mesh: MeshData, name: string): Uint8Array {
   view.setUint32(80, count, true);
   const p = mesh.positions;
   for (let t = 0; t < count; t++) {
-    const [a, b, c] = [0, 1, 2].map((k) => (mesh.triangles[t * 3 + k] ?? 0) * 3) as [number, number, number];
+    const vertex = (k: number) => (mesh.triangles[t * 3 + k] ?? 0) * 3;
+    const [a, b, c] = [vertex(0), vertex(1), vertex(2)];
     const u = [0, 1, 2].map((k) => (p[b + k] ?? 0) - (p[a + k] ?? 0));
     const w = [0, 1, 2].map((k) => (p[c + k] ?? 0) - (p[a + k] ?? 0));
     const n = [
