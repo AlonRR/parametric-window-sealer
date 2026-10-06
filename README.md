@@ -45,6 +45,8 @@ pre-commit run --all-files
 ```
 
 The commit hooks check the commit identity and message form; `CLAUDE.md` lists the rules.
+Adding a setting, a line of the plan or a part of the page: [`docs/extending.md`](docs/extending.md)
+says where each goes and which test fails if a step is missed.
 
 The geometry is a library in `packages/core`, the npm package `parametric-window-sealer`; the
 `window-sealer` command is in `packages/cli`, and the `window-sealer-mcp` server for LLM agents
