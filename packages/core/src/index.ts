@@ -10,6 +10,7 @@ export * from './joint.js';
 export * from './joint-geometry.js';
 export * from './layout.js';
 export * from './panel-geometry.js';
+export * from './fittings/index.js';
 export * from './pattern.js';
 export * from './params.js';
 export * from './plan.js';

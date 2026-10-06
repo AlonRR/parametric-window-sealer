@@ -6,8 +6,9 @@
 // that a test print confirms (Q107). The port is centred in one piece (Q105) and stays clear
 // of the strips along each edge, or no port is made (Q108).
 //
-// The solid is portPanel, in panel-geometry.ts with the other pieces. Frame, as every piece: width along X, height along Y, thickness along Z from 0, seen from
-// the room (Q106): column 0 at the left, row 0 at the bottom, the collar towards the viewer.
+// The piece's solid is portPanel, with the port as a fitting in fittings/hose-port.ts. Frame, as
+// every piece: width along X, height along Y, thickness along Z from 0, seen from the room
+// (Q106): column 0 at the left, row 0 at the bottom, the collar towards the viewer.
 import type { JointParams } from './joint.js';
 import type { GridLayout } from './layout.js';
 
@@ -71,6 +72,9 @@ export interface HosePort {
   row: number; // from 0, the bottom
 }
 
+// Sides of the polygon drawn for each circle: 128 keeps a 150 mm circle within 0.03 mm.
+export const PORT_SEGMENTS = 128;
+
 // Clear of the strips: the slot depth along each edge, and this much more (Q108).
 export const PORT_EDGE_CLEARANCE_MM = 2;
 
@@ -88,6 +92,9 @@ export function defaultPortPiece(plan: GridLayout): { column: number; row: numbe
 }
 
 const mm = (n: number): string => String(Math.round(n * 10) / 10);
+
+// In the piece's file name: piece-c2-r1-197.7x198.6-port-150.stl.
+export const portTag = (hoseMm: number): string => `-port-${mm(hoseMm)}`;
 
 export function checkPort(
   plan: GridLayout,

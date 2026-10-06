@@ -13,8 +13,7 @@ import type { Manifold } from 'manifold-3d';
 import type { EdgeStripPlacement } from './edge.js';
 import type { Engine } from './engine.js';
 import type { JointParams } from './joint.js';
-import { PORT_SEGMENTS } from './panel-geometry.js';
-import { collarInnerMm } from './port.js';
+import { PORT_SEGMENTS, collarInnerMm } from './port.js';
 import type { CollarParams, PortSetting } from './port.js';
 import type { TapeFit } from './tape.js';
 

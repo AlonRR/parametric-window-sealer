@@ -20,11 +20,11 @@ import { DEFAULT_MAX_PIECE, maxPieceSize } from './printer.js';
 import type { PrinterChoice } from './printer.js';
 import { DEFAULT_BED_MARGIN_MM } from './printer.js';
 import { PRINTER_IDS } from './printers.js';
-import { DEFAULT_COLLAR, checkPort, defaultPortPiece, formatPorts, parsePorts, portHoleMm } from './port.js';
+import { DEFAULT_COLLAR, formatPorts, parsePorts } from './port.js';
 import type { CollarParams, PortSetting } from './port.js';
-import { DEFAULT_RIM, checkCutout, formatCutouts, linedRim, parseCutouts } from './cutout.js';
+import { DEFAULT_RIM, formatCutouts, parseCutouts } from './cutout.js';
 import type { CutoutSetting, RimParams } from './cutout.js';
-import { DEFAULT_TAPE, NO_SEAL, TAPE_GROOVE_PLAY_MM, TAPE_GROOVE_WALL_MM, tapeFit, tapedCollar } from './tape.js';
+import { DEFAULT_TAPE, NO_SEAL, TAPE_GROOVE_PLAY_MM, TAPE_GROOVE_WALL_MM, tapeFit } from './tape.js';
 import type { SealKind, SealParams, TapeFit } from './tape.js';
 import { TPU_FIN_MM, gasketBaseMm } from './tpu.js';
 import { FILL_KINDS, MIN_BAR_MM, PATTERN_STYLES, SEALED } from './fill.js';
@@ -34,6 +34,8 @@ import { formatPieceFills, parsePieceFills } from './piece-fill.js';
 import type { PieceFill } from './piece-fill.js';
 import { FormReader, SIZE_MESSAGE, SIZE_OR_ZERO_MESSAGE } from './form-reader.js';
 import { planWall } from './plan.js';
+import { cutoutProblem, placeFittings, portProblem } from './fittings/index.js';
+import type { InPiece } from './fittings/index.js';
 import { hundredth, mm } from './words.js';
 
 export interface AxisChoice {
@@ -565,15 +567,21 @@ export function readParams(values: FormValues): ReadResult {
   // What is placed in pieces, once everything else is sound: the ports, then the cutouts, then
   // each piece's own fill, each against the plan the ones before it allow.
   const base = { ...opening, printer, bedMarginMm, width, height, thicknessMm, joint, edges, collar, seal, fill };
-  const ports: Required<PortSetting>[] = [];
-  if (r.ok && givenPorts.length > 0) {
-    const problem = placePorts({ ...base, ports: [], pieceFills: [], cutouts: [], rim }, givenPorts, ports);
-    if (problem !== undefined) r.fail('ports', problem);
+  const plan = r.ok ? planWall({ ...base, ports: [], pieceFills: [], cutouts: [], rim }) : undefined;
+  let ports: Required<PortSetting>[] = [];
+  if (plan !== undefined && givenPorts.length > 0) {
+    const check = (port: PortSetting & InPiece) => portProblem(plan, port, collar, fit, joint);
+    const placing = placeFittings(plan, { label: 'Port', plural: 'Ports', given: givenPorts, check });
+    if (placing.ok) ports = placing.placed;
+    else r.fail('ports', placing.problem);
   }
-  const cutouts: Required<CutoutSetting>[] = [];
-  if (r.ok && givenCutouts.length > 0) {
-    const problem = placeCutouts({ ...base, ports, pieceFills: [], cutouts: [], rim }, givenCutouts, cutouts);
-    if (problem !== undefined) r.fail('cutouts', problem);
+  let cutouts: Required<CutoutSetting>[] = [];
+  if (r.ok && plan !== undefined && givenCutouts.length > 0) {
+    const check = (cutout: CutoutSetting & InPiece) => cutoutProblem(plan, cutout, rim, fit, joint);
+    const earlier = [{ label: 'Port', placed: ports }];
+    const placing = placeFittings(plan, { label: 'Cutout', plural: 'Cutouts', given: givenCutouts, check }, earlier);
+    if (placing.ok) cutouts = placing.placed;
+    else r.fail('cutouts', placing.problem);
   }
   if (r.ok && pieceFills.length > 0) {
     const problem = checkPieceFills(planWall({ ...base, ports, pieceFills: [], cutouts, rim }), pieceFills);
@@ -595,52 +603,6 @@ function checkPieceFills(plan: GridLayout, fills: readonly PieceFill[]): string 
     if (other < i) {
       return `Piece fills ${other + 1} and ${i + 1} are both for column ${f.column}, row ${f.row}; give each piece one fill.`;
     }
-  }
-  return undefined;
-}
-
-// Each port in its piece (Q105, Q110), its lip leaving a hole, the piece there and big enough
-// (Q108), and no two in one piece (Q113). Fills `placed`; returns the first problem, if any.
-function placePorts(params: Params, given: PortSetting[], placed: Required<PortSetting>[]): string | undefined {
-  const plan = planWall(params);
-  const start = defaultPortPiece(plan);
-  const collar = tapedCollar(params.collar, tapeFit(params.seal)); // with tape inside, Q129
-  for (const [i, port] of given.entries()) {
-    const column = port.column ?? start.column + 1;
-    const row = port.row ?? start.row + 1;
-    if (!(portHoleMm(port.hoseMm, collar) > 0)) {
-      return `Port ${i + 1}: the ${mm(params.collar.lipMm)} mm lip would close a ${mm(port.hoseMm)} mm hose’s port; make the lip smaller.`;
-    }
-    const fit = checkPort(plan, { hoseMm: port.hoseMm, column: column - 1, row: row - 1 }, collar, params.joint);
-    if (!fit.ok) return `Port ${i + 1}: ${fit.message}`;
-    const other = placed.findIndex((p) => p.column === column && p.row === row);
-    if (other >= 0) {
-      return `Ports ${other + 1} and ${i + 1} are both in column ${column}, row ${row}; give each its own piece.`;
-    }
-    placed.push({ hoseMm: port.hoseMm, column, row });
-  }
-  return undefined;
-}
-
-// Each cutout in its piece (C47, as Q105 and Q110), the piece there and big enough for the rim
-// (C40, as Q108), and one cutout or port to a piece. Fills `placed`; returns the first problem.
-function placeCutouts(params: Params, given: CutoutSetting[], placed: Required<CutoutSetting>[]): string | undefined {
-  const plan = planWall(params);
-  const start = defaultPortPiece(plan);
-  const rim = linedRim(params.rim, tapeFit(params.seal));
-  for (const [i, cutout] of given.entries()) {
-    const column = cutout.column ?? start.column + 1;
-    const row = cutout.row ?? start.row + 1;
-    const fit = checkCutout(plan, { ...cutout, column: column - 1, row: row - 1 }, rim, params.joint);
-    if (!fit.ok) return `Cutout ${i + 1}: ${fit.message}`;
-    const port = params.ports.findIndex((p) => p.column === column && p.row === row);
-    if (port >= 0)
-      return `Cutout ${i + 1} and port ${port + 1} are both in column ${column}, row ${row}; give each its own piece.`;
-    const other = placed.findIndex((c) => c.column === column && c.row === row);
-    if (other >= 0) {
-      return `Cutouts ${other + 1} and ${i + 1} are both in column ${column}, row ${row}; give each its own piece.`;
-    }
-    placed.push({ widthMm: cutout.widthMm, heightMm: cutout.heightMm, column, row });
   }
   return undefined;
 }

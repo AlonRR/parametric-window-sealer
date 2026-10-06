@@ -18,6 +18,8 @@ import type { PartShape } from './joint.js';
 import type { GridPiece } from './layout.js';
 import type { GasketShape, SleeveShape } from './tpu.js';
 import type { FrameShape, Rectangle } from './cutout.js';
+import { cutoutTag } from './cutout.js';
+import { portTag } from './port.js';
 
 export interface MeshData {
   positions: Float32Array; // x, y, z per vertex, in mm
@@ -29,6 +31,7 @@ export interface ExportPiece {
   mesh: MeshData;
   hoseMm?: number; // the piece holds a hose port of this size (hose-port, #12)
   cutout?: Rectangle; // or a cutout for an appliance this size (measured-cutout, #23)
+  tag?: string; // its fitting in its file name, which takes the place of the two above
 }
 
 // A strip or cross piece shape, lying as it prints, and how many to print.
@@ -64,21 +67,32 @@ export function meshOf(solid: Manifold): MeshData {
 
 const mm = (n: number) => String(Math.round(n * 10) / 10);
 
+type Cell = Pick<GridPiece, 'column' | 'row' | 'widthMm' | 'heightMm'>;
+
+// A piece's file: its place and size, and its fitting's tag (fittings/), as
+// piece-c2-r1-197.7x198.6-port-150.stl.
+export const taggedFileName = (cell: Cell, extension: Format, tag = ''): string =>
+  `piece-c${cell.column + 1}-r${cell.row + 1}-${mm(cell.widthMm)}x${mm(cell.heightMm)}${tag}.${extension}`;
+
 // A piece with a hose port says so, and the hose's size: piece-c2-r1-197.7x198.6-port-150.stl;
 // a piece with a cutout, the appliance's: piece-c2-r1-197.7x198.6-cutout-120x80.stl (C46).
-export function pieceFileName(
-  cell: Pick<GridPiece, 'column' | 'row' | 'widthMm' | 'heightMm'>,
-  extension: Format,
-  hoseMm?: number,
-  cutout?: Rectangle,
-): string {
-  const port = hoseMm === undefined ? '' : `-port-${mm(hoseMm)}`;
-  const cut = cutout === undefined ? '' : `-cutout-${mm(cutout.widthMm)}x${mm(cutout.heightMm)}`;
-  return `piece-c${cell.column + 1}-r${cell.row + 1}-${mm(cell.widthMm)}x${mm(cell.heightMm)}${port}${cut}.${extension}`;
+export function pieceFileName(cell: Cell, extension: Format, hoseMm?: number, cutout?: Rectangle): string {
+  const tag = (hoseMm === undefined ? '' : portTag(hoseMm)) + (cutout === undefined ? '' : cutoutTag(cutout));
+  return taggedFileName(cell, extension, tag);
 }
 
-// Every part beside the pieces: the joints, the edge strips and the TPU seal's parts.
-export type AnyPartShape = PartShape | EdgeShape | GasketShape | SleeveShape | FrameShape;
+const fileOf = (piece: ExportPiece, extension: Format): string =>
+  piece.tag === undefined
+    ? pieceFileName(piece.cell, extension, piece.hoseMm, piece.cutout)
+    : taggedFileName(piece.cell, extension, piece.tag);
+
+// The wall's own parts beside the pieces: the joints, the edge strips and the TPU seal's gaskets.
+export type WallPartShape = PartShape | EdgeShape | GasketShape;
+
+// Every part beside the pieces: the wall's own and the fittings', a sleeve in each hose port and
+// a frame in each cutout's rim. A fitting with a new kind of part adds its shape here and its name
+// below; its solid stays in its own file (docs/extending.md, "A new fitting").
+export type AnyPartShape = WallPartShape | SleeveShape | FrameShape;
 
 // An edge strip's height depends on its track, so it is part of the name; with tape on its
 // sides, so is the track's depth, as two depths can give one size with grooves in different
@@ -191,9 +205,7 @@ export function to3mf(pieces: ExportPiece[], parts: ExportPart[] = []): Uint8Arr
   const alone = pieces.length + parts.reduce((n, p) => n + p.count, 0) === 1;
   pieces.forEach((piece, i) => {
     const id = i + 1;
-    objects.push(
-      objectXml(id, pieceFileName(piece.cell, '3mf', piece.hoseMm, piece.cutout).replace(/\.3mf$/, ''), piece.mesh),
-    );
+    objects.push(objectXml(id, fileOf(piece, '3mf').replace(/\.3mf$/, ''), piece.mesh));
     const x = alone ? 0 : piece.cell.xMm + piece.cell.column * GAP_MM;
     const y = alone ? 0 : piece.cell.yMm + piece.cell.row * GAP_MM;
     items.push(itemXml(id, x, y));
@@ -259,7 +271,7 @@ export function packageDownload(
   }
   const type = MEDIA_TYPES[choice.format];
   const perPiece = pieces.map((piece) => {
-    const name = pieceFileName(piece.cell, choice.format, piece.hoseMm, piece.cutout);
+    const name = fileOf(piece, choice.format);
     const bytes = choice.format === 'stl' ? toStl(piece.mesh, name.replace(/\.stl$/, '')) : to3mf([piece]);
     return { name, type, bytes };
   });

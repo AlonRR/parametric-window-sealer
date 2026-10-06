@@ -30,9 +30,8 @@ import { meshOf } from 'parametric-window-sealer';
 import { edgeStripSolid, edgeTapeSolid } from 'parametric-window-sealer';
 import { stripWidthMm } from 'parametric-window-sealer';
 import { crossSolid, stripSolid } from 'parametric-window-sealer';
-import { buildPieces, cutoutTapeSolid, portTapeSolid } from 'parametric-window-sealer';
-import { linedRim } from 'parametric-window-sealer';
-import { tapeFit, tapedCollar, tpuJoint } from 'parametric-window-sealer';
+import { buildPiecesWith, fittingSource, placedFittings } from 'parametric-window-sealer';
+import { tpuJoint } from 'parametric-window-sealer';
 import { fillFor, fillPattern } from 'parametric-window-sealer';
 import { planParts } from 'parametric-window-sealer';
 import type { Params } from 'parametric-window-sealer';
@@ -71,7 +70,6 @@ export function buildWallScene(engine: Engine, params: Params): Group {
   const { plan, joints, edges } = planParts(params);
   const { joint, thicknessMm } = params;
   const wall = new Group();
-  const tape = tapeFit(params.seal);
   // The TPU seal's parts take the tape's place; its joints, if in TPU, grip the panels (C34).
   const [sealKind, seal] = params.seal.kind === 'tpu' ? (['tpu', TPU] as const) : (['tape', TAPE] as const);
   const inTpu = params.seal.kind === 'tpu' && params.seal.tape.joints;
@@ -79,17 +77,8 @@ export function buildWallScene(engine: Engine, params: Params): Group {
   // Each piece's own fill, or the wall's (params-advanced, #21).
   const pattern = (cell: { column: number; row: number }) =>
     fillPattern(fillFor(params, cell.column + 1, cell.row + 1), joint);
-  const built = buildPieces(
-    engine,
-    plan,
-    thicknessMm,
-    params.ports,
-    params.collar,
-    tape,
-    pattern,
-    params.cutouts,
-    params.rim,
-  );
+  const fittings = placedFittings(fittingSource(params));
+  const built = buildPiecesWith(engine, plan, thicknessMm, fittings, pattern);
   try {
     built.forEach((piece, i) => {
       const cell = plan.pieces[i];
@@ -117,24 +106,13 @@ export function buildWallScene(engine: Engine, params: Params): Group {
         add(wall, edgeTapeSolid(engine, e.lengthMm, strip, thicknessMm, e.edge), sealKind, e.xMm, e.yMm, seal);
       }
     }
-    if (tape?.port) {
-      const collar = tapedCollar(params.collar, tape);
-      for (const port of params.ports) {
-        const cell = plan.pieces.find((c) => c.column === port.column - 1 && c.row === port.row - 1);
-        if (!cell) continue;
-        const size = { widthMm: cell.widthMm, heightMm: cell.heightMm, thicknessMm };
-        add(wall, portTapeSolid(engine, size, port.hoseMm, collar, tape), sealKind, cell.xMm, cell.yMm, seal);
-      }
-    }
-    // A cutout's rim is lined whenever there is a seal (measured-cutout, #23; C43).
-    if (tape) {
-      const rim = linedRim(params.rim, tape);
-      for (const c of params.cutouts) {
-        const cell = plan.pieces.find((p) => p.column === c.column - 1 && p.row === c.row - 1);
-        if (!cell) continue;
-        const size = { widthMm: cell.widthMm, heightMm: cell.heightMm, thicknessMm };
-        add(wall, cutoutTapeSolid(engine, size, c, rim, tape), sealKind, cell.xMm, cell.yMm, seal);
-      }
+    // Each fitting's seal, if it has one: tape or a TPU sleeve in a hose port's collar when the
+    // seal goes there (Q129), round a cutout's rim whenever there is a seal (C43).
+    for (const fitting of fittings) {
+      const cell = plan.pieces.find((c) => c.column === fitting.column - 1 && c.row === fitting.row - 1);
+      if (!cell) continue;
+      const lining = fitting.lining(engine, { widthMm: cell.widthMm, heightMm: cell.heightMm, thicknessMm });
+      if (lining) add(wall, lining, sealKind, cell.xMm, cell.yMm, seal);
     }
   } catch (error) {
     disposeWall(wall);

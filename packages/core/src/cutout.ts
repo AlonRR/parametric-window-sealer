@@ -11,7 +11,7 @@
 // place, or a TPU frame in that groove gripping the appliance (C43). Several are written as the
 // ports are (C44), and one without a piece starts in the port's starting piece (C47).
 //
-// The piece's solid is cutoutPanel, in panel-geometry.ts with the other pieces.
+// The piece's solid is cutoutPanel, with the cutout as a fitting in fittings/measured-cutout.ts.
 import type { Manifold } from 'manifold-3d';
 import type { Engine } from './engine.js';
 import type { JointParams } from './joint.js';
@@ -95,6 +95,9 @@ export function linedRim(rim: RimParams, fit: TapeFit | undefined): RimParams {
 }
 
 const mm = (n: number): string => String(Math.round(n * 10) / 10);
+
+// In the piece's file name: piece-c2-r1-197.7x198.6-cutout-120x80.stl (C46).
+export const cutoutTag = (cutout: Rectangle): string => `-cutout-${mm(cutout.widthMm)}x${mm(cutout.heightMm)}`;
 
 export function checkCutout(
   plan: GridLayout,

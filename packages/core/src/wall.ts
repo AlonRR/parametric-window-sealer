@@ -6,39 +6,67 @@ import { edgeShapes } from './edge.js';
 import { edgeStripSolid } from './edge-geometry.js';
 import { loadEngine } from './engine.js';
 import type { Engine } from './engine.js';
-import { MEDIA_TYPES, checkChoice, meshOf, packageDownload, partName, pieceFileName, wallLabel } from './export.js';
-import type { AnyPartShape, DownloadChoice, DownloadFile, ExportPart, ExportPiece } from './export.js';
+import { MEDIA_TYPES, checkChoice, meshOf, packageDownload, partName, taggedFileName, wallLabel } from './export.js';
+import type { AnyPartShape, DownloadChoice, DownloadFile, ExportPart, ExportPiece, WallPartShape } from './export.js';
 import { partShapes } from './joint.js';
 import { crossSolid, stripSolid } from './joint-geometry.js';
 import type { GridLayout } from './layout.js';
-import { buildPieces } from './panel-geometry.js';
+import { buildPiecesWith } from './panel-geometry.js';
+import { FITTINGS, fittingIn, fittingSource, placedFittings } from './fittings/index.js';
+import type { FittingPart } from './fittings/index.js';
 import { readParams, toFormValues } from './params.js';
 import { planParts, planWall } from './plan.js';
 import { describePlan } from './plan-text.js';
-import { tapeFit, tapedCollar } from './tape.js';
+import { tapeFit } from './tape.js';
 import { fillPattern } from './fill.js';
 import { fillFor } from './piece-fill.js';
-import { gasketShapes, gasketSolid, sleeveShapes, sleeveSolid, tpuJoint } from './tpu.js';
-import { frameShapes, frameSolid, linedRim } from './cutout.js';
+import { gasketShapes, gasketSolid, tpuJoint } from './tpu.js';
 import type { FieldErrors, Params } from './params.js';
 import type { PlanText } from './plan-text.js';
 
-// Every part beside the pieces, one shape with a count for identical ones (Q58): the joint
-// strips and cross pieces, in TPU if chosen (C34), the edge strips, and with the TPU seal its
-// gaskets, the sleeves for the hose ports (#22) and the frames for the cutouts (#23; C43). The
-// download and the dry run both list these.
-export function wallPartShapes(params: Params, plan: GridLayout = planWall(params)): AnyPartShape[] {
+// Every part beside the pieces, one shape with a count for identical ones (Q58), with its name
+// and its solid lying as it prints (Q53): the joint strips and cross pieces, in TPU if chosen
+// (C34), the edge strips, and with the TPU seal its gaskets and each fitting's parts: the
+// sleeves for the hose ports (#22) and the frames for the cutouts (#23; C43).
+function wallParts(params: Params, plan: GridLayout): FittingPart[] {
   const { joints, edges } = planParts(params, plan);
+  const { joint, thicknessMm } = params;
   const fit = tapeFit(params.seal);
   const tpu = params.seal.kind === 'tpu' && fit !== undefined ? fit : undefined;
   const inTpu = tpu !== undefined && params.seal.tape.joints;
-  return [
-    ...partShapes(joints, params.joint).map((s) => (inTpu ? { ...s, tpu: true as const } : s)),
+  const own: WallPartShape[] = [
+    ...partShapes(joints, joint).map((s) => (inTpu ? { ...s, tpu: true as const } : s)),
     ...edgeShapes(edges),
     ...(tpu === undefined ? [] : gasketShapes(edges, tpu, params.seal.tape.thicknessMm)),
-    ...(tpu === undefined ? [] : sleeveShapes(params.ports, tapedCollar(params.collar, tpu), tpu)),
-    ...(tpu === undefined ? [] : frameShapes(params.cutouts, linedRim(params.rim, tpu), tpu)),
   ];
+  const solidOf = (engine: Engine, shape: WallPartShape) => {
+    const strip = shape.kind !== 'edge' && 'tpu' in shape && shape.tpu === true ? tpuJoint(joint) : joint;
+    switch (shape.kind) {
+      case 'edge':
+        return edgeStripSolid(engine, shape.lengthMm, shape, joint, thicknessMm, 'print');
+      case 'strip':
+        return stripSolid(engine, shape.lengthMm, strip, thicknessMm, 'print');
+      case 'cross':
+        return crossSolid(engine, strip, thicknessMm, 'print');
+      case 'gasket':
+        if (fit === undefined) throw new Error('A gasket without a seal');
+        return gasketSolid(engine, shape.lengthMm, fit, shape.heightMm);
+      default: {
+        const unknown: never = shape;
+        throw new Error(`No part of kind ${(unknown as WallPartShape).kind}`);
+      }
+    }
+  };
+  const source = fittingSource(params);
+  return [
+    ...own.map((shape) => ({ shape, name: partName(shape), solid: (engine: Engine) => solidOf(engine, shape) })),
+    ...(tpu === undefined ? [] : FITTINGS.flatMap((f) => f.parts(source, tpu))),
+  ];
+}
+
+// The download and the dry run both list these.
+export function wallPartShapes(params: Params, plan: GridLayout = planWall(params)): AnyPartShape[] {
+  return wallParts(params, plan).map((p) => p.shape);
 }
 
 // Every piece in its cell, and one strip, cross piece or edge strip per shape, lying as it
@@ -48,17 +76,7 @@ export function buildExport(engine: Engine, params: Params): { pieces: ExportPie
   // Each piece's own fill, or the wall's (#21).
   const pattern = (cell: { column: number; row: number }) =>
     fillPattern(fillFor(params, cell.column + 1, cell.row + 1), params.joint);
-  const built = buildPieces(
-    engine,
-    plan,
-    params.thicknessMm,
-    params.ports,
-    params.collar,
-    tapeFit(params.seal),
-    pattern,
-    params.cutouts,
-    params.rim,
-  );
+  const built = buildPiecesWith(engine, plan, params.thicknessMm, placedFittings(fittingSource(params)), pattern);
   let pieces: ExportPiece[];
   try {
     pieces = built.map((b, i) => {
@@ -69,39 +87,16 @@ export function buildExport(engine: Engine, params: Params): { pieces: ExportPie
         mesh: meshOf(b.solid),
         ...(b.hoseMm === undefined ? {} : { hoseMm: b.hoseMm }),
         ...(b.cutout === undefined ? {} : { cutout: b.cutout }),
+        ...(b.tag === undefined ? {} : { tag: b.tag }),
       };
     });
   } finally {
     for (const b of built) b.solid.delete();
   }
-  const { joint, thicknessMm } = params;
-  const fit = tapeFit(params.seal);
-  const solidOf = (shape: AnyPartShape) => {
-    const own = shape.kind !== 'edge' && 'tpu' in shape && shape.tpu === true ? tpuJoint(joint) : joint;
-    switch (shape.kind) {
-      case 'edge':
-        return edgeStripSolid(engine, shape.lengthMm, shape, joint, thicknessMm, 'print');
-      case 'strip':
-        return stripSolid(engine, shape.lengthMm, own, thicknessMm, 'print');
-      case 'cross':
-        return crossSolid(engine, own, thicknessMm, 'print');
-      case 'gasket':
-        if (fit === undefined) throw new Error('A gasket without a seal');
-        return gasketSolid(engine, shape.lengthMm, fit, shape.heightMm);
-      case 'sleeve':
-        return sleeveSolid(engine, shape);
-      case 'frame':
-        return frameSolid(engine, shape);
-      default: {
-        const unknown: never = shape;
-        throw new Error(`No part of kind ${(unknown as AnyPartShape).kind}`);
-      }
-    }
-  };
-  const parts = wallPartShapes(params, plan).map((shape) => {
-    const solid = solidOf(shape);
+  const parts = wallParts(params, plan).map((part) => {
+    const solid = part.solid(engine);
     try {
-      return { name: partName(shape), mesh: meshOf(solid), count: shape.count };
+      return { name: part.name, mesh: meshOf(solid), count: part.shape.count };
     } finally {
       solid.delete();
     }
@@ -168,16 +163,12 @@ export function planFiles(params: Params, choice: DownloadChoice): PlannedFile[]
   if (choice.packaging === 'zip') return [{ name: `${label}-${choice.format}.zip`, type: MEDIA_TYPES.zip }];
   const plan = planWall(params);
   const type = MEDIA_TYPES[choice.format];
+  const fittings = placedFittings(fittingSource(params));
   return [
     ...plan.pieces.map((cell) => {
-      const port = params.ports.find((p) => p.column === cell.column + 1 && p.row === cell.row + 1);
-      const cut = params.cutouts.find((c) => c.column === cell.column + 1 && c.row === cell.row + 1);
-      const cutout = cut === undefined ? undefined : { widthMm: cut.widthMm, heightMm: cut.heightMm };
-      return { name: pieceFileName(cell, choice.format, port?.hoseMm, cutout), type };
+      const tag = fittingIn(fittings, cell.column + 1, cell.row + 1)?.tag;
+      return { name: taggedFileName(cell, choice.format, tag), type };
     }),
-    ...wallPartShapes(params, plan).map((shape) => ({
-      name: `${partName(shape)}.${choice.format}`,
-      type,
-    })),
+    ...wallParts(params, plan).map((part) => ({ name: `${part.name}.${choice.format}`, type })),
   ];
 }

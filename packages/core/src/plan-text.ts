@@ -4,12 +4,11 @@ import { EDGES, edgeShapes, panelSpan } from './edge.js';
 import { jointWidthMm, minPieceMm, partShapes } from './joint.js';
 import type { JointParams, JointPlan } from './joint.js';
 import type { Axis, GridLayout, Leftover } from './layout.js';
-import { linedRim, rimInnerMm } from './cutout.js';
-import { collarInnerMm } from './port.js';
-import { tapeFit, tapedCollar } from './tape.js';
+import { tapeFit } from './tape.js';
 import { fillWords } from './fill.js';
 import { fillFor } from './piece-fill.js';
 import { pieceLimit, planParts } from './plan.js';
+import { FITTINGS, HOSE_PORT, MEASURED_CUTOUT, fittingSource } from './fittings/index.js';
 import type { WallParts } from './plan.js';
 import type { Params } from './params.js';
 import { listed, mm, plural, sum } from './words.js';
@@ -98,53 +97,23 @@ function describeSeal(params: Params, parts: WallParts): string {
   const sides = fit.sides
     ? 2 * sum(parts.edges.filter((s) => params.edges.roles[s.edge] === 'track').map((s) => s.lengthMm))
     : 0;
-  const ports = fit.port ? params.ports : [];
-  const collar = tapedCollar(params.collar, fit);
   const faces = fit.sides ? 'outer faces and sides' : 'outer faces';
-  const each = ports.length === 1 ? 'the hose port’s collar' : 'each hose port’s collar';
-  // Every cutout's rim is lined (C43).
-  const cutouts = params.cutouts;
-  const eachRim = cutouts.length === 1 ? 'the cutout’s rim' : 'each cutout’s rim';
+  // Each kind of fitting's share: the tape inside each port's collar (Q129) and round each
+  // cutout's rim (C43), or what is printed in TPU there.
+  const source = fittingSource(params);
+  const linings = FITTINGS.flatMap((f) => f.lining(source) ?? []);
   if (params.seal.kind === 'tpu') {
     const metres = Math.round((outer + sides) / 100) / 10;
     const gaskets = `${mm(fit.grooveWidthMm)} × ${mm(tape.thicknessMm)} mm gaskets along the edge strips’ ${faces}: ${metres} m in all`;
-    const also = [
-      ...(ports.length === 0 ? [] : [`a sleeve inside ${each}`]),
-      ...(cutouts.length === 0 ? [] : [`a frame inside ${eachRim}`]),
-      ...(tape.joints ? ['the joint strips and cross pieces in TPU'] : []),
-    ];
+    const also = [...linings.map((l) => l.tpu), ...(tape.joints ? ['the joint strips and cross pieces in TPU'] : [])];
     const list = [gaskets, ...also];
     const last = list.length > 1 ? `, and ${list.pop() ?? ''}` : '';
     return `Seal: printed TPU, ${list.join(', ')}${last}.`;
   }
-  const round = sum(ports.map((p) => Math.PI * (collarInnerMm(p.hoseMm, collar) + 2 * fit.grooveDepthMm)));
-  const rim = linedRim(params.rim, fit);
-  const rims = sum(
-    cutouts.map((c) => {
-      const floor = rimInnerMm(c, rim);
-      return 2 * (floor.widthMm + floor.heightMm) + 8 * fit.grooveDepthMm;
-    }),
-  );
-  const places = [
-    ...(ports.length === 0 ? [] : [`inside ${each}`]),
-    ...(cutouts.length === 0 ? [] : [`round ${eachRim}`]),
-  ];
+  const places = linings.map((l) => l.tape);
   const inPorts = places.length === 0 ? '' : `, and ${places.join(' and ')}`;
-  const metres = Math.round((outer + sides + round + rims) / 100) / 10;
+  const metres = Math.round(linings.reduce((n, l) => n + l.tapeMm, outer + sides) / 100) / 10;
   return `Seal: ${mm(tape.widthMm)} × ${mm(tape.thicknessMm)} mm foam tape along the edge strips’ ${faces}${inPorts}: ${metres} m in all.`;
-}
-
-// Each cutout: the appliance, where, the opening and its rim, and what lines it (C43).
-function describeCutouts(params: Params): string[] {
-  const rim = linedRim(params.rim, tapeFit(params.seal));
-  const lining = { none: '', tape: ', lined with the foam tape', tpu: ', lined with a TPU frame' }[params.seal.kind];
-  return params.cutouts.map((c) => {
-    const opening = rimInnerMm(c, rim);
-    return (
-      `Cutout: a ${mm(c.widthMm)} × ${mm(c.heightMm)} mm appliance, in column ${c.column}, row ${c.row}, through a ` +
-      `${mm(opening.widthMm)} × ${mm(opening.heightMm)} mm opening in a ${mm(rim.depthMm)} mm rim${lining}.`
-    );
-  });
 }
 
 export function describePlan(plan: GridLayout, params: Params): PlanText {
@@ -173,8 +142,8 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     leftovers: plan.leftovers.map((note) =>
       describeLeftover(note, note.axis === 'width' ? max.widthMm : max.heightMm, params.joint),
     ),
-    ports: params.ports.map((p) => `Hose port: a ${mm(p.hoseMm)} mm hose end, in column ${p.column}, row ${p.row}.`),
-    cutouts: describeCutouts(params),
+    ports: HOSE_PORT.describe(fittingSource(params)),
+    cutouts: MEASURED_CUTOUT.describe(fittingSource(params)),
     units: EDGES.filter((e) => params.edges.roles[e] === 'unit').map(
       (e) =>
         `Window AC: the ${e} edge ${e === 'bottom' ? 'stands on the unit’s top' : e === 'top' ? 'meets the unit’s underside' : 'meets the unit’s side'}.`,
