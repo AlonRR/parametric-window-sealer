@@ -147,7 +147,10 @@ describe('settings in the library’s shape', () => {
     const fill = SETTINGS.filter((s) => s.path.startsWith('fill'));
     expect(fill.find((s) => s.path === 'fill.kind')?.values).toEqual(FILL_KINDS);
     expect(
-      fill.filter((s) => !/^fill\.(hexagon|brick|diamond)\./.test(s.path)).map((s) => [s.path, s.values ?? null]),
+      // The fill's own settings and the grid's; each other pattern's are checked in its own test.
+      fill
+        .filter((s) => !/^fill\.[a-z]+\./.test(s.path) || s.path.startsWith('fill.grid.'))
+        .map((s) => [s.path, s.values ?? null]),
     ).toEqual([
       ['fill.kind', FILL_KINDS],
       ['fill.style', ['relief', 'through']],

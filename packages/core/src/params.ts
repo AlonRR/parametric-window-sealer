@@ -27,17 +27,9 @@ import type { CutoutSetting, RimParams } from './cutout.js';
 import { DEFAULT_TAPE, NO_SEAL, TAPE_GROOVE_PLAY_MM, TAPE_GROOVE_WALL_MM, tapeFit, tapedCollar } from './tape.js';
 import type { SealKind, SealParams, TapeFit } from './tape.js';
 import { TPU_FIN_MM, gasketBaseMm } from './tpu.js';
-import {
-  DEFAULT_BRICK,
-  DEFAULT_DIAMOND,
-  DEFAULT_GRID,
-  DEFAULT_HEXAGON,
-  FILL_KINDS,
-  MIN_BAR_MM,
-  PATTERN_STYLES,
-  SEALED,
-} from './fill.js';
+import { FILL_KINDS, MIN_BAR_MM, PATTERN_STYLES, SEALED } from './fill.js';
 import type { FillKind, FillParams } from './fill.js';
+import { PATTERNS, PATTERN_FIELDS, patternSizes, sizesOf } from './patterns/index.js';
 import { formatPieceFills, parsePieceFills } from './piece-fill.js';
 import type { PieceFill } from './piece-fill.js';
 import { FormReader, SIZE_MESSAGE, SIZE_OR_ZERO_MESSAGE } from './form-reader.js';
@@ -94,7 +86,7 @@ export const EXAMPLE_PARAMS: Params = {
 
 // Every field of the page's form. The page reads and writes these by name; the settings list
 // (settings.ts), the command's flags and the MCP server's schema each have one entry per field,
-// and their tests fail when one is missing.
+// and their tests fail when one is missing. A pattern's fields come with the pattern.
 export const FIELD_NAMES = [
   'openingWidthMm',
   'openingHeightMm',
@@ -142,21 +134,13 @@ export const FIELD_NAMES = [
   'fill',
   'fillStyle',
   'reliefPct',
-  'gridOpeningMm',
-  'gridBarMm',
-  'hexOpeningMm',
-  'hexBarMm',
-  'brickWidthMm',
-  'brickHeightMm',
-  'brickBarMm',
-  'diamondWidthMm',
-  'diamondHeightMm',
-  'diamondBarMm',
   'pieceFills',
   'cutouts',
   'rimDepthMm',
   'rimWallMm',
   'rimClearanceMm',
+  // Each pattern's sizes, as the patterns declare them (patterns/).
+  ...PATTERN_FIELDS,
 ] as const;
 
 export type FieldName = (typeof FIELD_NAMES)[number];
@@ -502,22 +486,19 @@ function readCutouts(r: FormReader, fit: TapeFit | undefined): { rim: RimParams;
 // The panel fill (Q141) and each piece's own (#21). A pattern's sizes are read when the wall or
 // any piece uses it (C15), as the tape's are read only with a seal.
 
-const fillForm = (p: Params): FormValues => ({
-  fill: p.fill.kind,
-  fillStyle: p.fill.style,
-  reliefPct: String(p.fill.reliefPct),
-  gridOpeningMm: String(p.fill.grid.openingMm),
-  gridBarMm: String(p.fill.grid.barMm),
-  hexOpeningMm: String(p.fill.hexagon.openingMm),
-  hexBarMm: String(p.fill.hexagon.barMm),
-  brickWidthMm: String(p.fill.brick.widthMm),
-  brickHeightMm: String(p.fill.brick.heightMm),
-  brickBarMm: String(p.fill.brick.barMm),
-  diamondWidthMm: String(p.fill.diamond.widthMm),
-  diamondHeightMm: String(p.fill.diamond.heightMm),
-  diamondBarMm: String(p.fill.diamond.barMm),
-  pieceFills: formatPieceFills(p.pieceFills),
-});
+function fillForm(p: Params): FormValues {
+  const values: FormValues = {
+    fill: p.fill.kind,
+    fillStyle: p.fill.style,
+    reliefPct: String(p.fill.reliefPct),
+    pieceFills: formatPieceFills(p.pieceFills),
+  };
+  for (const pattern of PATTERNS) {
+    const size = sizesOf(p.fill, pattern.kind);
+    for (const s of pattern.sizes) values[s.field] = String(size(s.key));
+  }
+  return values;
+}
 
 function readFill(r: FormReader): { fill: FillParams; pieceFills: PieceFill[] } {
   const kind = r.oneOf('fill', FILL_KINDS);
@@ -526,10 +507,6 @@ function readFill(r: FormReader): { fill: FillParams; pieceFills: PieceFill[] } 
   const pieceFills = parsed.ok ? parsed.fills : [];
   const used = (pattern: FillKind) => kind === pattern || pieceFills.some((f) => f.kind === pattern);
   const patterned = FILL_KINDS.some((k) => k !== 'sealed' && used(k));
-  const size = (field: FieldName, pattern: FillKind, fallback: number) =>
-    r.numberIfUsed(field, used(pattern), fallback, positive, SIZE_MESSAGE);
-  const bar = (field: FieldName, pattern: FillKind, fallback: number) =>
-    r.numberIfUsed(field, used(pattern), fallback, barFits, BAR_MESSAGE);
   const fill: FillParams = {
     kind,
     style: r.oneOfIfUsed('fillStyle', patterned, PATTERN_STYLES, SEALED.style),
@@ -540,24 +517,11 @@ function readFill(r: FormReader): { fill: FillParams; pieceFills: PieceFill[] } 
       (n) => n > 0 && n < 100,
       'Enter a percentage greater than 0 and less than 100.',
     ),
-    grid: {
-      openingMm: size('gridOpeningMm', 'grid', DEFAULT_GRID.openingMm),
-      barMm: bar('gridBarMm', 'grid', DEFAULT_GRID.barMm),
-    },
-    hexagon: {
-      openingMm: size('hexOpeningMm', 'hexagon', DEFAULT_HEXAGON.openingMm),
-      barMm: bar('hexBarMm', 'hexagon', DEFAULT_HEXAGON.barMm),
-    },
-    brick: {
-      widthMm: size('brickWidthMm', 'brick', DEFAULT_BRICK.widthMm),
-      heightMm: size('brickHeightMm', 'brick', DEFAULT_BRICK.heightMm),
-      barMm: bar('brickBarMm', 'brick', DEFAULT_BRICK.barMm),
-    },
-    diamond: {
-      widthMm: size('diamondWidthMm', 'diamond', DEFAULT_DIAMOND.widthMm),
-      heightMm: size('diamondHeightMm', 'diamond', DEFAULT_DIAMOND.heightMm),
-      barMm: bar('diamondBarMm', 'diamond', DEFAULT_DIAMOND.barMm),
-    },
+    ...patternSizes((pattern, s) =>
+      s.bar
+        ? r.numberIfUsed(s.field, used(pattern.kind), s.start, barFits, BAR_MESSAGE)
+        : r.numberIfUsed(s.field, used(pattern.kind), s.start, positive, SIZE_MESSAGE),
+    ),
   };
   return { fill, pieceFills };
 }

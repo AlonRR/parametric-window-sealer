@@ -7,9 +7,8 @@ import type { Axis, GridLayout, Leftover } from './layout.js';
 import { linedRim, rimInnerMm } from './cutout.js';
 import { collarInnerMm } from './port.js';
 import { tapeFit, tapedCollar } from './tape.js';
-import type { FillParams } from './fill.js';
+import { fillWords } from './fill.js';
 import { fillFor } from './piece-fill.js';
-import { reliefDepthMm } from './pattern.js';
 import { pieceLimit, planParts } from './plan.js';
 import type { WallParts } from './plan.js';
 import type { Params } from './params.js';
@@ -85,22 +84,6 @@ function describeJoints(joints: JointPlan, joint: JointParams): string {
   const crosses =
     joints.crosses.length > 0 ? `, and ${plural(joints.crosses.length, 'cross piece', 'cross pieces')}` : '';
   return `Joints: ${plural(joints.strips.length, 'strip', 'strips')} in ${plural(lengths, 'length', 'lengths')}${crosses}; each joint ${mm(jointWidthMm(joint))} mm wide.`;
-}
-
-// A fill (Q141): sealed, or the pattern, its sizes and how it is cut.
-function fillWords(fill: FillParams, thicknessMm: number): string {
-  if (fill.kind === 'sealed') return 'sealed.';
-  const { grid, hexagon, brick, diamond } = fill;
-  const names: Record<Exclude<FillParams['kind'], 'sealed'>, string> = {
-    grid: `a grid of ${mm(grid.openingMm)} mm square openings and ${mm(grid.barMm)} mm bars`,
-    hexagon: `a honeycomb of hexagonal openings ${mm(hexagon.openingMm)} mm across the flats and ${mm(hexagon.barMm)} mm bars`,
-    brick: `bricks of ${mm(brick.widthMm)} × ${mm(brick.heightMm)} mm openings and ${mm(brick.barMm)} mm bars`,
-    diamond: `diamonds ${mm(diamond.widthMm)} mm wide and ${mm(diamond.heightMm)} mm tall and ${mm(diamond.barMm)} mm bars`,
-  };
-  const pattern = names[fill.kind];
-  return fill.style === 'through'
-    ? `${pattern}, cut through: air passes through the wall.`
-    : `${pattern}, cut ${mm(reliefDepthMm(thicknessMm, fill.reliefPct))} mm into the room side.`;
 }
 
 // The tape (Q119, Q127, Q129): its size, where it goes, and how much the wall takes, along each
