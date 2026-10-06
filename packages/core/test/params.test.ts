@@ -7,7 +7,9 @@
 // pieces span the opening plus each edge's reach: on the example slider 6.5 mm into each
 // of three tracks and 3.5 mm short of the sash, so 603 x 1013 mm (Q66, Q67, Q75).
 import { describe, expect, it } from 'vitest';
-import { EXAMPLE_PARAMS, describePlan, planWall, readParams, toFormValues } from '../src/params.js';
+import { EXAMPLE_PARAMS, readParams, toFormValues } from '../src/params.js';
+import { planWall } from '../src/plan.js';
+import { describePlan } from '../src/plan-text.js';
 import type { FormValues } from '../src/params.js';
 import { EXAMPLE_TRACK, WINDOW_PRESETS } from '../src/edge.js';
 import { DEFAULT_JOINT } from '../src/joint.js';
@@ -192,6 +194,17 @@ describe('readParams', () => {
     const r = read({ widthMode: 'diagonal', heightFiller: 'top' });
     expect(r.ok).toBe(false);
     if (!r.ok) expect(Object.keys(r.errors).sort()).toEqual(['heightFiller', 'widthMode']);
+  });
+
+  // The command and the MCP server list the problems in the order they are found: each section's
+  // fields as it reads them, then the checks across sections, the hose ports before the cutouts.
+  it('finds the problems in a fixed order', () => {
+    const r = read({ seal: 'tape', slideMm: '99999', trackClearanceMm: '99999' });
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(Object.keys(r.errors)).toEqual(['slideMm', 'trackWidthMm', 'webMm', 'tapeWidthMm']);
+    const lists = read({ ports: 'x', cutouts: 'x' });
+    expect(lists.ok).toBe(false);
+    if (!lists.ok) expect(Object.keys(lists.errors)).toEqual(['ports', 'cutouts']);
   });
 });
 

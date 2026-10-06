@@ -4,7 +4,8 @@
 import { describe, expect, it } from 'vitest';
 import { loadEngine } from '../src/engine.js';
 import { buildPieces, plainPanel } from '../src/panel-geometry.js';
-import { EXAMPLE_PARAMS, planWall } from '../src/params.js';
+import { EXAMPLE_PARAMS } from '../src/params.js';
+import { planWall } from '../src/plan.js';
 
 describe('plainPanel', () => {
   it('is a solid block of exactly the given size, lying flat from the origin', async () => {

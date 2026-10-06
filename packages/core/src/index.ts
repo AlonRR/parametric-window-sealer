@@ -12,6 +12,8 @@ export * from './layout.js';
 export * from './panel-geometry.js';
 export * from './pattern.js';
 export * from './params.js';
+export * from './plan.js';
+export * from './plan-text.js';
 export * from './port.js';
 export * from './printer.js';
 export * from './printers.js';

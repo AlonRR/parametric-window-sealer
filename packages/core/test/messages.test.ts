@@ -26,6 +26,9 @@ const COMPANY: FormValues[] = [
   { cutouts: '120x80' },
   { printer: 'custom', customWidthMm: '200', customHeightMm: '200' },
   { printer: 'model', printerModel: 'prusa-mk4s' },
+  // Full pieces that leave too little for a joint: the plan offers its ways out.
+  { widthMode: 'full-plus-filler', openingWidthMm: '200' },
+  { widthMode: 'full-plus-filler', openingWidthMm: '600' },
 ];
 
 function messages(): string[] {
@@ -46,16 +49,9 @@ function planLines(): string[] {
   for (const company of COMPANY) {
     const read = readParams({ ...start, ...company, bottomEdge: 'unit' });
     if (!read.ok) continue;
-    const text = describePlan(planWall(read.params), read.params);
-    for (const value of Object.values(text)) {
-      if (typeof value === 'string') lines.push(value);
-      else {
-        for (const item of value) {
-          if (typeof item === 'string') lines.push(item);
-          else lines.push(item.message, ...item.options.map((o) => o.label));
-        }
-      }
-    }
+    const { leftovers, ...rest } = describePlan(planWall(read.params), read.params);
+    for (const value of Object.values(rest)) lines.push(...(typeof value === 'string' ? [value] : value));
+    for (const l of leftovers) lines.push(l.message, ...l.options.map((o) => o.label));
   }
   return lines;
 }
@@ -70,6 +66,7 @@ describe('what the user reads names no internal question or choice', () => {
   it("in the plan's lines", () => {
     const lines = planLines();
     expect(lines.length).toBeGreaterThan(50);
+    expect(lines.some((l) => l.startsWith('Spread the pieces'))).toBe(true); // the leftovers' choices too
     expect(lines.filter((l) => INTERNAL_ID.test(l))).toEqual([]);
   });
 });

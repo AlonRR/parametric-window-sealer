@@ -12,13 +12,16 @@ import { partShapes } from './joint.js';
 import { crossSolid, stripSolid } from './joint-geometry.js';
 import type { GridLayout } from './layout.js';
 import { buildPieces } from './panel-geometry.js';
-import { describePlan, planParts, planWall, readParams, toFormValues } from './params.js';
+import { readParams, toFormValues } from './params.js';
+import { planParts, planWall } from './plan.js';
+import { describePlan } from './plan-text.js';
 import { tapeFit, tapedCollar } from './tape.js';
 import { fillPattern } from './fill.js';
 import { fillFor } from './piece-fill.js';
 import { gasketShapes, gasketSolid, sleeveShapes, sleeveSolid, tpuJoint } from './tpu.js';
 import { frameShapes, frameSolid, linedRim } from './cutout.js';
-import type { FieldErrors, Params, PlanText } from './params.js';
+import type { FieldErrors, Params } from './params.js';
+import type { PlanText } from './plan-text.js';
 
 // Every part beside the pieces, one shape with a count for identical ones (Q58): the joint
 // strips and cross pieces, in TPU if chosen (C34), the edge strips, and with the TPU seal its
