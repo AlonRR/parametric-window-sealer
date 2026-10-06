@@ -1,7 +1,7 @@
 // The settings as an input schema, in the library's own shape (Q99), built from the library's
 // SETTINGS so the server describes each one in the page's words and cannot miss one. Every
 // setting may be left out and then starts where the page starts, except the opening.
-import { FILL_KINDS, PATTERN_STYLES, SETTINGS } from 'parametric-window-sealer';
+import { FILL_KINDS, PATTERNS, PATTERN_STYLES, SETTINGS } from 'parametric-window-sealer';
 import type { ListKind } from 'parametric-window-sealer';
 import * as z from 'zod';
 
@@ -22,10 +22,8 @@ const GROUPS: Record<string, string> = {
     'The foam tape, or the TPU gaskets: its size and groove in mm, how far it is squeezed in %, where else it goes, ' +
     'and with TPU whether the joints are TPU too.',
   fill: "The panel fill: sealed, or a pattern, in relief or cut through. A pattern's settings without a kind mean that pattern.",
-  'fill.grid': "The grid's square openings and the bars between them, in mm.",
-  'fill.hexagon': "The honeycomb's hexagonal openings, across the flats, and the bars between them, in mm.",
-  'fill.brick': "The bricks' openings, width and height, and the bars between them, in mm.",
-  'fill.diamond': 'The diamonds, width and height corner to corner, and the bars between them, in mm.',
+  // Each pattern describes its own sizes (packages/core/src/patterns/).
+  ...Object.fromEntries(PATTERNS.map((p) => [`fill.${p.kind}`, p.group])),
   'edges.roles': 'What each edge meets. Setting the window type presets all four.',
   'edges.track': "The window's tracks, in mm.",
   'edges.track.depthMm': 'How deep each track is.',

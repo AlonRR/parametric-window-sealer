@@ -1,8 +1,8 @@
 // Every setting on the page as a flag (Q90), named after the page's field. What each setting
 // is, where it sits in a --params file and its choices come from the library's SETTINGS, so
 // the command and the MCP server describe them alike.
-import { SETTINGS } from 'parametric-window-sealer';
-import type { FieldName, Setting } from 'parametric-window-sealer';
+import { PATTERNS, SETTINGS } from 'parametric-window-sealer';
+import type { FieldName, PatternField, Setting } from 'parametric-window-sealer';
 
 export { settingAt } from 'parametric-window-sealer';
 
@@ -10,8 +10,11 @@ export interface SettingFlag extends Setting {
   flag: string; // without the leading dashes
 }
 
-// A Record over every field, so a field the library adds without a flag fails the type check.
-const FLAG_NAMES: Record<FieldName, string> = {
+// A Record over every field but the patterns', so a field the library adds without a flag fails
+// the type check. Each pattern declares its own flags (packages/core/src/patterns/); a pattern's
+// flag without --fill means that pattern (C11, C16, C21, C25).
+type OwnField = Exclude<FieldName, PatternField>;
+const FLAG_NAMES: Record<OwnField, string> = {
   openingWidthMm: 'width',
   openingHeightMm: 'height',
   printer: 'printer',
@@ -58,16 +61,6 @@ const FLAG_NAMES: Record<FieldName, string> = {
   fill: 'fill', // sealed or a pattern (Q141)
   fillStyle: 'fill-style',
   reliefPct: 'relief-depth',
-  gridOpeningMm: 'grid-opening', // a --grid-* flag without --fill means the grid
-  gridBarMm: 'grid-bar',
-  hexOpeningMm: 'hex-opening', // a --hex-* flag without --fill means the hexagon (C16)
-  hexBarMm: 'hex-bar',
-  brickWidthMm: 'brick-width', // a --brick-* flag without --fill means the bricks (C21)
-  brickHeightMm: 'brick-height',
-  brickBarMm: 'brick-bar',
-  diamondWidthMm: 'diamond-width', // a --diamond-* flag without --fill means the diamonds (C25)
-  diamondHeightMm: 'diamond-height',
-  diamondBarMm: 'diamond-bar',
   pieceFills: 'piece-fill', // repeatable: one --piece-fill for each piece (C28)
   cutouts: 'cutout', // repeatable, as --port (C44)
   rimDepthMm: 'rim-depth',
@@ -75,6 +68,10 @@ const FLAG_NAMES: Record<FieldName, string> = {
   rimClearanceMm: 'rim-clearance',
 };
 
-export const SETTING_FLAGS: readonly SettingFlag[] = SETTINGS.map((s) => ({ ...s, flag: FLAG_NAMES[s.field] }));
+const PATTERN_FLAGS = new Map<string, string>(PATTERNS.flatMap((p) => p.sizes.map((s) => [s.field, s.flag])));
+const isOwn = (field: FieldName): field is OwnField => !PATTERN_FLAGS.has(field);
+const flagName = (field: FieldName): string => (isOwn(field) ? FLAG_NAMES[field] : (PATTERN_FLAGS.get(field) ?? field));
 
-export const flagFor = (field: FieldName): string => `--${FLAG_NAMES[field]}`;
+export const SETTING_FLAGS: readonly SettingFlag[] = SETTINGS.map((s) => ({ ...s, flag: flagName(s.field) }));
+
+export const flagFor = (field: FieldName): string => `--${flagName(field)}`;
