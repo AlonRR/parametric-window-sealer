@@ -172,9 +172,7 @@ describe('window_sealer_plan_wall', () => {
       settings: { ...OPENING, seal: { kind: 'tape', tape: { joints: true } } },
     });
     expect(tape.isError).toBe(true);
-    expect(tape.text).toContain(
-      '- seal.tape.joints: Tape does not fit a joint (Q128): choose printed TPU for the joints.',
-    );
+    expect(tape.text).toContain('- seal.tape.joints: Tape does not fit a joint: choose printed TPU for the joints.');
   });
 
   it('measured cutouts in the library’s shape, lined with the seal, a TPU frame among the files (C43, C44)', async () => {

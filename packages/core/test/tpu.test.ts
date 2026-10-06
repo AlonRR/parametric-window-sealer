@@ -121,7 +121,7 @@ describe('the form', () => {
   it('refuses TPU joints with foam tape, which does not fit a joint (C38, Q128)', () => {
     expect(read({ seal: 'tape', tpuJoints: 'yes' })).toMatchObject({
       ok: false,
-      errors: { tpuJoints: 'Tape does not fit a joint (Q128): choose printed TPU for the joints.' },
+      errors: { tpuJoints: 'Tape does not fit a joint: choose printed TPU for the joints.' },
     });
   });
 

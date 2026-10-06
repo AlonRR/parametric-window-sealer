@@ -129,7 +129,7 @@ test('printed TPU: gaskets to the seal’s size, and its joints in TPU under Adv
   );
   await tape(page).check();
   await expect(page.getByTestId('error-tpuJoints')).toHaveText(
-    'Tape does not fit a joint (Q128): choose printed TPU for the joints.',
+    'Tape does not fit a joint: choose printed TPU for the joints.',
   );
 });
 

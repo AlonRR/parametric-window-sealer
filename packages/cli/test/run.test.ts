@@ -468,7 +468,7 @@ describe('the printed TPU seal (seal-tpu #22; C31 to C39)', () => {
   it('refuses TPU joints with foam tape, naming the flag', async () => {
     const r = await cli([...OPENING, '--seal', 'tape', '--tpu-joints', 'yes']);
     expect(r.code).toBe(2);
-    expect(r.err).toContain('--tpu-joints: Tape does not fit a joint (Q128): choose printed TPU for the joints.');
+    expect(r.err).toContain('--tpu-joints: Tape does not fit a joint: choose printed TPU for the joints.');
   });
 });
 

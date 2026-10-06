@@ -12,6 +12,12 @@ under Unreleased.
 
 ## [Unreleased]
 
+### Fixed
+
+- The message for printed TPU joints chosen with foam tape no longer shows an internal reference,
+  "(Q128)": it reads "Tape does not fit a joint: choose printed TPU for the joints." A test now
+  checks that no message or plan line names one.
+
 ## [0.3.0] - 2026-10-05
 
 ### Added

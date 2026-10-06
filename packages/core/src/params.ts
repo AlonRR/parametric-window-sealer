@@ -358,7 +358,7 @@ export function readParams(values: FormValues): ReadResult {
   const seal: SealParams = { kind: sealKind, tape };
   // Foam tape does not fit a joint (Q128): the joints in TPU are for the TPU seal (C38).
   if (sealKind === 'tape' && tape.joints) {
-    errors.tpuJoints = 'Tape does not fit a joint (Q128): choose printed TPU for the joints.';
+    errors.tpuJoints = 'Tape does not fit a joint: choose printed TPU for the joints.';
   }
   const fit = tapeFit(seal);
   const sideTape = fit !== undefined && fit.sides && Object.values(tape).every((v) => !Number.isNaN(v));
