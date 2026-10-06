@@ -181,9 +181,11 @@ None.
 
 ## Repository follow-ups
 
-- **Pending (C48, Q123):** the `v0.3.0` tag on the release commit `chore(release): v0.3.0, every
-  P1 item` and its GitHub release, asked of the session on the owner's machine once the commit is
-  on `main`; checked on GitHub afterwards.
+- **Done (C48, Q123):** the `v0.3.0` tag on the release commit `chore(release): v0.3.0, every
+  P1 item` (`d0268fd`) and its GitHub release, made by the session on the owner's machine on
+  6 Oct 2026 (verified: GitHub lists the annotated tag `v0.3.0` on `d0268fd`, signed by the
+  owner's key and marked verified, and the release "v0.3.0, every P1 item" with the CHANGELOG's
+  0.3.0 section as its notes). It is marked a pre-release, as `v0.1.0` and `v0.2.0` are (C63).
 - **Done (Q101, Q123):** the `v0.2.0` tag on the release commit `chore(release): v0.2.0, the
   API` (`983dc0f`) and its GitHub release, made by the session on the owner's machine on
   5 Oct 2026 (verified: GitHub lists the annotated tag on `983dc0f` and the release).
