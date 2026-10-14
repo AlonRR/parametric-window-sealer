@@ -91,8 +91,8 @@ const fileOf = (piece: ExportPiece, extension: Format): string =>
 export type WallPartShape = PartShape | EdgeShape | GasketShape;
 
 // Every part beside the pieces: the wall's own and the fittings', a sleeve in each hose port, a
-// frame in each cutout's rim and a clamp's jaws. A fitting with a new kind of part adds its shape here and its name
-// below; its solid stays in its own file (docs/extending.md, "A new fitting").
+// frame in each cutout's rim and a clamp's jaws. A fitting with a new kind of part adds its shape
+// here and its name below; its solid stays in its own file (docs/extending.md, "A new fitting").
 export type AnyPartShape = WallPartShape | SleeveShape | FrameShape | JawShape;
 
 // An edge strip's height depends on its track, so it is part of the name; with tape on its
