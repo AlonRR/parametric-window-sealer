@@ -18,6 +18,8 @@ const NAME = /[\p{L}_:][\p{L}\p{N}_:.\-·]*/uy;
 const SPACE = /\s*/y;
 const ENTITY = /&(#x[0-9a-fA-F]+|#[0-9]+|[A-Za-z_][-A-Za-z0-9_.]*);/g;
 const PREDEFINED: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
+// Deeper than any drawing program nests, and shallow enough for the code that walks the tree.
+const MAX_DEPTH = 500;
 
 // Character references as their characters; an entity the doctype declares is left as written.
 function decode(text: string): string {
@@ -123,6 +125,7 @@ export function parseXml(text: string): XmlElement {
       else {
         at += 1;
         open.push(element);
+        if (open.length > MAX_DEPTH) fail(`it nests elements more than ${MAX_DEPTH} deep`);
       }
     }
   }

@@ -247,6 +247,8 @@ describe('reading an SVG tile', () => {
     expect(refused('<html><body/></html>')).toBe('The file is not an SVG drawing: it has no svg element at its root.');
     expect(refused('<svg viewBox="0 0 10 10"><rect')).toMatch(/^The file is not an SVG drawing: /);
     expect(refused('')).toMatch(/^The file is not an SVG drawing: /);
+    const deep = svg(`${'<g>'.repeat(20000)}<rect width="2" height="2"/>${'</g>'.repeat(20000)}`);
+    expect(refused(deep)).toBe('The file is not an SVG drawing: it nests elements more than 500 deep.');
     expect(refused(svg('<rect width="2" height="2"/>', ''))).toBe(
       'Give the drawing a viewBox, or a width and height, so the tile has a size.',
     );

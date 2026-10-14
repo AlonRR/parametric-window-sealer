@@ -18,7 +18,7 @@ export interface Setting {
   field: FieldName; // the page's field
   path: string; // where it sits in the library's shape, as `edges.track.widthMm`
   help: string; // in the page's words
-  values?: readonly string[]; // a choice; otherwise a length in mm
+  values?: readonly string[]; // a choice; otherwise a length in mm, unless a list, on or off, or text
   list?: ListKind; // a list in the shape, written in the form as the command's --port takes it
   onOff?: true; // true or false in the shape, written yes or no in the form
   text?: true; // text in the shape and in the form, as an SVG file's
