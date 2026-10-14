@@ -167,6 +167,9 @@ Nothing has been test printed yet.
 | Q145 | Before the P2 items, the code is made **easy to extend**: "make sure its written so that later addition will be seamless to integrate". Four items, each its own pull request: a linter and a formatter in CI (`code-tooling`, #94); the settings reader and the page split so a new setting slots in, with a contributor's guide (`code-params-page`, #95); each pattern declared once (`fill-registry`, #96); the hose port and the cutout behind one fitting interface (`fitting-registry`, #97) | 6 Oct 2026 |
 | Q147 | The `checks` workflow runs **once per commit, through its pull request** (`ci-triggers`, #101): on pull requests and on pushes to `main` only, a newer push to a pull request cancelling the older run (never on `main`), and each job with a time limit. On 5–6 Oct, 106 of its 207 runs had re-checked a commit already checked; `pages.yml` is left as it is, as its runs are not billed. Asked whether to make it its own small pull request: "yes" | 14 Oct 2026 |
 | Q148 | P2 starts with two steps: **`pattern-plugins` (#26) is closed as covered by `fill-registry`** (#96), as a contributed pattern is one file and one line in `PATTERNS` (C97); then **`fan-mount`** (#28), the first new fitting, its sizes from the makers' own drawings. Asked whether to start P2 that way: "148 yes" | 14 Oct 2026 |
+| Q146 | **Code comments say their reason in plain words**; the question and choice IDs stay in these documents, the pull requests and the commit history. New code follows it; existing comments change as their code is next edited. Asked whether comments should keep citing the IDs, with that recommended: "146 yes" | 14 Oct 2026 |
+| Q150 | After the clamps, **the sliding insert** (`sliding-insert`, #38) is next: "150 sliding insert" | 14 Oct 2026 |
+| Q151 | Before going public, **the full history was reviewed for private details** and `.repo-status` and `PROJECT.yml` brought up to date: nothing private was found (see `.repo-status`). Making the repository public stays the owner's step (Q3): "151 yes" | 14 Oct 2026 |
 | Q149 | P2 goes on with **`svg-tile`** (#27), an SVG tile of the user's own as a pattern, its SVG read with a parsing library the agent chooses and logs (C98), **then `clamps`** (#32), the second new fitting. Asked whether to go ahead: "149 yes" | 14 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
@@ -182,11 +185,7 @@ The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-- **Q146.** Should the code's comments keep citing question and choice IDs (Q…, C…)? Today
-  they do, 331 times in the sources: good for tracing a line back to its decision, but a reader
-  needs `status.md` or `choices.md` open to follow the comment. Recommended: say the reason in
-  plain words in the code, and keep the IDs in these documents, the pull requests and the
-  commit history. Until answered, new code keeps today's style.
+None.
 
 ## Repository follow-ups
 

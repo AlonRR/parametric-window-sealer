@@ -3,7 +3,13 @@
 
 publish: not-yet
 reason:  meant to be public so people can run the web customizer from GitHub Pages
-review:  2026-10-05
+review:  2026-10-14
 blockers:
-  - the design is not settled and there is no model yet
-  - the full history has not been scanned for secrets before going public
+  - the owner's decision: making the repository public is his step (Q3)
+# Reviewed 14 Oct 2026 (Q151): every stored file in history (1037 blobs) and every commit
+# message (140 commits, all branches and tags) was searched for private IPs, email addresses,
+# machine paths, private host names, MAC addresses and prices. The hits are the owner's noreply
+# address, GitHub's bot address, test fixtures (example.com, home.arpa) and version numbers; no
+# private detail. CI's secrets-history job scans the history for credentials on every pull
+# request. The design and a model exist (v0.3.0); nothing is test printed yet, which the README
+# says.
