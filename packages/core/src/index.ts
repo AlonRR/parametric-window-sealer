@@ -28,4 +28,5 @@ export * from './wall.js';
 export * from './tpu.js';
 export * from './cutout.js';
 export * from './fan.js';
+export * from './clamp.js';
 export * from './measure.js';

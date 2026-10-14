@@ -8,7 +8,7 @@ import { tapeFit } from './tape.js';
 import { fillWords } from './fill.js';
 import { fillFor } from './piece-fill.js';
 import { pieceLimit, planParts } from './plan.js';
-import { FAN_MOUNT, FITTINGS, HOSE_PORT, MEASURED_CUTOUT, fittingSource } from './fittings/index.js';
+import { CLAMPS, FAN_MOUNT, FITTINGS, HOSE_PORT, MEASURED_CUTOUT, fittingSource } from './fittings/index.js';
 import type { WallParts } from './plan.js';
 import type { Params } from './params.js';
 import { listed, mm, plural, sum } from './words.js';
@@ -32,6 +32,7 @@ export interface PlanText {
   ports: string[]; // one line for each hose port
   cutouts: string[]; // one line for each measured cutout (#23)
   fans: string[]; // one line for each fan (#28)
+  clamps: string[]; // one line for each clamp (#32)
   units: string[]; // one line for each edge against a window AC (#24)
   seal: string;
   fill: string;
@@ -146,6 +147,7 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     ports: HOSE_PORT.describe(fittingSource(params)),
     cutouts: MEASURED_CUTOUT.describe(fittingSource(params)),
     fans: FAN_MOUNT.describe(fittingSource(params)),
+    clamps: CLAMPS.describe(fittingSource(params)),
     units: EDGES.filter((e) => params.edges.roles[e] === 'unit').map(
       (e) =>
         `Window AC: the ${e} edge ${e === 'bottom' ? 'stands on the unit’s top' : e === 'top' ? 'meets the unit’s underside' : 'meets the unit’s side'}.`,

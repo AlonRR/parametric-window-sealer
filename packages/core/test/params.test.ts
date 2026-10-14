@@ -17,6 +17,7 @@ import { DEFAULT_COLLAR } from '../src/port.js';
 import { NO_SEAL } from '../src/tape.js';
 import { SEALED } from '../src/fill.js';
 import { DEFAULT_RIM } from '../src/cutout.js';
+import { DEFAULT_CLAMP } from '../src/clamp.js';
 
 const example = toFormValues(EXAMPLE_PARAMS);
 const read = (over: FormValues) => readParams({ ...example, ...over });
@@ -41,6 +42,8 @@ describe('the starting values', () => {
       cutouts: [], // #23
       rim: DEFAULT_RIM, // C42
       fans: [], // #28
+      clamps: [], // #32
+      clamp: DEFAULT_CLAMP,
     });
   });
 
@@ -283,6 +286,7 @@ describe('describePlan', () => {
       ports: [],
       cutouts: [],
       fans: [], // #28
+      clamps: [], // #32
       units: [], // #24
       seal: 'Seal: none.',
       fill: 'Fill: sealed.',

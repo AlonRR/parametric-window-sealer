@@ -68,6 +68,9 @@ const FLAG_NAMES: Record<OwnField, string> = {
   rimWallMm: 'rim-wall',
   rimClearanceMm: 'rim-clearance',
   fans: 'fan', // repeatable, as --port (#28)
+  clamps: 'clamp', // repeatable, as --cutout (#32)
+  clampTravelMm: 'clamp-travel',
+  clampDepthMm: 'clamp-depth',
 };
 
 const PATTERN_FLAGS = new Map<string, string>(PATTERNS.flatMap((p) => p.sizes.map((s) => [s.field, s.flag])));

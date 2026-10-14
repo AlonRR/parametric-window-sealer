@@ -459,6 +459,48 @@ describe('fans (fan-mount #28: --fan, repeatable)', () => {
   });
 });
 
+describe('clamps (clamps #32: --clamp, repeatable)', () => {
+  const params = async (args: string[]) => {
+    const r = await cli([...args, '--dry-run', '--json']);
+    return json(r.out).params as typeof EXAMPLE_PARAMS;
+  };
+
+  it('--clamp 120x80 puts one in the bottom row’s middle piece, says so, and lists its jaws', async () => {
+    const r = await cli([...OPENING, '--clamp', '120x80', '--dry-run']);
+    expect(r.code).toBe(0);
+    expect(r.out).toContain(
+      'Clamp: a 120 × 80 mm appliance, in column 2, row 1, through a 130 × 90 mm opening; four jaws grip anything ' +
+        'from 110 × 70 to 130 × 90 mm, each on two M4 bolts at least 12 mm long, with nuts and washers.',
+    );
+    expect(r.out).toContain('  piece-c2-r1-197.7x198.6-clamp-120x80.stl');
+    expect(r.out).toContain('  jaw-138x21.3x15-print-2.stl');
+    expect(r.out).toContain('  jaw-69x21.3x15-print-2.stl');
+  });
+
+  it('--clamp 90x60@3,1 names the piece; given again, it adds one; the jaws have flags too', async () => {
+    const p = await params([...OPENING, '--clamp', '90x60@3,1', '--clamp', '120x80', '--clamp-travel', '8']);
+    expect(p.clamps).toEqual([
+      { widthMm: 90, heightMm: 60, column: 3, row: 1 },
+      { widthMm: 120, heightMm: 80, column: 2, row: 1 },
+    ]);
+    expect(p.clamp).toEqual({ travelMm: 8, depthMm: 15 });
+  });
+
+  it('refuses a clamp in a port’s piece, or one it cannot read', async () => {
+    const both = await cli([...OPENING, '--port', '150', '--clamp', '120x80']);
+    expect(both.code).toBe(2);
+    expect(both.err).toContain('--clamp: Clamp 1 and port 1 are both in column 2, row 1; give each its own piece.');
+    const bad = await cli([...OPENING, '--clamp', '120']);
+    expect(bad.err).toContain('--clamp: Clamp 1: write each as the appliance’s measured width x height in mm');
+  });
+
+  it('--help shows the form and that it repeats', async () => {
+    const r = await cli(['--help']);
+    expect(r.out.replace(/\s+/g, ' ')).toContain('--clamp <width>x<height>[@column,row]');
+    expect(r.out.replace(/\s+/g, ' ')).toContain('Give --clamp again for each clamp.');
+  });
+});
+
 describe('an SVG tile (svg-tile #27: --svg-tile <file>)', () => {
   const SQUARES =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">' +

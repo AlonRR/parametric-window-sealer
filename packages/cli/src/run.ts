@@ -87,8 +87,15 @@ function help(): string {
       pieceFills: '<column,row=fill[:style]>',
       cutouts: '<width>x<height>[@column,row]',
       fans: '<mm[@column,row]>',
+      clamps: '<width>x<height>[@column,row]',
     };
-    const each: Record<ListKind, string> = { ports: 'port', pieceFills: 'piece', cutouts: 'cutout', fans: 'fan' };
+    const each: Record<ListKind, string> = {
+      ports: 'port',
+      pieceFills: 'piece',
+      cutouts: 'cutout',
+      fans: 'fan',
+      clamps: 'clamp',
+    };
     const value = f.list
       ? lists[f.list]
       : f.text

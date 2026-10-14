@@ -1,10 +1,11 @@
 // A fitting: something in one piece that passes through the wall (fitting-registry, #97). The hose
-// port (#12) and the measured cutout (#23) are fittings; a fan mount, clamps or the cut round an
-// imported appliance would be more. Each kind is declared once (fittings/index.ts lists them),
+// port (#12), the measured cutout (#23), the fan mount (#28) and the clamps (#32) are fittings;
+// a sliding insert or the cut round an imported appliance would be more. Each kind is declared once (fittings/index.ts lists them),
 // with what the wall needs from it: each one in its piece, the piece's shape with it, the zone a
 // pattern keeps clear, its tag in the piece's file name, its seal for the preview, the parts
 // printed for it, and its lines and share of the seal in the plan.
 import type { Manifold } from 'manifold-3d';
+import type { ClampParams, ClampSetting } from '../clamp.js';
 import type { CutoutSetting, Rectangle, RimParams } from '../cutout.js';
 import type { Engine } from '../engine.js';
 import type { FanSetting } from '../fan.js';
@@ -26,8 +27,11 @@ export interface FittingSource {
   ports: readonly Required<PortSetting>[];
   cutouts: readonly Required<CutoutSetting>[];
   fans: readonly Required<FanSetting>[];
+  clamps: readonly Required<ClampSetting>[];
   collar: CollarParams;
   rim: RimParams;
+  clamp: ClampParams;
+  thicknessMm: number; // the panel's
   tape: TapeFit | undefined; // the seal, if any: foam tape or printed TPU
   sealKind: SealParams['kind'];
 }
@@ -62,7 +66,9 @@ export interface FittingLining {
 export interface FittingDefinition {
   kind: string;
   placed(source: FittingSource): PlacedFitting[]; // every one, in its piece
-  parts(source: FittingSource, tpu: TapeFit): FittingPart[]; // printed beside the pieces with the TPU seal
+  // Printed beside the pieces: with the TPU seal (tpu given), its seal's parts; and any it always
+  // needs, as the clamps' jaws.
+  parts(source: FittingSource, tpu: TapeFit | undefined): FittingPart[];
   lining(source: FittingSource): FittingLining | undefined; // with a seal, if this kind takes any
   describe(source: FittingSource): string[]; // its line in the plan, one for each
 }

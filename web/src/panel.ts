@@ -10,7 +10,7 @@ import { EXAMPLE_PARAMS, describePlan, planWall, readParams, toFormValues } from
 import type { FieldErrors, Params } from 'parametric-window-sealer';
 import { readForm, setValue, showErrors, valueOf, writeForm } from './form-fields';
 import type { FormPart } from './form-part';
-import { exhaustFan, hosePorts, measuredCutout } from './fittings';
+import { clamps, exhaustFan, hosePorts, measuredCutout } from './fittings';
 import { mountPatternControls } from './pattern-controls';
 import { pieceMap } from './piece-map';
 import { showPlan } from './plan-view';
@@ -55,6 +55,7 @@ export function mountPanel(
     hosePorts(form, update),
     measuredCutout(form),
     exhaustFan(form),
+    clamps(form),
     svgTile(form, update),
   ].filter((p): p is FormPart => p !== null);
   const pieces = pieceMap(form, update);

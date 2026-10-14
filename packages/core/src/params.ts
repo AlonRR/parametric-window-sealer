@@ -36,9 +36,11 @@ import { formatPieceFills, parsePieceFills } from './piece-fill.js';
 import type { PieceFill } from './piece-fill.js';
 import { FormReader, SIZE_MESSAGE, SIZE_OR_ZERO_MESSAGE } from './form-reader.js';
 import { planWall } from './plan.js';
-import { cutoutProblem, fanProblem, placeFittings, portProblem } from './fittings/index.js';
+import { clampProblem, cutoutProblem, fanProblem, placeFittings, portProblem } from './fittings/index.js';
 import { formatFans, parseFans } from './fan.js';
 import type { FanSetting } from './fan.js';
+import { DEFAULT_CLAMP, formatClamps, parseClamps } from './clamp.js';
+import type { ClampParams, ClampSetting } from './clamp.js';
 import type { InPiece } from './fittings/index.js';
 import { hundredth, mm } from './words.js';
 
@@ -66,6 +68,8 @@ export interface Params {
   cutouts: Required<CutoutSetting>[]; // measured cutouts (#23); none to start with
   rim: RimParams; // round each cutout (C42)
   fans: Required<FanSetting>[]; // fans from the list (#28); none to start with
+  clamps: Required<ClampSetting>[]; // appliances held by clamps (#32); none to start with
+  clamp: ClampParams; // their jaws
 }
 
 // The page starts here: an example opening (Q42, labelled as an example, Q18), the default
@@ -90,6 +94,8 @@ export const EXAMPLE_PARAMS: Params = {
   cutouts: [],
   rim: DEFAULT_RIM,
   fans: [],
+  clamps: [],
+  clamp: DEFAULT_CLAMP,
 };
 
 // Every field of the page's form. The page reads and writes these by name; the settings list
@@ -149,6 +155,9 @@ export const FIELD_NAMES = [
   'rimWallMm',
   'rimClearanceMm',
   'fans',
+  'clamps',
+  'clampTravelMm',
+  'clampDepthMm',
   // Each pattern's sizes, as the patterns declare them (patterns/).
   ...PATTERN_FIELDS,
 ] as const;
@@ -503,6 +512,22 @@ function readFans(r: FormReader): FanSetting[] {
   return parsed.ok ? parsed.fans : [];
 }
 
+// The clamps (clamps, #32): appliances measured roughly, placed after the fans, and their jaws'
+// travel and depth, read whether or not there are any, as the rim's are.
+
+const clampsForm = (p: Params): FormValues => ({
+  clamps: formatClamps(p.clamps),
+  clampTravelMm: String(p.clamp.travelMm),
+  clampDepthMm: String(p.clamp.depthMm),
+});
+
+function readClamps(r: FormReader): { clamp: ClampParams; given: ClampSetting[] } {
+  const clamp: ClampParams = { travelMm: r.size('clampTravelMm'), depthMm: r.size('clampDepthMm') };
+  const parsed = parseClamps(r.values.clamps ?? '');
+  if (!parsed.ok) r.fail('clamps', parsed.message);
+  return { clamp, given: parsed.ok ? parsed.clamps : [] };
+}
+
 // The panel fill (Q141) and each piece's own (#21). A pattern's sizes are read when the wall or
 // any piece uses it (C15), as the tape's are read only with a seal.
 
@@ -564,6 +589,7 @@ export function toFormValues(p: Params): FormValues {
     ...fillForm(p),
     ...cutoutsForm(p),
     ...fansForm(p),
+    ...clampsForm(p),
   };
 }
 
@@ -582,6 +608,7 @@ export function readParams(values: FormValues): ReadResult {
   const { collar, given: givenPorts } = readPorts(r, fit);
   const { rim, given: givenCutouts } = readCutouts(r, fit);
   const givenFans = readFans(r);
+  const { clamp, given: givenClamps } = readClamps(r);
   if (r.ok) {
     // The edge strips must leave the pieces something to cover.
     const span = panelSpan(opening.openingWidthMm, opening.openingHeightMm, edges, joint, fit);
@@ -590,10 +617,11 @@ export function readParams(values: FormValues): ReadResult {
   }
   const { fill, pieceFills } = readFill(r);
 
-  // What is placed in pieces, once everything else is sound: the ports, the cutouts and the fans,
-  // then each piece's own fill, each against the plan the ones before it allow.
+  // What is placed in pieces, once everything else is sound: the ports, the cutouts, the fans and
+  // the clamps, then each piece's own fill, each against the plan the ones before it allow.
   const base = { ...opening, printer, bedMarginMm, width, height, thicknessMm, joint, edges, collar, seal, fill };
-  const plan = r.ok ? planWall({ ...base, ports: [], pieceFills: [], cutouts: [], rim, fans: [] }) : undefined;
+  const none = { ports: [], pieceFills: [], cutouts: [], rim, fans: [], clamps: [], clamp };
+  const plan = r.ok ? planWall({ ...base, ...none }) : undefined;
   let ports: Required<PortSetting>[] = [];
   if (plan !== undefined && givenPorts.length > 0) {
     const check = (port: PortSetting & InPiece) => portProblem(plan, port, collar, fit, joint);
@@ -620,13 +648,26 @@ export function readParams(values: FormValues): ReadResult {
     if (placing.ok) fans = placing.placed;
     else r.fail('fans', placing.problem);
   }
+  let clamps: Required<ClampSetting>[] = [];
+  if (r.ok && plan !== undefined && givenClamps.length > 0) {
+    const check = (c: ClampSetting & InPiece) => clampProblem(plan, c, clamp, joint);
+    const earlier = [
+      { label: 'Port', placed: ports },
+      { label: 'Cutout', placed: cutouts },
+      { label: 'Fan', placed: fans },
+    ];
+    const placing = placeFittings(plan, { label: 'Clamp', plural: 'Clamps', given: givenClamps, check }, earlier);
+    if (placing.ok) clamps = placing.placed;
+    else r.fail('clamps', placing.problem);
+  }
   if (r.ok && pieceFills.length > 0) {
-    const problem = checkPieceFills(planWall({ ...base, ports, pieceFills: [], cutouts, rim, fans }), pieceFills);
+    const fitted = { ports, pieceFills: [], cutouts, rim, fans, clamps, clamp };
+    const problem = checkPieceFills(planWall({ ...base, ...fitted }), pieceFills);
     if (problem !== undefined) r.fail('pieceFills', problem);
   }
 
   if (!r.ok) return { ok: false, errors: r.errors };
-  return { ok: true, params: { ...base, ports, pieceFills, cutouts, rim, fans } };
+  return { ok: true, params: { ...base, ports, pieceFills, cutouts, rim, fans, clamps, clamp } };
 }
 
 // A piece the wall has, and one fill for each piece.

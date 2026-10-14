@@ -126,7 +126,7 @@ export const HOSE_PORT: FittingDefinition = {
   },
   // A TPU sleeve for each size of hose, with the TPU seal (C33).
   parts: ({ ports, collar }, tpu) =>
-    sleeveShapes(ports, tapedCollar(collar, tpu), tpu).map((shape) => ({
+    (tpu === undefined ? [] : sleeveShapes(ports, tapedCollar(collar, tpu), tpu)).map((shape) => ({
       shape,
       name: partName(shape),
       solid: (engine) => sleeveSolid(engine, shape),

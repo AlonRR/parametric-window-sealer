@@ -368,6 +368,11 @@
           <label>
             <input type="radio" name="appliance" value="cutout" /> Something else: a measured cutout
           </label>
+          <!-- Clamps (clamps, #32): an appliance measured roughly, gripped by four printed jaws on
+            bolts; one on the page, as the cutout (C45); the command and the MCP server take several. -->
+          <label>
+            <input type="radio" name="appliance" value="clamp" /> Something else, held by clamps
+          </label>
           <!-- A window AC (window-ac, #24): the edge facing the unit meets it (C49, C50). -->
           <label><input type="radio" name="appliance" value="ac" /> Window air conditioner</label>
           <div data-testid="ac" data-show-when="appliance=ac" hidden>
@@ -468,6 +473,35 @@
             </p>
           </div>
           <span class="error" data-testid="error-fans"></span>
+          <div data-testid="clamp" data-show-when="appliance=clamp" hidden>
+            <label>
+              Appliance width (mm)
+              <input data-part="clamp-width" inputmode="decimal" autocomplete="off" />
+            </label>
+            <label>
+              Appliance height (mm)
+              <input data-part="clamp-height" inputmode="decimal" autocomplete="off" />
+            </label>
+            <p class="note">
+              Measure the outside of what passes through the wall, across and up, seen from the
+              room; a few mm out is fine. Four printed jaws slide in on bolts to grip it, give or
+              take their travel (10 mm to start with, under Advanced). You need eight M4 bolts with
+              nuts and washers.
+            </p>
+            <label>
+              Column
+              <input data-part="column" inputmode="numeric" autocomplete="off" />
+            </label>
+            <label>
+              Row
+              <input data-part="row" inputmode="numeric" autocomplete="off" />
+            </label>
+            <p class="note">
+              The piece the clamp is centred in, counted from 1 at the bottom left, seen from the
+              room. It starts in the bottom row's middle piece.
+            </p>
+          </div>
+          <span class="error" data-testid="error-clamps"></span>
         </fieldset>
 
         <!-- The seal (seal-tape, #15): a choice starting at none (Q122), and foam tape from the
@@ -742,6 +776,29 @@
         </details>
 
         <details>
+          <summary>Advanced: the clamps</summary>
+          <p class="note">
+            The jaws that grip an appliance held by clamps. These are starting values: a test print
+            shows whether to change them.
+          </p>
+          <label>
+            Jaw travel (mm)
+            <input name="clampTravelMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">
+            How far each jaw slides: the clamp grips the measured size give or take this much, each
+            way. The opening is half of it larger each side.
+          </p>
+          <span class="error" data-testid="error-clampTravelMm"></span>
+          <label>
+            Jaw depth (mm)
+            <input name="clampDepthMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">How far each jaw's lip stands out on the room side, along the appliance.</p>
+          <span class="error" data-testid="error-clampDepthMm"></span>
+        </details>
+
+        <details>
           <summary>Advanced: the pattern</summary>
           <p class="note">Used when the fill is a pattern. It stays 2 mm further in than the strips reach.</p>
           <label>
@@ -831,6 +888,7 @@
         <input type="hidden" name="ports" />
         <input type="hidden" name="cutouts" />
         <input type="hidden" name="fans" />
+        <input type="hidden" name="clamps" />
         <!-- Every piece's own fill, written as the command's --piece-fill takes them (C28). -->
         <input type="hidden" name="pieceFills" />
       </form>
@@ -849,6 +907,7 @@
         <ul data-testid="plan-ports" data-plan="ports"></ul>
         <ul data-testid="plan-cutouts" data-plan="cutouts"></ul>
         <ul data-testid="plan-fans" data-plan="fans"></ul>
+        <ul data-testid="plan-clamps" data-plan="clamps"></ul>
         <ul data-testid="plan-units" data-plan="units"></ul>
         <p data-testid="plan-seal" data-plan="seal"></p>
         <p data-testid="plan-fill" data-plan="fill"></p>

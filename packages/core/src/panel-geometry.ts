@@ -11,6 +11,7 @@ import type { GridLayout } from './layout.js';
 import { DEFAULT_COLLAR } from './port.js';
 import type { CollarParams, PortSetting } from './port.js';
 import { DEFAULT_RIM } from './cutout.js';
+import { DEFAULT_CLAMP } from './clamp.js';
 import type { CutoutSetting, Rectangle, RimParams } from './cutout.js';
 import type { TapeFit } from './tape.js';
 import { patternedPanel, pieceOpenings } from './pattern.js';
@@ -101,8 +102,11 @@ export function buildPieces(
     ports: ports.filter(inAPiece),
     cutouts: cutouts.filter(inAPiece),
     fans: [],
+    clamps: [],
     collar,
     rim,
+    clamp: DEFAULT_CLAMP,
+    thicknessMm,
     tape,
     sealKind,
   } as const;

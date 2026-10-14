@@ -129,7 +129,7 @@ export const MEASURED_CUTOUT: FittingDefinition = {
   },
   // A TPU frame for each size of cutout, with the TPU seal (C43).
   parts: ({ cutouts, rim }, tpu) =>
-    frameShapes(cutouts, linedRim(rim, tpu), tpu).map((shape) => ({
+    (tpu === undefined ? [] : frameShapes(cutouts, linedRim(rim, tpu), tpu)).map((shape) => ({
       shape,
       name: partName(shape),
       solid: (engine) => frameSolid(engine, shape),

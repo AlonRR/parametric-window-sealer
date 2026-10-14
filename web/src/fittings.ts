@@ -1,7 +1,8 @@
-// What passes through the wall, on the page: the hose ports (hose-port, #12) and the measured
-// cutout (measured-cutout, #23). Their controls are not fields of their own: they are written
-// into the hidden ports and cutouts fields as the command's --port and --cutout take them (Q114,
-// C44), so the library checks them all. Each box shows only for its answer to "What is in the
+// What passes through the wall, on the page: the hose ports (hose-port, #12), the measured
+// cutout (measured-cutout, #23), the fan (fan-mount, #28) and the clamps (clamps, #32). Their
+// controls are not fields of their own: they are written into the hidden ports, cutouts, fans and
+// clamps fields as the command's --port, --cutout, --fan and --clamp take them (Q114, C44), so the
+// library checks them all. Each box shows only for its answer to "What is in the
 // window?" (data-show-when in the page).
 import { FANS } from 'parametric-window-sealer';
 import type { FieldErrors } from 'parametric-window-sealer';
@@ -140,6 +141,35 @@ export function measuredCutout(form: HTMLFormElement): FormPart | null {
     },
     placed(params) {
       showPlacedPiece(box, params.cutouts[0]);
+    },
+  };
+}
+
+// Clamps (clamps, #32): one on the page, as the cutout (C45), written as the command's --clamp
+// takes it; the appliance measured roughly, its piece as the port's (Q105).
+export function clamps(form: HTMLFormElement): FormPart | null {
+  const box = form.querySelector<HTMLElement>('[data-testid="clamp"]');
+  if (!box) return null;
+  const text = (): { text: string; problem?: string } => {
+    if (valueOf(form, 'appliance') !== 'clamp') return { text: '' };
+    const [width, height] = [read(box, 'clamp-width'), read(box, 'clamp-height')];
+    const [column, row] = [read(box, 'column'), read(box, 'row')];
+    const problem =
+      width === '' || height === ''
+        ? 'Clamp: enter the appliance’s width and height in mm.'
+        : pieceProblem(column, row, 'Clamp');
+    if (problem !== undefined) return { text: '@', problem };
+    const size = `${width}x${height}`;
+    return { text: column === '' ? size : `${size}@${column},${row}` };
+  };
+  return {
+    sync(): FieldErrors {
+      const given = text();
+      setValue(form, 'clamps', given.text);
+      return given.problem === undefined ? {} : { clamps: given.problem };
+    },
+    placed(params) {
+      showPlacedPiece(box, params.clamps[0]);
     },
   };
 }

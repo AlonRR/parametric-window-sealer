@@ -26,8 +26,9 @@ import type { PlanText } from './plan-text.js';
 
 // Every part beside the pieces, one shape with a count for identical ones (Q58), with its name
 // and its solid lying as it prints (Q53): the joint strips and cross pieces, in TPU if chosen
-// (C34), the edge strips, and with the TPU seal its gaskets and each fitting's parts: the
-// sleeves for the hose ports (#22) and the frames for the cutouts (#23; C43).
+// (C34), the edge strips, with the TPU seal its gaskets, and each fitting's parts: with the TPU
+// seal the sleeves for the hose ports (#22) and the frames for the cutouts (#23; C43), and
+// always the clamps' jaws (#32).
 function wallParts(params: Params, plan: GridLayout): FittingPart[] {
   const { joints, edges } = planParts(params, plan);
   const { joint, thicknessMm } = params;
@@ -60,7 +61,7 @@ function wallParts(params: Params, plan: GridLayout): FittingPart[] {
   const source = fittingSource(params);
   return [
     ...own.map((shape) => ({ shape, name: partName(shape), solid: (engine: Engine) => solidOf(engine, shape) })),
-    ...(tpu === undefined ? [] : FITTINGS.flatMap((f) => f.parts(source, tpu))),
+    ...FITTINGS.flatMap((f) => f.parts(source, tpu)),
   ];
 }
 

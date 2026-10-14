@@ -10,14 +10,16 @@ import type { FittingDefinition, FittingSource, PlacedFitting } from './define.j
 import { HOSE_PORT } from './hose-port.js';
 import { MEASURED_CUTOUT } from './measured-cutout.js';
 import { FAN_MOUNT } from './fan-mount.js';
+import { CLAMPS } from './clamps.js';
 
 export * from './define.js';
 export * from './place.js';
 export * from './hose-port.js';
 export * from './measured-cutout.js';
 export * from './fan-mount.js';
+export * from './clamps.js';
 
-export const FITTINGS: readonly FittingDefinition[] = [HOSE_PORT, MEASURED_CUTOUT, FAN_MOUNT];
+export const FITTINGS: readonly FittingDefinition[] = [HOSE_PORT, MEASURED_CUTOUT, FAN_MOUNT, CLAMPS];
 
 // The fittings' source in a wall's parameters.
 export const fittingSource = (
@@ -26,8 +28,11 @@ export const fittingSource = (
   ports: params.ports,
   cutouts: params.cutouts,
   fans: params.fans,
+  clamps: params.clamps,
   collar: params.collar,
   rim: params.rim,
+  clamp: params.clamp,
+  thicknessMm: params.thicknessMm,
   tape: tapeFit(params.seal),
   sealKind: params.seal.kind,
 });

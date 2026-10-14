@@ -211,6 +211,23 @@ describe('window_sealer_plan_wall', () => {
     expect(unlisted.text).toContain('100 mm is not a listed fan size; the sizes are 80, 92, 120 and 140 mm.');
   });
 
+  it('clamps in the library’s shape, with their line and their jaws among the files (#32)', async () => {
+    const { call } = await connect();
+    const r = await call('window_sealer_plan_wall', {
+      settings: { ...OPENING, clamps: [{ widthMm: 120, heightMm: 80 }], clamp: { travelMm: 8 } },
+    });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['settings'].clamps).toEqual([{ widthMm: 120, heightMm: 80, column: 2, row: 1 }]);
+    expect(r.data['settings'].clamp).toEqual({ travelMm: 8, depthMm: 15 });
+    expect(r.data['summary'].clamps).toEqual([
+      'Clamp: a 120 × 80 mm appliance, in column 2, row 1, through a 128 × 88 mm opening; four jaws grip anything ' +
+        'from 112 × 72 to 128 × 88 mm, each on two M4 bolts at least 12 mm long, with nuts and washers.',
+    ]);
+    const names = (r.data['files'] as { name: string }[]).map((f) => f.name);
+    expect(names).toContain('piece-c2-r1-197.7x198.6-clamp-120x80.stl');
+    expect(names.filter((n) => n.startsWith('jaw-'))).toHaveLength(2);
+  });
+
   it('a window AC as an edge role, and the summary’s line for it (C49, C52)', async () => {
     const { call } = await connect();
     const r = await call('window_sealer_plan_wall', {
