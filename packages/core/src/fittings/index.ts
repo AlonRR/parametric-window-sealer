@@ -1,7 +1,9 @@
-// Every kind of fitting (fitting-registry, #97), in the order they are placed and listed: a kind
-// placed later may not share a piece with one placed before. A new kind is a file beside these,
-// its FittingDefinition here, its fittings and settings in FittingSource, its placement when the
-// settings are read, and its key in the plan (docs/extending.md, "A new fitting").
+// Every kind of fitting (fitting-registry, #97), in the order they are listed: their parts, their
+// shares of the seal, their seals in the preview. Keep it the order readParams places them in,
+// where a kind placed later may not share a piece with one placed before. A new kind is a file
+// beside these, its FittingDefinition here, its fittings and settings in FittingSource, its
+// placement when the settings are read, and its key in the plan (docs/extending.md, "A new
+// fitting").
 import { tapeFit } from '../tape.js';
 import type { SealParams } from '../tape.js';
 import type { FittingDefinition, FittingSource, PlacedFitting } from './define.js';

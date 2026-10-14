@@ -1,6 +1,6 @@
 # Extending the window sealer
 
-For contributors: where a new setting, pattern, plan line or part of the page goes, and which
+For contributors: where a new setting, pattern, fitting, plan line or part of the page goes, and which
 test fails if a step is missed. The library (`packages/core`) holds every rule and every shape; the
 command (`packages/cli`), the MCP server (`packages/mcp`) and the page (`web/`) only move values
 to and from it, so most additions start in the library and reach the other three with little or
@@ -79,6 +79,49 @@ fields and flags, its settings, its starting tile, its reading, checking and wor
 `web/e2e/page-wiring.spec.ts` finds its controls on the running page; give the pattern a test file
 of its own for its tile's shape, as `grid.test.ts` has.
 
+## A new fitting
+
+A fitting is something in one piece that the appliance or its hose passes through: the hose
+port and the measured cutout today, a fan mount, clamps or a sliding insert later. Each kind is
+one file in `packages/core/src/fittings/` and one entry in `FITTINGS` (`fittings/index.ts`),
+whose order is the order the kinds are listed in: keep it the order they are placed in (step 2
+below). Write its `FittingDefinition`
+(`fittings/define.ts`), as `hose-port.ts` does:
+
+- `kind`, its name; each fitting's tag in its piece's file name starts with it (`-port-150`);
+- `placed(source)`: each fitting in its piece, with the piece's `solid` (start from `plainPanel`
+  and cut into it), the `keepOut` zone a pattern stays clear of, its `tag`, and its `lining`, the
+  seal drawn in the preview, if it has one. Leave `marks` empty: the hose port's and the cutout's
+  fields there are kept for the library's earlier callers;
+- `parts(source, tpu)`: what is printed beside the pieces for it with the TPU seal, each part
+  with its name and its solid;
+- `lining(source)`: its share of the seal in the plan, the tape it takes and where;
+- `describe(source)`: its lines in the plan, one for each fitting, naming its piece.
+
+Then:
+
+1. **Its fittings and their settings** go in `FittingSource` and in `fittingSource` (both in
+   `fittings/`), from the library's shape.
+2. **Its setting** is a setting like any other (above). Place its fittings in `readParams`
+   (`params.ts`) with `placeFittings`, after the kinds already there: its `label` and `plural`
+   for the messages ("Port 1", "Ports 1 and 2"), its `check` of a fitting in its piece, and the
+   kinds placed before it, so that two fittings never share a piece. A fitting given without a
+   piece goes in the starting one.
+3. **Its lines in the plan** need their key in `PlanText`, set from its `describe`, and their
+   place on the page (above).
+4. **A new kind of part**, if it prints one the wall does not have yet: its shape joins
+   `AnyPartShape` and its name `partName`, both in `export.ts`; its solid stays in its file.
+5. **On the page**, a control for several fittings is a form part (below), as
+   `web/src/fittings.ts` is for the ports and the cutouts.
+
+Nothing else changes: the pieces (`buildPiecesWith`), the pattern's keep-out, the files and their
+names, the dry run, the seal's line in the plan and the preview take every kind from `FITTINGS`.
+`packages/core/test/fittings.test.ts` holds every listed kind to the same rules (placed and
+tagged by its kind, through its piece and inside it, a seal in the preview exactly when the plan
+gives it one, one plan line for each, its parts named as the download names them) and builds a
+kind declared in the test alone; give the new kind a test file of its own for its shape, as
+`port.test.ts` and `cutout.test.ts` have.
+
 ## A part of the page that shows for some answers
 
 Say it in the HTML: `data-show-when="field=value"` shows an element only while the named
@@ -100,6 +143,6 @@ and add it to the list in `web/src/panel.ts`.
 
 Not yet a seam (C65 in [`choices.md`](choices.md)): one joint exists, the H strip, and the
 three planned (`joint-dovetail`, `joint-rails`, `joint-bolts`) change the layout itself. The
-joint reaches the layout through `jointWidthMm` and `minPieceMm` (`joint.ts`), the pieces'
-edges through `buildPieces` (`panel-geometry.ts`), and the parts list through `partShapes`;
+joint reaches the layout through `jointWidthMm` and `minPieceMm` (`joint.ts`), the
+pieces through `buildPiecesWith` (`panel-geometry.ts`), and the parts list through `partShapes`;
 the second joint should turn those into one interface with the H strip as its first kind.

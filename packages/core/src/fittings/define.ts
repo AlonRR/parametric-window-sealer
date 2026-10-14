@@ -34,7 +34,9 @@ export interface FittingSource {
 export interface PlacedFitting extends InPiece {
   kind: string;
   tag: string; // in the piece's file name: "-port-150"
-  marks: { hoseMm?: number; cutout?: Rectangle }; // what a built piece says of its fitting
+  // The port's and the cutout's own fields on a built piece, kept for the library's earlier
+  // callers; a new kind leaves it empty, and its piece is known by its tag.
+  marks: { hoseMm?: number; cutout?: Rectangle };
   solid(engine: Engine, size: PanelSize): Manifold; // the piece with the fitting
   keepOut(size: PanelSize, borderMm: number): KeepOut; // clear of a pattern, in the piece's frame
   lining(engine: Engine, size: PanelSize): Manifold | undefined; // its seal, for the preview only
