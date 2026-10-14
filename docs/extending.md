@@ -68,8 +68,13 @@ A pattern for the panel fill is one file in `packages/core/src/patterns/` and on
 - `sizes`: for each, its `key` in the library's shape (`fill.<kind>.<key>`), the page's `field`,
   the command's `flag`, the page's `label` and `note`, the settings' `help`, its `start`, and
   `bar: true` for the solid between openings, which must be at least 0.8 mm;
-- `tile(size)`, the cell repeated across the wall, and `describe(size)`, its words in the plan,
-  each reading its sizes by name: `size('openingMm')`.
+- `tile(size, drawing)`, the cell repeated across the wall, and `describe(size, drawing)`, its
+  words in the plan, each reading its sizes by name: `size('openingMm')`. The drawing is the SVG
+  tile's (`fill.drawing`, the text of an SVG file); a pattern drawn in code leaves it. The tile's
+  openings are counter-clockwise outlines, with any holes in them clockwise.
+
+A pattern given as data rather than code is the SVG tile (`patterns/svg.ts`), whose drawing is
+read by `svg/drawing.ts`; [`svg-tiles.md`](svg-tiles.md) says what it reads.
 
 Nothing else changes. The settings list, the command's flags and help, the MCP server's schema,
 the page's fill list, its sizes under Advanced, the piece-by-piece list and the plan all take the

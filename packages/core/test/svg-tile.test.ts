@@ -202,6 +202,35 @@ describe('reading an SVG tile', () => {
     expect(read(text).rings).toHaveLength(1);
   });
 
+  it('reads drawings as Inkscape, Illustrator and Figma write them', () => {
+    const inkscape =
+      '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n<!-- Created with Inkscape (http://www.inkscape.org/) -->\n' +
+      '<svg width="20mm" height="20mm" viewBox="0 0 20 20" version="1.1" id="svg1" sodipodi:docname="tile.svg" ' +
+      'xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" ' +
+      'xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg">\n' +
+      '  <sodipodi:namedview id="namedview1" pagecolor="#ffffff" inkscape:document-units="mm" />\n' +
+      '  <defs id="defs1" />\n' +
+      '  <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1" transform="translate(-1,-1)">\n' +
+      '    <circle style="fill:#000000;stroke:none;stroke-width:0.264583" id="path1" cx="11" cy="11" r="7" />\n' +
+      '  </g>\n</svg>\n';
+    const illustrator =
+      '<?xml version="1.0" encoding="utf-8"?>\n' +
+      '<!-- Generator: Adobe Illustrator 27.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->\n' +
+      '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" ' +
+      'x="0px" y="0px"\n\t viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;" xml:space="preserve">\n' +
+      '<style type="text/css">\n\t.st0{fill:none;stroke:#000000;stroke-miterlimit:10;}\n</style>\n' +
+      '<rect x="2" y="2" class="st0" width="16" height="16"/>\n<circle cx="10" cy="10" r="7"/>\n</svg>\n';
+    const figma =
+      '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">\n' +
+      '<rect x="0.5" y="0.5" width="19" height="19" stroke="black"/>\n<circle cx="10" cy="10" r="7" fill="#D9D9D9"/>\n</svg>\n';
+    for (const text of [inkscape, illustrator, figma]) {
+      const d = read(text);
+      expect([d.widthUnits, d.heightUnits]).toEqual([20, 20]);
+      expect(d.rings).toHaveLength(1); // the circle; a stroked square is no opening
+      expect(box(d.rings[0] ?? [])).toEqual([-7, -7, 7, 7]);
+    }
+  });
+
   it('takes the size from width and height when there is no viewBox, in the user units (px) shapes use', () => {
     const d = read(svg('<rect x="0" y="0" width="2" height="2"/>', 'width="30mm" height="15mm"'));
     expect(d.widthUnits).toBeCloseTo((30 * 96) / 25.4, 9);

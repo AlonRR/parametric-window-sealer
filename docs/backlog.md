@@ -24,7 +24,8 @@ and **`v0.3.0`, the same day again, every P1 row** (C48). Nothing in any of them
 printed yet. After `v0.3.0`, four rows were added at P1, ahead of P2, to make the code easy to
 extend (Q145): `code-tooling`, `code-params-page`, `fill-registry` and `fitting-registry`. On
 14 Oct, `ci-triggers` was added at P1 so that CI checks each commit once (Q147). P2 began the
-same day (Q148): `pattern-plugins` is covered by `fill-registry`, and `fan-mount` came first.
+same day (Q148): `pattern-plugins` is covered by `fill-registry`, and `fan-mount` came first,
+then `svg-tile`, with `clamps` next (Q149).
 
 ## How to read the table
 
@@ -85,12 +86,12 @@ same day (Q148): `pattern-plugins` is covered by `fill-registry`, and `fan-mount
 | `fitting-registry` | #97 | The hose port and the measured cutout behind one fitting interface, so the fan mount, clamps, sliding insert and imported appliance each add a fitting (C83 to C89) | P1 | M | `code-params-page` | Q145 | The two fittings differ in shape, so the interface must not assume either |
 | `ci-triggers` | #101 | The checks run once per commit, through its pull request: on pull requests and pushes to `main` only, a superseded run cancelled, each job with a time limit (C82) | P1 | S | | Q147 | Whether the owner's Gitea version honours `concurrency` |
 | `pattern-plugins` | #26 | Pattern files contributed to the repo appear in the list. **Covered by `fill-registry` (#96)**: a contributed pattern is one file and one line in `PATTERNS` (C97) | P2 | M | `patterns-core` | Q21, Q148 | Plugin format |
-| `svg-tile` | #27 | Upload an SVG tile as a pattern | P2 | M | `patterns-core` | Q21 | Arbitrary SVG: curves, holes, units |
+| `svg-tile` | #27 | Upload an SVG tile as a pattern: its `viewBox` one cell, its filled shapes the openings, at a width the user sets ([`svg-tiles.md`](svg-tiles.md); C98 to C109) | P2 | M | `patterns-core` | Q21, Q149 | Drawings it refuses, or reads otherwise than a browser (rings that cross) |
 | `fan-mount` | #28 | Fan mounts with screw patterns from a list: square-framed fans of 80, 92, 120 and 140 mm, from the makers' own drawings ([`fan-sizes.md`](fan-sizes.md); C90 to C96) | P2 | M | `measured-cutout` | Q15, Q16, Q148 | Test print: the screw holes and the 140 mm slots |
 | `joint-dovetail` | #29 | Advanced joint: puzzle dovetails | P2 | M | `layout` | Q13 | Test print |
 | `joint-rails` | #30 | Advanced joint: sliding dovetail rails | P2 | M | `layout` | Q13 | Test print; assembly order |
 | `joint-bolts` | #31 | Advanced joint: bolted flanges | P2 | M | `layout` | Q13 | Spec to verify: bolt and nut sizes |
-| `clamps` | #32 | Adjustable clamps with slotted holes gripping the appliance | P2 | M | `measured-cutout` | Q16 | Test print |
+| `clamps` | #32 | Adjustable clamps with slotted holes gripping the appliance | P2 | M | `measured-cutout` | Q16, Q149 | Test print |
 | `organiser-skadis` | #33 | Skådis organiser fill | P2 | M | `patterns-core` | Q9 | Spec to verify; accessory fit needs a test print |
 | `organiser-opengrid` | #34 | openGrid organiser fill | P2 | M | `patterns-core` | Q9 | Spec to verify; test print |
 | `mesh-appliance` | #35 | Cut the wall around an imported model of the appliance | P2 | M | `mesh-import` | Q25 | Inherits `mesh-import`'s risk |

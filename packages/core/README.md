@@ -65,7 +65,7 @@ Start from `EXAMPLE_PARAMS` and change what differs. Every length is in mm.
 | `rim`                                  | The rim round each cutout: `depthMm`, `wallMm`, `clearanceMm` (`DEFAULT_RIM`); lined with the seal when there is one                                                                                                   |
 | `fans`                                 | Fans from the list (`FANS`: 80, 92, 120 and 140 mm), none to start with: each `{ sizeMm, column, row }`, its piece from 1 at the bottom left                                                                           |
 | `seal`                                 | `{ kind: 'none' }`, `'tape'` or `'tpu'` (gaskets printed in TPU to the tape's size), with the `tape`'s `widthMm`, `thicknessMm` (`TAPE_SIZES`), `grooveMm`, `squeezePct`, whether it also goes on the strips' `sides` and in each `port`, and with TPU whether the `joints` are TPU too (`NO_SEAL`, `DEFAULT_TAPE`)   |
-| `fill`                                 | `{ kind: 'sealed' }`, or a pattern: `'grid'`, `'hexagon'`, `'brick'` or `'diamond'` (`FILL_KINDS`), its `style` (`'relief'`, cut into the room side to `reliefPct` of the thickness, or `'through'`), and each pattern's sizes in `grid`, `hexagon`, `brick` and `diamond` (`SEALED` holds the starting ones; bars at least `MIN_BAR_MM`) |
+| `fill`                                 | `{ kind: 'sealed' }`, or a pattern: `'grid'`, `'hexagon'`, `'brick'`, `'diamond'` or `'svg'` (`FILL_KINDS`), its `style` (`'relief'`, cut into the room side to `reliefPct` of the thickness, or `'through'`), each pattern's sizes in `grid`, `hexagon`, `brick`, `diamond` and `svg` (`SEALED` holds the starting ones; bars at least `MIN_BAR_MM`), and the SVG tile's `drawing`, the text of an SVG file (`SAMPLE_SVG_TILE` to start with) |
 | `pieceFills`                           | Pieces with a fill of their own, none to start with: each `{ column, row, kind, style? }`, from 1 at the bottom left seen from the room; the sizes stay the wall's (`fillFor` gives a piece's fill) |
 
 Wrong parameters throw a `ParamsError` whose `errors` names every wrong field with the page's
@@ -107,8 +107,8 @@ and `edgeTapeSolid` and `portTapeSolid`, the tape itself for a preview), the TPU
 (`gasketShapes`, `gasketSolid`, `sleeveShapes`, `sleeveSolid`, `tpuJoint`), every part's shape
 (`wallPartShapes`), the pattern framework
 (`pieceOpenings`, `patternedPanel`, `patternBorderMm`, and a tile of openings passed to
-`buildPieces`, as `gridTile`, `hexagonTile`, `brickTile`, `diamondTile` and `fillPattern`
-make), the measuring guide's sum (`fitFromMeasured` and `measuredPlayMm`, the fit from a
+`buildPieces`, as `gridTile`, `hexagonTile`, `brickTile`, `diamondTile`, `svgDrawingTile` and
+`fillPattern` make, with `readSvgDrawing` reading an SVG tile's drawing), the measuring guide's sum (`fitFromMeasured` and `measuredPlayMm`, the fit from a
 printed strip and piece measured with calipers) and the file writers
 (`toStl`, `to3mf`, `packageDownload`), with `planFiles`, which names the files without
 building them. The types are in the package.

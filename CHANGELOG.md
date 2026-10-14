@@ -14,6 +14,13 @@ under Unreleased.
 
 ### Added
 
+- SVG tiles: a pattern of your own for the panel fill. Choose "SVG tile" as the fill, then an SVG
+  file: its `viewBox` is one cell, repeated across the wall at the width you set (20 mm to start
+  with, its height in proportion), and its filled shapes are the openings, with curves, arcs,
+  holes, transforms and clones. A drawing it would read wrongly (clipped, masked, styled in ways
+  it cannot follow) is refused with what to change. How to draw one: `docs/svg-tiles.md`. The
+  command takes `--svg-tile tile.svg --svg-width 30`, the library and the MCP server the file's
+  text as `fill.drawing`. The library has a new dependency, `svg-pathdata` (MIT).
 - Exhaust fans: "Exhaust fan" under "What is in the window?" mounts a square-framed fan of 80,
   92, 120 or 140 mm in one piece: a round opening and four screw holes where the fan's own are,
   as the makers draw them (`docs/fan-sizes.md`). The 140 mm holes are short slots, so fans from

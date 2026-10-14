@@ -13,8 +13,8 @@ yet test printed.** The page in `web/` takes the opening you can see and your wi
 divides the opening into pieces your printer can make, joins them with connector strips and
 cross pieces, fits edge strips into the window's tracks, shows the wall in 3D and downloads
 every part as STL or 3MF. It fits a hose port, a measured cutout, an exhaust fan or a window air conditioner,
-seals the edges with foam tape or printed TPU, fills the pieces with a pattern, and has a
-measuring guide; it can also be saved as one file that works offline.
+seals the edges with foam tape or printed TPU, fills the pieces with a pattern or a tile of your
+own drawing ([`docs/svg-tiles.md`](docs/svg-tiles.md)), and has a measuring guide; it can also be saved as one file that works offline.
 The same geometry is a library for Node.js and browsers, the `window-sealer` command and the
 `window-sealer-mcp` server for LLM agents (see [Developing](#developing)). The joint's fit and the
 example track sizes are starting values that a test print still has to confirm. The site is
@@ -29,7 +29,7 @@ issues; what has changed is in [`CHANGELOG.md`](CHANGELOG.md).
 
 Planned next:
 
-- **Appliances**: fan mounts with their screw patterns.
+- **Appliances**: adjustable clamps gripping the appliance.
 - **Panel styles**: organiser patterns (pegboard-style), beside the grid, hexagon, brick and
   diamond patterns.
 - **Fit**: a guided test print that adjusts the joint's fit after each print.
