@@ -211,7 +211,9 @@ dist checks run the builds.
 already has a Chromium can point at it with `PW_CHROMIUM_PATH=<path>` instead.
 
 CI (`.github/workflows/checks.yml`) skips the `house-identity` hook, which checks the
-machine making a commit, and runs the history check instead.
+machine making a commit, and runs the history check instead. It runs on pull requests and on
+pushes to `main` only (Q147): a branch is checked once its pull request is open, so pushing a
+branch to keep the work safe costs no Actions minutes.
 
 `.github/workflows/pages.yml` builds the site on every push. It **publishes only when the
 repository variable `PAGES_PUBLISH` is `true`** (Q43). That variable, and enabling Pages, are

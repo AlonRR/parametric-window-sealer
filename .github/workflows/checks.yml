@@ -12,10 +12,21 @@
 # prevent it. Treat a red run as something to fix, not as a gate that held.
 name: checks
 
+# A branch is checked through its pull request, and main on every push; a branch pushed without
+# a pull request runs nothing. On GitHub each push to a branch with a pull request otherwise ran
+# twice (5-6 Oct 2026: 106 of 207 runs checked a commit already checked). Gitea runs this too:
+# there main is pushed directly, which `push: branches: [main]` still covers.
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
+
+# A newer push to the same pull request makes the run for the older one moot. Runs on main are
+# never cancelled, so every commit there keeps its own result.
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: read        # least privilege; Scorecard's Token-Permissions check
@@ -23,6 +34,7 @@ permissions:
 jobs:
   pre-commit:
     runs-on: ubuntu-latest
+    timeout-minutes: 10   # about 2 minutes when well; the default is 360
     steps:
       - uses: actions/checkout@v5
         with:
@@ -63,6 +75,7 @@ jobs:
     # configuration over stdio (#47); the static build, and that build opened in Chromium, the
     # only check that the WebAssembly engine starts in a browser (Q35).
     runs-on: ubuntu-latest
+    timeout-minutes: 20   # about 3 minutes when well
     steps:
       - uses: actions/checkout@v5
         with:
@@ -106,6 +119,7 @@ jobs:
     # The pre-commit secret hook only sees staged content. This is the history gate, and it is
     # the one that matters before a repo goes public.
     runs-on: ubuntu-latest
+    timeout-minutes: 5    # seconds when well
     steps:
       - uses: actions/checkout@v5
         with:
