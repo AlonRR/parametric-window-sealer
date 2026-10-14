@@ -419,6 +419,46 @@ describe('measured cutouts (measured-cutout #23; C40 to C47: --cutout, repeatabl
   });
 });
 
+describe('fans (fan-mount #28: --fan, repeatable)', () => {
+  const params = async (args: string[]) => {
+    const r = await cli([...args, '--dry-run', '--json']);
+    return json(r.out).params as typeof EXAMPLE_PARAMS;
+  };
+
+  it('--fan 120 puts one in the bottom row’s middle piece, and says so', async () => {
+    const r = await cli([...OPENING, '--fan', '120', '--dry-run']);
+    expect(r.code).toBe(0);
+    expect(r.out).toContain(
+      'Fan: a 120 mm fan, in column 2, row 1: a 116 mm opening, and four 4.5 mm screw holes 105 mm apart.',
+    );
+    expect(r.out).toContain('  piece-c2-r1-197.7x198.6-fan-120.stl');
+  });
+
+  it('--fan 140@3,1 names the piece; given again, it adds one', async () => {
+    const p = await params([...OPENING, '--fan', '140@3,1', '--fan', '80@1,5']);
+    expect(p.fans).toEqual([
+      { sizeMm: 140, column: 3, row: 1 },
+      { sizeMm: 80, column: 1, row: 5 },
+    ]);
+  });
+
+  it('refuses a fan in a port’s piece, or a size not on the list', async () => {
+    const both = await cli([...OPENING, '--port', '150', '--fan', '120']);
+    expect(both.code).toBe(2);
+    expect(both.err).toContain('--fan: Fan 1 and port 1 are both in column 2, row 1; give each its own piece.');
+    const unlisted = await cli([...OPENING, '--fan', '100']);
+    expect(unlisted.err).toContain(
+      '--fan: Fan 1: 100 mm is not a listed fan size; the sizes are 80, 92, 120 and 140 mm.',
+    );
+  });
+
+  it('--help shows the form and that it repeats', async () => {
+    const r = await cli(['--help']);
+    expect(r.out.replace(/\s+/g, ' ')).toContain('--fan <mm[@column,row]>');
+    expect(r.out.replace(/\s+/g, ' ')).toContain('Give --fan again for each fan.');
+  });
+});
+
 describe('a window AC (window-ac #24; C49 to C53)', () => {
   it('--bottom-edge unit: the wall stands on the unit, and the summary says so', async () => {
     const r = await cli(['--width', '600', '--height', '400', '--bottom-edge', 'unit', '--dry-run']);

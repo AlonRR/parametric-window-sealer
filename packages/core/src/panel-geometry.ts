@@ -100,6 +100,7 @@ export function buildPieces(
   const source = {
     ports: ports.filter(inAPiece),
     cutouts: cutouts.filter(inAPiece),
+    fans: [],
     collar,
     rim,
     tape,

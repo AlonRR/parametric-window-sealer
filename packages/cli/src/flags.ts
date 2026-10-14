@@ -66,6 +66,7 @@ const FLAG_NAMES: Record<OwnField, string> = {
   rimDepthMm: 'rim-depth',
   rimWallMm: 'rim-wall',
   rimClearanceMm: 'rim-clearance',
+  fans: 'fan', // repeatable, as --port (#28)
 };
 
 const PATTERN_FLAGS = new Map<string, string>(PATTERNS.flatMap((p) => p.sizes.map((s) => [s.field, s.flag])));

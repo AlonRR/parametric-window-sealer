@@ -11,6 +11,7 @@ import { EXAMPLE_PARAMS, readParams, toFormValues } from './params.js';
 import { PRINTER_IDS } from './printers.js';
 import { FILL_KINDS, PATTERN_STYLES } from './fill.js';
 import { PATTERNS } from './patterns/index.js';
+import { FANS } from './fan.js';
 import type { FieldName, FormValues, Params } from './params.js';
 
 export interface Setting {
@@ -29,11 +30,12 @@ const ROLE = ['track', 'sash', 'sill', 'unit'] as const;
 const YES_NO = ['no', 'yes'] as const;
 
 // The settings that are lists, and the shape of each item: what each field holds.
-export type ListKind = 'ports' | 'pieceFills' | 'cutouts';
+export type ListKind = 'ports' | 'pieceFills' | 'cutouts' | 'fans';
 export const LIST_ITEMS: Record<ListKind, Record<string, 'number' | 'text'>> = {
   ports: { hoseMm: 'number', column: 'number', row: 'number' },
   pieceFills: { column: 'number', row: 'number', kind: 'text', style: 'text' },
   cutouts: { widthMm: 'number', heightMm: 'number', column: 'number', row: 'number' },
+  fans: { sizeMm: 'number', column: 'number', row: 'number' },
 };
 
 const axis = (name: 'width' | 'height'): Setting[] => [
@@ -212,6 +214,15 @@ export const SETTINGS: readonly Setting[] = [
   { field: 'rimDepthMm', path: 'rim.depthMm', help: "How far a cutout's rim stands out on the room side." },
   { field: 'rimWallMm', path: 'rim.wallMm', help: "The cutout's rim's wall." },
   { field: 'rimClearanceMm', path: 'rim.clearanceMm', help: 'Clearance per side between the appliance and the rim.' },
+  {
+    field: 'fans',
+    path: 'fans',
+    help:
+      `Exhaust fans: for each, its size in mm (${FANS.map((f) => f.sizeMm).join(', ')}) and its piece, by column ` +
+      "and row from 1 at the bottom left. Without a piece, the bottom row's middle piece. The fan is screwed to " +
+      'the piece over an opening.',
+    list: 'fans',
+  },
 ];
 
 // The value at a dotted path, such as `edges.track.widthMm`; undefined if it is not there.
@@ -250,7 +261,8 @@ function checkShape(value: unknown, shape: unknown, path: string, problems: Sett
       problems.push({ kind: 'shape', path, message: `${path} should be a list` });
       return;
     }
-    const kind: ListKind = path === 'pieceFills' ? 'pieceFills' : path === 'cutouts' ? 'cutouts' : 'ports';
+    const kind = SETTINGS.find((s) => s.path === path)?.list;
+    if (kind === undefined) throw new Error(`No list setting at ${path}`);
     for (const [i, item] of value.entries()) {
       const at = `${path}.${i}`;
       checkShape(item, itemShape(kind), at, problems);

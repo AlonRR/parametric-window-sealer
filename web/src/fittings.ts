@@ -3,8 +3,9 @@
 // into the hidden ports and cutouts fields as the command's --port and --cutout take them (Q114,
 // C44), so the library checks them all. Each box shows only for its answer to "What is in the
 // window?" (data-show-when in the page).
+import { FANS } from 'parametric-window-sealer';
 import type { FieldErrors } from 'parametric-window-sealer';
-import { setValue, valueOf } from './form-fields';
+import { option, setValue, valueOf } from './form-fields';
 import type { FormPart } from './form-part';
 
 type PartControl = HTMLInputElement | HTMLSelectElement;
@@ -139,6 +140,33 @@ export function measuredCutout(form: HTMLFormElement): FormPart | null {
     },
     placed(params) {
       showPlacedPiece(box, params.cutouts[0]);
+    },
+  };
+}
+
+// An exhaust fan (fan-mount, #28): one on the page, as the cutout is (C45); its size from the
+// library's list, starting at 120 mm (C94), and its piece as the port's (Q105).
+export function exhaustFan(form: HTMLFormElement): FormPart | null {
+  const box = form.querySelector<HTMLElement>('[data-testid="fan"]');
+  const size = box?.querySelector<HTMLSelectElement>('[data-part="fan-size"]');
+  if (!box || !size) return null;
+  size.replaceChildren(...FANS.map((f) => option(String(f.sizeMm), `${f.sizeMm} mm`)));
+  size.value = '120';
+  const text = (): { text: string; problem?: string } => {
+    if (valueOf(form, 'appliance') !== 'fan') return { text: '' };
+    const [column, row] = [read(box, 'column'), read(box, 'row')];
+    const problem = pieceProblem(column, row, 'Fan');
+    if (problem !== undefined) return { text: '@', problem };
+    return { text: column === '' ? size.value : `${size.value}@${column},${row}` };
+  };
+  return {
+    sync(): FieldErrors {
+      const fans = text();
+      setValue(form, 'fans', fans.text);
+      return fans.problem === undefined ? {} : { fans: fans.problem };
+    },
+    placed(params) {
+      showPlacedPiece(box, params.fans[0]);
     },
   };
 }

@@ -7,6 +7,7 @@
 import type { Manifold } from 'manifold-3d';
 import type { CutoutSetting, Rectangle, RimParams } from '../cutout.js';
 import type { Engine } from '../engine.js';
+import type { FanSetting } from '../fan.js';
 import type { AnyPartShape } from '../export.js';
 import type { PanelSize } from '../panel.js';
 import type { KeepOut } from '../pattern.js';
@@ -24,6 +25,7 @@ export interface InPiece {
 export interface FittingSource {
   ports: readonly Required<PortSetting>[];
   cutouts: readonly Required<CutoutSetting>[];
+  fans: readonly Required<FanSetting>[];
   collar: CollarParams;
   rim: RimParams;
   tape: TapeFit | undefined; // the seal, if any: foam tape or printed TPU

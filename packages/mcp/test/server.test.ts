@@ -194,6 +194,21 @@ describe('window_sealer_plan_wall', () => {
     expect(half.text).toContain('cutouts.0 needs both column and row, or neither');
   });
 
+  it('fans from the list in the library’s shape, with their line and their piece’s file (#28)', async () => {
+    const { call } = await connect();
+    const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, fans: [{ sizeMm: 120 }] } });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['settings'].fans).toEqual([{ sizeMm: 120, column: 2, row: 1 }]);
+    expect(r.data['summary'].fans).toEqual([
+      'Fan: a 120 mm fan, in column 2, row 1: a 116 mm opening, and four 4.5 mm screw holes 105 mm apart.',
+    ]);
+    const names = (r.data['files'] as { name: string }[]).map((f) => f.name);
+    expect(names).toContain('piece-c2-r1-197.7x198.6-fan-120.stl');
+    const unlisted = await call('window_sealer_plan_wall', { settings: { ...OPENING, fans: [{ sizeMm: 100 }] } });
+    expect(unlisted.isError).toBe(true);
+    expect(unlisted.text).toContain('100 mm is not a listed fan size; the sizes are 80, 92, 120 and 140 mm.');
+  });
+
   it('a window AC as an edge role, and the summary’s line for it (C49, C52)', async () => {
     const { call } = await connect();
     const r = await call('window_sealer_plan_wall', {

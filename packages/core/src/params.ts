@@ -34,7 +34,9 @@ import { formatPieceFills, parsePieceFills } from './piece-fill.js';
 import type { PieceFill } from './piece-fill.js';
 import { FormReader, SIZE_MESSAGE, SIZE_OR_ZERO_MESSAGE } from './form-reader.js';
 import { planWall } from './plan.js';
-import { cutoutProblem, placeFittings, portProblem } from './fittings/index.js';
+import { cutoutProblem, fanProblem, placeFittings, portProblem } from './fittings/index.js';
+import { formatFans, parseFans } from './fan.js';
+import type { FanSetting } from './fan.js';
 import type { InPiece } from './fittings/index.js';
 import { hundredth, mm } from './words.js';
 
@@ -61,6 +63,7 @@ export interface Params {
   pieceFills: PieceFill[]; // pieces with a fill of their own (#21); none to start with
   cutouts: Required<CutoutSetting>[]; // measured cutouts (#23); none to start with
   rim: RimParams; // round each cutout (C42)
+  fans: Required<FanSetting>[]; // fans from the list (#28); none to start with
 }
 
 // The page starts here: an example opening (Q42, labelled as an example, Q18), the default
@@ -84,6 +87,7 @@ export const EXAMPLE_PARAMS: Params = {
   pieceFills: [],
   cutouts: [],
   rim: DEFAULT_RIM,
+  fans: [],
 };
 
 // Every field of the page's form. The page reads and writes these by name; the settings list
@@ -141,6 +145,7 @@ export const FIELD_NAMES = [
   'rimDepthMm',
   'rimWallMm',
   'rimClearanceMm',
+  'fans',
   // Each pattern's sizes, as the patterns declare them (patterns/).
   ...PATTERN_FIELDS,
 ] as const;
@@ -485,6 +490,16 @@ function readCutouts(r: FormReader, fit: TapeFit | undefined): { rim: RimParams;
   return { rim, given };
 }
 
+// The fans (fan-mount, #28): sizes from the list, placed after the ports and the cutouts.
+
+const fansForm = (p: Params): FormValues => ({ fans: formatFans(p.fans) });
+
+function readFans(r: FormReader): FanSetting[] {
+  const parsed = parseFans(r.values.fans ?? '');
+  if (!parsed.ok) r.fail('fans', parsed.message);
+  return parsed.ok ? parsed.fans : [];
+}
+
 // The panel fill (Q141) and each piece's own (#21). A pattern's sizes are read when the wall or
 // any piece uses it (C15), as the tape's are read only with a seal.
 
@@ -539,6 +554,7 @@ export function toFormValues(p: Params): FormValues {
     ...sealForm(p),
     ...fillForm(p),
     ...cutoutsForm(p),
+    ...fansForm(p),
   };
 }
 
@@ -556,6 +572,7 @@ export function readParams(values: FormValues): ReadResult {
   checkSealFits(r, edges, sealRead);
   const { collar, given: givenPorts } = readPorts(r, fit);
   const { rim, given: givenCutouts } = readCutouts(r, fit);
+  const givenFans = readFans(r);
   if (r.ok) {
     // The edge strips must leave the pieces something to cover.
     const span = panelSpan(opening.openingWidthMm, opening.openingHeightMm, edges, joint, fit);
@@ -564,10 +581,10 @@ export function readParams(values: FormValues): ReadResult {
   }
   const { fill, pieceFills } = readFill(r);
 
-  // What is placed in pieces, once everything else is sound: the ports, then the cutouts, then
-  // each piece's own fill, each against the plan the ones before it allow.
+  // What is placed in pieces, once everything else is sound: the ports, the cutouts and the fans,
+  // then each piece's own fill, each against the plan the ones before it allow.
   const base = { ...opening, printer, bedMarginMm, width, height, thicknessMm, joint, edges, collar, seal, fill };
-  const plan = r.ok ? planWall({ ...base, ports: [], pieceFills: [], cutouts: [], rim }) : undefined;
+  const plan = r.ok ? planWall({ ...base, ports: [], pieceFills: [], cutouts: [], rim, fans: [] }) : undefined;
   let ports: Required<PortSetting>[] = [];
   if (plan !== undefined && givenPorts.length > 0) {
     const check = (port: PortSetting & InPiece) => portProblem(plan, port, collar, fit, joint);
@@ -583,13 +600,24 @@ export function readParams(values: FormValues): ReadResult {
     if (placing.ok) cutouts = placing.placed;
     else r.fail('cutouts', placing.problem);
   }
+  let fans: Required<FanSetting>[] = [];
+  if (r.ok && plan !== undefined && givenFans.length > 0) {
+    const check = (fan: FanSetting & InPiece) => fanProblem(plan, fan, joint);
+    const earlier = [
+      { label: 'Port', placed: ports },
+      { label: 'Cutout', placed: cutouts },
+    ];
+    const placing = placeFittings(plan, { label: 'Fan', plural: 'Fans', given: givenFans, check }, earlier);
+    if (placing.ok) fans = placing.placed;
+    else r.fail('fans', placing.problem);
+  }
   if (r.ok && pieceFills.length > 0) {
-    const problem = checkPieceFills(planWall({ ...base, ports, pieceFills: [], cutouts, rim }), pieceFills);
+    const problem = checkPieceFills(planWall({ ...base, ports, pieceFills: [], cutouts, rim, fans }), pieceFills);
     if (problem !== undefined) r.fail('pieceFills', problem);
   }
 
   if (!r.ok) return { ok: false, errors: r.errors };
-  return { ok: true, params: { ...base, ports, pieceFills, cutouts, rim } };
+  return { ok: true, params: { ...base, ports, pieceFills, cutouts, rim, fans } };
 }
 
 // A piece the wall has, and one fill for each piece.

@@ -9,13 +9,15 @@ import type { SealParams } from '../tape.js';
 import type { FittingDefinition, FittingSource, PlacedFitting } from './define.js';
 import { HOSE_PORT } from './hose-port.js';
 import { MEASURED_CUTOUT } from './measured-cutout.js';
+import { FAN_MOUNT } from './fan-mount.js';
 
 export * from './define.js';
 export * from './place.js';
 export * from './hose-port.js';
 export * from './measured-cutout.js';
+export * from './fan-mount.js';
 
-export const FITTINGS: readonly FittingDefinition[] = [HOSE_PORT, MEASURED_CUTOUT];
+export const FITTINGS: readonly FittingDefinition[] = [HOSE_PORT, MEASURED_CUTOUT, FAN_MOUNT];
 
 // The fittings' source in a wall's parameters.
 export const fittingSource = (
@@ -23,6 +25,7 @@ export const fittingSource = (
 ): FittingSource => ({
   ports: params.ports,
   cutouts: params.cutouts,
+  fans: params.fans,
   collar: params.collar,
   rim: params.rim,
   tape: tapeFit(params.seal),

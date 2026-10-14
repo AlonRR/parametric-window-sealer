@@ -26,4 +26,5 @@ export * from './piece-fill.js';
 export * from './wall.js';
 export * from './tpu.js';
 export * from './cutout.js';
+export * from './fan.js';
 export * from './measure.js';

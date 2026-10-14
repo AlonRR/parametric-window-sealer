@@ -15,7 +15,7 @@ import {
   toFormValues,
   wallLabel,
 } from 'parametric-window-sealer';
-import type { DownloadChoice, Format, Packaging, PlanText } from 'parametric-window-sealer';
+import type { DownloadChoice, Format, ListKind, Packaging, PlanText } from 'parametric-window-sealer';
 import { messageOf, version } from './about.js';
 import { SETTING_FLAGS } from './flags.js';
 import { readParamsFile, settingsFrom } from './settings.js';
@@ -82,12 +82,13 @@ function help(): string {
     // A long list of choices (the printers) is named after the hint, so the table stays narrow.
     const long = (f.values?.length ?? 0) > 8;
     const unit = f.field.endsWith('Pct') ? '<%>' : '<mm>'; // a percentage, such as the tape's squeeze
-    const lists = {
+    const lists: Record<ListKind, string> = {
       ports: '<mm[@column,row]>',
       pieceFills: '<column,row=fill[:style]>',
       cutouts: '<width>x<height>[@column,row]',
+      fans: '<mm[@column,row]>',
     };
-    const each = { ports: 'port', pieceFills: 'piece', cutouts: 'cutout' };
+    const each: Record<ListKind, string> = { ports: 'port', pieceFills: 'piece', cutouts: 'cutout', fans: 'fan' };
     const value = f.list ? lists[f.list] : f.values === undefined ? unit : long ? '<id>' : `<${f.values.join('|')}>`;
     const start = f.flag === 'width' || f.flag === 'height' ? '' : starting[f.field];
     const text = f.list

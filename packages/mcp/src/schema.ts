@@ -1,7 +1,7 @@
 // The settings as an input schema, in the library's own shape (Q99), built from the library's
 // SETTINGS so the server describes each one in the page's words and cannot miss one. Every
 // setting may be left out and then starts where the page starts, except the opening.
-import { FILL_KINDS, PATTERNS, PATTERN_STYLES, SETTINGS } from 'parametric-window-sealer';
+import { FANS, FILL_KINDS, PATTERNS, PATTERN_STYLES, SETTINGS } from 'parametric-window-sealer';
 import type { ListKind } from 'parametric-window-sealer';
 import * as z from 'zod';
 
@@ -63,7 +63,16 @@ const CUTOUT = z.strictObject({
   row: z.number().int().min(1).optional().describe('The row of its piece, from 1 at the bottom.'),
 });
 
-const ITEMS: Record<ListKind, z.ZodType> = { ports: PORT, pieceFills: PIECE_FILL, cutouts: CUTOUT };
+// A fan (#28): its size from the list, and its piece as a port's.
+const FAN = z.strictObject({
+  sizeMm: z
+    .number()
+    .describe(`The fan's size in mm, one of ${FANS.map((f) => f.sizeMm).join(', ')}: its square frame, each way.`),
+  column: z.number().int().min(1).optional().describe('The column of its piece, from 1 at the left.'),
+  row: z.number().int().min(1).optional().describe('The row of its piece, from 1 at the bottom.'),
+});
+
+const ITEMS: Record<ListKind, z.ZodType> = { ports: PORT, pieceFills: PIECE_FILL, cutouts: CUTOUT, fans: FAN };
 
 function leaf(
   help: string,

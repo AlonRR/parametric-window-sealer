@@ -22,7 +22,7 @@ import type { FittingDefinition, InPiece, Params, SealParams } from '../src/inde
 
 const engine = await loadEngine();
 
-// A wall of pieces up to 300 mm, with a port and a cutout.
+// A wall of pieces up to 300 mm, with a port, a cutout and a fan.
 const params: Params = {
   ...EXAMPLE_PARAMS,
   openingWidthMm: 1200,
@@ -30,6 +30,7 @@ const params: Params = {
   printer: { kind: 'custom', widthMm: 300, heightMm: 300 },
   ports: [{ hoseMm: 150, column: 3, row: 1 }],
   cutouts: [{ widthMm: 120, heightMm: 80, column: 1, row: 2 }],
+  fans: [{ sizeMm: 120, column: 1, row: 4 }],
 };
 const plan = planWall(params);
 const SEALS: Record<string, SealParams> = {
@@ -52,7 +53,7 @@ describe('every kind of fitting', () => {
   it('has a kind of its own', () => {
     const kinds = FITTINGS.map((f) => f.kind);
     expect(new Set(kinds).size).toBe(kinds.length);
-    expect(kinds).toEqual(['port', 'cutout']);
+    expect(kinds).toEqual(['port', 'cutout', 'fan']);
   });
 
   for (const [seal, sealParams] of Object.entries(SEALS)) {
@@ -115,12 +116,23 @@ describe('every kind of fitting', () => {
   }
 
   const tpuSeal: SealParams = { kind: 'tpu', tape: { ...DEFAULT_TAPE, port: true } };
+  it('with the TPU seal, prints a sleeve for the hose port and a frame for the cutout, and nothing for the fan', () => {
+    const tpu = tapeFit(tpuSeal);
+    if (tpu === undefined) throw new Error('no fit for the TPU seal');
+    const source = fittingSource({ ...params, seal: tpuSeal });
+    const names = Object.fromEntries(FITTINGS.map((k) => [k.kind, k.parts(source, tpu).map((p) => p.name)]));
+    expect(names).toEqual({
+      port: [expect.stringMatching(/^sleeve-150-tpu-print-1$/)],
+      cutout: [expect.stringMatching(/^frame-120x80-tpu-print-1$/)],
+      fan: [],
+    });
+  });
   for (const kind of FITTINGS) {
+    // A kind need print nothing (a fan is screwed straight on); what one prints is held to this.
     it(`${kind.kind}: with the TPU seal, makes each part it prints and names it as the download does`, () => {
       const tpu = tapeFit(tpuSeal);
       if (tpu === undefined) throw new Error('no fit for the TPU seal');
       const parts = kind.parts(fittingSource({ ...params, seal: tpuSeal }), tpu);
-      expect(parts.length).toBeGreaterThan(0);
       expect(new Set(parts.map((p) => p.name)).size).toBe(parts.length);
       for (const part of parts) {
         expect(part.name).toBe(partName(part.shape));

@@ -40,6 +40,7 @@ describe('the starting values', () => {
       pieceFills: [], // #21
       cutouts: [], // #23
       rim: DEFAULT_RIM, // C42
+      fans: [], // #28
     });
   });
 
@@ -281,6 +282,7 @@ describe('describePlan', () => {
       leftovers: [],
       ports: [],
       cutouts: [],
+      fans: [], // #28
       units: [], // #24
       seal: 'Seal: none.',
       fill: 'Fill: sealed.',

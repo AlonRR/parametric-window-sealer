@@ -361,6 +361,8 @@
           <legend>What is in the window?</legend>
           <label><input type="radio" name="appliance" value="none" checked /> None, a plain wall</label>
           <label><input type="radio" name="appliance" value="hose" /> Portable AC hose</label>
+          <!-- An exhaust fan (fan-mount, #28): a square-framed fan from the library's list (C90). -->
+          <label><input type="radio" name="appliance" value="fan" /> Exhaust fan</label>
           <!-- A measured cutout (measured-cutout, #23): one on the page (C45), its piece as the
             port's (C47); the command and the MCP server take several. -->
           <label>
@@ -442,6 +444,30 @@
             </p>
           </div>
           <span class="error" data-testid="error-cutouts"></span>
+          <div data-testid="fan" data-show-when="appliance=fan" hidden>
+            <label>
+              Fan size
+              <select data-part="fan-size"></select>
+            </label>
+            <p class="note">
+              The size of the fan's square frame. The piece gets a round opening and four screw
+              holes where the fan's own holes are, as its maker draws them; screw the fan to
+              either face.
+            </p>
+            <label>
+              Column
+              <input data-part="column" inputmode="numeric" autocomplete="off" />
+            </label>
+            <label>
+              Row
+              <input data-part="row" inputmode="numeric" autocomplete="off" />
+            </label>
+            <p class="note">
+              The piece the fan is centred in, counted from 1 at the bottom left, seen from the
+              room. It starts in the bottom row's middle piece.
+            </p>
+          </div>
+          <span class="error" data-testid="error-fans"></span>
         </fieldset>
 
         <!-- The seal (seal-tape, #15): a choice starting at none (Q122), and foam tape from the
@@ -789,6 +815,7 @@
         <!-- Every port, written as the command's --port takes them (Q114). -->
         <input type="hidden" name="ports" />
         <input type="hidden" name="cutouts" />
+        <input type="hidden" name="fans" />
         <!-- Every piece's own fill, written as the command's --piece-fill takes them (C28). -->
         <input type="hidden" name="pieceFills" />
       </form>
@@ -806,6 +833,7 @@
         <p data-testid="plan-edges" data-plan="edges"></p>
         <ul data-testid="plan-ports" data-plan="ports"></ul>
         <ul data-testid="plan-cutouts" data-plan="cutouts"></ul>
+        <ul data-testid="plan-fans" data-plan="fans"></ul>
         <ul data-testid="plan-units" data-plan="units"></ul>
         <p data-testid="plan-seal" data-plan="seal"></p>
         <p data-testid="plan-fill" data-plan="fill"></p>
