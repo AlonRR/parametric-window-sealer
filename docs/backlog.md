@@ -25,7 +25,7 @@ printed yet. After `v0.3.0`, four rows were added at P1, ahead of P2, to make th
 extend (Q145): `code-tooling`, `code-params-page`, `fill-registry` and `fitting-registry`. On
 14 Oct, `ci-triggers` was added at P1 so that CI checks each commit once (Q147). P2 began the
 same day (Q148): `pattern-plugins` is covered by `fill-registry`, and `fan-mount` came first,
-then `svg-tile` and `clamps` (Q149).
+then `svg-tile` and `clamps` (Q149), and `sliding-insert` (Q150).
 
 ## How to read the table
 
@@ -98,7 +98,7 @@ then `svg-tile` and `clamps` (Q149).
 | `fit-test-print` | #63 | Optional guided test print: print a small test joint, answer too tight, too loose or right after each print, and the page adjusts the fit; can use caliper readings of the printed parts | P2 | M | `connector-strip`, `user-guide` | Q51, Q54, Q55 | How big a fit change each answer should make; needs the owner's test prints to calibrate |
 | `organiser-multiboard` | #36 | Multiboard organiser fill | P2 | L | `patterns-core` | Q9 | Spec to verify; its connection geometry is more involved (inferred) |
 | `organiser-hsw` | #37 | Honeycomb Storage Wall organiser fill | P2 | L | `patterns-core` | Q9 | Spec to verify; test print |
-| `sliding-insert` | #38 | Sliding insert that closes in around the appliance and locks | P2 | L | `measured-cutout` | Q16 | Mechanism design; several test prints |
+| `sliding-insert` | #38 | Sliding insert that closes in around the appliance and locks: two shutters in dovetail rails on the piece, each locked by an M4 bolt ([`sliding-insert.md`](sliding-insert.md); C119 to C124) | P2 | L | `measured-cutout` | Q16, Q150 | Mechanism design; several test prints |
 | `draw-tile` | #39 | Draw a pattern tile in the page | P2 | L | `patterns-core` | Q21 | An editor is a project of its own |
 | `mesh-tiles` | #40 | Imported organiser tiles and 3D pattern tiles placed on a panel | P2 | L | `mesh-import`, `patterns-core` | Q25 | Inherits `mesh-import`'s risk |
 | `mesh-custom-piece` | #41 | A whole imported piece, trimmed to size, with connector edges added | P2 | L | `mesh-import`, `connector-strip` | Q25 | Inherits `mesh-import`'s risk |

@@ -14,6 +14,12 @@ under Unreleased.
 
 ### Added
 
+- A sliding insert: "Something else, in a sliding insert" under "What is in the window?" gives
+  the appliance's piece an opening, two rails on its room face and two printed shutters that slide
+  in from each side and close round it, its width give or take their travel (20 mm to start with),
+  each locked by an M4 bolt. Only a 1 mm clearance above and below stays open. The command takes
+  `--insert 120x80`, with `--insert-travel` and `--insert-clearance`; the library and the MCP server
+  `inserts` and `insert`. How to fit it: `docs/sliding-insert.md`. Not yet test printed.
 - Clamps: "Something else, held by clamps" under "What is in the window?" takes an appliance
   measured roughly. Its piece gets an opening and eight bolt holes, and four printed jaws slide in
   on M4 bolts to grip it, the measured size give or take the jaws' travel (10 mm to start with,

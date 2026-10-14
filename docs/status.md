@@ -5,7 +5,7 @@ a fresh session resumes from here.
 
 Last updated: 14 Oct 2026. Phase: **P2** ([`backlog.md`](backlog.md)). `v0.3.0` holds every P1
 row; since then the code was made easy to extend (Q145) and P2 began (Q148, Q149): the fan mount
-(`fan-mount`, #28), the SVG tile (`svg-tile`, #27) and the clamps (`clamps`, #32) are built.
+(`fan-mount`, #28), the SVG tile (`svg-tile`, #27) the clamps (`clamps`, #32) and the sliding insert (`sliding-insert`, #38) are built.
 Nothing has been test printed yet.
 
 ## The brief (the owner's request, 5 Oct 2026)

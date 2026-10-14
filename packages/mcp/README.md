@@ -68,7 +68,8 @@ height makes the printer custom, and a printer `id` from the list, such as `"pri
 end that goes in), and optionally its piece as `column` and `row`, from 1 at the bottom left seen
 from the room; without them it goes in the bottom row's middle piece. An appliance measured only
 roughly goes in `clamps`, as `[{ "widthMm": 120, "heightMm": 80 }]`, gripped by four printed jaws
-on M4 bolts, give or take their travel (`clamp.travelMm`, 10 mm). Foam tape goes in `seal`,
+on M4 bolts, give or take their travel (`clamp.travelMm`, 10 mm); one in `inserts` gets two
+shutters that slide in rails and close round it (`insert.travelMm`, 20 mm). Foam tape goes in `seal`,
 as `{ "kind": "tape" }`, or with its size and places, such as `{ "tape": { "widthMm": 9.5,
 "thicknessMm": 4.8, "sides": true } }`; tape settings without a `kind` mean tape. A grid pattern goes in `fill`, as `{ "kind": "grid" }`
 or with its sizes, such as `{ "grid": { "openingMm": 12, "barMm": 2 }, "style": "through" }`;

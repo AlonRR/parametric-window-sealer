@@ -66,6 +66,8 @@ Start from `EXAMPLE_PARAMS` and change what differs. Every length is in mm.
 | `fans`                                 | Fans from the list (`FANS`: 80, 92, 120 and 140 mm), none to start with: each `{ sizeMm, column, row }`, its piece from 1 at the bottom left                                                                           |
 | `clamps`                               | Appliances held by clamps (#32), none to start with: each `{ widthMm, heightMm, column, row }`, the appliance measured roughly, its piece from 1 at the bottom left |
 | `clamp`                                | The clamps' jaws: `travelMm`, how far each slides (the give or take), and `depthMm`, how far its lip stands out (`DEFAULT_CLAMP`) |
+| `inserts`                              | Appliances in a sliding insert (#38), none to start with: each `{ widthMm, heightMm, column, row }` |
+| `insert`                               | The shutters: `travelMm` and `clearanceMm` (`DEFAULT_INSERT`) |
 | `seal`                                 | `{ kind: 'none' }`, `'tape'` or `'tpu'` (gaskets printed in TPU to the tape's size), with the `tape`'s `widthMm`, `thicknessMm` (`TAPE_SIZES`), `grooveMm`, `squeezePct`, whether it also goes on the strips' `sides` and in each `port`, and with TPU whether the `joints` are TPU too (`NO_SEAL`, `DEFAULT_TAPE`)   |
 | `fill`                                 | `{ kind: 'sealed' }`, or a pattern: `'grid'`, `'hexagon'`, `'brick'`, `'diamond'` or `'svg'` (`FILL_KINDS`), its `style` (`'relief'`, cut into the room side to `reliefPct` of the thickness, or `'through'`), each pattern's sizes in `grid`, `hexagon`, `brick`, `diamond` and `svg` (`SEALED` holds the starting ones; bars at least `MIN_BAR_MM`), and the SVG tile's `drawing`, the text of an SVG file (`SAMPLE_SVG_TILE` to start with) |
 | `pieceFills`                           | Pieces with a fill of their own, none to start with: each `{ column, row, kind, style? }`, from 1 at the bottom left seen from the room; the sizes stay the wall's (`fillFor` gives a piece's fill) |
@@ -104,7 +106,8 @@ shapes (`plainPanel`, `portPanel`, `stripSolid`, `crossSolid`, `edgeStripSolid`)
 port's rules (`checkPort`, `parsePorts`, `formatPorts`), the measured cutout's (`checkCutout`,
 `parseCutouts`, `formatCutouts`, `linedRim`, `cutoutPanel`, `frameShapes`, `frameSolid`), the fan mount's
 (`FANS`, `checkFan`, `parseFans`, `formatFans`, `fanPanel`), the clamps' (`checkClamp`, `parseClamps`,
-`formatClamps`, `clampPanel`, `jawShapes`, `jawSolid`), the per-piece fills'
+`formatClamps`, `clampPanel`, `jawShapes`, `jawSolid`), the sliding insert's (`checkInsert`, `parseInserts`,
+`formatInserts`, `insertPanel`, `shutterShapes`, `shutterSolid`), the per-piece fills'
 (`fillFor`, `parsePieceFills`, `formatPieceFills`), the tape's (`tapeFit`, `tapedCollar`,
 and `edgeTapeSolid` and `portTapeSolid`, the tape itself for a preview), the TPU seal's
 (`gasketShapes`, `gasketSolid`, `sleeveShapes`, `sleeveSolid`, `tpuJoint`), every part's shape
