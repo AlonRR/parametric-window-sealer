@@ -25,7 +25,7 @@ export interface PatternTile {
   pitchXMm: number;
   pitchYMm: number;
   rowShiftMm: number;
-  openings: Point[][]; // counter-clockwise polygons; they may reach past the cell
+  openings: Point[][]; // counter-clockwise outlines, and clockwise holes inside them; they may reach past the cell
   barMm: number; // the solid between openings; a sliver of opening thinner than this stays solid
 }
 
@@ -36,6 +36,10 @@ export interface PatternChoice {
 }
 
 export const DEFAULT_RELIEF_PCT = 50;
+
+// The least solid between openings: two lines from a 0.4 mm nozzle, as the walls beside the
+// tape's groove (Q131, Q143).
+export const MIN_BAR_MM = 0.8;
 
 export const patternBorderMm = (joint: JointParams): number => joint.slotMm + PORT_EDGE_CLEARANCE_MM;
 

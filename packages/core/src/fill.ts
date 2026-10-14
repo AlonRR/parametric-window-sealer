@@ -4,7 +4,7 @@
 import type { JointParams } from './joint.js';
 import { DEFAULT_RELIEF_PCT, patternBorderMm, reliefDepthMm } from './pattern.js';
 import type { PatternChoice, PatternStyle } from './pattern.js';
-import { PATTERNS, patternOf, patternSizes, sizesOf } from './patterns/index.js';
+import { PATTERNS, SAMPLE_SVG_TILE, patternOf, patternSizes, sizesOf } from './patterns/index.js';
 import type { PatternKind, PatternSizes } from './patterns/index.js';
 import { mm } from './words.js';
 
@@ -19,23 +19,22 @@ export interface FillParams extends PatternSizes {
   kind: FillKind;
   style: PatternStyle;
   reliefPct: number; // a relief's depth, as a percentage of the panel's thickness (Q138)
+  drawing: string; // the SVG tile's drawing, the text of an SVG file (svg-tile, #27)
 }
 
 export const SEALED: FillParams = {
   kind: 'sealed',
   style: 'relief',
   reliefPct: DEFAULT_RELIEF_PCT,
+  drawing: SAMPLE_SVG_TILE,
   ...patternSizes((_, size) => size.start),
 };
-
-// Two lines from a 0.4 mm nozzle, as the walls beside the tape's groove (Q131, Q143).
-export const MIN_BAR_MM = 0.8;
 
 // The pattern buildPieces takes, or nothing for a sealed wall; the border follows the joint (Q134).
 export function fillPattern(fill: FillParams, joint: JointParams): (PatternChoice & { borderMm: number }) | undefined {
   const pattern = patternOf(fill.kind);
   if (pattern === undefined) return undefined;
-  const tile = pattern.tile(sizesOf(fill, pattern.kind));
+  const tile = pattern.tile(sizesOf(fill, pattern.kind), fill.drawing);
   return { tile, style: fill.style, reliefPct: fill.reliefPct, borderMm: patternBorderMm(joint) };
 }
 
@@ -43,7 +42,7 @@ export function fillPattern(fill: FillParams, joint: JointParams): (PatternChoic
 export function fillWords(fill: FillParams, thicknessMm: number): string {
   const pattern = patternOf(fill.kind);
   if (pattern === undefined) return 'sealed.';
-  const words = pattern.describe(sizesOf(fill, pattern.kind));
+  const words = pattern.describe(sizesOf(fill, pattern.kind), fill.drawing);
   return fill.style === 'through'
     ? `${words}, cut through: air passes through the wall.`
     : `${words}, cut ${mm(reliefDepthMm(thicknessMm, fill.reliefPct))} mm into the room side.`;

@@ -27,7 +27,9 @@ import type { CutoutSetting, RimParams } from './cutout.js';
 import { DEFAULT_TAPE, NO_SEAL, TAPE_GROOVE_PLAY_MM, TAPE_GROOVE_WALL_MM, tapeFit } from './tape.js';
 import type { SealKind, SealParams, TapeFit } from './tape.js';
 import { TPU_FIN_MM, gasketBaseMm } from './tpu.js';
-import { FILL_KINDS, MIN_BAR_MM, PATTERN_STYLES, SEALED } from './fill.js';
+import { FILL_KINDS, PATTERN_STYLES, SEALED } from './fill.js';
+import { MIN_BAR_MM } from './pattern.js';
+import { readSvgDrawing } from './svg/drawing.js';
 import type { FillKind, FillParams } from './fill.js';
 import { PATTERNS, PATTERN_FIELDS, patternSizes, sizesOf } from './patterns/index.js';
 import { formatPieceFills, parsePieceFills } from './piece-fill.js';
@@ -140,6 +142,7 @@ export const FIELD_NAMES = [
   'fill',
   'fillStyle',
   'reliefPct',
+  'fillDrawing',
   'pieceFills',
   'cutouts',
   'rimDepthMm',
@@ -508,6 +511,7 @@ function fillForm(p: Params): FormValues {
     fill: p.fill.kind,
     fillStyle: p.fill.style,
     reliefPct: String(p.fill.reliefPct),
+    fillDrawing: p.fill.drawing,
     pieceFills: formatPieceFills(p.pieceFills),
   };
   for (const pattern of PATTERNS) {
@@ -524,6 +528,10 @@ function readFill(r: FormReader): { fill: FillParams; pieceFills: PieceFill[] } 
   const pieceFills = parsed.ok ? parsed.fills : [];
   const used = (pattern: FillKind) => kind === pattern || pieceFills.some((f) => f.kind === pattern);
   const patterned = FILL_KINDS.some((k) => k !== 'sealed' && used(k));
+  // The SVG tile's drawing, read as its sizes are: only where it is used (svg-tile, #27).
+  const drawing = r.values.fillDrawing ?? '';
+  const read = readSvgDrawing(drawing);
+  if (!read.ok && used('svg')) r.fail('fillDrawing', read.message);
   const fill: FillParams = {
     kind,
     style: r.oneOfIfUsed('fillStyle', patterned, PATTERN_STYLES, SEALED.style),
@@ -534,6 +542,7 @@ function readFill(r: FormReader): { fill: FillParams; pieceFills: PieceFill[] } 
       (n) => n > 0 && n < 100,
       'Enter a percentage greater than 0 and less than 100.',
     ),
+    drawing: read.ok ? drawing : SEALED.drawing,
     ...patternSizes((pattern, s) =>
       s.bar
         ? r.numberIfUsed(s.field, used(pattern.kind), s.start, barFits, BAR_MESSAGE)

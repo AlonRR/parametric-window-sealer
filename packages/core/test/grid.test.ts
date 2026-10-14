@@ -157,6 +157,7 @@ describe('settings in the library’s shape', () => {
       ['fill.reliefPct', null],
       ['fill.grid.openingMm', null],
       ['fill.grid.barMm', null],
+      ['fill.drawing', null], // the SVG tile's, text (svg-tile, #27)
     ]);
   });
 

@@ -65,6 +65,8 @@ describe('the server', () => {
       expect(node.description).toBe(s.help);
       if (s.onOff)
         expect(node.type).toBe('boolean'); // a place for the tape: true or false
+      else if (s.text)
+        expect(node.type).toBe('string'); // the SVG tile's drawing
       else if (s.values) expect(node.enum).toEqual([...s.values]);
     }
     expect(settings.required).toEqual(['openingWidthMm', 'openingHeightMm']);
@@ -270,6 +272,22 @@ describe('window_sealer_plan_wall', () => {
     expect(r.data['summary'].fill).toBe(
       'Fill: diamonds 20 mm wide and 30 mm tall and 2 mm bars, cut 1.5 mm into the room side.',
     );
+  });
+
+  it('an SVG tile: the drawing as text, given alone meaning the tile (#27)', async () => {
+    const { call } = await connect();
+    const drawing =
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">' +
+      '<rect width="10" height="10"/><rect x="12" width="5" height="5"/></svg>';
+    const r = await call('window_sealer_plan_wall', {
+      settings: { ...OPENING, fill: { drawing, svg: { widthMm: 30 } } },
+    });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['settings'].fill).toMatchObject({ kind: 'svg', drawing });
+    expect(r.data['summary'].fill).toBe('Fill: an SVG tile 30 × 30 mm with 2 openings, cut 1.5 mm into the room side.');
+    const page = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { drawing: '<html/>' } } });
+    expect(page.isError).toBe(true);
+    expect(page.text).toContain('The file is not an SVG drawing: it has no svg element at its root.');
   });
 
   it('pieces with fills of their own (#21)', async () => {

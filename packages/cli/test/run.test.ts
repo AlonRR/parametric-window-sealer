@@ -459,6 +459,40 @@ describe('fans (fan-mount #28: --fan, repeatable)', () => {
   });
 });
 
+describe('an SVG tile (svg-tile #27: --svg-tile <file>)', () => {
+  const SQUARES =
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">' +
+    '<rect width="10" height="10"/><rect x="12" width="5" height="5"/></svg>';
+
+  it('--svg-tile reads the file and means the tile; --svg-width sets its width', async () => {
+    const r = await cli([...OPENING, '--svg-tile', 'tile.svg', '--svg-width', '30', '--dry-run', '--json'], undefined, {
+      'tile.svg': SQUARES,
+    });
+    expect(r.code).toBe(0);
+    const out = json(r.out);
+    expect(out.params.fill).toMatchObject({ kind: 'svg', drawing: SQUARES, svg: { widthMm: 30 } });
+    expect(out.summary.fill).toBe('Fill: an SVG tile 30 × 30 mm with 2 openings, cut 1.5 mm into the room side.');
+  });
+
+  it('refuses a file it cannot read, or one that is not a drawing, naming the flag', async () => {
+    const missing = await cli([...OPENING, '--svg-tile', 'nowhere.svg', '--dry-run']);
+    expect(missing.code).toBe(2);
+    expect(missing.err).toMatch(/^--svg-tile: cannot read nowhere\.svg: /);
+    const page = await cli([...OPENING, '--svg-tile', 'page.html', '--dry-run'], undefined, {
+      'page.html': '<html><body/></html>',
+    });
+    expect(page.code).toBe(2);
+    expect(page.err).toContain('--svg-tile: The file is not an SVG drawing: it has no svg element at its root.');
+  });
+
+  it('--help names a file, and does not print the starting drawing', async () => {
+    const r = await cli(['--help']);
+    const help = r.out.replace(/\s+/g, ' ');
+    expect(help).toContain('--svg-tile <file.svg>');
+    expect(help).not.toContain('<circle');
+  });
+});
+
 describe('a window AC (window-ac #24; C49 to C53)', () => {
   it('--bottom-edge unit: the wall stands on the unit, and the summary says so', async () => {
     const r = await cli(['--width', '600', '--height', '400', '--bottom-edge', 'unit', '--dry-run']);

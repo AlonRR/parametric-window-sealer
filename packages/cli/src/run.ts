@@ -19,7 +19,7 @@ import type { DownloadChoice, Format, ListKind, Packaging, PlanText } from 'para
 import { messageOf, version } from './about.js';
 import { SETTING_FLAGS } from './flags.js';
 import { readParamsFile, settingsFrom } from './settings.js';
-import type { FromFile, Problem } from './settings.js';
+import type { Flags, FromFile, Problem } from './settings.js';
 
 export interface Io {
   cwd: string;
@@ -89,8 +89,17 @@ function help(): string {
       fans: '<mm[@column,row]>',
     };
     const each: Record<ListKind, string> = { ports: 'port', pieceFills: 'piece', cutouts: 'cutout', fans: 'fan' };
-    const value = f.list ? lists[f.list] : f.values === undefined ? unit : long ? '<id>' : `<${f.values.join('|')}>`;
-    const start = f.flag === 'width' || f.flag === 'height' ? '' : starting[f.field];
+    const value = f.list
+      ? lists[f.list]
+      : f.text
+        ? '<file.svg>'
+        : f.values === undefined
+          ? unit
+          : long
+            ? '<id>'
+            : `<${f.values.join('|')}>`;
+    // The opening has no starting value, and a drawing's is too long to show.
+    const start = f.flag === 'width' || f.flag === 'height' || f.text ? '' : starting[f.field];
     const text = f.list
       ? `${f.help} Give --${f.flag} again for each ${each[f.list]}.`
       : long
@@ -215,9 +224,19 @@ export async function run(args: string[], io: Io): Promise<number> {
       else start = read;
     }
   }
+  // A text setting's flag names a file, whose text is the setting: the SVG tile's drawing (#27).
+  const flags: Flags = Object.fromEntries(SETTING_FLAGS.map((f) => [f.flag, text(f.flag)]));
+  for (const f of SETTING_FLAGS) {
+    const file = flags[f.flag];
+    if (f.text !== true || file === undefined) continue;
+    try {
+      flags[f.flag] = readFileSync(resolve(io.cwd, file), 'utf8');
+    } catch (error) {
+      problems.push({ flag: `--${f.flag}`, message: `cannot read ${file}: ${messageOf(error)}` });
+    }
+  }
   if (problems.length > 0) return fail(WRONG_USE, problems);
 
-  const flags = Object.fromEntries(SETTING_FLAGS.map((f) => [f.flag, text(f.flag)]));
   const settings = settingsFrom(start, flags);
   if ('problems' in settings) return fail(WRONG_USE, settings.problems);
   const { params } = settings;

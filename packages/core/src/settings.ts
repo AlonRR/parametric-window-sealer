@@ -21,6 +21,7 @@ export interface Setting {
   values?: readonly string[]; // a choice; otherwise a length in mm
   list?: ListKind; // a list in the shape, written in the form as the command's --port takes it
   onOff?: true; // true or false in the shape, written yes or no in the form
+  text?: true; // text in the shape and in the form, as an SVG file's
 }
 
 const DIVISION = ['equal', 'full-plus-filler'] as const;
@@ -195,6 +196,14 @@ export const SETTINGS: readonly Setting[] = [
   { field: 'reliefPct', path: 'fill.reliefPct', help: "A relief's depth, as a percentage of the panel's thickness." },
   ...patternSettings(),
   {
+    field: 'fillDrawing',
+    path: 'fill.drawing',
+    help:
+      "The SVG tile's drawing: the text of an SVG file, its viewBox one cell of the pattern and its filled " +
+      'shapes the openings. Starts as one round opening in a square cell.',
+    text: true,
+  },
+  {
     field: 'pieceFills',
     path: 'pieceFills',
     help:
@@ -338,11 +347,13 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
     const tape = seal['tape'];
     params.seal = { ...params.seal, kind: isObject(tape) && tape['joints'] === true ? 'tpu' : 'tape' };
   }
-  // A pattern's sizes without a kind mean that pattern (C11, C16, C21, C25).
+  // A pattern's sizes without a kind mean that pattern (C11, C16, C21, C25), and a drawing the
+  // SVG tile.
   const fill = input['fill'];
   for (const p of PATTERNS) {
     if (isObject(fill) && !('kind' in fill) && p.kind in fill) params.fill = { ...params.fill, kind: p.kind };
   }
+  if (isObject(fill) && !('kind' in fill) && 'drawing' in fill) params.fill = { ...params.fill, kind: 'svg' };
 
   const values: FormValues = toFormValues(params);
   const presetWindow = overrides.window;
@@ -359,6 +370,7 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
     const sized = p.sizes.some((s) => overrides[s.field] !== undefined);
     if (overrides.fill === undefined && sized) values.fill = p.kind;
   }
+  if (overrides.fill === undefined && overrides.fillDrawing !== undefined) values.fill = 'svg';
   Object.assign(values, overrides);
 
   const problems: SettingProblem[] = [];

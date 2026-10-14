@@ -592,6 +592,21 @@
               <optgroup label="Patterns" data-part="pattern-list"></optgroup>
             </select>
           </label>
+          <!-- The SVG tile (svg-tile, #27): a drawing of one cell, its filled shapes the openings
+            (docs/svg-tiles.md). The page reads the file and puts its text in fillDrawing. -->
+          <div data-testid="svg-tile" data-show-when="fill=svg" hidden>
+            <label>
+              SVG file
+              <input type="file" accept=".svg,image/svg+xml" data-part="svg-file" />
+            </label>
+            <p class="note">
+              One cell of the pattern: the drawing's viewBox is the cell, and its filled shapes are
+              the openings. Its width on the wall is with the pattern's sizes, under Advanced.
+            </p>
+            <p class="note" data-testid="svg-tile-name">Using the starting drawing: one round opening.</p>
+          </div>
+          <input type="hidden" name="fillDrawing" />
+          <span class="error" data-testid="error-fillDrawing"></span>
           <div data-testid="fill-style" data-show-when="fill!=sealed" hidden>
             <label><input type="radio" name="fillStyle" value="relief" /> Relief</label>
             <p class="note">Cut into the face you see from the room; the wall stays sealed.</p>

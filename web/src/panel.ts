@@ -16,6 +16,7 @@ import { pieceMap } from './piece-map';
 import { showPlan } from './plan-view';
 import { printerChoice } from './printer-choice';
 import { applyConditions } from './show-when';
+import { svgTile } from './svg-tile';
 import { tapeSize } from './tape-size';
 import { mountWindowRoles } from './window-roles';
 
@@ -54,6 +55,7 @@ export function mountPanel(
     hosePorts(form, update),
     measuredCutout(form),
     exhaustFan(form),
+    svgTile(form, update),
   ].filter((p): p is FormPart => p !== null);
   const pieces = pieceMap(form, update);
   mountPatternControls(form);

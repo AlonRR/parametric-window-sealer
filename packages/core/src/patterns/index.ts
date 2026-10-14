@@ -7,14 +7,16 @@ import type { PatternDefinition } from './define.js';
 import { DIAMOND } from './diamond.js';
 import { GRID } from './grid.js';
 import { HEXAGON } from './hexagon.js';
+import { SVG_TILE } from './svg.js';
 
 export * from './define.js';
 export * from './grid.js';
 export * from './hexagon.js';
 export * from './brick.js';
 export * from './diamond.js';
+export * from './svg.js';
 
-export const PATTERNS = [GRID, HEXAGON, BRICK, DIAMOND] as const;
+export const PATTERNS = [GRID, HEXAGON, BRICK, DIAMOND, SVG_TILE] as const;
 
 export type Pattern = (typeof PATTERNS)[number];
 export type PatternKind = Pattern['kind'];

@@ -80,8 +80,17 @@ function leaf(
   required: boolean,
   list?: ListKind,
   onOff = false,
+  text = false,
 ): z.ZodType {
-  const base = list ? z.array(ITEMS[list]) : onOff ? z.boolean() : values === undefined ? z.number() : choices(values);
+  const base = list
+    ? z.array(ITEMS[list])
+    : onOff
+      ? z.boolean()
+      : text
+        ? z.string() // the SVG tile's drawing: an SVG file's text
+        : values === undefined
+          ? z.number()
+          : choices(values);
   const described = base.describe(help);
   return required ? described : described.optional();
 }
@@ -112,7 +121,7 @@ export function settingsSchema(): z.ZodObject {
       if (next instanceof z.ZodType) throw new Error(`${s.path} sits inside the setting ${key}`);
       at = at[key] = next;
     }
-    at[last] = leaf(s.help, s.values, REQUIRED.has(s.path), s.list, s.onOff === true);
+    at[last] = leaf(s.help, s.values, REQUIRED.has(s.path), s.list, s.onOff === true, s.text === true);
   }
   return toSchema(tree, '').describe(
     "The window's settings in the library's shape; every length in mm. Only the opening is required; " +

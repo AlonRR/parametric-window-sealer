@@ -22,6 +22,7 @@ export * from './settings.js';
 export * from './tape.js';
 export * from './fill.js';
 export * from './patterns/index.js';
+export * from './svg/drawing.js';
 export * from './piece-fill.js';
 export * from './wall.js';
 export * from './tpu.js';

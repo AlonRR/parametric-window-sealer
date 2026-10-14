@@ -50,8 +50,9 @@ describe('the patterns', () => {
     expect(pattern?.tile.pitchXMm).toBeGreaterThan(0);
     expect(pattern?.tile.pitchYMm).toBeGreaterThan(0);
     expect(pattern?.tile.openings.length).toBeGreaterThan(0);
+    // Its bar size's start; the SVG tile has none, its bars being what the drawing leaves.
     const bar = p.sizes.find((s) => s.bar === true);
-    expect(pattern?.tile.barMm).toBe(bar?.start);
+    expect(pattern?.tile.barMm).toBe(bar?.start ?? MIN_BAR_MM);
   });
 
   it.each(PATTERNS.map((p) => [p.kind, p] as const))('%s: its sizes are read, checked and named', (kind, p) => {

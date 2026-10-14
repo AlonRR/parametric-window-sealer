@@ -61,6 +61,7 @@ const FLAG_NAMES: Record<OwnField, string> = {
   fill: 'fill', // sealed or a pattern (Q141)
   fillStyle: 'fill-style',
   reliefPct: 'relief-depth',
+  fillDrawing: 'svg-tile', // names a file, whose text is the drawing; without --fill means the tile (#27)
   pieceFills: 'piece-fill', // repeatable: one --piece-fill for each piece (C28)
   cutouts: 'cutout', // repeatable, as --port (C44)
   rimDepthMm: 'rim-depth',

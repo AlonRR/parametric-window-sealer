@@ -24,8 +24,9 @@ export interface PatternDefinition<K extends string = string, F extends string =
   words: string; // among the patterns in a sentence: "a grid"
   group: string; // the MCP server's description of fill.<kind>
   sizes: readonly PatternSize<F, S>[];
-  tile(size: SizeOf<S>): PatternTile;
-  describe(size: SizeOf<S>): string; // in the plan: "a grid of 15 mm square openings and 3 mm bars"
+  // The drawing is the SVG tile's, the text of its file (svg-tile, #27); the others leave it.
+  tile(size: SizeOf<S>, drawing: string): PatternTile;
+  describe(size: SizeOf<S>, drawing: string): string; // in the plan: "a grid of 15 mm square openings and 3 mm bars"
 }
 
 // Keeps every name exact, so the type checker knows each pattern's kind, fields and sizes.
