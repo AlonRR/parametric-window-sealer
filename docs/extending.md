@@ -82,11 +82,11 @@ of its own for its tile's shape, as `grid.test.ts` has.
 ## A new fitting
 
 A fitting is something in one piece that the appliance or its hose passes through: the hose
-port and the measured cutout today, a fan mount, clamps or a sliding insert later. Each kind is
+port, the measured cutout and the fan mount today, clamps or a sliding insert later. Each kind is
 one file in `packages/core/src/fittings/` and one entry in `FITTINGS` (`fittings/index.ts`),
 whose order is the order the kinds are listed in: keep it the order they are placed in (step 2
 below). Write its `FittingDefinition`
-(`fittings/define.ts`), as `hose-port.ts` does:
+(`fittings/define.ts`), as `hose-port.ts` does; `fan-mount.ts` is the smallest:
 
 - `kind`, its name; each fitting's tag in its piece's file name starts with it (`-port-150`);
 - `placed(source)`: each fitting in its piece, with the piece's `solid` (start from `plainPanel`
@@ -106,7 +106,9 @@ Then:
    (`params.ts`) with `placeFittings`, after the kinds already there: its `label` and `plural`
    for the messages ("Port 1", "Ports 1 and 2"), its `check` of a fitting in its piece, and the
    kinds placed before it, so that two fittings never share a piece. A fitting given without a
-   piece goes in the starting one.
+   piece goes in the starting one. A setting that lists several fittings also adds its kind to
+   `ListKind` and its items to `LIST_ITEMS` (`settings.ts`); the type checker then names the
+   command's and the MCP server's tables that need it too.
 3. **Its lines in the plan** need their key in `PlanText`, set from its `describe`, and their
    place on the page (above).
 4. **A new kind of part**, if it prints one the wall does not have yet: its shape joins

@@ -84,7 +84,9 @@ window-sealer --width 600 --height 1000 --printer-model prusa-mk4s
   seen from the room. Give `--port` again for each port. `--cutout 120x80` cuts an opening for
   an appliance you measured, 120 mm wide and 80 mm high seen from the room, with a rim round it
   lined with the seal if there is one; `--cutout 120x80@2,1` places it, and `--rim-depth`,
-  `--rim-wall` and `--rim-clearance` change the rim. `--collar-depth`, `--collar-wall`,
+  `--rim-wall` and `--rim-clearance` change the rim. `--fan 120` mounts an exhaust fan: a round
+  opening and four screw holes for a fan of 80, 92, 120 or 140 mm, as its maker draws them;
+  `--fan 120@2,1` places it, and `--fan` again adds one. `--collar-depth`, `--collar-wall`,
   `--collar-clearance` and `--collar-lip` change the collar the hose end slides into.
 - `--seal tape` adds foam tape in a groove along each edge strip's face that the track, sash or
   sill presses; `--tape-width` and `--tape-thickness` set its size (9 × 4 mm to start with;

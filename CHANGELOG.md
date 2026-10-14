@@ -12,6 +12,15 @@ under Unreleased.
 
 ## [Unreleased]
 
+### Added
+
+- Exhaust fans: "Exhaust fan" under "What is in the window?" mounts a square-framed fan of 80,
+  92, 120 or 140 mm in one piece: a round opening and four screw holes where the fan's own are,
+  as the makers draw them (`docs/fan-sizes.md`). The 140 mm holes are short slots, so fans from
+  makers who space them 124.5 or 125 mm apart both fit. The command takes `--fan 120` or
+  `--fan 120@2,1`, the library and the MCP server `fans: [{ sizeMm: 120 }]`. Not yet test
+  printed.
+
 ### Fixed
 
 - The message for printed TPU joints chosen with foam tape no longer shows an internal reference,

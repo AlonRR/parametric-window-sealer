@@ -23,7 +23,8 @@ adds the three API rows that need no server** (`api-library`, `api-cli`, `api-mc
 and **`v0.3.0`, the same day again, every P1 row** (C48). Nothing in any of them has been test
 printed yet. After `v0.3.0`, four rows were added at P1, ahead of P2, to make the code easy to
 extend (Q145): `code-tooling`, `code-params-page`, `fill-registry` and `fitting-registry`. On
-14 Oct, `ci-triggers` was added at P1 so that CI checks each commit once (Q147).
+14 Oct, `ci-triggers` was added at P1 so that CI checks each commit once (Q147). P2 began the
+same day (Q148): `pattern-plugins` is covered by `fill-registry`, and `fan-mount` came first.
 
 ## How to read the table
 
@@ -83,9 +84,9 @@ extend (Q145): `code-tooling`, `code-params-page`, `fill-registry` and `fitting-
 | `fill-registry` | #96 | Each pattern declared once, in one file: its sizes, starting values, limits, help, flags and tile; the settings, flags, MCP schema, page controls and plan words come from it. The in-code half of `pattern-plugins` | P1 | M | `code-params-page` | Q145 | Keeping the types exact for fields declared at run time |
 | `fitting-registry` | #97 | The hose port and the measured cutout behind one fitting interface, so the fan mount, clamps, sliding insert and imported appliance each add a fitting (C83 to C89) | P1 | M | `code-params-page` | Q145 | The two fittings differ in shape, so the interface must not assume either |
 | `ci-triggers` | #101 | The checks run once per commit, through its pull request: on pull requests and pushes to `main` only, a superseded run cancelled, each job with a time limit (C82) | P1 | S | | Q147 | Whether the owner's Gitea version honours `concurrency` |
-| `pattern-plugins` | #26 | Pattern files contributed to the repo appear in the list | P2 | M | `patterns-core` | Q21 | Plugin format |
+| `pattern-plugins` | #26 | Pattern files contributed to the repo appear in the list. **Covered by `fill-registry` (#96)**: a contributed pattern is one file and one line in `PATTERNS` (C97) | P2 | M | `patterns-core` | Q21, Q148 | Plugin format |
 | `svg-tile` | #27 | Upload an SVG tile as a pattern | P2 | M | `patterns-core` | Q21 | Arbitrary SVG: curves, holes, units |
-| `fan-mount` | #28 | Fan mounts with screw patterns from a list | P2 | M | `measured-cutout` | Q15, Q16 | Spec to verify per fan size |
+| `fan-mount` | #28 | Fan mounts with screw patterns from a list: square-framed fans of 80, 92, 120 and 140 mm, from the makers' own drawings ([`fan-sizes.md`](fan-sizes.md); C90 to C96) | P2 | M | `measured-cutout` | Q15, Q16, Q148 | Test print: the screw holes and the 140 mm slots |
 | `joint-dovetail` | #29 | Advanced joint: puzzle dovetails | P2 | M | `layout` | Q13 | Test print |
 | `joint-rails` | #30 | Advanced joint: sliding dovetail rails | P2 | M | `layout` | Q13 | Test print; assembly order |
 | `joint-bolts` | #31 | Advanced joint: bolted flanges | P2 | M | `layout` | Q13 | Spec to verify: bolt and nut sizes |
