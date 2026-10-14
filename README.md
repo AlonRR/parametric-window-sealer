@@ -12,7 +12,8 @@ panel style, and get a set of printable pieces that join together and fit the ga
 yet test printed.** The page in `web/` takes the opening you can see and your window type,
 divides the opening into pieces your printer can make, joins them with connector strips and
 cross pieces, fits edge strips into the window's tracks, shows the wall in 3D and downloads
-every part as STL or 3MF. It fits a hose port, a measured cutout, an exhaust fan or a window air conditioner,
+every part as STL or 3MF. It fits a hose port, a measured cutout, an exhaust fan, an appliance held by
+clamps ([`docs/clamps.md`](docs/clamps.md)) or a window air conditioner,
 seals the edges with foam tape or printed TPU, fills the pieces with a pattern or a tile of your
 own drawing ([`docs/svg-tiles.md`](docs/svg-tiles.md)), and has a measuring guide; it can also be saved as one file that works offline.
 The same geometry is a library for Node.js and browsers, the `window-sealer` command and the
@@ -29,7 +30,7 @@ issues; what has changed is in [`CHANGELOG.md`](CHANGELOG.md).
 
 Planned next:
 
-- **Appliances**: adjustable clamps gripping the appliance.
+- **Appliances**: a sliding insert that closes in round the appliance.
 - **Panel styles**: organiser patterns (pegboard-style), beside the grid, hexagon, brick and
   diamond patterns.
 - **Fit**: a guided test print that adjusts the joint's fit after each print.

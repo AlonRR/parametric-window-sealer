@@ -25,7 +25,7 @@ printed yet. After `v0.3.0`, four rows were added at P1, ahead of P2, to make th
 extend (Q145): `code-tooling`, `code-params-page`, `fill-registry` and `fitting-registry`. On
 14 Oct, `ci-triggers` was added at P1 so that CI checks each commit once (Q147). P2 began the
 same day (Q148): `pattern-plugins` is covered by `fill-registry`, and `fan-mount` came first,
-then `svg-tile`, with `clamps` next (Q149).
+then `svg-tile` and `clamps` (Q149).
 
 ## How to read the table
 
@@ -91,7 +91,7 @@ then `svg-tile`, with `clamps` next (Q149).
 | `joint-dovetail` | #29 | Advanced joint: puzzle dovetails | P2 | M | `layout` | Q13 | Test print |
 | `joint-rails` | #30 | Advanced joint: sliding dovetail rails | P2 | M | `layout` | Q13 | Test print; assembly order |
 | `joint-bolts` | #31 | Advanced joint: bolted flanges | P2 | M | `layout` | Q13 | Spec to verify: bolt and nut sizes |
-| `clamps` | #32 | Adjustable clamps with slotted holes gripping the appliance | P2 | M | `measured-cutout` | Q16, Q149 | Test print |
+| `clamps` | #32 | Adjustable clamps with slotted holes gripping the appliance: an opening and four printed jaws on M4 bolts, gripping the measured size give or take their travel ([`clamps.md`](clamps.md); C110 to C118) | P2 | M | `measured-cutout` | Q16, Q149 | Test print: the grip, and the slots against the bolt holes |
 | `organiser-skadis` | #33 | Skådis organiser fill | P2 | M | `patterns-core` | Q9 | Spec to verify; accessory fit needs a test print |
 | `organiser-opengrid` | #34 | openGrid organiser fill | P2 | M | `patterns-core` | Q9 | Spec to verify; test print |
 | `mesh-appliance` | #35 | Cut the wall around an imported model of the appliance | P2 | M | `mesh-import` | Q25 | Inherits `mesh-import`'s risk |

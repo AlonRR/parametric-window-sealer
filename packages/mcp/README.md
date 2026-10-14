@@ -66,7 +66,9 @@ height makes the printer custom, and a printer `id` from the list, such as `"pri
 "prusa-mk4s" }`, a listed one (`window_sealer_list_settings` names them all). A port for a portable air conditioner's hose goes in `ports`, as
 `[{ "hoseMm": 150 }]`: the hose end's outside diameter (150 and 130 mm are common; measure the
 end that goes in), and optionally its piece as `column` and `row`, from 1 at the bottom left seen
-from the room; without them it goes in the bottom row's middle piece. Foam tape goes in `seal`,
+from the room; without them it goes in the bottom row's middle piece. An appliance measured only
+roughly goes in `clamps`, as `[{ "widthMm": 120, "heightMm": 80 }]`, gripped by four printed jaws
+on M4 bolts, give or take their travel (`clamp.travelMm`, 10 mm). Foam tape goes in `seal`,
 as `{ "kind": "tape" }`, or with its size and places, such as `{ "tape": { "widthMm": 9.5,
 "thicknessMm": 4.8, "sides": true } }`; tape settings without a `kind` mean tape. A grid pattern goes in `fill`, as `{ "kind": "grid" }`
 or with its sizes, such as `{ "grid": { "openingMm": 12, "barMm": 2 }, "style": "through" }`;

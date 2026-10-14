@@ -14,6 +14,13 @@ under Unreleased.
 
 ### Added
 
+- Clamps: "Something else, held by clamps" under "What is in the window?" takes an appliance
+  measured roughly. Its piece gets an opening and eight bolt holes, and four printed jaws slide in
+  on M4 bolts to grip it, the measured size give or take the jaws' travel (10 mm to start with,
+  under Advanced). The plan names the bolts; `docs/clamps.md` says how to fit them, and that a
+  small gap can stay open at each corner. The command takes `--clamp 120x80` or
+  `--clamp 120x80@2,1`, with `--clamp-travel` and `--clamp-depth`; the library and the MCP server
+  `clamps` and `clamp`. Not yet test printed.
 - SVG tiles: a pattern of your own for the panel fill. Choose "SVG tile" as the fill, then an SVG
   file: its `viewBox` is one cell, repeated across the wall at the width you set (20 mm to start
   with, its height in proportion), and its filled shapes are the openings, with curves, arcs,

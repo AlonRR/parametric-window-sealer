@@ -86,7 +86,10 @@ window-sealer --width 600 --height 1000 --printer-model prusa-mk4s
   lined with the seal if there is one; `--cutout 120x80@2,1` places it, and `--rim-depth`,
   `--rim-wall` and `--rim-clearance` change the rim. `--fan 120` mounts an exhaust fan: a round
   opening and four screw holes for a fan of 80, 92, 120 or 140 mm, as its maker draws them;
-  `--fan 120@2,1` places it, and `--fan` again adds one. `--collar-depth`, `--collar-wall`,
+  `--fan 120@2,1` places it, and `--fan` again adds one. `--clamp 120x80` grips an appliance
+  measured roughly with four printed jaws on M4 bolts, give or take their travel (`--clamp-travel`,
+  10 mm; `--clamp-depth` for the jaws' lips); `--clamp 120x80@2,1` places it, and the jaws are
+  among the files. `--collar-depth`, `--collar-wall`,
   `--collar-clearance` and `--collar-lip` change the collar the hose end slides into.
 - `--seal tape` adds foam tape in a groove along each edge strip's face that the track, sash or
   sill presses; `--tape-width` and `--tape-thickness` set its size (9 × 4 mm to start with;

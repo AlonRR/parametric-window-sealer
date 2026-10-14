@@ -98,8 +98,9 @@ below). Write its `FittingDefinition`
   and cut into it), the `keepOut` zone a pattern stays clear of, its `tag`, and its `lining`, the
   seal drawn in the preview, if it has one. Leave `marks` empty: the hose port's and the cutout's
   fields there are kept for the library's earlier callers;
-- `parts(source, tpu)`: what is printed beside the pieces for it with the TPU seal, each part
-  with its name and its solid;
+- `parts(source, tpu)`: what is printed beside the pieces for it, each part with its name and
+  its solid: with the TPU seal (`tpu` given), its share of the seal, as the hose port's sleeves;
+  and whatever the seal, the parts it always needs, as the clamps' jaws;
 - `lining(source)`: its share of the seal in the plan, the tape it takes and where;
 - `describe(source)`: its lines in the plan, one for each fitting, naming its piece.
 
@@ -119,7 +120,7 @@ Then:
 4. **A new kind of part**, if it prints one the wall does not have yet: its shape joins
    `AnyPartShape` and its name `partName`, both in `export.ts`; its solid stays in its file.
 5. **On the page**, a control for several fittings is a form part (below), as
-   `web/src/fittings.ts` is for the ports and the cutouts.
+   `web/src/fittings.ts` is for the ports, the cutout, the fan and the clamps.
 
 Nothing else changes: the pieces (`buildPiecesWith`), the pattern's keep-out, the files and their
 names, the dry run, the seal's line in the plan and the preview take every kind from `FITTINGS`.
