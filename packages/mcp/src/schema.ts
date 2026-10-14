@@ -15,6 +15,7 @@ const GROUPS: Record<string, string> = {
   edges: 'The window and its four edges.',
   collar: "The hose port's collar, in mm. Starting values; a test print confirms them.",
   rim: 'The rim round each measured cutout, in mm. Starting values; a test print confirms them.',
+  insert: "The sliding inserts' shutters, in mm: how far each slides and the clearance above and below.",
   clamp: "The clamps' jaws, in mm: how far each slides and how far its lip stands out. A test print confirms them.",
   seal:
     'The seal: none, foam tape, or gaskets printed in TPU to the tape’s size. Tape settings without a kind mean tape; ' +
@@ -81,12 +82,21 @@ const CLAMP = z.strictObject({
   row: z.number().int().min(1).optional().describe('The row of its piece, from 1 at the bottom.'),
 });
 
+// An appliance in a sliding insert (#38): its size, and its piece as a port's.
+const INSERT = z.strictObject({
+  widthMm: z.number().describe("The appliance's outside width in mm, seen from the room, give or take the travel."),
+  heightMm: z.number().describe("The appliance's outside height in mm."),
+  column: z.number().int().min(1).optional().describe('The column of its piece, from 1 at the left.'),
+  row: z.number().int().min(1).optional().describe('The row of its piece, from 1 at the bottom.'),
+});
+
 const ITEMS: Record<ListKind, z.ZodType> = {
   ports: PORT,
   pieceFills: PIECE_FILL,
   cutouts: CUTOUT,
   fans: FAN,
   clamps: CLAMP,
+  inserts: INSERT,
 };
 
 function leaf(

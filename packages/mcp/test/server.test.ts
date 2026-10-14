@@ -211,6 +211,19 @@ describe('window_sealer_plan_wall', () => {
     expect(unlisted.text).toContain('100 mm is not a listed fan size; the sizes are 80, 92, 120 and 140 mm.');
   });
 
+  it('sliding inserts in the library’s shape, with their line and shutters (#38)', async () => {
+    const { call } = await connect();
+    const big = { openingWidthMm: 1200, openingHeightMm: 900, printer: { widthMm: 300, heightMm: 300 } };
+    const r = await call('window_sealer_plan_wall', {
+      settings: { ...big, inserts: [{ widthMm: 120, heightMm: 80 }] },
+    });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['settings'].inserts).toEqual([{ widthMm: 120, heightMm: 80, column: 2, row: 1 }]);
+    expect(r.data['summary'].inserts[0]).toMatch(/^Sliding insert: a 120 × 80 mm appliance, in column 2, row 1/);
+    const names = (r.data['files'] as { name: string }[]).map((f) => f.name);
+    expect(names).toContain('shutter-32x89.4-print-2.stl');
+  });
+
   it('clamps in the library’s shape, with their line and their jaws among the files (#32)', async () => {
     const { call } = await connect();
     const r = await call('window_sealer_plan_wall', {

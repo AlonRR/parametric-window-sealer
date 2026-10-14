@@ -32,6 +32,7 @@ const params: Params = {
   cutouts: [{ widthMm: 120, heightMm: 80, column: 1, row: 2 }],
   fans: [{ sizeMm: 120, column: 1, row: 4 }],
   clamps: [{ widthMm: 120, heightMm: 80, column: 2, row: 3 }],
+  inserts: [{ widthMm: 100, heightMm: 80, column: 3, row: 3 }],
 };
 const plan = planWall(params);
 const SEALS: Record<string, SealParams> = {
@@ -54,7 +55,7 @@ describe('every kind of fitting', () => {
   it('has a kind of its own', () => {
     const kinds = FITTINGS.map((f) => f.kind);
     expect(new Set(kinds).size).toBe(kinds.length);
-    expect(kinds).toEqual(['port', 'cutout', 'fan', 'clamp']);
+    expect(kinds).toEqual(['port', 'cutout', 'fan', 'clamp', 'insert']);
   });
 
   for (const [seal, sealParams] of Object.entries(SEALS)) {
@@ -118,6 +119,7 @@ describe('every kind of fitting', () => {
 
   const tpuSeal: SealParams = { kind: 'tpu', tape: { ...DEFAULT_TAPE, port: true } };
   const JAWS = ['jaw-138x21.3x15-print-2', 'jaw-69x21.3x15-print-2'];
+  const SHUTTERS = ['shutter-32x89.4-print-2'];
   it('with the TPU seal, prints a sleeve for the hose port, a frame for the cutout, nothing for the fan and the clamp’s jaws', () => {
     const tpu = tapeFit(tpuSeal);
     if (tpu === undefined) throw new Error('no fit for the TPU seal');
@@ -128,12 +130,13 @@ describe('every kind of fitting', () => {
       cutout: [expect.stringMatching(/^frame-120x80-tpu-print-1$/)],
       fan: [],
       clamp: JAWS,
+      insert: SHUTTERS,
     });
   });
-  it('without the TPU seal, prints only what a kind always needs: the clamp’s jaws', () => {
+  it('without the TPU seal, prints only what a kind always needs: the clamp’s jaws and the insert’s shutters', () => {
     const source = fittingSource({ ...params, seal: SEALS['tape'] ?? EXAMPLE_PARAMS.seal });
     const names = Object.fromEntries(FITTINGS.map((k) => [k.kind, k.parts(source, undefined).map((p) => p.name)]));
-    expect(names).toEqual({ port: [], cutout: [], fan: [], clamp: JAWS });
+    expect(names).toEqual({ port: [], cutout: [], fan: [], clamp: JAWS, insert: SHUTTERS });
   });
   for (const kind of FITTINGS) {
     // A kind need print nothing (a fan is screwed straight on); what one prints is held to this.

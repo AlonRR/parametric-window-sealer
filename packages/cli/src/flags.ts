@@ -71,6 +71,9 @@ const FLAG_NAMES: Record<OwnField, string> = {
   clamps: 'clamp', // repeatable, as --cutout (#32)
   clampTravelMm: 'clamp-travel',
   clampDepthMm: 'clamp-depth',
+  inserts: 'insert', // repeatable, as --cutout (#38)
+  insertTravelMm: 'insert-travel',
+  insertClearanceMm: 'insert-clearance',
 };
 
 const PATTERN_FLAGS = new Map<string, string>(PATTERNS.flatMap((p) => p.sizes.map((s) => [s.field, s.flag])));

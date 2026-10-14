@@ -18,6 +18,7 @@ import { NO_SEAL } from '../src/tape.js';
 import { SEALED } from '../src/fill.js';
 import { DEFAULT_RIM } from '../src/cutout.js';
 import { DEFAULT_CLAMP } from '../src/clamp.js';
+import { DEFAULT_INSERT } from '../src/insert.js';
 
 const example = toFormValues(EXAMPLE_PARAMS);
 const read = (over: FormValues) => readParams({ ...example, ...over });
@@ -44,6 +45,8 @@ describe('the starting values', () => {
       fans: [], // #28
       clamps: [], // #32
       clamp: DEFAULT_CLAMP,
+      inserts: [], // #38
+      insert: DEFAULT_INSERT,
     });
   });
 
@@ -287,6 +290,7 @@ describe('describePlan', () => {
       cutouts: [],
       fans: [], // #28
       clamps: [], // #32
+      inserts: [], // #38
       units: [], // #24
       seal: 'Seal: none.',
       fill: 'Fill: sealed.',

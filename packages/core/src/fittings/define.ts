@@ -6,6 +6,7 @@
 // printed for it, and its lines and share of the seal in the plan.
 import type { Manifold } from 'manifold-3d';
 import type { ClampParams, ClampSetting } from '../clamp.js';
+import type { InsertParams, InsertSetting } from '../insert.js';
 import type { CutoutSetting, Rectangle, RimParams } from '../cutout.js';
 import type { Engine } from '../engine.js';
 import type { FanSetting } from '../fan.js';
@@ -28,9 +29,11 @@ export interface FittingSource {
   cutouts: readonly Required<CutoutSetting>[];
   fans: readonly Required<FanSetting>[];
   clamps: readonly Required<ClampSetting>[];
+  inserts: readonly Required<InsertSetting>[];
   collar: CollarParams;
   rim: RimParams;
   clamp: ClampParams;
+  insert: InsertParams;
   thicknessMm: number; // the panel's
   tape: TapeFit | undefined; // the seal, if any: foam tape or printed TPU
   sealKind: SealParams['kind'];

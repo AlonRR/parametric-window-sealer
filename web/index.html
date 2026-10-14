@@ -373,6 +373,10 @@
           <label>
             <input type="radio" name="appliance" value="clamp" /> Something else, held by clamps
           </label>
+          <!-- A sliding insert (sliding-insert, #38): one on the page, as the cutout (C45). -->
+          <label>
+            <input type="radio" name="appliance" value="insert" /> Something else, in a sliding insert
+          </label>
           <!-- A window AC (window-ac, #24): the edge facing the unit meets it (C49, C50). -->
           <label><input type="radio" name="appliance" value="ac" /> Window air conditioner</label>
           <div data-testid="ac" data-show-when="appliance=ac" hidden>
@@ -502,6 +506,35 @@
             </p>
           </div>
           <span class="error" data-testid="error-clamps"></span>
+          <div data-testid="insert" data-show-when="appliance=insert" hidden>
+            <label>
+              Appliance width (mm)
+              <input data-part="insert-width" inputmode="decimal" autocomplete="off" />
+            </label>
+            <label>
+              Appliance height (mm)
+              <input data-part="insert-height" inputmode="decimal" autocomplete="off" />
+            </label>
+            <p class="note">
+              Measure the outside of what passes through the wall, across and up, seen from the
+              room. Two printed shutters slide in rails from each side and close round it, its width
+              give or take their travel (20 mm to start with, under Advanced); each is locked by an
+              M4 bolt with a nut and washers.
+            </p>
+            <label>
+              Column
+              <input data-part="column" inputmode="numeric" autocomplete="off" />
+            </label>
+            <label>
+              Row
+              <input data-part="row" inputmode="numeric" autocomplete="off" />
+            </label>
+            <p class="note">
+              The piece the insert is centred in, counted from 1 at the bottom left, seen from the
+              room. It starts in the bottom row's middle piece.
+            </p>
+          </div>
+          <span class="error" data-testid="error-inserts"></span>
         </fieldset>
 
         <!-- The seal (seal-tape, #15): a choice starting at none (Q122), and foam tape from the
@@ -776,6 +809,22 @@
         </details>
 
         <details>
+          <summary>Advanced: the sliding insert</summary>
+          <label>
+            Shutter travel (mm)
+            <input name="insertTravelMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">How far each shutter slides: the insert takes the width give or take this much.</p>
+          <span class="error" data-testid="error-insertTravelMm"></span>
+          <label>
+            Insert clearance (mm)
+            <input name="insertClearanceMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">The gap above and below the appliance.</p>
+          <span class="error" data-testid="error-insertClearanceMm"></span>
+        </details>
+
+        <details>
           <summary>Advanced: the clamps</summary>
           <p class="note">
             The jaws that grip an appliance held by clamps. These are starting values: a test print
@@ -889,6 +938,7 @@
         <input type="hidden" name="cutouts" />
         <input type="hidden" name="fans" />
         <input type="hidden" name="clamps" />
+        <input type="hidden" name="inserts" />
         <!-- Every piece's own fill, written as the command's --piece-fill takes them (C28). -->
         <input type="hidden" name="pieceFills" />
       </form>
@@ -908,6 +958,7 @@
         <ul data-testid="plan-cutouts" data-plan="cutouts"></ul>
         <ul data-testid="plan-fans" data-plan="fans"></ul>
         <ul data-testid="plan-clamps" data-plan="clamps"></ul>
+        <ul data-testid="plan-inserts" data-plan="inserts"></ul>
         <ul data-testid="plan-units" data-plan="units"></ul>
         <p data-testid="plan-seal" data-plan="seal"></p>
         <p data-testid="plan-fill" data-plan="fill"></p>

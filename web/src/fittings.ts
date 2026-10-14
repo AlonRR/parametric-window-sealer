@@ -1,8 +1,8 @@
 // What passes through the wall, on the page: the hose ports (hose-port, #12), the measured
-// cutout (measured-cutout, #23), the fan (fan-mount, #28) and the clamps (clamps, #32). Their
-// controls are not fields of their own: they are written into the hidden ports, cutouts, fans and
-// clamps fields as the command's --port, --cutout, --fan and --clamp take them (Q114, C44), so the
-// library checks them all. Each box shows only for its answer to "What is in the
+// cutout (measured-cutout, #23), the fan (fan-mount, #28), the clamps (clamps, #32) and the
+// sliding insert (#38). Their controls are not fields of their own: they are written into the
+// hidden fields as the command's --port, --cutout, --fan, --clamp and --insert take them (Q114,
+// C44), so the library checks them all. Each box shows only for its answer to "What is in the
 // window?" (data-show-when in the page).
 import { FANS } from 'parametric-window-sealer';
 import type { FieldErrors } from 'parametric-window-sealer';
@@ -170,6 +170,35 @@ export function clamps(form: HTMLFormElement): FormPart | null {
     },
     placed(params) {
       showPlacedPiece(box, params.clamps[0]);
+    },
+  };
+}
+
+// A sliding insert (sliding-insert, #38): one on the page, as the cutout (C45), written as the
+// command's --insert takes it, its piece as the port's (Q105).
+export function slidingInsert(form: HTMLFormElement): FormPart | null {
+  const box = form.querySelector<HTMLElement>('[data-testid="insert"]');
+  if (!box) return null;
+  const text = (): { text: string; problem?: string } => {
+    if (valueOf(form, 'appliance') !== 'insert') return { text: '' };
+    const [width, height] = [read(box, 'insert-width'), read(box, 'insert-height')];
+    const [column, row] = [read(box, 'column'), read(box, 'row')];
+    const problem =
+      width === '' || height === ''
+        ? 'Insert: enter the appliance’s width and height in mm.'
+        : pieceProblem(column, row, 'Insert');
+    if (problem !== undefined) return { text: '@', problem };
+    const size = `${width}x${height}`;
+    return { text: column === '' ? size : `${size}@${column},${row}` };
+  };
+  return {
+    sync(): FieldErrors {
+      const given = text();
+      setValue(form, 'inserts', given.text);
+      return given.problem === undefined ? {} : { inserts: given.problem };
+    },
+    placed(params) {
+      showPlacedPiece(box, params.inserts[0]);
     },
   };
 }

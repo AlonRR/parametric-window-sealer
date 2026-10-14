@@ -88,6 +88,7 @@ function help(): string {
       cutouts: '<width>x<height>[@column,row]',
       fans: '<mm[@column,row]>',
       clamps: '<width>x<height>[@column,row]',
+      inserts: '<width>x<height>[@column,row]',
     };
     const each: Record<ListKind, string> = {
       ports: 'port',
@@ -95,6 +96,7 @@ function help(): string {
       cutouts: 'cutout',
       fans: 'fan',
       clamps: 'clamp',
+      inserts: 'insert',
     };
     const value = f.list
       ? lists[f.list]

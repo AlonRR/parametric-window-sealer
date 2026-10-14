@@ -459,6 +459,47 @@ describe('fans (fan-mount #28: --fan, repeatable)', () => {
   });
 });
 
+describe('sliding inserts (sliding-insert #38: --insert, repeatable)', () => {
+  const WIDE = ['--width', '1200', '--height', '900', '--printer-width', '300', '--printer-height', '300'];
+
+  it('--insert 120x80 puts one in its piece, says so, and lists its shutters', async () => {
+    const r = await cli([...WIDE, '--insert', '120x80', '--dry-run']);
+    expect(r.code).toBe(0);
+    expect(r.out).toContain(
+      'Sliding insert: a 120 × 80 mm appliance, in column 2, row 1, through a 140 × 82 mm opening',
+    );
+    expect(r.out).toMatch(/ {2}piece-c2-r1-[0-9.x]+-insert-120x80\.stl/);
+    expect(r.out).toContain('  shutter-32x89.4-print-2.stl');
+  });
+
+  it('--insert-travel and --insert-clearance set the shutters', async () => {
+    const r = await cli([
+      ...WIDE,
+      '--insert',
+      '120x80',
+      '--insert-travel',
+      '10',
+      '--insert-clearance',
+      '0.5',
+      '--dry-run',
+      '--json',
+    ]);
+    expect(json(r.out).params.insert).toEqual({ travelMm: 10, clearanceMm: 0.5 });
+  });
+
+  it('refuses one too big for its piece, naming the flag', async () => {
+    const r = await cli([...OPENING, '--insert', '160x120']);
+    expect(r.code).toBe(2);
+    expect(r.err).toContain('--insert: Insert 1: a 160 × 120 mm appliance in a sliding insert needs a piece at least');
+  });
+
+  it('--help shows the form and that it repeats', async () => {
+    const r = await cli(['--help']);
+    expect(r.out.replace(/\s+/g, ' ')).toContain('--insert <width>x<height>[@column,row]');
+    expect(r.out.replace(/\s+/g, ' ')).toContain('Give --insert again for each insert.');
+  });
+});
+
 describe('clamps (clamps #32: --clamp, repeatable)', () => {
   const params = async (args: string[]) => {
     const r = await cli([...args, '--dry-run', '--json']);

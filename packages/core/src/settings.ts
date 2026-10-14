@@ -31,13 +31,14 @@ const ROLE = ['track', 'sash', 'sill', 'unit'] as const;
 const YES_NO = ['no', 'yes'] as const;
 
 // The settings that are lists, and the shape of each item: what each field holds.
-export type ListKind = 'ports' | 'pieceFills' | 'cutouts' | 'fans' | 'clamps';
+export type ListKind = 'ports' | 'pieceFills' | 'cutouts' | 'fans' | 'clamps' | 'inserts';
 export const LIST_ITEMS: Record<ListKind, Record<string, 'number' | 'text'>> = {
   ports: { hoseMm: 'number', column: 'number', row: 'number' },
   pieceFills: { column: 'number', row: 'number', kind: 'text', style: 'text' },
   cutouts: { widthMm: 'number', heightMm: 'number', column: 'number', row: 'number' },
   fans: { sizeMm: 'number', column: 'number', row: 'number' },
   clamps: { widthMm: 'number', heightMm: 'number', column: 'number', row: 'number' },
+  inserts: { widthMm: 'number', heightMm: 'number', column: 'number', row: 'number' },
 };
 
 const axis = (name: 'width' | 'height'): Setting[] => [
@@ -244,6 +245,25 @@ export const SETTINGS: readonly Setting[] = [
   },
   { field: 'clampTravelMm', path: 'clamp.travelMm', help: "How far each clamp's jaw slides: the give or take." },
   { field: 'clampDepthMm', path: 'clamp.depthMm', help: "How far a clamp jaw's lip stands out on the room side." },
+  {
+    field: 'inserts',
+    path: 'inserts',
+    help:
+      "Appliances in a sliding insert: for each, the appliance's outside width and height in mm and its piece, " +
+      "by column and row from 1 at the bottom left. Without a piece, the bottom row's middle piece. Two printed " +
+      'shutters slide in rails to close round it from each side, each locked by an M4 bolt.',
+    list: 'inserts',
+  },
+  {
+    field: 'insertTravelMm',
+    path: 'insert.travelMm',
+    help: "How far each insert's shutter slides: the give or take in width.",
+  },
+  {
+    field: 'insertClearanceMm',
+    path: 'insert.clearanceMm',
+    help: 'Clearance above and below the appliance in an insert.',
+  },
 ];
 
 // The value at a dotted path, such as `edges.track.widthMm`; undefined if it is not there.

@@ -36,11 +36,20 @@ import { formatPieceFills, parsePieceFills } from './piece-fill.js';
 import type { PieceFill } from './piece-fill.js';
 import { FormReader, SIZE_MESSAGE, SIZE_OR_ZERO_MESSAGE } from './form-reader.js';
 import { planWall } from './plan.js';
-import { clampProblem, cutoutProblem, fanProblem, placeFittings, portProblem } from './fittings/index.js';
+import {
+  clampProblem,
+  cutoutProblem,
+  insertProblem,
+  fanProblem,
+  placeFittings,
+  portProblem,
+} from './fittings/index.js';
 import { formatFans, parseFans } from './fan.js';
 import type { FanSetting } from './fan.js';
 import { DEFAULT_CLAMP, formatClamps, parseClamps } from './clamp.js';
 import type { ClampParams, ClampSetting } from './clamp.js';
+import { DEFAULT_INSERT, formatInserts, parseInserts } from './insert.js';
+import type { InsertParams, InsertSetting } from './insert.js';
 import type { InPiece } from './fittings/index.js';
 import { hundredth, mm } from './words.js';
 
@@ -70,6 +79,8 @@ export interface Params {
   fans: Required<FanSetting>[]; // fans from the list (#28); none to start with
   clamps: Required<ClampSetting>[]; // appliances held by clamps (#32); none to start with
   clamp: ClampParams; // their jaws
+  inserts: Required<InsertSetting>[]; // appliances in a sliding insert (#38); none to start with
+  insert: InsertParams; // its shutters
 }
 
 // The page starts here: an example opening (Q42, labelled as an example, Q18), the default
@@ -96,6 +107,8 @@ export const EXAMPLE_PARAMS: Params = {
   fans: [],
   clamps: [],
   clamp: DEFAULT_CLAMP,
+  inserts: [],
+  insert: DEFAULT_INSERT,
 };
 
 // Every field of the page's form. The page reads and writes these by name; the settings list
@@ -158,6 +171,9 @@ export const FIELD_NAMES = [
   'clamps',
   'clampTravelMm',
   'clampDepthMm',
+  'inserts',
+  'insertTravelMm',
+  'insertClearanceMm',
   // Each pattern's sizes, as the patterns declare them (patterns/).
   ...PATTERN_FIELDS,
 ] as const;
@@ -528,6 +544,22 @@ function readClamps(r: FormReader): { clamp: ClampParams; given: ClampSetting[] 
   return { clamp, given: parsed.ok ? parsed.clamps : [] };
 }
 
+// The sliding inserts (sliding-insert, #38): placed after the clamps; their shutters' travel and
+// the clearance above and below, read whether or not there are any.
+
+const insertsForm = (p: Params): FormValues => ({
+  inserts: formatInserts(p.inserts),
+  insertTravelMm: String(p.insert.travelMm),
+  insertClearanceMm: String(p.insert.clearanceMm),
+});
+
+function readInserts(r: FormReader): { insert: InsertParams; given: InsertSetting[] } {
+  const insert: InsertParams = { travelMm: r.size('insertTravelMm'), clearanceMm: r.sizeOrZero('insertClearanceMm') };
+  const parsed = parseInserts(r.values.inserts ?? '');
+  if (!parsed.ok) r.fail('inserts', parsed.message);
+  return { insert, given: parsed.ok ? parsed.inserts : [] };
+}
+
 // The panel fill (Q141) and each piece's own (#21). A pattern's sizes are read when the wall or
 // any piece uses it (C15), as the tape's are read only with a seal.
 
@@ -590,6 +622,7 @@ export function toFormValues(p: Params): FormValues {
     ...cutoutsForm(p),
     ...fansForm(p),
     ...clampsForm(p),
+    ...insertsForm(p),
   };
 }
 
@@ -609,6 +642,7 @@ export function readParams(values: FormValues): ReadResult {
   const { rim, given: givenCutouts } = readCutouts(r, fit);
   const givenFans = readFans(r);
   const { clamp, given: givenClamps } = readClamps(r);
+  const { insert, given: givenInserts } = readInserts(r);
   if (r.ok) {
     // The edge strips must leave the pieces something to cover.
     const span = panelSpan(opening.openingWidthMm, opening.openingHeightMm, edges, joint, fit);
@@ -620,7 +654,7 @@ export function readParams(values: FormValues): ReadResult {
   // What is placed in pieces, once everything else is sound: the ports, the cutouts, the fans and
   // the clamps, then each piece's own fill, each against the plan the ones before it allow.
   const base = { ...opening, printer, bedMarginMm, width, height, thicknessMm, joint, edges, collar, seal, fill };
-  const none = { ports: [], pieceFills: [], cutouts: [], rim, fans: [], clamps: [], clamp };
+  const none = { ports: [], pieceFills: [], cutouts: [], rim, fans: [], clamps: [], clamp, inserts: [], insert };
   const plan = r.ok ? planWall({ ...base, ...none }) : undefined;
   let ports: Required<PortSetting>[] = [];
   if (plan !== undefined && givenPorts.length > 0) {
@@ -660,14 +694,27 @@ export function readParams(values: FormValues): ReadResult {
     if (placing.ok) clamps = placing.placed;
     else r.fail('clamps', placing.problem);
   }
+  let inserts: Required<InsertSetting>[] = [];
+  if (r.ok && plan !== undefined && givenInserts.length > 0) {
+    const check = (c: InsertSetting & InPiece) => insertProblem(plan, c, insert, joint);
+    const earlier = [
+      { label: 'Port', placed: ports },
+      { label: 'Cutout', placed: cutouts },
+      { label: 'Fan', placed: fans },
+      { label: 'Clamp', placed: clamps },
+    ];
+    const placing = placeFittings(plan, { label: 'Insert', plural: 'Inserts', given: givenInserts, check }, earlier);
+    if (placing.ok) inserts = placing.placed;
+    else r.fail('inserts', placing.problem);
+  }
   if (r.ok && pieceFills.length > 0) {
-    const fitted = { ports, pieceFills: [], cutouts, rim, fans, clamps, clamp };
+    const fitted = { ports, pieceFills: [], cutouts, rim, fans, clamps, clamp, inserts, insert };
     const problem = checkPieceFills(planWall({ ...base, ...fitted }), pieceFills);
     if (problem !== undefined) r.fail('pieceFills', problem);
   }
 
   if (!r.ok) return { ok: false, errors: r.errors };
-  return { ok: true, params: { ...base, ports, pieceFills, cutouts, rim, fans, clamps, clamp } };
+  return { ok: true, params: { ...base, ports, pieceFills, cutouts, rim, fans, clamps, clamp, inserts, insert } };
 }
 
 // A piece the wall has, and one fill for each piece.

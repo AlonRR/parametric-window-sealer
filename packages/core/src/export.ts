@@ -19,6 +19,7 @@ import type { GridPiece } from './layout.js';
 import type { GasketShape, SleeveShape } from './tpu.js';
 import type { FrameShape, Rectangle } from './cutout.js';
 import type { JawShape } from './clamp.js';
+import type { ShutterShape } from './insert.js';
 import { cutoutTag } from './cutout.js';
 import { portTag } from './port.js';
 
@@ -93,7 +94,7 @@ export type WallPartShape = PartShape | EdgeShape | GasketShape;
 // Every part beside the pieces: the wall's own and the fittings', a sleeve in each hose port, a
 // frame in each cutout's rim and a clamp's jaws. A fitting with a new kind of part adds its shape
 // here and its name below; its solid stays in its own file (docs/extending.md, "A new fitting").
-export type AnyPartShape = WallPartShape | SleeveShape | FrameShape | JawShape;
+export type AnyPartShape = WallPartShape | SleeveShape | FrameShape | JawShape | ShutterShape;
 
 // An edge strip's height depends on its track, so it is part of the name; with tape on its
 // sides, so is the track's depth, as two depths can give one size with grooves in different
@@ -101,6 +102,7 @@ export type AnyPartShape = WallPartShape | SleeveShape | FrameShape | JawShape;
 export function partName(shape: AnyPartShape): string {
   if (shape.kind === 'sleeve') return `sleeve-${mm(shape.hoseMm)}-tpu-print-${shape.count}`;
   if (shape.kind === 'frame') return `frame-${mm(shape.widthMm)}x${mm(shape.heightMm)}-tpu-print-${shape.count}`;
+  if (shape.kind === 'shutter') return `shutter-${mm(shape.widthMm)}x${mm(shape.heightMm)}-print-${shape.count}`;
   if (shape.kind === 'jaw') {
     return `jaw-${mm(shape.lengthMm)}x${mm(shape.widthMm)}x${mm(shape.depthMm)}-print-${shape.count}`;
   }
