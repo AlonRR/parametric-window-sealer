@@ -26,6 +26,10 @@ extend (Q145): `code-tooling`, `code-params-page`, `fill-registry` and `fitting-
 14 Oct, `ci-triggers` was added at P1 so that CI checks each commit once (Q147). P2 began the
 same day (Q148): `pattern-plugins` is covered by `fill-registry`, and `fan-mount` came first,
 then `svg-tile` and `clamps` (Q149), and `sliding-insert` (Q150).
+On 15 Oct a design review against published work
+([`research/design-review.md`](research/design-review.md)) gave thirteen changes, R1 to R13,
+which the owner took in full (Q153). They are added at P1, ahead of the rest of P2, **in the
+review's order rather than by ease**, starting with `joint-lock`.
 
 ## How to read the table
 
@@ -85,6 +89,19 @@ then `svg-tile` and `clamps` (Q149), and `sliding-insert` (Q150).
 | `fill-registry` | #96 | Each pattern declared once, in one file: its sizes, starting values, limits, help, flags and tile; the settings, flags, MCP schema, page controls and plan words come from it. The in-code half of `pattern-plugins` | P1 | M | `code-params-page` | Q145 | Keeping the types exact for fields declared at run time |
 | `fitting-registry` | #97 | The hose port and the measured cutout behind one fitting interface, so the fan mount, clamps, sliding insert and imported appliance each add a fitting (C83 to C89) | P1 | M | `code-params-page` | Q145 | The two fittings differ in shape, so the interface must not assume either |
 | `ci-triggers` | #101 | The checks run once per commit, through its pull request: on pull requests and pushes to `main` only, a superseded run cancelled, each job with a time limit (C82) | P1 | S | | Q147 | Whether the owner's Gitea version honours `concurrency` |
+| `joint-lock` | #110 | A tighter joint that locks: less play, crush bumps on the strip's flanges, a pin or detent against pull-out, the clearance a setting with a test coupon (R1) | P1 | M | | Q153, Q13 | Test print: the clearance and the bumps' squeeze vary by printer |
+| `stiffener-strips` | #111 | Strips that stiffen: a fin on the H-strips across spans over about 500 mm; a bought stiffener asked for above about 1000 mm (R2) | P1 | M | `joint-lock` | Q153 | Test print of a loaded wall; the fin depth is calculated, not measured |
+| `sheet-pieces` | #112 | Pieces cut from sheet: print only the strips, cross pieces, edge strips and fittings; the slot follows the sheet's thickness (R3) | P1 | M | `joint-lock` | Q153 | Spec to verify: the thicknesses sheets are sold in |
+| `material-advice` | #113 | Material advice by place: PETG in a light colour by default, ASA in sun or near a hose, PLA for test fits; the page warns (R4) | P1 | S | | Q153, Q6 | Where the sun falls is the user's to say |
+| `hose-socket` | #114 | Seal the hose first: bayonet or threaded sockets for 130 and 150 mm hoses, a sealed ring, a cap for when the AC is off, an optional screen (R5) | P1 | M | | Q153 | Spec to verify: makers' hose-end threads and bayonets; test print |
+| `tpu-fin-seals` | #115 | Seals that bend: printed TPU 85A fins or bulbs with a hard stop, in place of foam that must stay squeezed; tape stays, closed-cell only (R6) | P1 | M | `joint-lock` | Q153, Q6, Q17 | Test print: no published data on printed bulb seals |
+| `meeting-rail` | #116 | A filler for the gap between a hung window's two sashes (R7) | P1 | S | | Q153 | Test print; the gap varies by window |
+| `rain-face` | #117 | Rain on the outside face: upper pieces lap over lower ones, a drip edge and outward slope on the bottom edge strip, weep holes, nothing blocking an AC's tilt or drain (R8) | P1 | M | `joint-lock` | Q153 | How a lap works with the grid of H-strips |
+| `sash-stop` | #118 | A sash stop that blocks opening from outside and comes off by hand from inside (R9) | P1 | S | | Q153 | Window hardware varies; test print |
+| `double-wall` | #119 | A double wall for winter: two skins with an air gap (R10) | P1 | M | `joint-lock` | Q153 | It doubles the printing; twin-wall sheet (`sheet-pieces`) is the cheaper way |
+| `compression-edge` | #120 | Windows without a track: a slightly oversize TPU compression edge for casement screen openings, tilt-and-turn frames and sliding doors (R11) | P1 | L | `tpu-fin-seals` | Q153, Q14 | Several test prints; frames vary |
+| `safety-guidance` | #121 | Guidance and warnings: falls, escape windows, ground-floor locks, winter condensation, PLA in sun, fire, how to assemble; nothing claimed the evidence does not support (R12) | P1 | S | | Q153 | Wording only |
+| `print-defaults` | #122 | Printing defaults against warping: rounded piece corners, a 1 mm bottom chamfer, brim advice by material (R13) | P1 | S | | Q153 | Test print |
 | `pattern-plugins` | #26 | Pattern files contributed to the repo appear in the list. **Covered by `fill-registry` (#96)**: a contributed pattern is one file and one line in `PATTERNS` (C97) | P2 | M | `patterns-core` | Q21, Q148 | Plugin format |
 | `svg-tile` | #27 | Upload an SVG tile as a pattern: its `viewBox` one cell, its filled shapes the openings, at a width the user sets ([`svg-tiles.md`](svg-tiles.md); C98 to C109) | P2 | M | `patterns-core` | Q21, Q149 | Drawings it refuses, or reads otherwise than a browser (rings that cross) |
 | `fan-mount` | #28 | Fan mounts with screw patterns from a list: square-framed fans of 80, 92, 120 and 140 mm, from the makers' own drawings ([`fan-sizes.md`](fan-sizes.md); C90 to C96) | P2 | M | `measured-cutout` | Q15, Q16, Q148 | Test print: the screw holes and the 140 mm slots |

@@ -193,6 +193,9 @@ the research reports.
 
 ## 5. Recommendations
 
+The owner took all thirteen (Q153, "153 yes to all"). Each is a backlog item at P1, issues #110
+to #122, in this order.
+
 Each recommendation names its evidence, its rough size, and the decision it would change, if any.
 They are listed in the order recommended.
 

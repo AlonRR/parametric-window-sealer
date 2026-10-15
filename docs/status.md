@@ -3,9 +3,9 @@
 Working document: the brief, every decision so far, and every open question. Keep it current;
 a fresh session resumes from here.
 
-Last updated: 14 Oct 2026. Phase: **P2** ([`backlog.md`](backlog.md)). `v0.3.0` holds every P1
+Last updated: 15 Oct 2026. Phase: **P2** ([`backlog.md`](backlog.md)). `v0.3.0` holds every P1
 row; since then the code was made easy to extend (Q145) and P2 began (Q148, Q149): the fan mount
-(`fan-mount`, #28), the SVG tile (`svg-tile`, #27) the clamps (`clamps`, #32) and the sliding insert (`sliding-insert`, #38) are built.
+(`fan-mount`, #28), the SVG tile (`svg-tile`, #27), the clamps (`clamps`, #32) and the sliding insert (`sliding-insert`, #38) are built. A design review against published work led to thirteen changes (Q153), now first in line, starting with a tighter joint (`joint-lock`, #110).
 Nothing has been test printed yet.
 
 ## The brief (the owner's request, 5 Oct 2026)
@@ -170,6 +170,7 @@ Nothing has been test printed yet.
 | Q146 | **Code comments say their reason in plain words**; the question and choice IDs stay in these documents, the pull requests and the commit history. New code follows it; existing comments change as their code is next edited. Asked whether comments should keep citing the IDs, with that recommended: "146 yes" | 14 Oct 2026 |
 | Q150 | After the clamps, **the sliding insert** (`sliding-insert`, #38) is next: "150 sliding insert" | 14 Oct 2026 |
 | Q151 | Before going public, **the full history was reviewed for private details** and `.repo-status` and `PROJECT.yml` brought up to date: nothing private was found (see `.repo-status`). Making the repository public stays the owner's step (Q3): "151 yes" | 14 Oct 2026 |
+| Q153 | **All thirteen design changes, R1 to R13, from the review against published work** ([`research/design-review.md`](research/design-review.md)), each its own backlog item at P1 (#110 to #122), built in the review's order starting with a tighter joint that locks. They change Q13's friction fit (R1), turn Q6's silence on materials into advice (R4) and refine its seals (R6), and take the wall beyond the track (R11, extending Q14). It also answers Q152, what to build next. Asked: "153 yes to all" | 15 Oct 2026 |
 | Q149 | P2 goes on with **`svg-tile`** (#27), an SVG tile of the user's own as a pattern, its SVG read with a parsing library the agent chooses and logs (C98), **then `clamps`** (#32), the second new fitting. Asked whether to go ahead: "149 yes" | 14 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
@@ -185,8 +186,7 @@ The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-- **Q153.** Which of the design changes R1 to R13 in [`research/design-review.md`](research/design-review.md) should be built, and in what order? Recommended: all of them, in their listed order, each as its own backlog item, starting with R1 (a tighter joint that locks) and R2 (strips that stiffen), since the joints decide whether the wall holds. R4 and R6 change Q6, R1 changes Q13, and R11 extends Q14, so they need the owner's word.
-- **Q152.** What to build next after the sliding insert: superseded by Q153 if the owner takes it up.
+None.
 
 ## Repository follow-ups
 
