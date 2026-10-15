@@ -17,6 +17,13 @@ listed under Unreleased.
 
 ### Added
 
+- 3D tiles of your own as the panel fill: choose **3D tile of your own** and an STL, OBJ or 3MF file of
+  one tile (`--mesh-tile`, or `fill.mesh.file` in base64), an organiser's own tile or a tile of a 3D
+  pattern. Its box seen from the room is one cell: the tiles are set side by side in whole cells inside
+  each piece's border, in the panel's place, standing proud on the room side where they are deeper. Its
+  top faces the room to start with (`--mesh-tile-view`). A tile with no flat face on a side of its box is
+  refused, as it would not join its neighbour. How: `docs/meshes.md`.
+
 - A wall cut round a 3D model of the appliance: choose **Something else: cut round its 3D model** and
   its STL, OBJ or 3MF file (`--model-file`, or `model.file` in base64). The model is turned so the side
   you name faces the room (`--model-view`, as a modelling program's views; the front to start with),

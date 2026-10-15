@@ -672,6 +672,52 @@ describe('a model of the appliance (mesh-appliance #35: --model-file <file>)', (
   });
 });
 
+describe('a 3D tile of your own (mesh-tiles #40: --mesh-tile <file>)', () => {
+  // A binary STL box 28 × 28 × 6 mm, lying flat as a tile is drawn to print.
+  const tile = (): Uint8Array => {
+    const corners = [0, 0, 0, 28, 0, 0, 28, 28, 0, 0, 28, 0, 0, 0, 6, 28, 0, 6, 28, 28, 6, 0, 28, 6];
+    const faces = [
+      0, 2, 1, 0, 3, 2, 4, 5, 6, 4, 6, 7, 0, 1, 5, 0, 5, 4, 1, 2, 6, 1, 6, 5, 2, 3, 7, 2, 7, 6, 3, 0, 4, 3, 4, 7,
+    ];
+    const bytes = new Uint8Array(84 + 50 * 12);
+    const view = new DataView(bytes.buffer);
+    view.setUint32(80, 12, true);
+    faces.forEach((c, i) => {
+      for (let a = 0; a < 3; a++) {
+        view.setFloat32(84 + 50 * Math.floor(i / 3) + 12 + 12 * (i % 3) + 4 * a, corners[3 * c + a] ?? 0, true);
+      }
+    });
+    return bytes;
+  };
+
+  it('--mesh-tile reads the file and means the tile; --mesh-tile-view turns it', async () => {
+    const r = await cli([...OPENING, '--mesh-tile', 'tile.stl', '--dry-run', '--json'], undefined, {
+      'tile.stl': tile(),
+    });
+    expect(r.code).toBe(0);
+    const out = json(r.out);
+    expect(out.params.fill).toMatchObject({ kind: 'mesh', mesh: { view: 'top' } });
+    expect(out.summary.fill).toBe(
+      'Fill: 3D tiles of your own, from the STL file: each 28 × 28 mm seen from its top and 6 mm deep, set side by ' +
+        'side in whole cells inside each piece’s border, standing 3 mm proud on the room side.',
+    );
+    const front = await cli(
+      [...OPENING, '--mesh-tile', 'tile.stl', '--mesh-tile-view', 'front', '--dry-run', '--json'],
+      undefined,
+      {
+        'tile.stl': tile(),
+      },
+    );
+    expect(json(front.out).summary.fill).toContain('each 28 × 6 mm seen from its front and 28 mm deep');
+  });
+
+  it('refuses --fill mesh without a file, naming the flag', async () => {
+    const r = await cli([...OPENING, '--fill', 'mesh', '--dry-run']);
+    expect(r.code).toBe(2);
+    expect(r.err).toContain('--mesh-tile: Choose the tile’s file.');
+  });
+});
+
 describe('an SVG tile (svg-tile #27: --svg-tile <file>)', () => {
   const SQUARES =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">' +

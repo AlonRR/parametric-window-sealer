@@ -25,7 +25,9 @@ const GROUPS: Record<string, string> = {
   'seal.tape':
     'The foam tape, or the TPU gaskets: its size and groove in mm, how far it is squeezed in %, where else it goes, ' +
     'and with TPU whether the joints are TPU too.',
-  fill: "The panel fill: sealed, or a pattern, in relief or cut through. A pattern's settings without a kind mean that pattern.",
+  fill: "The panel fill: sealed, or a pattern, in relief or cut through, an organiser board, or a 3D tile of your own. A pattern's settings without a kind mean that pattern, and a 3D tile's the tile.",
+  'fill.mesh':
+    'A 3D tile of your own: its file, an STL, OBJ or 3MF in mm as its bytes in base64, and the side facing the room.',
   // Each pattern describes its own sizes (packages/core/src/patterns/).
   ...Object.fromEntries(PATTERNS.map((p) => [`fill.${p.kind}`, p.group])),
   'edges.roles': 'What each edge meets. Setting the window type presets all four.',
@@ -54,7 +56,7 @@ const PORT = z.strictObject({
 const PIECE_FILL = z.strictObject({
   column: z.number().int().min(1).describe('The column of the piece, from 1 at the left.'),
   row: z.number().int().min(1).describe('The row of the piece, from 1 at the bottom.'),
-  kind: choices(FILL_KINDS).describe('Its fill: sealed, a pattern or an organiser board.'),
+  kind: choices(FILL_KINDS).describe('Its fill: sealed, a pattern, an organiser board or the 3D tile.'),
   style: choices(PATTERN_STYLES).optional().describe("A pattern's style; the wall's if left out. A board has none."),
 });
 

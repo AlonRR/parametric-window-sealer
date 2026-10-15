@@ -876,11 +876,43 @@
               <optgroup label="Patterns" data-part="pattern-list"></optgroup>
               <!-- The library's organiser boards, filled in by the page. -->
               <optgroup label="Organiser boards" data-part="organiser-list"></optgroup>
+              <!-- A 3D tile of your own (mesh-tiles, #40), read from a mesh file. -->
+              <optgroup label="Your own">
+                <option value="mesh">3D tile of your own</option>
+              </optgroup>
             </select>
           </label>
           <span class="error" data-testid="error-fill"></span>
           <!-- A note for each organiser's board, made by the page; only the chosen one's shows. -->
           <div data-part="organiser-notes"></div>
+          <!-- The 3D tile (mesh-tiles, #40): the page reads the file and puts it, in base64, in
+            fillMeshFile (mesh-tile.ts); the tiles replace the panel in whole cells. -->
+          <div data-testid="mesh-tile" data-show-when="fill=mesh" hidden>
+            <label>
+              The tile’s file
+              <input type="file" accept=".stl,.obj,.3mf" data-part="mesh-file" />
+            </label>
+            <p class="note" data-testid="mesh-tile-name">No file chosen yet.</p>
+            <p class="note">
+              One tile, an STL, OBJ or 3MF file drawn in mm: an organiser's own tile, or a tile of a
+              3D pattern. Its box seen from the room is one cell; the tiles are set side by side in
+              whole cells inside each piece's border, in the panel's place, standing proud on the
+              room side where they are deeper than the panel. The file stays on your computer.
+            </p>
+            <span class="error" data-testid="error-fillMeshFile"></span>
+            <label>
+              Which side of the tile faces the room
+              <select name="fillMeshView">
+                <option value="top">Its top: the top view, seen from +Z with Y up</option>
+                <option value="front">Its front: the front view, seen from −Y with Z up</option>
+                <option value="back">Its back</option>
+                <option value="left">Its left side</option>
+                <option value="right">Its right side: seen from +X with Z up</option>
+                <option value="bottom">Its underside</option>
+              </select>
+            </label>
+            <span class="error" data-testid="error-fillMeshView"></span>
+          </div>
           <!-- The SVG tile (svg-tile, #27): a drawing of one cell, its filled shapes the openings
             (docs/svg-tiles.md). The page reads the file and puts its text in fillDrawing. -->
           <div data-testid="svg-tile" data-show-when="fill=svg" hidden>
@@ -1298,6 +1330,8 @@
         <input type="hidden" name="modelRow" />
         <!-- Every piece's own fill, written as the command's --piece-fill takes them (C28). -->
         <input type="hidden" name="pieceFills" />
+        <!-- The 3D tile's file, in base64. -->
+        <input type="hidden" name="fillMeshFile" />
       </form>
 
       <section id="plan" aria-live="polite">

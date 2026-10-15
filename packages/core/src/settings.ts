@@ -316,7 +316,7 @@ export const SETTINGS: readonly Setting[] = [
         .replace(/, ([^,]*)$/, ' or $1')}; or a board for an organiser's accessories: ` +
       `${ORGANISERS.map((o) => o.words)
         .join(', ')
-        .replace(/, ([^,]*)$/, ' or $1')}, cut through.`,
+        .replace(/, ([^,]*)$/, ' or $1')}, cut through; or a 3D tile of your own (mesh).`,
     values: FILL_KINDS,
   },
   {
@@ -334,6 +334,22 @@ export const SETTINGS: readonly Setting[] = [
       "The SVG tile's drawing: the text of an SVG file, its viewBox one cell of the pattern and its filled " +
       'shapes the openings. Starts as one round opening in a square cell.',
     text: true,
+  },
+  {
+    field: 'fillMeshFile',
+    path: 'fill.mesh.file',
+    help:
+      'The 3D tile: an STL, OBJ or 3MF file in mm, as its bytes in base64. Its box seen from the room is one ' +
+      "cell; the tiles are set side by side in whole cells inside each piece's border, in the panel's place.",
+    binary: true,
+  },
+  {
+    field: 'fillMeshView',
+    path: 'fill.mesh.view',
+    help:
+      'Which side of the 3D tile faces the room, as a modelling program names its views: top (seen from +Z, Y up) ' +
+      'to start with, as tiles are drawn lying flat; or front, back, left, right or bottom.',
+    values: MODEL_VIEWS,
   },
   {
     field: 'pieceFills',
@@ -546,13 +562,14 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
     const tape = seal['tape'];
     params.seal = { ...params.seal, kind: isObject(tape) && tape['joints'] === true ? 'tpu' : 'tape' };
   }
-  // A pattern's sizes without a kind mean that pattern (C11, C16, C21, C25), and a drawing the
-  // SVG tile.
+  // A pattern's sizes without a kind mean that pattern, a drawing the SVG tile, and a 3D tile's
+  // file the 3D tile.
   const fill = input['fill'];
   for (const p of PATTERNS) {
     if (isObject(fill) && !('kind' in fill) && p.kind in fill) params.fill = { ...params.fill, kind: p.kind };
   }
   if (isObject(fill) && !('kind' in fill) && 'drawing' in fill) params.fill = { ...params.fill, kind: 'svg' };
+  if (isObject(fill) && !('kind' in fill) && 'mesh' in fill) params.fill = { ...params.fill, kind: 'mesh' };
 
   const values: FormValues = toFormValues(params);
   const presetWindow = overrides.window;
@@ -573,6 +590,7 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
     if (overrides.fill === undefined && sized) values.fill = p.kind;
   }
   if (overrides.fill === undefined && overrides.fillDrawing !== undefined) values.fill = 'svg';
+  if (overrides.fill === undefined && overrides.fillMeshFile !== undefined) values.fill = 'mesh';
   Object.assign(values, overrides);
 
   const problems: SettingProblem[] = [];

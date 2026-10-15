@@ -85,6 +85,7 @@ describe('the setting flags (Q90)', () => {
       'tpu-joints',
       'fill',
       'fill-style',
+      'mesh-tile-view', // the side of a 3D tile facing the room (#40)
       'model-view', // the side of a model facing the room (#35)
     ]);
   });
@@ -102,6 +103,8 @@ describe('the setting flags (Q90)', () => {
       ...(f.field === 'wall' ? { thicknessMm: '10' } : {}), // a double wall needs panels thick enough
       ...(f.path.startsWith('edges.roles.') ? { seal: 'tpu' } : {}), // an edge in a frame, a TPU gasket
       ...(f.path.startsWith('model.') ? { modelFile: boxFile() } : {}), // read only with a model
+      ...(f.path.startsWith('fill.') ? { fillMeshFile: boxFile() } : {}), // a 3D tile's, read only with it
+      ...(f.path.startsWith('fill.mesh.') ? { fill: 'mesh' } : {}),
     };
     for (const value of f.values ?? []) {
       expect(readParams({ ...base, [f.field]: value })).toMatchObject({ ok: true });

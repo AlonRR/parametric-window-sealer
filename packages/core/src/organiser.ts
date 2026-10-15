@@ -9,9 +9,12 @@ import type { KeepOut, PieceArea, Point } from './pattern.js';
 
 const EPS = 1e-9;
 
+// A lattice of whole cells: one opening's box, and the spacing, as an organiser's board has them.
+export type Lattice = Pick<OrganiserDefinition, 'widthMm' | 'heightMm' | 'pitchXMm' | 'pitchYMm' | 'rowShiftMm'>;
+
 // Whether one opening centred here stays clear of the zone kept solid round a fitting: its box
 // against the circle round a port, or against the rectangle round a cutout.
-function clearOf(o: OrganiserDefinition, [x, y]: Point, keepOut: KeepOut): boolean {
+function clearOf(o: Lattice, [x, y]: Point, keepOut: KeepOut): boolean {
   const [halfW, halfH] = [o.widthMm / 2, o.heightMm / 2];
   if ('radiusMm' in keepOut) {
     const dx = Math.max(Math.abs(x - keepOut.xMm) - halfW, 0);
@@ -28,7 +31,7 @@ function clearOf(o: OrganiserDefinition, [x, y]: Point, keepOut: KeepOut): boole
 // wall's centre whose whole opening lies inside the piece's border and clear of its fitting. An
 // opening that would cross either is left out, not cut short.
 export function organiserOpenings(
-  o: OrganiserDefinition,
+  o: Lattice,
   wallCentre: Point,
   piece: PieceArea,
   borderMm: number,

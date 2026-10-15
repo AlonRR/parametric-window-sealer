@@ -20,6 +20,7 @@ import type { TapeFit } from './tape.js';
 import { patternedPanel, pieceOpenings } from './pattern.js';
 import type { FillChoice } from './fill.js';
 import { organisedPanel, organiserOpenings } from './organiser.js';
+import { tileCells, tiledPanel } from './mesh-tile.js';
 import type { PatternChoice, Point } from './pattern.js';
 import { plainPanel } from './panel.js';
 import { fittingIn, placedFittings } from './fittings/index.js';
@@ -106,7 +107,12 @@ export function buildPiecesWith(
         solid.delete();
         solid = hollowed;
       }
-      if (here !== undefined && 'organiser' in here) {
+      if (here !== undefined && 'meshTile' in here) {
+        // A 3D tile: whole cells only, each the tile instead of the panel.
+        const keepOut = fitting?.keepOut(size, here.borderMm);
+        const at = tileCells(here.meshTile, centre, cell, here.borderMm, keepOut);
+        solid = tiledPanel(engine, solid, here.meshTile, at, thicknessMm);
+      } else if (here !== undefined && 'organiser' in here) {
         // An organiser's board: whole openings only, the board raised inside the border.
         const keepOut = fitting?.keepOut(size, here.borderMm);
         const at = organiserOpenings(here.organiser, centre, cell, here.borderMm, keepOut);

@@ -80,7 +80,10 @@ grid settings without a `kind` mean the grid. A honeycomb is `"kind": "hexagon"`
 `fill.brick` (`widthMm`, `heightMm`, `barMm`), and diamonds `"kind": "diamond"`, in `fill.diamond`
 (`widthMm` and `heightMm` corner to corner, `barMm`). An SVG tile is `"kind": "svg"`, its
 drawing in `fill.drawing` as the SVG file's text (its `viewBox` one cell, its filled shapes the
-openings) and its width in `fill.svg.widthMm`; a drawing without a `kind` means the tile. A piece with a fill of its own goes in
+openings) and its width in `fill.svg.widthMm`; a drawing without a `kind` means the tile. A 3D
+tile of your own is `"kind": "mesh"`, its file in `fill.mesh.file` as its bytes in base64 and the
+side facing the room in `fill.mesh.view` (`top` to start with); a tile's file without a `kind` means
+the tile. A piece with a fill of its own goes in
 `pieceFills`, as `[{ "column": 2, "row": 1, "kind": "sealed" }]`, with an optional `style`.
 
 `window_sealer_make_files` also takes:

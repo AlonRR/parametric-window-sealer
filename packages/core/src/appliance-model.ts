@@ -84,7 +84,7 @@ export const VIEW_WORDS: Record<ModelView, string> = {
   bottom: 'its underside',
 };
 
-const FORMAT_WORDS: Record<ImportedMesh['format'], string> = { stl: 'STL', obj: 'OBJ', '3mf': '3MF' };
+export const FORMAT_WORDS: Record<ImportedMesh['format'], string> = { stl: 'STL', obj: 'OBJ', '3mf': '3MF' };
 
 const BASE64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 const DIGIT = new Int16Array(128).fill(-1);
@@ -167,27 +167,33 @@ function turned(mesh: ImportedMesh, view: ModelView): ApplianceModel {
   };
 }
 
-// The last file read, and the last model turned: the settings are read again at every change on the
-// page, and a model's file can be tens of MB.
-let lastMesh: { file: string; read: MeshRead } | undefined;
-let lastModel: { file: string; view: ModelView; read: ModelRead } | undefined;
+// The files read last, and the models turned last: the settings are read again at every change on
+// the page, a wall can hold a model and a tile, and a model's file can be tens of MB.
+const KEPT = 4;
+const meshes: { file: string; read: MeshRead }[] = [];
+const models: { file: string; view: ModelView; read: ModelRead }[] = [];
+const kept = <T>(list: T[], entry: T): T => {
+  list.unshift(entry);
+  list.length = Math.min(list.length, KEPT);
+  return entry;
+};
 
-// The model in a file given as the setting holds it, turned to the wall.
+// The mesh in a file given as the setting holds it, turned to the wall.
 export function readApplianceModel(file: string, view: ModelView): ModelRead {
   if (file === '') return { ok: false, message: 'Choose the model’s file.' };
-  if (lastModel !== undefined && lastModel.view === view && lastModel.file === file) return lastModel.read;
-  let mesh = lastMesh !== undefined && lastMesh.file === file ? lastMesh.read : undefined;
+  const model = models.find((m) => m.view === view && m.file === file);
+  if (model !== undefined) return model.read;
+  let mesh = meshes.find((m) => m.file === file)?.read;
   if (mesh === undefined) {
     const bytes = decodeModelFile(file);
     mesh =
       bytes === undefined
         ? { ok: false, message: 'The model file should be the file’s bytes in base64.' }
         : readMesh(bytes);
-    lastMesh = { file, read: mesh };
+    kept(meshes, { file, read: mesh });
   }
   const read: ModelRead = mesh.ok ? { ok: true, model: turned(mesh.mesh, view) } : mesh;
-  lastModel = { file, view, read };
-  return read;
+  return kept(models, { file, view, read }).read;
 }
 
 // A shadow's outlines, once for each model: projecting a large mesh takes a while.

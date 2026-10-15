@@ -133,7 +133,8 @@ and `edgeTapeSolid` and `portTapeSolid`, the tape itself for a preview), the TPU
 `fillPattern` make, with `readSvgDrawing` reading an SVG tile's drawing), the measuring guide's sum (`fitFromMeasured` and `measuredPlayMm`, the fit from a
 printed strip and piece measured with calipers), a mesh of your own (`readMesh`, reading an STL, OBJ
 or 3MF file and repairing or refusing it, and `meshSolid`), the appliance's model (`encodeModelFile`,
-`readApplianceModel`, `modelOutline`, `modelPanel`) and the file writers
+`readApplianceModel`, `modelOutline`, `modelPanel`), the 3D tile (`readMeshTile`, `tileCells`,
+`tiledPanel`) and the file writers
 (`toStl`, `to3mf`, `packageDownload`), with `planFiles`, which names the files without
 building them. The types are in the package.
 

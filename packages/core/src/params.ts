@@ -66,6 +66,7 @@ import type { ClampParams, ClampSetting } from './clamp.js';
 import { DEFAULT_INSERT, formatInserts, parseInserts } from './insert.js';
 import type { InsertParams, InsertSetting } from './insert.js';
 import { MODEL_VIEWS, NO_MODEL, readApplianceModel } from './appliance-model.js';
+import { NO_MESH_TILE, readMeshTile } from './mesh-tile.js';
 import type { ApplianceModel, ModelSetting } from './appliance-model.js';
 import type { InPiece } from './fittings/index.js';
 import { capitalised, hundredth, mm } from './words.js';
@@ -217,6 +218,8 @@ export const FIELD_NAMES = [
   'fillStyle',
   'reliefPct',
   'fillDrawing',
+  'fillMeshFile',
+  'fillMeshView',
   'pieceFills',
   'cutouts',
   'rimDepthMm',
@@ -439,7 +442,7 @@ function readWall(r: FormReader, thicknessMm: number, fill: FillKind): WallKind 
         `round a ${mm(DOUBLE_LEAST_GAP_MM)} mm air gap.`,
     );
   } else if (fill !== 'sealed') {
-    const what = organiserOf(fill)?.words ?? 'a pattern';
+    const what = organiserOf(fill)?.words ?? (fill === 'mesh' ? '3D tiles of your own' : 'a pattern');
     r.fail(
       'wall',
       `A double wall’s skins are too thin for ${what} across the wall: choose a sealed fill, or give single ` +
@@ -790,6 +793,8 @@ function fillForm(p: Params): FormValues {
     fillStyle: p.fill.style,
     reliefPct: String(p.fill.reliefPct),
     fillDrawing: p.fill.drawing,
+    fillMeshFile: p.fill.mesh.file,
+    fillMeshView: p.fill.mesh.view,
     pieceFills: formatPieceFills(p.pieceFills),
   };
   for (const pattern of PATTERNS) {
@@ -810,6 +815,16 @@ function readFill(r: FormReader): { fill: FillParams; pieceFills: PieceFill[] } 
   const drawing = r.values.fillDrawing ?? '';
   const read = readSvgDrawing(drawing);
   if (!read.ok && used('svg')) r.fail('fillDrawing', read.message);
+  // The 3D tile's file and the side facing the room, read only where it is used (mesh-tiles, #40).
+  const tiled = used('mesh');
+  const mesh = {
+    file: r.values.fillMeshFile ?? '',
+    view: r.oneOfIfUsed('fillMeshView', tiled, MODEL_VIEWS, NO_MESH_TILE.view),
+  };
+  if (tiled) {
+    const tile = readMeshTile(mesh.file, mesh.view);
+    if (!tile.ok) r.fail('fillMeshFile', tile.message);
+  }
   const fill: FillParams = {
     kind,
     style: r.oneOfIfUsed('fillStyle', patterned, PATTERN_STYLES, SEALED.style),
@@ -821,6 +836,7 @@ function readFill(r: FormReader): { fill: FillParams; pieceFills: PieceFill[] } 
       'Enter a percentage greater than 0 and less than 100.',
     ),
     drawing: read.ok ? drawing : SEALED.drawing,
+    mesh,
     ...patternSizes((pattern, s) =>
       s.bar
         ? r.numberIfUsed(s.field, used(pattern.kind), s.start, barFits, BAR_MESSAGE)
@@ -909,6 +925,12 @@ export function readParams(values: FormValues): ReadResult {
       'pieceSource',
       `${capitalised(board.words)} for the whole wall is printed into every piece, so none would be cut: choose ` +
         'a sealed fill, or give single pieces the board.',
+    );
+  } else if (sheet.source === 'sheet' && fill.kind === 'mesh') {
+    r.fail(
+      'pieceSource',
+      '3D tiles of your own for the whole wall are printed into every piece, so none would be cut: choose a ' +
+        'sealed fill, or give single pieces the tiles.',
     );
   } else if (sheet.source === 'sheet' && fill.kind !== 'sealed') {
     r.fail(

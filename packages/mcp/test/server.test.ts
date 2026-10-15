@@ -360,6 +360,32 @@ describe('window_sealer_plan_wall', () => {
     expect(bad.text).toContain('The file is not a mesh: choose an STL, OBJ or 3MF file.');
   });
 
+  it('a 3D tile of your own: its file in base64, given alone meaning the tile (#40)', async () => {
+    const { call, client } = await connect();
+    const corners = [0, 0, 0, 28, 0, 0, 28, 28, 0, 0, 28, 0, 0, 0, 6, 28, 0, 6, 28, 28, 6, 0, 28, 6];
+    const faces = [
+      0, 2, 1, 0, 3, 2, 4, 5, 6, 4, 6, 7, 0, 1, 5, 0, 5, 4, 1, 2, 6, 1, 6, 5, 2, 3, 7, 2, 7, 6, 3, 0, 4, 3, 4, 7,
+    ];
+    const bytes = Buffer.alloc(84 + 50 * 12);
+    bytes.writeUInt32LE(12, 80);
+    faces.forEach((c, i) => {
+      for (let a = 0; a < 3; a++) {
+        bytes.writeFloatLE(corners[3 * c + a] ?? 0, 84 + 50 * Math.floor(i / 3) + 12 + 12 * (i % 3) + 4 * a);
+      }
+    });
+    const file = bytes.toString('base64');
+    const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { mesh: { file } } } });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['settings'].fill).toMatchObject({ kind: 'mesh', mesh: { file, view: 'top' } });
+    expect(r.data['summary'].fill).toMatch(/^Fill: 3D tiles of your own, from the STL file: each 28 × 28 mm/);
+    const plan = (await client.listTools()).tools.find((t) => t.name === 'window_sealer_plan_wall');
+    if (!plan) throw new Error('window_sealer_plan_wall expected');
+    const fill = (plan.inputSchema.properties as Record<string, any>)['settings'].properties.fill;
+    expect(fill.properties.mesh.description).toBe(
+      'A 3D tile of your own: its file, an STL, OBJ or 3MF in mm as its bytes in base64, and the side facing the room.',
+    );
+  });
+
   it('pieces with fills of their own (#21)', async () => {
     const { call } = await connect();
     const r = await call('window_sealer_plan_wall', {

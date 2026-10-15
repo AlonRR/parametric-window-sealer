@@ -11,6 +11,7 @@ import type { FieldErrors, Params } from 'parametric-window-sealer';
 import { readForm, setValue, showErrors, valueOf, writeForm } from './form-fields';
 import type { FormPart } from './form-part';
 import { applianceModel, clamps, exhaustFan, slidingInsert, hosePorts, measuredCutout } from './fittings';
+import { meshTile } from './mesh-tile';
 import { mountPatternControls } from './pattern-controls';
 import { pieceMap } from './piece-map';
 import { showPlan } from './plan-view';
@@ -60,6 +61,7 @@ export function mountPanel(
     slidingInsert(form),
     applianceModel(form, update),
     svgTile(form, update),
+    meshTile(form, update),
     tileEditor(form, update),
   ].filter((p): p is FormPart => p !== null);
   const pieces = pieceMap(form, update);

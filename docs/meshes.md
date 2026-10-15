@@ -7,7 +7,7 @@ it can repair without guessing the shape, and refuses the rest with what to do a
 The parts that use a mesh:
 
 - cutting the wall round a model of the appliance (`mesh-appliance`, #35; below);
-- tiles placed on a panel (`mesh-tiles`, #40), still to come;
+- 3D tiles of your own, as the panel fill (`mesh-tiles`, #40; below);
 - a whole piece of your own (`mesh-custom-piece`, #41), still to come.
 
 ## The files it reads
@@ -76,6 +76,31 @@ The file is read as above, and stays on your computer.
 One model goes in a wall. A large file is read once, about a second for 80,000 faces (measured once,
 in Node), and kept while its settings change.
 
+## 3D tiles of your own
+
+An organiser's own tile, or a tile of a 3D pattern, can fill the panel: on the page, **3D tile of
+your own** as the fill, or as one piece's own fill under "Advanced: piece by piece"; for the
+command, `--mesh-tile tile.stl` (which means the tile without `--fill`); for the library and the
+MCP server, `fill.mesh.file`, the file's bytes in base64, with `fill.kind` `mesh`.
+
+- **Which side faces the room**, named as for the appliance's model; the top to start with, as tiles
+  are drawn lying flat to print (`--mesh-tile-view`).
+- **One tile is one cell.** Its box seen from the room is the cell and the spacing, so the tiles meet
+  face to face, on one lattice centred on the wall. Only whole cells are used, inside each piece's
+  border and clear of a fitting, as an organiser's openings are; the band between them and the
+  border stays plain panel.
+- **The tile takes the panel's place** in each cell, its back on the panel's outside face. A tile
+  deeper than the panel stands proud on the room side; a shallower one stops short of the room
+  face. The border keeps the piece's thickness, so the joints still fit.
+- **A tile must have a flat face on each side of its box**, seen from the room: that is the face it
+  meets its neighbour by. A round tile, or one whose sides are open, is refused, saying which side.
+- Like an organiser's board, it is refused for the whole wall with pieces cut from sheet, and with a
+  double wall; single pieces may have it.
+- **The plan** names the file's format, the tile's size, the side facing the room and its depth,
+  and how it stands against the room face, with anything repaired.
+
+A wall can hold a model of the appliance and a tile: the last four files read are kept.
+
 ## For contributors
 
 `readMesh(bytes)` returns the mesh, indexed, in mm, with its size, its repairs and its notes, or the
@@ -86,3 +111,8 @@ The appliance's model is `packages/core/src/appliance-model.ts`: `encodeModelFil
 setting, `readApplianceModel(file, view)` reads and turns it, `modelOutline` projects its shadow,
 `modelPanel` cuts the piece and `modelProblem` checks its room. `fittings/appliance-model.ts` makes
 it a fitting, placed after the others.
+
+The 3D tile is `packages/core/src/mesh-tile.ts`: `readMeshTile(file, view)` reads it and checks its
+sides, `tileCells` finds the whole cells in a piece on the lattice `organiserOpenings` uses, and
+`tiledPanel` sets the tiles in. It is the fill kind `mesh`, reached through `fillChoice` and
+`fillWords` (`fill.ts`) as the patterns and the boards are.

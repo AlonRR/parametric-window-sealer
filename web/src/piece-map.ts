@@ -7,7 +7,8 @@ import { option, setValue, valueOf } from './form-fields';
 
 const STYLE_NAMES: Record<PatternStyle, string> = { relief: 'relief', through: 'cut through' };
 
-// Sealed, then each of the library's patterns in each style, then each organiser's board.
+// Sealed, then each of the library's patterns in each style, then each organiser's board, then the
+// 3D tile.
 function fillChoices(choice: HTMLSelectElement): void {
   const options = [option('', 'As the wall'), option('sealed', 'Sealed')];
   for (const pattern of PATTERNS) {
@@ -16,6 +17,7 @@ function fillChoices(choice: HTMLSelectElement): void {
     }
   }
   for (const organiser of ORGANISERS) options.push(option(organiser.kind, organiser.name));
+  options.push(option('mesh', '3D tile of your own'));
   choice.replaceChildren(...options);
 }
 
@@ -79,7 +81,7 @@ export function pieceMap(form: HTMLFormElement, changed: () => void): PieceMap {
       const own = fills.find((f) => f.column === chosen?.column && f.row === chosen.row);
       name.textContent = `Fill of column ${chosen.column}, row ${chosen.row}`;
       const style = own?.style ?? valueOf(form, 'fillStyle') ?? 'relief';
-      const plain = own === undefined || own.kind === 'sealed' || ORGANISERS.some((o) => o.kind === own.kind);
+      const plain = own === undefined || !PATTERNS.some((p) => p.kind === own.kind); // sealed, a board or the 3D tile
       choice.value = own === undefined ? '' : plain ? own.kind : `${own.kind}:${style}`;
     }
     shownFor = key;
