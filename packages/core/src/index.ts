@@ -11,6 +11,7 @@ export * from './joint-geometry.js';
 export * from './coupon.js';
 export * from './dovetail.js';
 export * from './slider.js';
+export * from './flange.js';
 export * from './fit-test.js';
 export * from './sheet.js';
 export * from './material.js';

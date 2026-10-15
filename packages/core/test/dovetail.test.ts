@@ -68,7 +68,7 @@ describe('the setting', () => {
     expect(fields.indexOf('jointStyle')).toBe(fields.indexOf('slotMm') - 1);
     expect(SETTINGS.find((s) => s.field === 'jointStyle')).toMatchObject({
       path: 'joint.style',
-      values: ['strips', 'dovetails', 'rails'], // sliding rails since #30
+      values: ['strips', 'dovetails', 'rails', 'bolts'], // sliding rails since #30, bolted flanges #31
     });
   });
 });

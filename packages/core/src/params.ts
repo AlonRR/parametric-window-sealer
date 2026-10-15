@@ -523,9 +523,9 @@ function readSeal(r: FormReader): SealRead {
   return { seal, fit, sideTape };
 }
 
-// Puzzle dovetails (#29) and sliding rails (#30) are printed on the pieces, and have no strips: none
-// in TPU, and no coupon for their grip.
-const JOINT_NAMES = { dovetails: 'Puzzle dovetails', rails: 'Sliding rails' } as const;
+// Puzzle dovetails (#29), sliding rails (#30) and bolted flanges (#31) are printed on the pieces, and
+// have no strips: none in TPU, and no coupon for their grip.
+const JOINT_NAMES = { dovetails: 'Puzzle dovetails', rails: 'Sliding rails', bolts: 'Bolted flanges' } as const;
 
 function checkJoinery(r: FormReader, joint: JointParams, sheet: SheetParams, seal: SealParams, coupon: boolean) {
   if (joint.style === 'strips') return;

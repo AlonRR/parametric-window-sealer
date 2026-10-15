@@ -17,10 +17,10 @@
 import type { GridLayout } from './layout.js';
 
 // H-strips between the pieces, or puzzle dovetails on their edges (joint-dovetail, #29), or sliding
-// dovetail rails (joint-rails, #30): with either of those the pieces meet edge to edge and there are
-// no strips or cross pieces; the edge strips stay.
-export type JointStyle = 'strips' | 'dovetails' | 'rails';
-export const JOINT_STYLES: readonly JointStyle[] = ['strips', 'dovetails', 'rails'];
+// dovetail rails (joint-rails, #30), or bolted flanges (joint-bolts, #31): with any but the strips the
+// pieces meet edge to edge and there are no strips or cross pieces; the edge strips stay.
+export type JointStyle = 'strips' | 'dovetails' | 'rails' | 'bolts';
+export const JOINT_STYLES: readonly JointStyle[] = ['strips', 'dovetails', 'rails', 'bolts'];
 
 export interface JointParams {
   style: JointStyle;

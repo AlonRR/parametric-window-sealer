@@ -30,6 +30,8 @@ import { dovetailOutline } from './dovetail.js';
 import type { PieceDovetails } from './dovetail.js';
 import { railsOn } from './slider.js';
 import type { PieceRails } from './slider.js';
+import { flangesOn } from './flange.js';
+import type { PieceFlanges } from './flange.js';
 
 export { plainPanel } from './panel.js';
 export type { PanelSize } from './panel.js';
@@ -71,6 +73,7 @@ export function buildPiecesWith(
   printed: (cell: { column: number; row: number }) => boolean = () => true, // not cut from sheet (#112)
   dovetails?: PieceDovetails, // puzzle dovetails (#29): tabs and sockets on the edges pieces share
   rails?: PieceRails, // sliding dovetail rails (#30): half rails on the edges pieces share
+  flanges?: PieceFlanges, // bolted flanges (#31): a flange on each edge pieces share, with bolt holes
 ): BuiltPiece[] {
   const built: BuiltPiece[] = [];
   // The wall's centre, where the pattern's tiles are centred (Q135).
@@ -123,21 +126,23 @@ export function buildPiecesWith(
           for (const m of new Set([cellSquare, tabs, tabSolid, shape, added, solid])) m?.delete();
           solid = cut;
         }
-        // With sliding rails, half a rail stands on its room side along each edge it shares.
-        if (rails !== undefined) {
-          const halves = railsOn(engine, cell, thicknessMm, rails.sliders);
-          if (halves.length > 0) {
-            const railed = engine.Manifold.union([solid, ...halves]);
-            for (const m of [...halves, solid]) m.delete();
-            solid = railed;
-          }
+        // With sliding rails, half a rail stands on its room side along each edge it shares; with
+        // bolted flanges, a flange with its bolt holes.
+        const standing = [
+          ...(rails === undefined ? [] : railsOn(engine, cell, thicknessMm, rails.sliders)),
+          ...(flanges === undefined ? [] : flangesOn(engine, cell, thicknessMm, flanges.flanges)),
+        ];
+        if (standing.length > 0) {
+          const joined = engine.Manifold.union([solid, ...standing]);
+          for (const m of [...standing, solid]) m.delete();
+          solid = joined;
         }
         // Rounded corners and a chamfer against warping (#122), on a piece to print; one cut from
-        // sheet is cut square. Pieces that meet with nothing over their corners, dovetailed or
-        // railed, keep square corners, a dovetailed one's chamfer following its tabs.
+        // sheet is cut square. Pieces that meet with nothing over their corners, dovetailed, railed or
+        // flanged, keep square corners, a dovetailed one's chamfer following its tabs.
         if (printed(cell)) {
           if (outline !== undefined) solid = printReadyOutline(engine, solid, outline);
-          else if (rails !== undefined) {
+          else if (rails !== undefined || flanges !== undefined) {
             const square = engine.CrossSection.square([cell.widthMm, cell.heightMm]);
             solid = printReadyOutline(engine, solid, square);
             square.delete();

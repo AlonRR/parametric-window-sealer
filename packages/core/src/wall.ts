@@ -118,8 +118,9 @@ export function buildExport(engine: Engine, params: Params): { pieces: ExportPie
   const printed = (cell: { column: number; row: number }) => !isCut(params, cell);
   const dovetails =
     params.joint.style === 'dovetails' ? { joint: params.joint, tabs: planDovetails(plan, params.joint) } : undefined;
-  const rails =
-    params.joint.style === 'rails' ? { joint: params.joint, sliders: planParts(params, plan).sliders } : undefined;
+  const joinery = planParts(params, plan);
+  const rails = params.joint.style === 'rails' ? { joint: params.joint, sliders: joinery.sliders } : undefined;
+  const flanges = params.joint.style === 'bolts' ? { joint: params.joint, flanges: joinery.flanges } : undefined;
   const built = buildPiecesWith(
     engine,
     plan,
@@ -131,6 +132,7 @@ export function buildExport(engine: Engine, params: Params): { pieces: ExportPie
     printed,
     dovetails,
     rails,
+    flanges,
   );
   let pieces: ExportPiece[];
   try {

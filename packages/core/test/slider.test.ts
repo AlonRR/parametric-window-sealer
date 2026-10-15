@@ -57,7 +57,7 @@ const grid = (widthMm: number, heightMm: number, maxHeightMm = heightMm) =>
 describe('the setting', () => {
   it('a third joint style', () => {
     expect(read(rails).joint.style).toBe('rails');
-    expect(SETTINGS.find((s) => s.field === 'jointStyle')?.values).toEqual(['strips', 'dovetails', 'rails']);
+    expect(SETTINGS.find((s) => s.field === 'jointStyle')?.values).toEqual(['strips', 'dovetails', 'rails', 'bolts']); // bolted flanges since #31
   });
 });
 

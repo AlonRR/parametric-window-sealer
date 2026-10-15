@@ -69,3 +69,26 @@ test('sliding rails: the plan counts the sliders, and the download has them', as
   expect(names.filter((n) => n.startsWith('slider-'))).toHaveLength(4);
   expect(names.some((n) => n.startsWith('strip-') || n.startsWith('cross-'))).toBe(false);
 });
+
+// Bolted flanges (joint-bolts, #31): the fourth joint style.
+test('bolted flanges: the plan says how many bolts to buy, and nothing but pieces and edge strips is printed', async ({
+  page,
+}) => {
+  await expect(page.getByTestId('engine-status')).toHaveAttribute('data-state', 'ready');
+  await page.getByLabel('Joint style').selectOption('bolts');
+  await expect(page.getByText('bolted together with M4 bolts, a washer and a nut each')).toBeVisible();
+  await expect(page.getByTestId('plan-joints')).toHaveText(
+    /^Joints: bolted flanges along the 38 edges where pieces meet: 76 M4 bolts, 12 mm long/,
+  );
+  await page.getByRole('button', { name: 'Download the pieces' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Download the pieces' });
+  await dialog.getByRole('radio', { name: 'STL', exact: true }).check();
+  await dialog.getByRole('radio', { name: 'One zip file' }).check();
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    dialog.getByRole('button', { name: 'Download', exact: true }).click(),
+  ]);
+  const names = Object.keys(unzipSync(await readFile((await download.path()) ?? '')));
+  expect(names.filter((n) => n.startsWith('piece-'))).toHaveLength(24);
+  expect(names.every((n) => /^(piece|edge|stiffener)-/.test(n))).toBe(true);
+});

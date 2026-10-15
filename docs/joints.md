@@ -111,11 +111,38 @@ pair of rails from its end. To take it apart, slide them off. The same settings 
 the puzzle dovetails, and the same lines in the plan apply. The preview draws neither the rails nor
 the sliders.
 
+## Bolted flanges
+
+**Joint style: Bolted flanges** joins the pieces with bought bolts and nothing else printed. The
+pieces meet edge to edge. Each has a flange standing on its room side along every edge it shares,
+10 mm high and 3 mm thick, flush with the joint. The two flanges stand back to back and are bolted
+together.
+
+- The bolts are M4, 12 mm long, each with a nut and a washer on each side. That is two 3 mm flanges,
+  two 0.8 mm washers and a 3.2 mm nut, 10.8 mm, with a little thread to spare. The plan says how
+  many to buy.
+- There is one bolt about every 80 mm of flange, centred in equal lengths, and none within 15 mm of
+  a flange's end. Each goes through a 4.5 mm hole halfway up both flanges.
+- The flanges run to the crossings, and stop as far from the wall's edge as the H-strips stop from
+  an edge strip.
+- The corners stay square, and the bed-side chamfer runs round each piece, as with the rails.
+
+To put the wall together, lay the pieces room side up, edge to edge, and bolt each pair of
+flanges together. The flanges stand into the room. They hold the pieces in and across the wall's
+plane, and come apart with a screwdriver. The same settings are refused as with the puzzle
+dovetails, and the preview does not draw the flanges.
+
+Sizes of the bought parts: an M4 nut (ISO 4032) is 3.2 mm high and 7 mm across its flats
+([a maker's listing](https://eshop.wurth.ae/Hexagon-nut-ISO-4032-A2-70-stainless-steel-plain-NUT-HEX-ISO4032-A2-70-WS7-M4/032294.sku/en/US/AED)).
+An M4 washer (ISO 7089) is 0.8 mm thick, 9 mm across and 4.3 mm inside
+([the ISO 7089 table](https://fasten.it/norms/norm/din_en_iso_7089)). The 4.5 mm hole is ISO
+273's medium clearance for M4, as the clamps' holes are.
+
 ## The settings
 
 | On the page | Command | Library and MCP server | Starts at |
 | --- | --- | --- | --- |
-| Joint style | `--joint-style strips`, `dovetails` or `rails` | `joint.style` | strips |
+| Joint style | `--joint-style strips`, `dovetails`, `rails` or `bolts` | `joint.style` | strips |
 | Grip (mm per face) | `--grip` | `joint.gripMm` | 0.15; 0 leaves the strips without ribs |
 | Pin each strip | `--pins yes` or `no` | `joint.pins` | yes |
 | Add a test coupon to the download | `--coupon yes` or `no` | `coupon` | no |
@@ -134,3 +161,5 @@ while the pins are on.
   wall steps at a joint in wind: a test print.
 - That a slider slides along its rails with 0.2 mm a face, and that the rails' 14° lean prints
   clean: a test print.
+- That 10 × 3 mm flanges stand stiff enough to bolt, and that the 4.5 mm holes print round enough
+  for an M4 bolt: a test print.

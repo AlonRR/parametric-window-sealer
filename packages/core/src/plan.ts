@@ -6,6 +6,8 @@ import { jointWidthMm, minPieceMm, planJoints } from './joint.js';
 import { DOVETAIL } from './dovetail.js';
 import { planSliders } from './slider.js';
 import type { SliderPlacement } from './slider.js';
+import { planFlanges } from './flange.js';
+import type { FlangePlacement } from './flange.js';
 import { anyPrinted } from './sheet.js';
 import type { JointPlan } from './joint.js';
 import { layoutGrid } from './layout.js';
@@ -74,6 +76,7 @@ export interface WallParts {
   joints: JointPlan;
   edges: EdgeStripPlacement[];
   sliders: SliderPlacement[]; // on sliding dovetail rails (#30)
+  flanges: FlangePlacement[]; // bolted flanges (#31)
 }
 
 // Everything the wall is made of, in the pieces' frame: the plan, the joint strips and
@@ -86,6 +89,7 @@ export function planParts(p: Params, plan: GridLayout = planWall(p)): WallParts 
     plan,
     joints: planJoints(plan, p.joint, jointStripInsetMm(p.joint), longest),
     sliders: planSliders(plan, p.joint, jointStripInsetMm(p.joint), longest),
+    flanges: planFlanges(plan, p.joint, jointStripInsetMm(p.joint)),
     edges: planEdges(span.widthMm, span.heightMm, p.edges, p.joint, longest, tape),
   };
 }

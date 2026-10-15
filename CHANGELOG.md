@@ -15,6 +15,11 @@ published work (Q153). Changes since the latest version are listed under Unrelea
 
 ### Added
 
+- Bolted flanges, a fourth joint style: Joint style: Bolted flanges (`--joint-style bolts`). The pieces
+  meet edge to edge, each with a flange 10 mm high and 3 mm thick along every edge it shares on its
+  room side, and the two flanges back to back are bolted together with M4 bolts, 12 mm long, a nut and
+  two washers each, one about every 80 mm: the plan says how many to buy. Nothing else is printed for
+  them. How: `docs/joints.md`. Not yet test printed.
 - Sliding dovetail rails, a third joint style: Joint style: Sliding dovetail rails (`--joint-style
   rails`). The pieces meet edge to edge, each with half a dovetail rail, 4 mm high, along every edge it
   shares on its room side, and a printed slider slides along each pair, holding the pieces in and
