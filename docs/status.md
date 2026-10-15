@@ -185,7 +185,8 @@ The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-None.
+- **Q153.** Which of the design changes R1 to R13 in [`research/design-review.md`](research/design-review.md) should be built, and in what order? Recommended: all of them, in their listed order, each as its own backlog item, starting with R1 (a tighter joint that locks) and R2 (strips that stiffen), since the joints decide whether the wall holds. R4 and R6 change Q6, R1 changes Q13, and R11 extends Q14, so they need the owner's word.
+- **Q152.** What to build next after the sliding insert: superseded by Q153 if the owner takes it up.
 
 ## Repository follow-ups
 
