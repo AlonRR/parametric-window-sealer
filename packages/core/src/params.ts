@@ -42,6 +42,8 @@ import { DEFAULT_SOCKET, PORT_LOCKS } from './socket.js';
 import type { SocketParams } from './socket.js';
 import { DEFAULT_RAIL, railEdge, railLeastGapMm } from './rail.js';
 import type { RailParams } from './rail.js';
+import { DEFAULT_STOP, STOP_LEAST_MM, stopTrack } from './stop.js';
+import type { StopParams } from './stop.js';
 import { FormReader, SIZE_MESSAGE, SIZE_OR_ZERO_MESSAGE } from './form-reader.js';
 import { planWall } from './plan.js';
 import {
@@ -95,6 +97,7 @@ export interface Params {
   socket: SocketParams; // how the hose ports hold the hose, with caps and screens (#114)
   rail: RailParams; // the filler between the sashes (meeting-rail, #116); none to start with
   rain: boolean; // weep holes in the strips and a drip groove under the edge strips (rain-face, #117)
+  stop: StopParams; // a strut in the sash's track that lifts out by hand (sash-stop, #118); none to start with
 }
 
 // The page starts here: an example opening (Q42, labelled as an example, Q18), the default
@@ -129,6 +132,7 @@ export const EXAMPLE_PARAMS: Params = {
   socket: DEFAULT_SOCKET,
   rail: DEFAULT_RAIL,
   rain: true,
+  stop: DEFAULT_STOP,
 };
 
 // Every field of the page's form. The page reads and writes these by name; the settings list
@@ -176,6 +180,7 @@ export const FIELD_NAMES = [
   'rightDepthMm',
   'trackClearanceMm',
   'railGapMm',
+  'sashStopMm',
   'ports',
   'collarDepthMm',
   'collarWallMm',
@@ -375,6 +380,7 @@ const edgesForm = (p: Params): FormValues => ({
   rightDepthMm: String(p.edges.track.depthMm.right),
   trackClearanceMm: String(p.edges.track.clearanceMm),
   railGapMm: String(p.rail.gapMm),
+  sashStopMm: String(p.stop.lengthMm),
 });
 
 function readEdges(r: FormReader): EdgeParams {
@@ -393,6 +399,18 @@ function readEdges(r: FormReader): EdgeParams {
     depthMm: { top: depthOf('top'), bottom: depthOf('bottom'), left: depthOf('left'), right: depthOf('right') },
   };
   return { window, roles, track };
+}
+
+// The sash stop (sash-stop, #118): it lies in the track beside the edge the sash presses on.
+function readStop(r: FormReader, edges: EdgeParams): StopParams {
+  const lengthMm = r.sizeOrZero('sashStopMm');
+  if (!(lengthMm > 0)) return DEFAULT_STOP;
+  if (stopTrack(edges) === undefined) {
+    r.fail('sashStopMm', 'A sash stop lies in the track the sash runs in: put the edges beside the sash in a track.');
+  } else if (lengthMm < STOP_LEAST_MM - 1e-9) {
+    r.fail('sashStopMm', `Make it at least ${mm(STOP_LEAST_MM)} mm, or 0 for none.`);
+  }
+  return { lengthMm };
 }
 
 // The filler between the sashes (meeting-rail, #116), read after the seal, whose grooves it takes:
@@ -749,6 +767,7 @@ export function readParams(values: FormValues): ReadResult {
   const sealRead = readSeal(r);
   const { seal, fit } = sealRead;
   const rail = readRail(r, edges, seal);
+  const stop = readStop(r, edges);
   checkTrackWidth(r, thicknessMm, joint, edges, sealRead);
   checkPieceSize(r, printer, bedMarginMm, joint);
   checkSealFits(r, edges, sealRead);
@@ -792,6 +811,7 @@ export function readParams(values: FormValues): ReadResult {
     socket,
     rail,
     rain,
+    stop,
   };
   // Fittings and pieces' own patterns are placed against the plan they will be in: with any to
   // place, a printed piece keeps every piece to the printer's size, before they are placed.

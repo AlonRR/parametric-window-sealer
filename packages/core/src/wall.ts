@@ -11,6 +11,7 @@ import type { AnyPartShape, DownloadChoice, DownloadFile, ExportPart, ExportPiec
 import { partShapes, planPins } from './joint.js';
 import { couponShape, couponSolid } from './coupon.js';
 import { planRail, railGasketLengths, railShapes, railSolid } from './rail.js';
+import { planStop, stopShapes, stopSolid } from './stop.js';
 import { isCut, slotPins } from './sheet.js';
 import { crossSolid, stripSolid } from './joint-geometry.js';
 import type { GridLayout } from './layout.js';
@@ -32,7 +33,7 @@ import type { PlanText } from './plan-text.js';
 // cross pieces, in TPU if chosen, the edge strips, with the TPU seal its gaskets, and each fitting's
 // parts: with the TPU seal the sleeves for the hose ports (#22) and the frames for the cutouts (#23),
 // always the clamps' jaws (#32), the filler between the sashes if there is one, with printed TPU its
-// gaskets (#116), and if asked for, the joint's test coupon (#110).
+// gaskets (#116), the sash stop if there is one (#118), and if asked for, the joint's test coupon (#110).
 function wallParts(params: Params, plan: GridLayout): FittingPart[] {
   const { joints, edges } = planParts(params, plan);
   const { joint, thicknessMm } = params;
@@ -46,6 +47,7 @@ function wallParts(params: Params, plan: GridLayout): FittingPart[] {
     ...edgeShapes(edges),
     ...(tpu === undefined ? [] : gasketShapes(edges, tpu, params.seal.tape.thicknessMm, railGaskets)),
     ...(rail === undefined ? [] : railShapes(rail)),
+    ...stopShapesFor(params),
     ...(params.coupon ? [couponShape(joint)] : []),
   ];
   const solidOf = (engine: Engine, shape: WallPartShape) => {
@@ -64,6 +66,8 @@ function wallParts(params: Params, plan: GridLayout): FittingPart[] {
         return couponSolid(engine, shape, joint, thicknessMm);
       case 'rail':
         return railSolid(engine, shape);
+      case 'stop':
+        return stopSolid(engine, shape);
       default: {
         const unknown: never = shape;
         throw new Error(`No part of kind ${(unknown as WallPartShape).kind}`);
@@ -75,6 +79,11 @@ function wallParts(params: Params, plan: GridLayout): FittingPart[] {
     ...own.map((shape) => ({ shape, name: partName(shape), solid: (engine: Engine) => solidOf(engine, shape) })),
     ...FITTINGS.flatMap((f) => f.parts(source, tpu)),
   ];
+}
+
+function stopShapesFor(params: Params) {
+  const plan = planStop(params);
+  return plan === undefined ? [] : stopShapes(plan);
 }
 
 // The download and the dry run both list these.

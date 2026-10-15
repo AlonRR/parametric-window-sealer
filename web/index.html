@@ -378,6 +378,18 @@
             edge the sash presses on, with the seal on both faces. 0 for none.
           </p>
           <span class="error" data-testid="error-railGapMm"></span>
+          <!-- The sash stop (sash-stop, #118): none to start with. -->
+          <label>
+            Sash stop length (mm)
+            <input name="sashStopMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">
+            The wall is not a lock. A sash stop is a printed strut that lies in the track the sash
+            runs in, from its edge to the frame, so the sash cannot be opened further from outside;
+            it lifts out by hand from inside, so the window still opens as an escape. Measure that
+            gap along the track; 0 for none.
+          </p>
+          <span class="error" data-testid="error-sashStopMm"></span>
         </fieldset>
 
         <!-- The hose port (hose-port, #12): an appliance choice starting at none (Q112), the
@@ -1109,6 +1121,7 @@
         <p data-testid="plan-material" data-plan="material"></p>
         <ul data-testid="plan-rail" data-plan="rail"></ul>
         <ul data-testid="plan-rain" data-plan="rain"></ul>
+        <ul data-testid="plan-stop" data-plan="stop"></ul>
         <ul data-testid="plan-warnings" data-plan="warnings"></ul>
         <p><button type="button" id="download-open">Download the pieces...</button></p>
         <!-- The offline file (offline-file, #25): the page as one file, offered here (C55). -->

@@ -14,6 +14,7 @@ export * from './material.js';
 export * from './socket.js';
 export * from './rail.js';
 export * from './rain.js';
+export * from './stop.js';
 export * from './layout.js';
 export * from './panel-geometry.js';
 export * from './fittings/index.js';

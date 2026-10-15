@@ -191,6 +191,13 @@ export const SETTINGS: readonly Setting[] = [
       'seal on both faces; 0 for none.',
   },
   {
+    field: 'sashStopMm',
+    path: 'stop.lengthMm',
+    help:
+      "A sash stop: the gap in the sash's track from its edge to the frame, for a printed strut that stops the " +
+      'sash opening further and lifts out by hand from inside; 0 for none.',
+  },
+  {
     field: 'ports',
     path: 'ports',
     help:

@@ -56,6 +56,7 @@ const FLAG_NAMES: Record<OwnField, string> = {
   rightDepthMm: 'right-depth',
   trackClearanceMm: 'track-clearance',
   railGapMm: 'rail-gap', // the filler between the sashes (#116); 0 for none
+  sashStopMm: 'sash-stop', // a strut in the sash's track (#118); 0 for none
   ports: 'port', // repeatable: one --port for each port (Q114)
   collarDepthMm: 'collar-depth',
   collarWallMm: 'collar-wall',

@@ -23,6 +23,7 @@ import { DEFAULT_SHEET } from '../src/sheet.js';
 import { DEFAULT_MATERIAL } from '../src/material.js';
 import { DEFAULT_SOCKET } from '../src/socket.js';
 import { DEFAULT_RAIL } from '../src/rail.js';
+import { DEFAULT_STOP } from '../src/stop.js';
 
 const example = toFormValues(EXAMPLE_PARAMS);
 const read = (over: FormValues) => readParams({ ...example, ...over });
@@ -57,6 +58,7 @@ describe('the starting values', () => {
       socket: DEFAULT_SOCKET, // #114
       rail: DEFAULT_RAIL, // #116
       rain: true, // #117
+      stop: DEFAULT_STOP, // #118
     });
   });
 
@@ -316,6 +318,7 @@ describe('describePlan', () => {
         'Rain: every strip and edge strip has weep holes in one flange to let water out of its slots; fit each ' +
           'with that flange outside. A groove under each edge strip stops water creeping under it to the room.',
       ], // #117
+      stop: [], // #118
     });
   });
 

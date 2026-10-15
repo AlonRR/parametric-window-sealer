@@ -14,6 +14,12 @@ under Unreleased.
 
 ### Added
 
+- A sash stop: under The window, the gap along the sash's track from its edge to the frame
+  (`--sash-stop`, 0 for none to start with) prints a strut that lies in that track, standing 10 mm
+  out, so the sash cannot be opened further from outside; it lifts out by hand from inside, so an
+  escape window still opens. Longer than the printer makes, it comes in lengths that lap and pin.
+  The page says the wall itself is not a lock. Why: `docs/sash-stop.md`. Not yet test printed.
+
 - Rain on the outside: under The panel, "The outside of the wall gets rain" (`--rain`, on to start
   with) gives every strip and edge strip weep holes in one flange, beside the web or at the slot's
   floor, so water that gets into the slots runs out again, and a drip groove under each edge strip

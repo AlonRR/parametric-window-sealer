@@ -78,18 +78,28 @@ export function railLeastGapMm(seal: SealParams): number {
   return tenth(depth + (fit === undefined ? RAIL_FIT_MM : 2 * fit.standOutMm));
 }
 
+// The longest length the printer makes: a length can be turned on the bed.
+export function longestMm(p: { printer: PrinterChoice; bedMarginMm: number }): number {
+  const max = maxPieceSize(p.printer, p.bedMarginMm);
+  return Math.max(max.widthMm, max.heightMm);
+}
+
+// A bar longer than the printer makes, as the fewest equal lengths that lap: each rounded down to
+// 0.1 mm so none is longer than the printer makes.
+export function lappedLengths(lengthMm: number, longest: number, lapMm: number): { pieces: number; pieceMm: number } {
+  if (lengthMm <= longest) return { pieces: 1, pieceMm: lengthMm };
+  if (!(longest > 2 * lapMm)) throw new RangeError(`A ${longest} mm length leaves no room for two laps`);
+  const pieces = Math.ceil((lengthMm - lapMm) / (longest - lapMm) - 1e-9);
+  return { pieces, pieceMm: Math.floor(((lengthMm + (pieces - 1) * lapMm) / pieces) * 10) / 10 };
+}
+
 export function planRail(p: RailSource): RailPlan | undefined {
   const edge = railEdge(p.edges);
   if (p.rail.gapMm <= 0 || edge === undefined) return undefined;
   const fit = tapeFit(p.seal);
   const along = edge === 'top' || edge === 'bottom' ? p.openingWidthMm : p.openingHeightMm;
   const lengthMm = tenth(along - RAIL_END_MM);
-  const max = maxPieceSize(p.printer, p.bedMarginMm);
-  const longest = Math.max(max.widthMm, max.heightMm);
-  if (!(longest > 2 * RAIL_LAP_MM)) throw new RangeError(`A ${longest} mm length leaves no room for two laps`);
-  const pieces = lengthMm <= longest ? 1 : Math.ceil((lengthMm - RAIL_LAP_MM) / (longest - RAIL_LAP_MM) - 1e-9);
-  // Equal lengths, rounded down to 0.1 mm so none is longer than the printer makes.
-  const pieceMm = pieces === 1 ? lengthMm : Math.floor(((lengthMm + (pieces - 1) * RAIL_LAP_MM) / pieces) * 10) / 10;
+  const { pieces, pieceMm } = lappedLengths(lengthMm, longestMm(p), RAIL_LAP_MM);
   const groove = fit === undefined ? undefined : { widthMm: tenth(fit.grooveWidthMm), depthMm: fit.grooveDepthMm };
   return {
     edge,
@@ -121,9 +131,9 @@ export function railShapes(rail: RailPlan): RailShape[] {
 }
 
 // With printed TPU, a gasket along each face in lengths the printer makes.
-export function railGasketLengths(rail: RailPlan | undefined, longestMm: number): number[] {
+export function railGasketLengths(rail: RailPlan | undefined, maxMm: number): number[] {
   if (rail?.groove === undefined) return [];
-  const each = evenSegments(0, rail.lengthMm, longestMm).map(([, lengthMm]) => lengthMm);
+  const each = evenSegments(0, rail.lengthMm, maxMm).map(([, lengthMm]) => lengthMm);
   return [...each, ...each];
 }
 
