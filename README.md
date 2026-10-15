@@ -18,6 +18,7 @@ clamps ([`docs/clamps.md`](docs/clamps.md)) or in a sliding insert ([`docs/slidi
 cuts the pieces from sheet instead of printing them if you like ([`docs/sheet-pieces.md`](docs/sheet-pieces.md)),
 warns where the material you print in would get too hot ([`docs/materials.md`](docs/materials.md)),
 fills the gap between a window's two sashes ([`docs/sash-filler.md`](docs/sash-filler.md)),
+drains rain out of its joints ([`docs/rain.md`](docs/rain.md)),
 seals the edges with foam tape or printed TPU gaskets whose fins bend ([`docs/seals.md`](docs/seals.md)), fills the pieces with a pattern or a tile of your
 own drawing ([`docs/svg-tiles.md`](docs/svg-tiles.md)), and has a measuring guide; it can also be saved as one file that works offline.
 The same geometry is a library for Node.js and browsers, the `window-sealer` command and the

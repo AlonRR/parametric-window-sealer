@@ -56,6 +56,7 @@ describe('the starting values', () => {
       material: DEFAULT_MATERIAL, // #113
       socket: DEFAULT_SOCKET, // #114
       rail: DEFAULT_RAIL, // #116
+      rain: true, // #117
     });
   });
 
@@ -311,6 +312,10 @@ describe('describePlan', () => {
       sheet: [], // every piece printed (#112)
       material: 'Material: PETG in a light colour.', // #113
       rail: [], // #116
+      rain: [
+        'Rain: every strip and edge strip has weep holes in one flange to let water out of its slots; fit each ' +
+          'with that flange outside. A groove under each edge strip stops water creeping under it to the room.',
+      ], // #117
     });
   });
 

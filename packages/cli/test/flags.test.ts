@@ -48,6 +48,7 @@ describe('the setting flags (Q90)', () => {
       'material',
       'colour',
       'sun',
+      'rain',
       'pins',
       'coupon',
       'window',

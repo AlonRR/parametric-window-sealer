@@ -134,6 +134,15 @@ export const SETTINGS: readonly Setting[] = [
     values: YES_NO,
     onOff: true,
   },
+  {
+    field: 'rain',
+    path: 'rain',
+    help:
+      "Rain on the wall's outside: weep holes in one flange of every strip and edge strip, and a groove under " +
+      'each edge strip with no seal, to let water out: yes or no.',
+    values: YES_NO,
+    onOff: true,
+  },
   { field: 'slotMm', path: 'joint.slotMm', help: 'How deep a piece can go into a strip.' },
   { field: 'slideMm', path: 'joint.slideMm', help: 'How far a piece can move in its slot.' },
   { field: 'webMm', path: 'joint.webMm', help: "The wall between the strip's two slots." },

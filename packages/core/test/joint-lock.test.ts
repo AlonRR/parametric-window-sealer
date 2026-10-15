@@ -251,7 +251,8 @@ describe('the download', () => {
     expect(genus(piece(0, 0)?.mesh ?? { positions: new Float32Array(), triangles: new Uint32Array() })).toBe(2);
     expect(genus(piece(1, 2)?.mesh ?? { positions: new Float32Array(), triangles: new Uint32Array() })).toBe(4);
     const strip = parts.find((p) => p.name.startsWith('strip-'));
-    expect(strip && genus(strip.mesh)).toBe(4);
+    // Two through each flange for the pins, and in rain (#117) a weep hole each side of the web at four places.
+    expect(strip && genus(strip.mesh)).toBe(4 + 8);
   });
 });
 

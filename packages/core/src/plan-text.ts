@@ -6,6 +6,7 @@ import { COUPON_SECTIONS, couponGrips } from './coupon.js';
 import { describeSheet } from './sheet.js';
 import { describeMaterial, materialWarnings } from './material.js';
 import { describeRail, planRail } from './rail.js';
+import { describeRain } from './rain.js';
 import type { JointParams, JointPlan } from './joint.js';
 import type { Axis, GridLayout, Leftover } from './layout.js';
 import { tapeFit } from './tape.js';
@@ -53,6 +54,7 @@ export interface PlanText {
   sheet: string[]; // with pieces cut from sheet (#112): what to cut, what to print, the pins to drill
   material: string; // what the parts are printed in, and in sun how hot it gets (#113)
   rail: string[]; // the filler between the sashes, if there is one (#116)
+  rain: string[]; // the weep holes, and keeping a window AC's tilt (#117)
 }
 
 function describeLeftover(note: GridLayout['leftovers'][number], maxPieceMm: number, joint: JointParams): LeftoverText {
@@ -199,5 +201,6 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     sheet: describeSheet(params, plan, params.joint.pins ? 2 * parts.joints.strips.length : 0),
     material: describeMaterial(params.material),
     rail: describeRail(params),
+    rain: describeRain(params),
   };
 }

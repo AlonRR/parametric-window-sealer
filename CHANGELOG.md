@@ -14,6 +14,12 @@ under Unreleased.
 
 ### Added
 
+- Rain on the outside: under The panel, "The outside of the wall gets rain" (`--rain`, on to start
+  with) gives every strip and edge strip weep holes in one flange, beside the web or at the slot's
+  floor, so water that gets into the slots runs out again, and a drip groove under each edge strip
+  with no seal. The plan says to fit them with the holes outside, and with a window AC, to keep its
+  outward tilt and its drain. File names are unchanged. Why: `docs/rain.md`. Not yet test printed.
+
 - A filler for the gap between the sashes where they overlap: under The window, the gap measured
   front to back (`--rail-gap`, 0 for none to start with) prints a bar as long as the edge the sash
   presses on, the seal in a groove on both faces, in lengths that lap 10 mm. The plan says how many

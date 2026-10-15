@@ -75,6 +75,7 @@ Start from `EXAMPLE_PARAMS` and change what differs. Every length is in mm.
 | `pieceFills`                           | Pieces with a fill of their own, none to start with: each `{ column, row, kind, style? }`, from 1 at the bottom left seen from the room; the sizes stay the wall's (`fillFor` gives a piece's fill) |
 | `coupon`                               | `true` adds the joint's test coupon to the files: five short strips that try the grip |
 | `sheet`                                | `source` `'printed'` or `'sheet'`, and the sheet's `widthMm` and `heightMm` (`DEFAULT_SHEET`): with `'sheet'`, the pieces without a fitting or pattern of their own are cut from it and left out of the files (`docs/sheet-pieces.md`) |
+| `rain`                                 | `true` (to start with) gives every strip and edge strip weep holes in one flange, to fit outside, and each edge strip with no seal on its outer face a drip groove under it (`docs/rain.md`) |
 | `material`                             | `kind` `'petg'`, `'asa'` or `'pla'`, `colour` `'light'` or `'dark'`, and `sun`, whether the outside gets direct sun (`DEFAULT_MATERIAL`): the plan names it and warns where it gets too hot (`docs/materials.md`) |
 
 Wrong parameters throw a `ParamsError` whose `errors` names every wrong field with the page's

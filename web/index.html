@@ -701,6 +701,17 @@
             and ASA in sun. The plan warns where the wall would get near what the material takes.
           </p>
           <span class="error" data-testid="error-sun"></span>
+          <!-- Rain on the outside face (rain-face, #117): on to start with. -->
+          <label>
+            <input type="checkbox" name="rain" value="yes" />
+            The outside of the wall gets rain
+          </label>
+          <p class="note">
+            Every strip gets weep holes in one flange, so water that gets into its slots runs out
+            again: fit that flange outside. Edge strips with no seal get a groove underneath that
+            stops water creeping under them.
+          </p>
+          <span class="error" data-testid="error-rain"></span>
           <!-- Pieces cut from sheet (sheet-pieces, #112): only the strips and fittings printed. -->
           <label><input type="radio" name="pieceSource" value="printed" checked /> Print the pieces</label>
           <label><input type="radio" name="pieceSource" value="sheet" /> Cut the pieces from sheet</label>
@@ -1097,6 +1108,7 @@
         <ul data-testid="plan-sheet" data-plan="sheet"></ul>
         <p data-testid="plan-material" data-plan="material"></p>
         <ul data-testid="plan-rail" data-plan="rail"></ul>
+        <ul data-testid="plan-rain" data-plan="rain"></ul>
         <ul data-testid="plan-warnings" data-plan="warnings"></ul>
         <p><button type="button" id="download-open">Download the pieces...</button></p>
         <!-- The offline file (offline-file, #25): the page as one file, offered here (C55). -->

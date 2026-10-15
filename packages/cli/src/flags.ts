@@ -35,6 +35,7 @@ const FLAG_NAMES: Record<OwnField, string> = {
   material: 'material', // petg, asa or pla (#113)
   colour: 'colour',
   sun: 'sun',
+  rain: 'rain', // weep holes and drip grooves (#117), yes to start with
   slotMm: 'slot',
   slideMm: 'slide',
   webMm: 'web',

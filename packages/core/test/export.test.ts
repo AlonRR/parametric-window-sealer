@@ -223,7 +223,8 @@ describe('3MF', () => {
       strip?.positions ?? new Float32Array(),
       strip?.triangles ?? new Uint32Array(),
     );
-    const expected = stripSolid(engine, 180.7, { ...DEFAULT_JOINT, pins: false }, 3, 'print'); // as exampleDownload
+    // As exampleDownload, with the weep holes the starting values give (#117).
+    const expected = stripSolid(engine, 180.7, { ...DEFAULT_JOINT, pins: false }, 3, 'print', true);
     expect(solid.volume()).toBeCloseTo(expected.volume(), 2);
     solid.delete();
     expected.delete();

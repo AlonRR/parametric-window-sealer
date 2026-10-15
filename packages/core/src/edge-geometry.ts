@@ -17,6 +17,7 @@ import type { EdgeGroove, EdgeName, EdgeTape } from './edge.js';
 import type { Engine } from './engine.js';
 import type { JointParams } from './joint.js';
 import { TAPE_GROOVE_PLAY_MM, TAPE_GROOVE_WALL_MM } from './tape.js';
+import { DRIP_GROOVE_MM, DRIP_LEAST_WALL_MM, WEEP_LENGTH_MM, WEEP_MM, weepPlacesMm } from './rain.js';
 
 export type EdgePose = EdgeName | 'print';
 
@@ -67,6 +68,7 @@ export function edgeStripSolid(
   joint: JointParams,
   panelMm: number,
   pose: EdgePose,
+  rain = false,
 ): Manifold {
   requirePositive('lengthMm', lengthMm);
   requirePositive('panel thickness', panelMm);
@@ -108,6 +110,19 @@ export function edgeStripSolid(
       const v: Range = [groove.side.fromMm, groove.side.toMm];
       cuts.push({ u: through, v, w: [across[0] - 1, across[0] + groove.depthMm] });
       cuts.push({ u: through, v, w: [across[1] - groove.depthMm, across[1] + 1] });
+    }
+  }
+  // In rain (rain-face, #117), weep holes through the outside wall at the slot's floor, and with no
+  // seal along the outer face, a drip groove under the outside wall where it has room for one.
+  if (rain) {
+    for (const u of weepPlacesMm(lengthMm)) {
+      const at: Range = [u - WEEP_LENGTH_MM / 2, u + WEEP_LENGTH_MM / 2];
+      cuts.push({ u: at, v: [floor, floor + WEEP_MM], w: [across[0] - 1, slot[0] + 0.1] });
+    }
+    const sealed = groove !== undefined && groove.depthMm > 0;
+    if (!sealed && slot[0] - across[0] >= DRIP_LEAST_WALL_MM - 1e-9) {
+      const from = across[0] + DRIP_GROOVE_MM.inMm;
+      cuts.push({ u: through, v: [-1, DRIP_GROOVE_MM.depthMm], w: [from, from + DRIP_GROOVE_MM.widthMm] });
     }
   }
   const solid = placed(engine, boxes, pose, height, across);

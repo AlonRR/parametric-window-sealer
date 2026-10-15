@@ -27,6 +27,7 @@ import {
   stripWidthMm,
 } from './joint.js';
 import type { PanelSize } from './panel.js';
+import { WEEP_LENGTH_MM, WEEP_MM, weepPlacesMm } from './rain.js';
 
 // Enough sides that a pin's hole is round to a few hundredths of a mm.
 const PIN_SEGMENTS = 32;
@@ -97,7 +98,9 @@ function ribs(engine: Engine, lengthMm: number, joint: JointParams, panelMm: num
 }
 
 // The strip lying along x, across it y, through it z from its outer face.
-function stripInFrame(engine: Engine, lengthMm: number, joint: JointParams, panelMm: number): Manifold {
+// With weeps, holes through the flange at w = 0, the outside in the wall, at the floor of both slots
+// (rain-face, #117).
+function stripInFrame(engine: Engine, lengthMm: number, joint: JointParams, panelMm: number, weeps: boolean): Manifold {
   const { width, thick, web, inner } = dimensions(joint, panelMm);
   const along: Range = [0, lengthMm];
   const boxes: Frame[] = [
@@ -112,11 +115,23 @@ function stripInFrame(engine: Engine, lengthMm: number, joint: JointParams, pane
     solid = engine.Manifold.union([plain, ...extra]);
     for (const m of [plain, ...extra]) m.delete();
   }
-  if (!joint.pins) return solid;
   const r = PIN_HOLE_MM / 2;
-  const holes = [pinDepthMm(joint), width - pinDepthMm(joint)].map((v) =>
-    engine.Manifold.cylinder(thick + 2, r, r, PIN_SEGMENTS).translate([lengthMm / 2, v, -1]),
-  );
+  const pins = joint.pins
+    ? [pinDepthMm(joint), width - pinDepthMm(joint)].map((v) =>
+        engine.Manifold.cylinder(thick + 2, r, r, PIN_SEGMENTS).translate([lengthMm / 2, v, -1]),
+      )
+    : [];
+  const weepBoxes: Frame[] = weeps
+    ? weepPlacesMm(lengthMm).flatMap((u) =>
+        [web[1], web[0] - WEEP_MM].map((v) => ({
+          u: [u - WEEP_LENGTH_MM / 2, u + WEEP_LENGTH_MM / 2] as Range,
+          v: [v, v + WEEP_MM] as Range,
+          w: [-1, joint.flangeMm + 0.1] as Range,
+        })),
+      )
+    : [];
+  const holes = [...pins, ...weepBoxes.map((f) => solidOf(engine, [f], ({ u, v, w }) => [u, v, w]))];
+  if (holes.length === 0) return solid;
   const cut = engine.Manifold.union(holes);
   const holed = solid.subtract(cut);
   for (const m of [...holes, cut, solid]) m.delete();
@@ -129,10 +144,11 @@ export function stripSolid(
   joint: JointParams,
   panelMm: number,
   pose: StripPose,
+  weeps = false,
 ): Manifold {
   requirePositive('lengthMm', lengthMm);
   const { width, thick, below } = dimensions(joint, panelMm);
-  const strip = stripInFrame(engine, lengthMm, joint, panelMm);
+  const strip = stripInFrame(engine, lengthMm, joint, panelMm, weeps);
   // Along a horizontal joint it lies as built, lowered round the panel; along a vertical one it is
   // turned a quarter round; to print, it is stood on its flanges, across the strip upward.
   const placed =

@@ -100,7 +100,7 @@ export function buildWallScene(engine: Engine, params: Params): Group {
   try {
     for (const s of joints.strips) {
       const pose = s.axis === 'vertical' ? 'wall-vertical' : 'wall-horizontal';
-      add(wall, stripSolid(engine, s.lengthMm, own, thicknessMm, pose), 'strip', s.xMm, s.yMm, ownLook);
+      add(wall, stripSolid(engine, s.lengthMm, own, thicknessMm, pose, params.rain), 'strip', s.xMm, s.yMm, ownLook);
     }
     const half = stripWidthMm(joint) / 2;
     for (const c of joints.crosses) {
@@ -108,7 +108,7 @@ export function buildWallScene(engine: Engine, params: Params): Group {
     }
     for (const p of pins) add(wall, pinSolid(engine, joint, thicknessMm), 'pin', p.xMm, p.yMm, PIN);
     for (const e of edges) {
-      const solid = edgeStripSolid(engine, e.lengthMm, e, joint, thicknessMm, e.edge);
+      const solid = edgeStripSolid(engine, e.lengthMm, e, joint, thicknessMm, e.edge, params.rain);
       add(wall, solid, 'edge', e.xMm, e.yMm, JOINT);
       if (e.tape) {
         const strip = { widthMm: e.widthMm, heightMm: e.heightMm, tape: e.tape };

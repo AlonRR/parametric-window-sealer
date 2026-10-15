@@ -52,9 +52,9 @@ function wallParts(params: Params, plan: GridLayout): FittingPart[] {
     const strip = shape.kind !== 'edge' && 'tpu' in shape && shape.tpu === true ? tpuJoint(joint) : joint;
     switch (shape.kind) {
       case 'edge':
-        return edgeStripSolid(engine, shape.lengthMm, shape, joint, thicknessMm, 'print');
+        return edgeStripSolid(engine, shape.lengthMm, shape, joint, thicknessMm, 'print', params.rain);
       case 'strip':
-        return stripSolid(engine, shape.lengthMm, strip, thicknessMm, 'print');
+        return stripSolid(engine, shape.lengthMm, strip, thicknessMm, 'print', params.rain);
       case 'cross':
         return crossSolid(engine, strip, thicknessMm, 'print');
       case 'gasket':

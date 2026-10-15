@@ -94,6 +94,7 @@ export interface Params {
   material: MaterialParams; // what the parts are printed in, and whether the wall is in sun (#113)
   socket: SocketParams; // how the hose ports hold the hose, with caps and screens (#114)
   rail: RailParams; // the filler between the sashes (meeting-rail, #116); none to start with
+  rain: boolean; // weep holes in the strips and a drip groove under the edge strips (rain-face, #117)
 }
 
 // The page starts here: an example opening (Q42, labelled as an example, Q18), the default
@@ -127,6 +128,7 @@ export const EXAMPLE_PARAMS: Params = {
   material: DEFAULT_MATERIAL,
   socket: DEFAULT_SOCKET,
   rail: DEFAULT_RAIL,
+  rain: true,
 };
 
 // Every field of the page's form. The page reads and writes these by name; the settings list
@@ -151,6 +153,7 @@ export const FIELD_NAMES = [
   'material',
   'colour',
   'sun',
+  'rain',
   'widthLeftover',
   'heightLeftover',
   'slotMm',
@@ -308,6 +311,7 @@ const panelForm = (p: Params): FormValues => ({
   material: p.material.kind,
   colour: p.material.colour,
   sun: yesNo(p.material.sun),
+  rain: yesNo(p.rain),
 });
 
 function readPanel(r: FormReader): {
@@ -316,6 +320,7 @@ function readPanel(r: FormReader): {
   coupon: boolean;
   sheet: SheetParams;
   material: MaterialParams;
+  rain: boolean;
 } {
   const thicknessMm = r.size('thicknessMm');
   const joint: JointParams = {
@@ -350,7 +355,8 @@ function readPanel(r: FormReader): {
     colour: r.oneOf('colour', COLOURS),
     sun: r.oneOf('sun', YES_NO) === 'yes',
   };
-  return { thicknessMm, joint, coupon, sheet, material };
+  const rain = r.oneOf('rain', YES_NO) === 'yes';
+  return { thicknessMm, joint, coupon, sheet, material, rain };
 }
 
 // The window and its four edges (Q66, Q71, Q75). A track's depth is read only where the edge is
@@ -738,7 +744,7 @@ export function readParams(values: FormValues): ReadResult {
   const opening = readOpening(r);
   const { printer, bedMarginMm } = readPrinter(r);
   const { width, height } = readDivision(r);
-  const { thicknessMm, joint, coupon, sheet, material } = readPanel(r);
+  const { thicknessMm, joint, coupon, sheet, material, rain } = readPanel(r);
   const edges = readEdges(r);
   const sealRead = readSeal(r);
   const { seal, fit } = sealRead;
@@ -785,6 +791,7 @@ export function readParams(values: FormValues): ReadResult {
     material,
     socket,
     rail,
+    rain,
   };
   // Fittings and pieces' own patterns are placed against the plan they will be in: with any to
   // place, a printed piece keeps every piece to the printer's size, before they are placed.
