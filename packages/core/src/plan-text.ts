@@ -5,6 +5,7 @@ import { PIN_MM, jointWidthMm, minPieceMm, partShapes, pinLengthMm } from './joi
 import { COUPON_SECTIONS, couponGrips } from './coupon.js';
 import { describeSheet } from './sheet.js';
 import { describeMaterial, materialWarnings } from './material.js';
+import { describeRail, planRail } from './rail.js';
 import type { JointParams, JointPlan } from './joint.js';
 import type { Axis, GridLayout, Leftover } from './layout.js';
 import { tapeFit } from './tape.js';
@@ -51,6 +52,7 @@ export interface PlanText {
   pieceFills: string[]; // one line for each piece with a fill of its own (#21)
   sheet: string[]; // with pieces cut from sheet (#112): what to cut, what to print, the pins to drill
   material: string; // what the parts are printed in, and in sun how hot it gets (#113)
+  rail: string[]; // the filler between the sashes, if there is one (#116)
 }
 
 function describeLeftover(note: GridLayout['leftovers'][number], maxPieceMm: number, joint: JointParams): LeftoverText {
@@ -130,17 +132,24 @@ function describeSeal(params: Params, parts: WallParts): string {
   // cutout's rim (C43), or what is printed in TPU there.
   const source = fittingSource(params);
   const linings = FITTINGS.flatMap((f) => f.lining(source) ?? []);
+  // Both faces of the filler between the sashes (#116).
+  const railMm = 2 * (planRail(params)?.lengthMm ?? 0);
+  const onRail = 'along both faces of the filler between the sashes';
   if (params.seal.kind === 'tpu') {
     const metres = Math.round((outer + sides) / 100) / 10;
     const gaskets = `${mm(fit.grooveWidthMm)} × ${mm(tape.thicknessMm)} mm gaskets along the edge strips’ ${faces}: ${metres} m in all`;
-    const also = [...linings.map((l) => l.tpu), ...(tape.joints ? ['the joint strips and cross pieces in TPU'] : [])];
+    const also = [
+      ...(railMm > 0 ? [`${Math.round(railMm / 100) / 10} m more ${onRail}`] : []),
+      ...linings.map((l) => l.tpu),
+      ...(tape.joints ? ['the joint strips and cross pieces in TPU'] : []),
+    ];
     const list = [gaskets, ...also];
     const last = list.length > 1 ? `, and ${list.pop() ?? ''}` : '';
     return `Seal: printed TPU, 85A for the best recovery, ${list.join(', ')}${last}.`;
   }
-  const places = linings.map((l) => l.tape);
+  const places = [...linings.map((l) => l.tape), ...(railMm > 0 ? [onRail] : [])];
   const inPorts = places.length === 0 ? '' : `, and ${places.join(' and ')}`;
-  const metres = Math.round(linings.reduce((n, l) => n + l.tapeMm, outer + sides) / 100) / 10;
+  const metres = Math.round(linings.reduce((n, l) => n + l.tapeMm, outer + sides + railMm) / 100) / 10;
   return `Seal: ${mm(tape.widthMm)} × ${mm(tape.thicknessMm)} mm closed-cell foam tape along the edge strips’ ${faces}${inPorts}: ${metres} m in all.`;
 }
 
@@ -189,5 +198,6 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     ),
     sheet: describeSheet(params, plan, params.joint.pins ? 2 * parts.joints.strips.length : 0),
     material: describeMaterial(params.material),
+    rail: describeRail(params),
   };
 }

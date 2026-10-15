@@ -367,6 +367,17 @@
           </label>
           <p class="note">Example sizes: measure your own tracks. Every edge strip is this wide.</p>
           <span class="error" data-testid="error-trackWidthMm"></span>
+          <!-- The filler between the sashes (meeting-rail, #116): none to start with. -->
+          <label>
+            Gap between the sashes (mm)
+            <input name="railGapMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">
+            Where the two sashes overlap, a gap runs between them from outside to the room. Measure
+            it front to back where a filler would go, and one is printed to close it, as long as the
+            edge the sash presses on, with the seal on both faces. 0 for none.
+          </p>
+          <span class="error" data-testid="error-railGapMm"></span>
         </fieldset>
 
         <!-- The hose port (hose-port, #12): an appliance choice starting at none (Q112), the
@@ -1085,6 +1096,7 @@
         <ul data-testid="plan-piece-fills" data-plan="pieceFills"></ul>
         <ul data-testid="plan-sheet" data-plan="sheet"></ul>
         <p data-testid="plan-material" data-plan="material"></p>
+        <ul data-testid="plan-rail" data-plan="rail"></ul>
         <ul data-testid="plan-warnings" data-plan="warnings"></ul>
         <p><button type="button" id="download-open">Download the pieces...</button></p>
         <!-- The offline file (offline-file, #25): the page as one file, offered here (C55). -->

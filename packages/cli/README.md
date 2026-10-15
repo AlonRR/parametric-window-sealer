@@ -69,6 +69,9 @@ window-sealer --width 600 --height 1000 --printer-model prusa-mk4s
 - `--window slider` or `hung` sets the four edges as the page does; an edge flag such as
   `--top-edge track` then changes one. A `--printer-width` or `--printer-height` makes the
   printer custom.
+- `--rail-gap 20` adds a filler for the 20 mm gap between the sashes where they overlap, as
+  long as the edge the sash presses on, with the seal on both faces, printed in lengths that lap;
+  why and how to measure is in the repository's `docs/sash-filler.md`.
 - `--printer-model prusa-mk4s` picks your printer from the list (`--help` names them all): its
   bed less `--bed-margin` (10 mm to start with) is the largest piece, turned whichever way needs
   fewer pieces.

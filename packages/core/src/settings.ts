@@ -175,6 +175,13 @@ export const SETTINGS: readonly Setting[] = [
   depth('right'),
   { field: 'trackClearanceMm', path: 'edges.track.clearanceMm', help: 'Clearance in the track, per side.' },
   {
+    field: 'railGapMm',
+    path: 'rail.gapMm',
+    help:
+      'The gap between the two sashes where they overlap, front to back, for a filler printed to fit it, with the ' +
+      'seal on both faces; 0 for none.',
+  },
+  {
     field: 'ports',
     path: 'ports',
     help:

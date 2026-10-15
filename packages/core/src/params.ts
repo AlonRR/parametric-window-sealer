@@ -40,6 +40,8 @@ import { COLOURS, DEFAULT_MATERIAL, MATERIAL_KINDS } from './material.js';
 import type { MaterialParams } from './material.js';
 import { DEFAULT_SOCKET, PORT_LOCKS } from './socket.js';
 import type { SocketParams } from './socket.js';
+import { DEFAULT_RAIL, railEdge, railLeastGapMm } from './rail.js';
+import type { RailParams } from './rail.js';
 import { FormReader, SIZE_MESSAGE, SIZE_OR_ZERO_MESSAGE } from './form-reader.js';
 import { planWall } from './plan.js';
 import {
@@ -91,6 +93,7 @@ export interface Params {
   sheet: SheetParams; // the pieces printed, or cut from sheet (sheet-pieces, #112)
   material: MaterialParams; // what the parts are printed in, and whether the wall is in sun (#113)
   socket: SocketParams; // how the hose ports hold the hose, with caps and screens (#114)
+  rail: RailParams; // the filler between the sashes (meeting-rail, #116); none to start with
 }
 
 // The page starts here: an example opening (Q42, labelled as an example, Q18), the default
@@ -123,6 +126,7 @@ export const EXAMPLE_PARAMS: Params = {
   sheet: DEFAULT_SHEET,
   material: DEFAULT_MATERIAL,
   socket: DEFAULT_SOCKET,
+  rail: DEFAULT_RAIL,
 };
 
 // Every field of the page's form. The page reads and writes these by name; the settings list
@@ -168,6 +172,7 @@ export const FIELD_NAMES = [
   'leftDepthMm',
   'rightDepthMm',
   'trackClearanceMm',
+  'railGapMm',
   'ports',
   'collarDepthMm',
   'collarWallMm',
@@ -363,6 +368,7 @@ const edgesForm = (p: Params): FormValues => ({
   leftDepthMm: String(p.edges.track.depthMm.left),
   rightDepthMm: String(p.edges.track.depthMm.right),
   trackClearanceMm: String(p.edges.track.clearanceMm),
+  railGapMm: String(p.rail.gapMm),
 });
 
 function readEdges(r: FormReader): EdgeParams {
@@ -381,6 +387,23 @@ function readEdges(r: FormReader): EdgeParams {
     depthMm: { top: depthOf('top'), bottom: depthOf('bottom'), left: depthOf('left'), right: depthOf('right') },
   };
   return { window, roles, track };
+}
+
+// The filler between the sashes (meeting-rail, #116), read after the seal, whose grooves it takes:
+// it needs a sash edge, along which the sashes overlap, and room for the seal on both faces.
+function readRail(r: FormReader, edges: EdgeParams, seal: SealParams): RailParams {
+  const gapMm = r.sizeOrZero('railGapMm');
+  if (!(gapMm > 0)) return DEFAULT_RAIL;
+  if (railEdge(edges) === undefined) {
+    r.fail('railGapMm', 'No edge is pressed by a sash: a filler goes where two sashes overlap.');
+    return DEFAULT_RAIL;
+  }
+  const least = railLeastGapMm(seal);
+  if (gapMm < least - 1e-9) {
+    const filler = seal.kind === 'none' ? 'a filler to slide in' : 'a filler with the seal on both faces';
+    r.fail('railGapMm', `At least ${mm(least)} mm, for ${filler}; a narrower gap takes foam tape on one sash.`);
+  }
+  return { gapMm };
 }
 
 // The seal (seal-tape, #15). The tape's fields are read only with a seal, as a custom printer's
@@ -719,6 +742,7 @@ export function readParams(values: FormValues): ReadResult {
   const edges = readEdges(r);
   const sealRead = readSeal(r);
   const { seal, fit } = sealRead;
+  const rail = readRail(r, edges, seal);
   checkTrackWidth(r, thicknessMm, joint, edges, sealRead);
   checkPieceSize(r, printer, bedMarginMm, joint);
   checkSealFits(r, edges, sealRead);
@@ -760,6 +784,7 @@ export function readParams(values: FormValues): ReadResult {
     sheet,
     material,
     socket,
+    rail,
   };
   // Fittings and pieces' own patterns are placed against the plan they will be in: with any to
   // place, a printed piece keeps every piece to the printer's size, before they are placed.

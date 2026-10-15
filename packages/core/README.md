@@ -59,6 +59,7 @@ Start from `EXAMPLE_PARAMS` and change what differs. Every length is in mm.
 | `thicknessMm`                          | The panels' thickness                                                                                                                                                                                                   |
 | `joint`                                | The strips' `slotMm`, `slideMm`, `webMm`, `flangeMm` and `fitMm`; `gripMm`, how far their ribs reach past each panel face, and `pins`, a filament pin through each strip (`DEFAULT_JOINT`; `docs/joints.md`)                                                                                                                                      |
 | `edges`                                | The `window` (`'slider'` or `'hung'`), each edge's role (`'track'`, `'sash'`, `'sill'` or `'unit'`, against a window AC; `WINDOW_PRESETS`, `unitRoles`) and the `track`'s width, clearance and depth at each edge                                                   |
+| `rail`                                 | The filler between the sashes: `gapMm`, the gap where they overlap, front to back, 0 for none (`DEFAULT_RAIL`): a bar as long as the edge the sash presses on, the seal in a groove on both faces, printed in lengths that lap (`docs/sash-filler.md`) |
 | `ports`                                | Hose ports, none for a plain wall: each `{ hoseMm, column, row }`, the hose end's outside diameter (`COMMON_HOSE_MM`: 150 and 130) and its piece, from 1 at the bottom left seen from the room                     |
 | `collar`                               | The port's collar: `depthMm`, `wallMm`, `clearanceMm`, `lipMm` (`DEFAULT_COLLAR`)                                                                                                                                       |
 | `socket`                               | How each port holds the hose, `lock` `'push'` or `'twist'` (a printed ring that clamps on the hose end and twists in), and whether it has a `cap` and a `screen` (`DEFAULT_SOCKET`; `docs/hose-port.md`) |
@@ -88,7 +89,8 @@ message. `validateParams(params)` gives the same messages without building anyth
   and how many to print (`strip-182.6x18-print-10.stl`); an edge strip with tape on its
   sides also names its track's depth (`edge-152.5x13x11-track-10-print-8.stl`), and a part
   printed in TPU says so (`gasket-152.5x9.5x4-tpu-print-8.stl`, `sleeve-150-tpu-print-1.stl`),
-  and a piece with a cutout names it (`piece-c2-r1-197.7x198.6-cutout-120x80.stl`);
+  a piece with a cutout names it (`piece-c2-r1-197.7x198.6-cutout-120x80.stl`), and the filler
+  between the sashes names its end and middle lengths (`rail-end-157.2x18x20-print-2.stl`);
 - `'zip'`: those files in one ZIP;
 - `'single'`: one 3MF holding every copy (3MF only, since an STL holds one object).
 

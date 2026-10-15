@@ -14,6 +14,12 @@ under Unreleased.
 
 ### Added
 
+- A filler for the gap between the sashes where they overlap: under The window, the gap measured
+  front to back (`--rail-gap`, 0 for none to start with) prints a bar as long as the edge the sash
+  presses on, the seal in a groove on both faces, in lengths that lap 10 mm. The plan says how many
+  lengths, and counts the seal along it. Why and how to measure: `docs/sash-filler.md`. Not yet
+  test printed.
+
 - A hose port that locks and closes: under Advanced: the hose port, the hose can be held by a
   printed ring clamped on its end with an M4 bolt, whose three pins twist into slots near the
   collar's mouth (`--port-lock twist`); a cap for each port closes it while the AC is off

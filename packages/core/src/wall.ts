@@ -10,6 +10,7 @@ import { MEDIA_TYPES, checkChoice, meshOf, packageDownload, partName, taggedFile
 import type { AnyPartShape, DownloadChoice, DownloadFile, ExportPart, ExportPiece, WallPartShape } from './export.js';
 import { partShapes, planPins } from './joint.js';
 import { couponShape, couponSolid } from './coupon.js';
+import { planRail, railGasketLengths, railShapes, railSolid } from './rail.js';
 import { isCut, slotPins } from './sheet.js';
 import { crossSolid, stripSolid } from './joint-geometry.js';
 import type { GridLayout } from './layout.js';
@@ -17,7 +18,7 @@ import { buildPiecesWith } from './panel-geometry.js';
 import { FITTINGS, fittingIn, fittingSource, placedFittings } from './fittings/index.js';
 import type { FittingPart } from './fittings/index.js';
 import { readParams, toFormValues } from './params.js';
-import { planParts, planWall } from './plan.js';
+import { longestStripMm, planParts, planWall } from './plan.js';
 import { describePlan } from './plan-text.js';
 import { tapeFit } from './tape.js';
 import { fillPattern } from './fill.js';
@@ -30,17 +31,21 @@ import type { PlanText } from './plan-text.js';
 // many times as its name says, with its name and its solid lying as it prints: the joint strips and
 // cross pieces, in TPU if chosen, the edge strips, with the TPU seal its gaskets, and each fitting's
 // parts: with the TPU seal the sleeves for the hose ports (#22) and the frames for the cutouts (#23),
-// always the clamps' jaws (#32), and if asked for, the joint's test coupon (#110).
+// always the clamps' jaws (#32), the filler between the sashes if there is one, with printed TPU its
+// gaskets (#116), and if asked for, the joint's test coupon (#110).
 function wallParts(params: Params, plan: GridLayout): FittingPart[] {
   const { joints, edges } = planParts(params, plan);
   const { joint, thicknessMm } = params;
   const fit = tapeFit(params.seal);
   const tpu = params.seal.kind === 'tpu' && fit !== undefined ? fit : undefined;
   const inTpu = tpu !== undefined && params.seal.tape.joints;
+  const rail = planRail(params);
+  const railGaskets = railGasketLengths(rail, longestStripMm(params));
   const own: WallPartShape[] = [
     ...partShapes(joints, joint).map((s) => (inTpu ? { ...s, tpu: true as const } : s)),
     ...edgeShapes(edges),
-    ...(tpu === undefined ? [] : gasketShapes(edges, tpu, params.seal.tape.thicknessMm)),
+    ...(tpu === undefined ? [] : gasketShapes(edges, tpu, params.seal.tape.thicknessMm, railGaskets)),
+    ...(rail === undefined ? [] : railShapes(rail)),
     ...(params.coupon ? [couponShape(joint)] : []),
   ];
   const solidOf = (engine: Engine, shape: WallPartShape) => {
@@ -57,6 +62,8 @@ function wallParts(params: Params, plan: GridLayout): FittingPart[] {
         return gasketSolid(engine, shape.lengthMm, fit, shape.heightMm);
       case 'coupon':
         return couponSolid(engine, shape, joint, thicknessMm);
+      case 'rail':
+        return railSolid(engine, shape);
       default: {
         const unknown: never = shape;
         throw new Error(`No part of kind ${(unknown as WallPartShape).kind}`);

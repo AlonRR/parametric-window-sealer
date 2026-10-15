@@ -71,14 +71,19 @@ export interface SleeveShape {
 const tenth = (n: number) => Math.round(n * 10) / 10;
 
 // One gasket along each edge strip's outer face, and with the sides, one on each side of the
-// strips in a track: wherever the tape would go (Q119, Q127).
-export function gasketShapes(strips: readonly EdgeStripPlacement[], fit: TapeFit, heightMm: number): GasketShape[] {
+// strips in a track: wherever the tape would go. Gaskets of other lengths, such as
+// those for the filler between the sashes, join them, one file for each length.
+export function gasketShapes(
+  strips: readonly EdgeStripPlacement[],
+  fit: TapeFit,
+  heightMm: number,
+  others: readonly number[] = [],
+): GasketShape[] {
   const counts = new Map<number, number>();
-  for (const s of strips) {
-    const length = tenth(s.lengthMm);
-    const each = s.tape?.groove.side === undefined ? 1 : 3;
-    counts.set(length, (counts.get(length) ?? 0) + each);
-  }
+  const add = (lengthMm: number, count: number) =>
+    counts.set(tenth(lengthMm), (counts.get(tenth(lengthMm)) ?? 0) + count);
+  for (const s of strips) add(s.lengthMm, s.tape?.groove.side === undefined ? 1 : 3);
+  for (const lengthMm of others) add(lengthMm, 1);
   return [...counts]
     .sort(([a], [b]) => b - a)
     .map(([lengthMm, count]) => ({

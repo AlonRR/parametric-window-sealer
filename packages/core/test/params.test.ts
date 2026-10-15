@@ -22,6 +22,7 @@ import { DEFAULT_INSERT } from '../src/insert.js';
 import { DEFAULT_SHEET } from '../src/sheet.js';
 import { DEFAULT_MATERIAL } from '../src/material.js';
 import { DEFAULT_SOCKET } from '../src/socket.js';
+import { DEFAULT_RAIL } from '../src/rail.js';
 
 const example = toFormValues(EXAMPLE_PARAMS);
 const read = (over: FormValues) => readParams({ ...example, ...over });
@@ -54,6 +55,7 @@ describe('the starting values', () => {
       sheet: DEFAULT_SHEET, // #112
       material: DEFAULT_MATERIAL, // #113
       socket: DEFAULT_SOCKET, // #114
+      rail: DEFAULT_RAIL, // #116
     });
   });
 
@@ -308,6 +310,7 @@ describe('describePlan', () => {
       pieceFills: [],
       sheet: [], // every piece printed (#112)
       material: 'Material: PETG in a light colour.', // #113
+      rail: [], // #116
     });
   });
 
