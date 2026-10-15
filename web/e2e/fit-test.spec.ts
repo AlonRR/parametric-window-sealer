@@ -59,7 +59,11 @@ test('into none, not even the section with no ribs: the fit goes up', async ({ p
 });
 
 test('no answer while the grip or the fit is not a size', async ({ page }) => {
-  await step(page).getByLabel('Grip of the strip that held best (mm per face)').fill('');
+  // Clearing a box that is already empty fires no input event, and the guide fills its boxes from
+  // the form only once it has opened: so wait for that before clearing the grip.
+  const grip = step(page).getByLabel('Grip of the strip that held best (mm per face)');
+  await expect(grip).toHaveValue('0.15');
+  await grip.fill('');
   await expect(step(page).getByRole('button', { name: 'It went into none' })).toBeDisabled();
   await expect(sections(page)).toHaveText(['Section 1', 'Section 2', 'Section 3', 'Section 4', 'Section 5']);
 });
