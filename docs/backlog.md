@@ -122,7 +122,7 @@ review's order rather than by ease**, starting with `joint-lock`.
 | `draw-tile` | #39 | Draw a pattern tile in the page: the openings of one cell on a grid of squares, by clicking or typing each point, used as the SVG tile's drawing and saved as a file ([`svg-tiles.md`](svg-tiles.md); C242 to C248) | P2 | L | `patterns-core`, `svg-tile` | Q21 | Each finished shape rebuilds a patterned preview, 1 to 5 s |
 | `mesh-tiles` | #40 | Imported organiser tiles and 3D pattern tiles placed on a panel | P2 | L | `mesh-import`, `patterns-core` | Q25 | Inherits `mesh-import`'s risk |
 | `mesh-custom-piece` | #41 | A whole imported piece, trimmed to size, with connector edges added | P2 | L | `mesh-import`, `connector-strip` | Q25 | Inherits `mesh-import`'s risk |
-| `mesh-import` | #42 | Import STL and similar meshes: repair, and refuse clearly when a mesh cannot be used | P2 | XL | `page-skeleton` | Q25 | Arbitrary user meshes; often not watertight |
+| `mesh-import` | #42 | Import STL and similar meshes: repair, and refuse clearly when a mesh cannot be used. STL, OBJ and 3MF read in the library, corners welded, faces turned and parts turned outward, the rest refused with what to do ([`meshes.md`](meshes.md); C262 to C267) | P2 | XL | `page-skeleton` | Q25 | Arbitrary user meshes; often not watertight |
 | `other-windows` | #43 | Window types beyond sliders and hung windows | P3 | L | `track-edge` | (none) | Not specified yet |
 | `api-hosted` | #48 | A hosted web API, an HTTP service anyone can call (part of #1). **Parked**: no funding to run a server (Q32) | P3 | L | `api-library` | Q31, Q32 | Where it would run and who pays for it; against Q24's nothing sent to a server |
 

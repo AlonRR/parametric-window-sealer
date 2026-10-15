@@ -11,7 +11,8 @@ All of it is released as `v0.4.0` (Q155). `v0.5.0` is the joint tuned and in its
 rails and bolted flanges (#29 to #31). The next minor version, `v0.6.0`, is the organiser fills and
 the drawn tile (C215): the tile editor (`draw-tile`, #39), the Skådis board
 (`organiser-skadis`, #33), the openGrid board (`organiser-opengrid`, #34) and the Honeycomb
-Storage Wall board (`organiser-hsw`, #37) are built; Multiboard (#36) waits on Q159. Nothing has been test printed yet.
+Storage Wall board (`organiser-hsw`, #37) are built; Multiboard (#36) waits on Q159. For `v0.7.0`, the
+mesh reader (`mesh-import`, #42) is built in the library. Nothing has been test printed yet.
 
 ## The brief (the owner's request, 5 Oct 2026)
 

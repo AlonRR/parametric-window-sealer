@@ -48,3 +48,4 @@ export * from './fan.js';
 export * from './clamp.js';
 export * from './insert.js';
 export * from './measure.js';
+export * from './mesh/index.js';

@@ -17,6 +17,13 @@ listed under Unreleased.
 
 ### Added
 
+- Mesh import, in the library: `readMesh` reads an STL (binary or text), OBJ or 3MF file into one mesh
+  in mm, repairs what it can without guessing the shape (corners welded, faces of no area dropped,
+  faces and parts turned to face outward) and says what it repaired, and refuses a mesh with holes,
+  an edge shared by more than two faces or more than 500,000 faces, saying what to do; `meshSolid`
+  makes it a solid. The page and the command use it with the parts that need a mesh. How:
+  `docs/meshes.md`.
+
 - A Honeycomb Storage Wall board, the third organiser board: choose **Honeycomb Storage Wall** as the
   fill (`--fill hsw`) for its inserts. It matches the author's own wall: 8 mm thick, hexagonal cells
   20 mm across their flats and 23.6 mm apart, each widening from 20 to 22 mm behind a ledge 5.1 mm in,
