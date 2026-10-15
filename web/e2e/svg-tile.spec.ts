@@ -50,6 +50,8 @@ test('a file that is not a drawing is refused, with the reason', async ({ page }
 });
 
 test('the downloaded pieces carry its openings', async ({ page }) => {
+  // Cutting a drawn tile into every piece takes 28 to 30 s on its own, at the 30 s limit: three times it.
+  test.slow();
   await expect(page.getByTestId('engine-status')).toHaveAttribute('data-state', 'ready');
   // Without the pins' slots (joint-lock, #110), so a sealed piece would be a plain box.
   await page.getByText('Advanced: the joint between pieces').click();
