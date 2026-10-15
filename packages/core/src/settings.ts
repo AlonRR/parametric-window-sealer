@@ -13,6 +13,7 @@ import { FILL_KINDS, PATTERN_STYLES } from './fill.js';
 import { PATTERNS } from './patterns/index.js';
 import { FANS } from './fan.js';
 import { PIECE_SOURCES } from './sheet.js';
+import { COLOURS, MATERIAL_KINDS } from './material.js';
 import type { FieldName, FormValues, Params } from './params.js';
 
 export interface Setting {
@@ -113,6 +114,25 @@ export const SETTINGS: readonly Setting[] = [
   },
   { field: 'sheetWidthMm', path: 'sheet.widthMm', help: 'The sheet’s width: the widest piece cut from it.' },
   { field: 'sheetHeightMm', path: 'sheet.heightMm', help: 'The sheet’s height: the tallest piece cut from it.' },
+  {
+    field: 'material',
+    path: 'material.kind',
+    help: 'What the parts are printed in: PETG, ASA, or PLA for test fits; the plan warns where it gets too hot.',
+    values: MATERIAL_KINDS,
+  },
+  {
+    field: 'colour',
+    path: 'material.colour',
+    help: 'Its colour: light, or dark, which the sun heats more.',
+    values: COLOURS,
+  },
+  {
+    field: 'sun',
+    path: 'material.sun',
+    help: "The wall's outside face gets direct sun: yes or no.",
+    values: YES_NO,
+    onOff: true,
+  },
   { field: 'slotMm', path: 'joint.slotMm', help: 'How deep a piece can go into a strip.' },
   { field: 'slideMm', path: 'joint.slideMm', help: 'How far a piece can move in its slot.' },
   { field: 'webMm', path: 'joint.webMm', help: "The wall between the strip's two slots." },

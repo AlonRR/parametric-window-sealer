@@ -32,6 +32,9 @@ const FLAG_NAMES: Record<OwnField, string> = {
   pieceSource: 'pieces', // printed, or cut from sheet (#112)
   sheetWidthMm: 'sheet-width', // a sheet size without --pieces means cutting from sheet
   sheetHeightMm: 'sheet-height',
+  material: 'material', // petg, asa or pla (#113)
+  colour: 'colour',
+  sun: 'sun',
   slotMm: 'slot',
   slideMm: 'slide',
   webMm: 'web',

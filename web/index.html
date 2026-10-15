@@ -660,6 +660,33 @@
             <input name="thicknessMm" inputmode="decimal" autocomplete="off" />
           </label>
           <span class="error" data-testid="error-thicknessMm"></span>
+          <!-- What the parts are printed in (material-advice, #113): the plan warns where it gets too hot. -->
+          <label>
+            Material
+            <select name="material">
+              <option value="petg">PETG</option>
+              <option value="asa">ASA</option>
+              <option value="pla">PLA, for test fits</option>
+            </select>
+          </label>
+          <span class="error" data-testid="error-material"></span>
+          <label>
+            Colour
+            <select name="colour">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </label>
+          <span class="error" data-testid="error-colour"></span>
+          <label>
+            <input type="checkbox" name="sun" value="yes" />
+            The outside of the wall gets direct sun
+          </label>
+          <p class="note">
+            PLA softens in a summer window and beside a hose's exhaust; PETG in a light colour holds up,
+            and ASA in sun. The plan warns where the wall would get near what the material takes.
+          </p>
+          <span class="error" data-testid="error-sun"></span>
           <!-- Pieces cut from sheet (sheet-pieces, #112): only the strips and fittings printed. -->
           <label><input type="radio" name="pieceSource" value="printed" checked /> Print the pieces</label>
           <label><input type="radio" name="pieceSource" value="sheet" /> Cut the pieces from sheet</label>
@@ -1031,6 +1058,7 @@
         <p data-testid="plan-fill" data-plan="fill"></p>
         <ul data-testid="plan-piece-fills" data-plan="pieceFills"></ul>
         <ul data-testid="plan-sheet" data-plan="sheet"></ul>
+        <p data-testid="plan-material" data-plan="material"></p>
         <ul data-testid="plan-warnings" data-plan="warnings"></ul>
         <p><button type="button" id="download-open">Download the pieces...</button></p>
         <!-- The offline file (offline-file, #25): the page as one file, offered here (C55). -->

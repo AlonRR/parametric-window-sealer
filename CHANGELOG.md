@@ -14,6 +14,12 @@ under Unreleased.
 
 ### Added
 
+- Material advice: under The panel, the material (PETG to start with, ASA, or PLA for test fits),
+  its colour and whether the wall gets sun (`--material`, `--colour`, `--sun`). The plan names it,
+  says how hot the wall gets in sun, and warns where that, or a hose's exhaust, comes within 10 °C
+  of where the material gave in a loaded oven test: PLA in sun or beside a hose, dark PETG in sun.
+  Why: `docs/materials.md`.
+
 - Pieces cut from sheet: "Cut the pieces from sheet" under The panel (`--pieces sheet`) prints only
   the strips, cross pieces, edge strips and any piece with a fitting or a pattern of its own; the
   plan lists the pieces to cut by size, and the download leaves them out. Cut pieces can be as large

@@ -20,6 +20,7 @@ import { DEFAULT_RIM } from '../src/cutout.js';
 import { DEFAULT_CLAMP } from '../src/clamp.js';
 import { DEFAULT_INSERT } from '../src/insert.js';
 import { DEFAULT_SHEET } from '../src/sheet.js';
+import { DEFAULT_MATERIAL } from '../src/material.js';
 
 const example = toFormValues(EXAMPLE_PARAMS);
 const read = (over: FormValues) => readParams({ ...example, ...over });
@@ -50,6 +51,7 @@ describe('the starting values', () => {
       insert: DEFAULT_INSERT,
       coupon: false, // #110
       sheet: DEFAULT_SHEET, // #112
+      material: DEFAULT_MATERIAL, // #113
     });
   });
 
@@ -303,6 +305,7 @@ describe('describePlan', () => {
       fill: 'Fill: sealed.',
       pieceFills: [],
       sheet: [], // every piece printed (#112)
+      material: 'Material: PETG in a light colour.', // #113
     });
   });
 

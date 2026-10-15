@@ -36,6 +36,8 @@ import { formatPieceFills, parsePieceFills } from './piece-fill.js';
 import type { PieceFill } from './piece-fill.js';
 import { DEFAULT_SHEET, PIECE_SOURCES } from './sheet.js';
 import type { SheetParams } from './sheet.js';
+import { COLOURS, DEFAULT_MATERIAL, MATERIAL_KINDS } from './material.js';
+import type { MaterialParams } from './material.js';
 import { FormReader, SIZE_MESSAGE, SIZE_OR_ZERO_MESSAGE } from './form-reader.js';
 import { planWall } from './plan.js';
 import {
@@ -85,6 +87,7 @@ export interface Params {
   insert: InsertParams; // its shutters
   coupon: boolean; // the joint's test coupon in the download too (joint-lock, #110)
   sheet: SheetParams; // the pieces printed, or cut from sheet (sheet-pieces, #112)
+  material: MaterialParams; // what the parts are printed in, and whether the wall is in sun (#113)
 }
 
 // The page starts here: an example opening (Q42, labelled as an example, Q18), the default
@@ -115,6 +118,7 @@ export const EXAMPLE_PARAMS: Params = {
   insert: DEFAULT_INSERT,
   coupon: false,
   sheet: DEFAULT_SHEET,
+  material: DEFAULT_MATERIAL,
 };
 
 // Every field of the page's form. The page reads and writes these by name; the settings list
@@ -136,6 +140,9 @@ export const FIELD_NAMES = [
   'pieceSource',
   'sheetWidthMm',
   'sheetHeightMm',
+  'material',
+  'colour',
+  'sun',
   'widthLeftover',
   'heightLeftover',
   'slotMm',
@@ -286,9 +293,18 @@ const panelForm = (p: Params): FormValues => ({
   pieceSource: p.sheet.source,
   sheetWidthMm: String(p.sheet.widthMm),
   sheetHeightMm: String(p.sheet.heightMm),
+  material: p.material.kind,
+  colour: p.material.colour,
+  sun: yesNo(p.material.sun),
 });
 
-function readPanel(r: FormReader): { thicknessMm: number; joint: JointParams; coupon: boolean; sheet: SheetParams } {
+function readPanel(r: FormReader): {
+  thicknessMm: number;
+  joint: JointParams;
+  coupon: boolean;
+  sheet: SheetParams;
+  material: MaterialParams;
+} {
   const thicknessMm = r.size('thicknessMm');
   const joint: JointParams = {
     slotMm: r.size('slotMm'),
@@ -317,7 +333,12 @@ function readPanel(r: FormReader): { thicknessMm: number; joint: JointParams; co
         `${mm(joint.slotMm - joint.slideMm)} mm deeper. Make the slot deeper or the slide shorter, or turn the pins off.`,
     );
   }
-  return { thicknessMm, joint, coupon, sheet };
+  const material: MaterialParams = {
+    kind: r.oneOf('material', MATERIAL_KINDS),
+    colour: r.oneOf('colour', COLOURS),
+    sun: r.oneOf('sun', YES_NO) === 'yes',
+  };
+  return { thicknessMm, joint, coupon, sheet, material };
 }
 
 // The window and its four edges (Q66, Q71, Q75). A track's depth is read only where the edge is
@@ -667,7 +688,7 @@ export function readParams(values: FormValues): ReadResult {
   const opening = readOpening(r);
   const { printer, bedMarginMm } = readPrinter(r);
   const { width, height } = readDivision(r);
-  const { thicknessMm, joint, coupon, sheet } = readPanel(r);
+  const { thicknessMm, joint, coupon, sheet, material } = readPanel(r);
   const edges = readEdges(r);
   const sealRead = readSeal(r);
   const { seal, fit } = sealRead;
@@ -710,6 +731,7 @@ export function readParams(values: FormValues): ReadResult {
     fill,
     coupon,
     sheet,
+    material,
   };
   // Fittings and pieces' own patterns are placed against the plan they will be in: with any to
   // place, a printed piece keeps every piece to the printer's size, before they are placed.

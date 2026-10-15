@@ -5,7 +5,7 @@ a fresh session resumes from here.
 
 Last updated: 15 Oct 2026. Phase: **P2** ([`backlog.md`](backlog.md)). `v0.3.0` holds every P1
 row; since then the code was made easy to extend (Q145) and P2 began (Q148, Q149): the fan mount
-(`fan-mount`, #28), the SVG tile (`svg-tile`, #27), the clamps (`clamps`, #32) and the sliding insert (`sliding-insert`, #38) are built. A design review against published work led to thirteen changes (Q153), now first in line: a tighter joint that locks (`joint-lock`, #110) and pieces cut from sheet (`sheet-pieces`, #112) are built. Strips that stiffen (`stiffener-strips`, #111) wait on Q154, as the review's fins would not stiffen the wall.
+(`fan-mount`, #28), the SVG tile (`svg-tile`, #27), the clamps (`clamps`, #32) and the sliding insert (`sliding-insert`, #38) are built. A design review against published work led to thirteen changes (Q153), now first in line: a tighter joint that locks (`joint-lock`, #110), pieces cut from sheet (`sheet-pieces`, #112) and material advice (`material-advice`, #113) are built. Strips that stiffen (`stiffener-strips`, #111) wait on Q154, as the review's fins would not stiffen the wall.
 Nothing has been test printed yet.
 
 ## The brief (the owner's request, 5 Oct 2026)
@@ -34,7 +34,7 @@ Nothing has been test printed yet.
 | Q3 | Build the Pages site now; **the owner publishes it later** (the repo is private, and making it public is his action) | 5 Oct 2026 |
 | Q4 | `.repo-status`: **`publish: not-yet`** | 5 Oct 2026 |
 | Q5 | Printed on **users' own printers**: the maximum piece size is a parameter, not tied to one printer. It is set from a **printer-presets list**, with a **safe default** (one size most mainstream beds fit) selected until the user picks a printer; "custom" stays available. Every preset's bed size is to be verified from the maker's own specification | 5 Oct 2026 |
-| Q6 | **Material-agnostic**: the parts must print well in PLA, PETG and ASA/ABS ("it shouldn't really matter if it's well designed for printing"). Sealing is an option: **printed TPU**, **tape** (its size a parameter), or **none**, because some users do not need a perfect seal | 5 Oct 2026 |
+| Q6 | **Material-agnostic**: the parts must print well in PLA, PETG and ASA/ABS ("it shouldn't really matter if it's well designed for printing"). Sealing is an option: **printed TPU**, **tape** (its size a parameter), or **none**, because some users do not need a perfect seal. Since Q153 (R4, `material-advice`) the user still chooses, and the plan advises and warns by place ([`materials.md`](materials.md)) | 5 Oct 2026 |
 | Q7 | Patterns are **cut through or relief, chosen per piece** | 5 Oct 2026 |
 | Q8 | **"Open" means a cut-through pattern**, not a separate fill type. So the fills are: sealed (solid), a pattern (through or relief), or an organiser | 5 Oct 2026 |
 | Q9 | Organiser systems: **Honeycomb Storage Wall**, **Skådis**, **Multiboard**, **openGrid**, built so **more can be added later**. "Honeycomb" in the brief is the organiser system | 5 Oct 2026 |

@@ -73,6 +73,7 @@ Start from `EXAMPLE_PARAMS` and change what differs. Every length is in mm.
 | `pieceFills`                           | Pieces with a fill of their own, none to start with: each `{ column, row, kind, style? }`, from 1 at the bottom left seen from the room; the sizes stay the wall's (`fillFor` gives a piece's fill) |
 | `coupon`                               | `true` adds the joint's test coupon to the files: five short strips that try the grip |
 | `sheet`                                | `source` `'printed'` or `'sheet'`, and the sheet's `widthMm` and `heightMm` (`DEFAULT_SHEET`): with `'sheet'`, the pieces without a fitting or pattern of their own are cut from it and left out of the files (`docs/sheet-pieces.md`) |
+| `material`                             | `kind` `'petg'`, `'asa'` or `'pla'`, `colour` `'light'` or `'dark'`, and `sun`, whether the outside gets direct sun (`DEFAULT_MATERIAL`): the plan names it and warns where it gets too hot (`docs/materials.md`) |
 
 Wrong parameters throw a `ParamsError` whose `errors` names every wrong field with the page's
 message. `validateParams(params)` gives the same messages without building anything.
@@ -107,7 +108,8 @@ and `SETTINGS` (settings in the library's shape, possibly partial, and what each
 shapes (`plainPanel`, `portPanel`, `stripSolid`, `crossSolid`, `edgeStripSolid`), the joint's ribs
 and pins (`ribPlacesMm`, `planPins`, `pinSlotsIn`, `pinSlotCuts`, `pinSolid`) and its test coupon
 (`couponShape`, `couponSolid`), the pieces cut from sheet (`isCut`, `printedFor`, `slotPins`,
-`describeSheet`, with `pieceLimit`, `printLimit` and `longestStripMm`), the hose
+`describeSheet`, with `pieceLimit`, `printLimit` and `longestStripMm`), the material advice
+(`hottestC`, `describeMaterial`, `materialWarnings`, `GIVES_AT_C`), the hose
 port's rules (`checkPort`, `parsePorts`, `formatPorts`), the measured cutout's (`checkCutout`,
 `parseCutouts`, `formatCutouts`, `linedRim`, `cutoutPanel`, `frameShapes`, `frameSolid`), the fan mount's
 (`FANS`, `checkFan`, `parseFans`, `formatFans`, `fanPanel`), the clamps' (`checkClamp`, `parseClamps`,

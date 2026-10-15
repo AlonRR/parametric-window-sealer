@@ -4,6 +4,7 @@ import { EDGES, edgeShapes, panelSpan } from './edge.js';
 import { PIN_MM, jointWidthMm, minPieceMm, partShapes, pinLengthMm } from './joint.js';
 import { COUPON_SECTIONS, couponGrips } from './coupon.js';
 import { describeSheet } from './sheet.js';
+import { describeMaterial, materialWarnings } from './material.js';
 import type { JointParams, JointPlan } from './joint.js';
 import type { Axis, GridLayout, Leftover } from './layout.js';
 import { tapeFit } from './tape.js';
@@ -49,6 +50,7 @@ export interface PlanText {
   fill: string;
   pieceFills: string[]; // one line for each piece with a fill of its own (#21)
   sheet: string[]; // with pieces cut from sheet (#112): what to cut, what to print, the pins to drill
+  material: string; // what the parts are printed in, and in sun how hot it gets (#113)
 }
 
 function describeLeftover(note: GridLayout['leftovers'][number], maxPieceMm: number, joint: JointParams): LeftoverText {
@@ -161,10 +163,13 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     span: `Pieces and joints: ${mm(span.widthMm)} × ${mm(span.heightMm)} mm, for a ${mm(params.openingWidthMm)} × ${mm(params.openingHeightMm)} mm opening.`,
     joints: describeJoints(parts.joints, params.joint, params.thicknessMm, params.coupon),
     edges: `Edges: ${plural(parts.edges.length, 'edge strip', 'edge strips')} in ${plural(shapes, 'shape', 'shapes')}.`,
-    warnings: plan.warnings.map((w) => {
-      const [where, dimension] = w.axis === 'width' ? ['Column', 'wide'] : ['Row', 'high'];
-      return `${where} ${w.index + 1} is ${mm(w.lengthMm)} mm ${dimension}, under the ${mm(w.minPieceMm)} mm the joints need.`;
-    }),
+    warnings: [
+      ...plan.warnings.map((w) => {
+        const [where, dimension] = w.axis === 'width' ? ['Column', 'wide'] : ['Row', 'high'];
+        return `${where} ${w.index + 1} is ${mm(w.lengthMm)} mm ${dimension}, under the ${mm(w.minPieceMm)} mm the joints need.`;
+      }),
+      ...materialWarnings(params.material, params.ports.length > 0),
+    ],
     leftovers: plan.leftovers.map((note) =>
       describeLeftover(note, note.axis === 'width' ? max.widthMm : max.heightMm, params.joint),
     ),
@@ -179,9 +184,10 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     ),
     seal: describeSeal(params, parts),
     fill: `Fill: ${fillWords(params.fill, params.thicknessMm)}`,
-    sheet: describeSheet(params, plan, params.joint.pins ? 2 * parts.joints.strips.length : 0),
     pieceFills: params.pieceFills.map(
       (f) => `Column ${f.column}, row ${f.row}: ${fillWords(fillFor(params, f.column, f.row), params.thicknessMm)}`,
     ),
+    sheet: describeSheet(params, plan, params.joint.pins ? 2 * parts.joints.strips.length : 0),
+    material: describeMaterial(params.material),
   };
 }
