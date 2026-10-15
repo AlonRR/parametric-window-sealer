@@ -15,6 +15,14 @@ listed under Unreleased.
 
 ## [Unreleased]
 
+### Added
+
+- A tile editor: under the SVG tile's file, Draw a tile draws the openings of one cell on a grid
+  of squares, by clicking corners and circles or typing each point, beside the cell repeated as
+  the wall repeats it. Each finished shape is used at once, as a chosen file is; Undo, Remove and
+  Clear take shapes back, and Save as an SVG file keeps the drawing to use again, on the page or
+  with the command's `--svg-tile`.
+
 ## [0.5.0] - 2026-10-15
 
 ### Added

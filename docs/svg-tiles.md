@@ -1,9 +1,36 @@
 # SVG tiles
 
-A pattern of your own for the panel fill: draw one cell of it in any drawing program that saves
-SVG (Inkscape, Illustrator, Affinity Designer, Figma and others), and the wall repeats it across
-every piece, lined up across the joints as the other patterns are. The filled shapes in your
-drawing are the openings; the rest of the cell stays solid.
+A pattern of your own for the panel fill: draw one cell of it on the page, or in any drawing
+program that saves SVG (Inkscape, Illustrator, Affinity Designer, Figma and others), and the wall
+repeats it across every piece, lined up across the joints as the other patterns are. The filled
+shapes in your drawing are the openings; the rest of the cell stays solid.
+
+## Drawing a tile on the page
+
+Choose **SVG tile** as the fill, then open **Draw a tile** under the file's box.
+
+- **The cell** is a grid of squares, 20 across and 20 down to start with; **Cell width
+  (squares)** and **Cell height (squares)** change it, from 1 to 100 each way. Its width on the
+  wall is **Tile width (mm)**, as for a file, and the editor says what one square comes to: at the
+  starting 20 mm, a square is 1 mm.
+- **Corners.** Click to place each corner of a shape; a click lands on the nearest half square.
+  Click the shape's first corner again, or **Finish the shape**, to finish it: it needs at least
+  three corners.
+- **A circle.** Choose **A circle**, click its centre, then any point on its rim.
+- **Typing a point.** **Across** and **Down** are squares from the cell's top left corner, as
+  typed, not rounded: **Add a corner** adds a corner to the shape being drawn, and **Add a
+  circle** a circle of the **Radius** given.
+- A shape may reach past the cell's edge: it then joins the next cell's, as in a file. Beside the
+  cell, the same cell is drawn three times each way, as the wall repeats it.
+- **Undo** takes back the last corner, a circle's centre still waiting for its rim, or else the
+  last shape; each shape in the list has **Remove**, and **Clear** removes them all.
+- **Save as an SVG file** gives the drawing as `tile.svg`, to use again later: with **SVG file**
+  on the page, or with `--svg-tile` in the command.
+
+The wall uses the drawing as each shape is finished; the plan and the preview follow, and the
+preview can take a few seconds for a tile with curves. Typing a point changes nothing on the wall
+until the shape is finished. A file chosen afterwards takes the drawing's place, until you draw
+again. Like a chosen file, the drawing is not kept when the page is reloaded: save it as a file.
 
 ## Drawing a tile
 

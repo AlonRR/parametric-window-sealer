@@ -18,6 +18,7 @@ import { printerChoice } from './printer-choice';
 import { applyConditions } from './show-when';
 import { svgTile } from './svg-tile';
 import { tapeSize } from './tape-size';
+import { tileEditor } from './tile-editor';
 import { mountWindowRoles } from './window-roles';
 
 // onChange hears the parameters after every edit, or null while a field is wrong.
@@ -58,6 +59,7 @@ export function mountPanel(
     clamps(form),
     slidingInsert(form),
     svgTile(form, update),
+    tileEditor(form, update),
   ].filter((p): p is FormPart => p !== null);
   const pieces = pieceMap(form, update);
   mountPatternControls(form);

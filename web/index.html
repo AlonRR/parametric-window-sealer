@@ -115,6 +115,29 @@
         flex-wrap: wrap;
         gap: 0.5rem;
       }
+      /* The tile editor (#39): the cell to draw on and the cell repeated, side by side while they fit. */
+      .tile-views {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        margin: 0.5rem 0;
+      }
+      .tile-canvas {
+        cursor: crosshair;
+        max-width: 100%;
+        touch-action: none;
+        width: 16rem;
+      }
+      .tile-repeat {
+        max-width: 100%;
+        width: 12rem;
+      }
+      .tile-canvas,
+      .tile-repeat {
+        border: 1px solid #ddd;
+        border-radius: 0.4rem;
+        height: auto;
+      }
       .guide-drawing {
         display: block;
         max-width: 100%;
@@ -821,6 +844,52 @@
               the openings. Its width on the wall is with the pattern's sizes, under Advanced.
             </p>
             <p class="note" data-testid="svg-tile-name">Using the starting drawing: one round opening.</p>
+            <!-- A tile drawn here (draw-tile, #39): its shapes written into fillDrawing as an SVG
+              drawing, so the wall takes it as it takes a file (tile-editor.ts). -->
+            <details data-testid="tile-editor">
+              <summary>Draw a tile</summary>
+              <p class="note">
+                The openings of one cell, on a grid of squares. Click to place each corner of a
+                shape, and click its first corner again to finish it; or type each point below. A
+                shape may reach past the cell's edge: it joins the next cell's.
+              </p>
+              <div class="tile-views">
+                <svg data-testid="tile-canvas" class="tile-canvas" role="img" aria-label="The cell: its grid of squares, the shapes drawn and the shape being drawn"></svg>
+                <svg data-testid="tile-repeat" class="tile-repeat" role="img" aria-label="The cell repeated three times each way, as the wall repeats it"></svg>
+              </div>
+              <p class="note" data-testid="tile-scale"></p>
+              <fieldset>
+                <legend>Draw with</legend>
+                <label><input type="radio" name="tileTool" value="corners" checked /> Corners</label>
+                <label><input type="radio" name="tileTool" value="circle" /> A circle: click its centre, then its rim</label>
+              </fieldset>
+              <label>
+                Cell width (squares)
+                <input data-part="tile-width" inputmode="numeric" autocomplete="off" value="20" />
+              </label>
+              <label>
+                Cell height (squares)
+                <input data-part="tile-height" inputmode="numeric" autocomplete="off" value="20" />
+              </label>
+              <fieldset>
+                <legend>Type a point, in squares from the cell's top left corner</legend>
+                <label>Across <input data-part="tile-x" inputmode="decimal" autocomplete="off" /></label>
+                <label>Down <input data-part="tile-y" inputmode="decimal" autocomplete="off" /></label>
+                <label>Radius <input data-part="tile-radius" inputmode="decimal" autocomplete="off" /></label>
+                <div class="answers">
+                  <button type="button" data-part="tile-add-corner">Add a corner</button>
+                  <button type="button" data-part="tile-add-circle">Add a circle</button>
+                </div>
+              </fieldset>
+              <p data-testid="tile-status" aria-live="polite"></p>
+              <div class="answers">
+                <button type="button" data-part="tile-finish">Finish the shape</button>
+                <button type="button" data-part="tile-undo">Undo</button>
+                <button type="button" data-part="tile-clear">Clear</button>
+                <button type="button" data-part="tile-save">Save as an SVG file</button>
+              </div>
+              <ol data-testid="tile-shapes"></ol>
+            </details>
           </div>
           <input type="hidden" name="fillDrawing" />
           <span class="error" data-testid="error-fillDrawing"></span>

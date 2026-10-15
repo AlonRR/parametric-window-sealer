@@ -119,7 +119,7 @@ review's order rather than by ease**, starting with `joint-lock`.
 | `organiser-multiboard` | #36 | Multiboard organiser fill | P2 | L | `patterns-core` | Q9 | Spec to verify; its connection geometry is more involved (inferred) |
 | `organiser-hsw` | #37 | Honeycomb Storage Wall organiser fill | P2 | L | `patterns-core` | Q9 | Spec to verify; test print |
 | `sliding-insert` | #38 | Sliding insert that closes in around the appliance and locks: two shutters in dovetail rails on the piece, each locked by an M4 bolt ([`sliding-insert.md`](sliding-insert.md); C119 to C124) | P2 | L | `measured-cutout` | Q16, Q150 | Mechanism design; several test prints |
-| `draw-tile` | #39 | Draw a pattern tile in the page | P2 | L | `patterns-core` | Q21 | An editor is a project of its own |
+| `draw-tile` | #39 | Draw a pattern tile in the page: the openings of one cell on a grid of squares, by clicking or typing each point, used as the SVG tile's drawing and saved as a file ([`svg-tiles.md`](svg-tiles.md); C242 to C248) | P2 | L | `patterns-core`, `svg-tile` | Q21 | Each finished shape rebuilds a patterned preview, 1 to 5 s |
 | `mesh-tiles` | #40 | Imported organiser tiles and 3D pattern tiles placed on a panel | P2 | L | `mesh-import`, `patterns-core` | Q25 | Inherits `mesh-import`'s risk |
 | `mesh-custom-piece` | #41 | A whole imported piece, trimmed to size, with connector edges added | P2 | L | `mesh-import`, `connector-strip` | Q25 | Inherits `mesh-import`'s risk |
 | `mesh-import` | #42 | Import STL and similar meshes: repair, and refuse clearly when a mesh cannot be used | P2 | XL | `page-skeleton` | Q25 | Arbitrary user meshes; often not watertight |
