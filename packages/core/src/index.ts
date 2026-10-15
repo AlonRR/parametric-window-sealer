@@ -9,6 +9,7 @@ export * from './export.js';
 export * from './joint.js';
 export * from './joint-geometry.js';
 export * from './coupon.js';
+export * from './fit-test.js';
 export * from './sheet.js';
 export * from './material.js';
 export * from './socket.js';

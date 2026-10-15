@@ -26,24 +26,35 @@ little short is fine.
 2. Push a pin through the hole, the piece's slot and the far flange.
 3. To take the wall apart, push the pins out with a thin nail or a 1.5 mm drill bit.
 
-## Finding the grip: the test coupon
+## Finding the grip: the guided test print
 
-Printers print a little off, so the grip that holds well differs from one printer to the next.
+Printers print a little off, so the grip that holds well differs from one printer to the next. The
+measuring guide's fifth step, **The grip**, takes you through it.
 
-1. Under **Advanced: the joint between pieces**, tick **Add a test coupon to the download**. The
-   download then holds a file named like `coupon-grip-0.05-to-0.25-print-1`: five short strips in a
-   row, and a tab as thick as the pieces.
+1. Press **Add the test coupon to the download** (or, under **Advanced: the joint between
+   pieces**, tick **Add a test coupon to the download**). The download then holds a file named like
+   `coupon-grip-0.05-to-0.25-print-1`: five short strips in a row, and a tab as thick as the pieces.
 2. Print it with the material and settings the strips will have. The strips stand on their flanges
    as the joint strips do; the tab lies flat as the pieces do.
 3. The strips are marked by notches in the top of their flanges: one notch on the first, five on
-   the last. The plan lists each one's grip: two steps of 0.05 mm either side of the grip set.
-4. Push the tab into each strip from the side without notches. The one that takes it with a firm
-   push and holds it has the grip to use. Too loose, and the tab slips out; too tight, and it will
-   not go in, or the flanges crack.
-5. Enter that grip under **Grip (mm per face)**, or in step 5 of the measuring guide.
+   the last. Each section's button in the guide says its grip: two steps of 0.05 mm either side of
+   the grip set.
+4. Push the tab into each strip from the side without notches. Too loose, and the tab slips out;
+   too tight, and it will not go in, or the flanges crack.
+5. Press the button for the section that took the tab with a firm push and held it. The guide sets
+   that grip and takes the coupon out of the download: the strips can be printed.
 
-If even the loosest or the tightest strip is not right, set the grip to it and print the coupon
-again: the coupon centres on the grip set.
+If none held, say how:
+
+- **It slipped out of every one**: the grip goes up, so the next coupon starts one step above the
+  last one's tightest. With the grip at 0.15 mm, the next coupon tries 0.3 to 0.5 mm.
+- **It went into none**: the grip goes down, so the next coupon ends one step below the last one's
+  loosest, never below no ribs at all. If even the section with no ribs was too tight, the ribs are
+  not the trouble: the slot prints narrower than the piece, so the **fit** goes up by 0.1 mm a face
+  instead.
+
+Then print the coupon again. Measuring a printed strip's slot with calipers, in the guide's fourth
+step, gives the fit in one go and can save a print.
 
 ## The settings
 

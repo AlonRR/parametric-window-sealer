@@ -3,10 +3,19 @@
 // holds a value the form does not. The guide sits inside the form, so an edit here goes on to the
 // form's own update once its value is copied across. One track depth fills every edge in a track;
 // the fourth step works out the fit from a printed strip and piece measured with calipers, and the
-// fifth takes the grip from the test coupon (joint-lock, #110). Why each is so: docs/choices.md.
+// fifth takes the grip from the test coupon (joint-lock, #110), moving the grip or the fit after each
+// print until a section holds (fit-test-print, #63). Why each is so: docs/choices.md.
 // Each step's text for what is in the window shows by the page's own data-show-when.
-import { EDGES, FIT_TARGET_MM, fitFromMeasured, measuredPlayMm } from 'parametric-window-sealer';
-import { setValue, valueOf } from './form-fields';
+import {
+  DEFAULT_JOINT,
+  EDGES,
+  FIT_TARGET_MM,
+  couponGrips,
+  fitFromMeasured,
+  measuredPlayMm,
+  nextTestPrint,
+} from 'parametric-window-sealer';
+import { control, setValue, valueOf } from './form-fields';
 import { applyConditions } from './show-when';
 
 type Field = HTMLInputElement | HTMLSelectElement;
@@ -93,4 +102,53 @@ export function mountGuide(form: HTMLFormElement): void {
     form.dispatchEvent(new Event('input', { bubbles: true }));
   });
   work();
+
+  // The guided test print (#63): a button for each of the coupon's sections, with its grip, and two
+  // for none; each answer sets the grip or the fit for the next print, and the coupon in or out.
+  const answers = [...guide.querySelectorAll<HTMLButtonElement>('button[data-answer]')];
+  const told = guide.querySelector<HTMLElement>('[data-testid="guide-test-print"]');
+  const gripBox = guide.querySelector<HTMLInputElement>('input[data-fills="gripMm"]');
+  const size = (name: string): number | undefined => {
+    const text = value(name).trim();
+    const n = Number(text);
+    return text !== '' && Number.isFinite(n) && n >= 0 ? n : undefined;
+  };
+  const coupon = (on: boolean) => {
+    const box = control(form, 'coupon');
+    if (box instanceof HTMLInputElement) box.checked = on;
+  };
+  const label = () => {
+    const grip = size('gripMm');
+    const grips = grip === undefined ? [] : couponGrips(grip);
+    for (const button of answers) {
+      const section = Number(button.dataset.answer);
+      const gripMm = grips[section - 1];
+      if (Number.isInteger(section))
+        button.textContent = `Section ${section}${gripMm === undefined ? '' : `: ${mm(gripMm)} mm`}`;
+      button.disabled = grip === undefined || size('fitMm') === undefined;
+    }
+  };
+  for (const button of answers) {
+    button.addEventListener('click', () => {
+      const [gripMm, fitMm] = [size('gripMm'), size('fitMm')];
+      if (gripMm === undefined || fitMm === undefined) return;
+      const answer = button.dataset.answer ?? '';
+      const next = nextTestPrint(
+        { ...DEFAULT_JOINT, gripMm, fitMm },
+        answer === 'all-loose' || answer === 'all-tight' ? answer : Number(answer),
+      );
+      set('gripMm', String(next.joint.gripMm));
+      set('fitMm', String(next.joint.fitMm));
+      if (gripBox) gripBox.value = String(next.joint.gripMm);
+      coupon(!next.done);
+      if (told) told.textContent = next.say;
+      form.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  }
+  guide.querySelector<HTMLButtonElement>('[data-part="add-coupon"]')?.addEventListener('click', () => {
+    coupon(true);
+    form.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  form.addEventListener('input', label);
+  label();
 }

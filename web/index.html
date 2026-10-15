@@ -109,6 +109,12 @@
       }
       /* The measuring guide's drawings (#14): drawn in the text's colour, so they follow the
         theme, and never wider than the screen. */
+      /* The guided test print's answers (#63): a row of buttons that wraps. */
+      .answers {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
       .guide-drawing {
         display: block;
         max-width: 100%;
@@ -260,12 +266,22 @@
           <section data-step="grip">
             <h3>5. The grip</h3>
             <p>
-              In the joint's advanced settings below, tick Add a test coupon to the download, and
-              print the coupon as the strips will be printed. Push its tab into each of the five short
-              strips, from the side without notches. The one that takes the tab with a firm push and
-              holds it has the grip to use; the plan says each one's grip, and the notches say which
-              is which.
+              Print the test coupon as the strips will be printed: five short strips, marked with one
+              to five notches, and a tab as thick as the pieces. Push the tab into each strip from the
+              side without notches, and say which took it with a firm push and held it. If none did,
+              the guide moves the grip, or the fit, and you print the coupon again.
             </p>
+            <p><button type="button" data-part="add-coupon">Add the test coupon to the download</button></p>
+            <div class="answers" role="group" aria-label="Which strip held the tab best?">
+              <button type="button" data-answer="1">Section 1</button>
+              <button type="button" data-answer="2">Section 2</button>
+              <button type="button" data-answer="3">Section 3</button>
+              <button type="button" data-answer="4">Section 4</button>
+              <button type="button" data-answer="5">Section 5</button>
+              <button type="button" data-answer="all-loose">It slipped out of every one</button>
+              <button type="button" data-answer="all-tight">It went into none</button>
+            </div>
+            <p data-testid="guide-test-print" aria-live="polite"></p>
             <label>
               Grip of the strip that held best (mm per face)
               <input data-fills="gripMm" inputmode="decimal" autocomplete="off" />

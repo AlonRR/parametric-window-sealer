@@ -13,6 +13,15 @@ published work (Q153). Changes since the latest version are listed under Unrelea
 
 ## [Unreleased]
 
+### Added
+
+- A guided test print: in the measuring guide's fifth step, The grip, a button puts the test coupon
+  in the download, and after printing it you press the section that held the tab, or say that it
+  slipped out of every one or went into none. The guide sets that grip, or moves the grip so the
+  next coupon tries five new ones, or, when even the section with no ribs was too tight, raises the
+  fit by 0.1 mm a face, and says what to print next. The library has it as `nextTestPrint`. How:
+  `docs/joints.md`. Not yet test printed.
+
 ## [0.4.0] - 2026-10-15
 
 ### Added
