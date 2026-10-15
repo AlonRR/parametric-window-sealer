@@ -108,6 +108,9 @@ window-sealer --width 600 --height 1000 --printer-model prusa-mk4s
   model of the appliance, an STL, OBJ or 3MF file in mm: its outline seen from the room, 1 mm clear,
   with the cutout's rim; `--model-view` names the side facing the room (`front`, as a modelling
   program's front view, to start with), and `--model-column` and `--model-row` its piece.
+  `--custom-piece piece.stl` makes one piece from a mesh of your own, centred and trimmed to fit
+  inside a frame as thick as the pieces, for the joints; `--custom-piece-column` and
+  `--custom-piece-row` place it, and `--custom-piece-view` names the side facing the room (`top`).
   `--clamp 120x80` grips an appliance
   measured roughly with four printed jaws on M4 bolts, give or take their travel (`--clamp-travel`,
   10 mm; `--clamp-depth` for the jaws' lips); `--clamp 120x80@2,1` places it, and the jaws are

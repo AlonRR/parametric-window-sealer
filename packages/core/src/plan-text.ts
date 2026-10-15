@@ -24,6 +24,7 @@ import { fillFor } from './piece-fill.js';
 import { pieceLimit, planParts } from './plan.js';
 import {
   APPLIANCE_MODEL,
+  CUSTOM_PIECE,
   SLIDING_INSERT,
   CLAMPS,
   FAN_MOUNT,
@@ -58,6 +59,7 @@ export interface PlanText {
   clamps: string[]; // one line for each clamp (#32)
   inserts: string[]; // one line for each sliding insert (#38)
   model: string[]; // the imported model of the appliance, if there is one (#35)
+  customPiece: string[]; // a whole piece of your own, if there is one (#41)
   units: string[]; // one line for each edge against a window AC (#24)
   seal: string;
   fill: string;
@@ -213,6 +215,7 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     clamps: CLAMPS.describe(fittingSource(params)),
     inserts: SLIDING_INSERT.describe(fittingSource(params)),
     model: APPLIANCE_MODEL.describe(fittingSource(params)),
+    customPiece: CUSTOM_PIECE.describe(fittingSource(params)),
     units: EDGES.filter((e) => params.edges.roles[e] === 'unit').map(
       (e) =>
         `Window AC: the ${e} edge ${e === 'bottom' ? 'stands on the unit’s top' : e === 'top' ? 'meets the unit’s underside' : 'meets the unit’s side'}.`,

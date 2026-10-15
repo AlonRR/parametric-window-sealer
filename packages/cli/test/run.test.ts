@@ -718,6 +718,52 @@ describe('a 3D tile of your own (mesh-tiles #40: --mesh-tile <file>)', () => {
   });
 });
 
+describe('a whole piece of your own (mesh-custom-piece #41: --custom-piece <file>)', () => {
+  // A binary STL plate 250 mm square and 5 mm deep, lying flat as a piece is drawn to print.
+  const plateStl = (): Uint8Array => {
+    const [x, y, z] = [250, 250, 5];
+    const corners = [0, 0, 0, x, 0, 0, x, y, 0, 0, y, 0, 0, 0, z, x, 0, z, x, y, z, 0, y, z];
+    const faces = [
+      0, 2, 1, 0, 3, 2, 4, 5, 6, 4, 6, 7, 0, 1, 5, 0, 5, 4, 1, 2, 6, 1, 6, 5, 2, 3, 7, 2, 7, 6, 3, 0, 4, 3, 4, 7,
+    ];
+    const bytes = new Uint8Array(84 + 50 * 12);
+    const view = new DataView(bytes.buffer);
+    view.setUint32(80, 12, true);
+    faces.forEach((c, i) => {
+      for (let a = 0; a < 3; a++) {
+        view.setFloat32(84 + 50 * Math.floor(i / 3) + 12 + 12 * (i % 3) + 4 * a, corners[3 * c + a] ?? 0, true);
+      }
+    });
+    return bytes;
+  };
+
+  it('--custom-piece reads the file into its piece; --custom-piece-column and -row place it', async () => {
+    const r = await cli(
+      [...OPENING, '--custom-piece', 'piece.stl', '--custom-piece-column', '1', '--custom-piece-row', '3', '--dry-run'],
+      undefined,
+      { 'piece.stl': plateStl() },
+    );
+    expect(r.code).toBe(0);
+    expect(r.out).toContain(
+      'Custom piece: the piece in column 1, row 3, from the STL file: 250 × 250 mm seen from its top and 5 mm deep, ' +
+        'trimmed to fit inside a 10 mm frame as thick as the pieces, for the joints.',
+    );
+    expect(r.out).toContain('  piece-c1-r3-197.7x198.6-custom-250x250.stl');
+  });
+
+  it('refuses one seen too small from its side, naming the flag', async () => {
+    const r = await cli(
+      [...OPENING, '--custom-piece', 'piece.stl', '--custom-piece-view', 'front', '--dry-run'],
+      undefined,
+      {
+        'piece.stl': plateStl(),
+      },
+    );
+    expect(r.code).toBe(2);
+    expect(r.err).toContain('--custom-piece: The custom piece is 250 × 5 mm seen from the room;');
+  });
+});
+
 describe('an SVG tile (svg-tile #27: --svg-tile <file>)', () => {
   const SQUARES =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">' +

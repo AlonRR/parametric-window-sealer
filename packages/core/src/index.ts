@@ -49,5 +49,6 @@ export * from './clamp.js';
 export * from './insert.js';
 export * from './appliance-model.js';
 export * from './mesh-tile.js';
+export * from './custom-piece.js';
 export * from './measure.js';
 export * from './mesh/index.js';

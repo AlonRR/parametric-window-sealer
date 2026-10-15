@@ -10,7 +10,7 @@ import { EXAMPLE_PARAMS, describePlan, planWall, readParams, toFormValues } from
 import type { FieldErrors, Params } from 'parametric-window-sealer';
 import { readForm, setValue, showErrors, valueOf, writeForm } from './form-fields';
 import type { FormPart } from './form-part';
-import { applianceModel, clamps, exhaustFan, slidingInsert, hosePorts, measuredCutout } from './fittings';
+import { applianceModel, clamps, customPiece, exhaustFan, slidingInsert, hosePorts, measuredCutout } from './fittings';
 import { meshTile } from './mesh-tile';
 import { mountPatternControls } from './pattern-controls';
 import { pieceMap } from './piece-map';
@@ -60,6 +60,7 @@ export function mountPanel(
     clamps(form),
     slidingInsert(form),
     applianceModel(form, update),
+    customPiece(form, update),
     svgTile(form, update),
     meshTile(form, update),
     tileEditor(form, update),

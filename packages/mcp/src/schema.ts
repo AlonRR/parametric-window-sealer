@@ -18,6 +18,7 @@ const GROUPS: Record<string, string> = {
   insert: "The sliding inserts' shutters, in mm: how far each slides and the clearance above and below.",
   model:
     'A 3D model of the appliance to cut the wall round: its file in base64, the side facing the room, and its piece.',
+  customPiece: 'A whole piece of your own: its file in base64, the side facing the room, and its piece.',
   clamp: "The clamps' jaws, in mm: how far each slides and how far its lip stands out. A test print confirms them.",
   seal:
     'The seal: none, foam tape, or gaskets printed in TPU to the tape’s size. Tape settings without a kind mean tape; ' +

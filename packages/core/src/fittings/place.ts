@@ -16,6 +16,7 @@ export interface Placing<G extends Partial<InPiece>> {
 export interface Placed {
   label: string;
   placed: readonly InPiece[];
+  alone?: true; // a wall has one at most: "the model", not "model 1"
 }
 
 export function placeFittings<G extends Partial<InPiece>>(
@@ -43,4 +44,36 @@ export function placeFittings<G extends Partial<InPiece>>(
     placed.push(here);
   }
   return { ok: true, placed };
+}
+
+// One fitting of a kind a wall has at most one of (the model, the custom piece): its piece given
+// by column and row from 1, or 0 and 0 for the starting piece; then its own check there; and a
+// piece of its own, apart from the kinds placed before it. Named in messages: "The model".
+export function placeOne<S extends InPiece>(
+  plan: GridLayout,
+  setting: S,
+  name: string,
+  check: (at: InPiece) => string | undefined,
+  earlier: readonly Placed[] = [],
+): { ok: true; placed: S } | { ok: false; problem: string } {
+  const start = defaultPortPiece(plan);
+  const at =
+    setting.column === 0 && setting.row === 0
+      ? { column: start.column + 1, row: start.row + 1 }
+      : { column: setting.column, row: setting.row };
+  const problem = check(at);
+  if (problem !== undefined) return { ok: false, problem };
+  for (const kind of earlier) {
+    const other = kind.placed.findIndex((p) => p.column === at.column && p.row === at.row);
+    if (other >= 0) {
+      return {
+        ok: false,
+        problem:
+          `${name} and ${kind.alone ? `the ${kind.label.toLowerCase()}` : `${kind.label.toLowerCase()} ${other + 1}`} ` +
+          `are both in column ${at.column}, row ${at.row}; ` +
+          'give each its own piece.',
+      };
+    }
+  }
+  return { ok: true, placed: { ...setting, ...at } };
 }

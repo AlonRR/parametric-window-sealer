@@ -1261,6 +1261,50 @@
           <span class="error" data-testid="error-pieceFills"></span>
         </details>
 
+        <!-- A whole piece of your own (mesh-custom-piece, #41): its file read into the hidden
+          customPieceFile field, trimmed into its piece inside a frame for the joints. -->
+        <details data-testid="custom-piece">
+          <summary>Advanced: a whole piece of your own</summary>
+          <p class="note">
+            One piece of the wall from an STL, OBJ or 3MF file drawn in mm: centred on its piece and
+            trimmed to fit inside the border the joints take, which stays a frame as thick as the
+            pieces. Draw it at least as large as the piece. The file stays on your computer.
+          </p>
+          <label>
+            The piece’s file
+            <input type="file" accept=".stl,.obj,.3mf" data-part="custom-file" />
+          </label>
+          <p class="note" data-testid="custom-piece-name">No file chosen yet.</p>
+          <button type="button" data-part="custom-clear">No piece of your own</button>
+          <label>
+            Which side of the piece faces the room
+            <select name="customPieceView">
+              <option value="top">Its top: the top view, seen from +Z with Y up</option>
+              <option value="front">Its front: the front view, seen from −Y with Z up</option>
+              <option value="back">Its back</option>
+              <option value="left">Its left side</option>
+              <option value="right">Its right side: seen from +X with Z up</option>
+              <option value="bottom">Its underside</option>
+            </select>
+          </label>
+          <span class="error" data-testid="error-customPieceView"></span>
+          <label>
+            Column
+            <input data-part="column" inputmode="numeric" autocomplete="off" />
+          </label>
+          <label>
+            Row
+            <input data-part="row" inputmode="numeric" autocomplete="off" />
+          </label>
+          <p class="note">
+            Its piece, counted from 1 at the bottom left, seen from the room. It starts in the bottom
+            row's middle piece.
+          </p>
+          <span class="error" data-testid="error-customPieceColumn"></span>
+          <span class="error" data-testid="error-customPieceRow"></span>
+          <span class="error" data-testid="error-customPieceFile"></span>
+        </details>
+
         <details>
           <summary>Advanced: the seal</summary>
           <p class="note">
@@ -1328,6 +1372,10 @@
         <input type="hidden" name="modelFile" />
         <input type="hidden" name="modelColumn" />
         <input type="hidden" name="modelRow" />
+        <!-- A whole piece of your own: its file in base64, and its piece, 0 and 0 for the starting one. -->
+        <input type="hidden" name="customPieceFile" />
+        <input type="hidden" name="customPieceColumn" />
+        <input type="hidden" name="customPieceRow" />
         <!-- Every piece's own fill, written as the command's --piece-fill takes them (C28). -->
         <input type="hidden" name="pieceFills" />
         <!-- The 3D tile's file, in base64. -->
@@ -1351,6 +1399,7 @@
         <ul data-testid="plan-clamps" data-plan="clamps"></ul>
         <ul data-testid="plan-inserts" data-plan="inserts"></ul>
         <ul data-testid="plan-model" data-plan="model"></ul>
+        <ul data-testid="plan-custom-piece" data-plan="customPiece"></ul>
         <ul data-testid="plan-units" data-plan="units"></ul>
         <p data-testid="plan-seal" data-plan="seal"></p>
         <p data-testid="plan-fill" data-plan="fill"></p>

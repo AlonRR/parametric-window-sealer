@@ -71,6 +71,7 @@ describe('SETTINGS: every setting on the page', () => {
         ...(s.field === 'wall' ? { thicknessMm: '10' } : {}), // a double wall needs panels thick enough (#119)
         ...(s.path.startsWith('edges.roles.') ? { seal: 'tpu' } : {}), // an edge in a frame, a TPU gasket (#120)
         ...(s.path.startsWith('model.') ? { modelFile: boxFile(120, 50, 80) } : {}), // read only with a model (#35)
+        ...(s.path.startsWith('customPiece.') ? { customPieceFile: boxFile(400, 400, 400) } : {}), // and a custom piece (#41)
         // A 3D tile's file, read only with the tile (#40); the tile's own settings with it chosen.
         ...(s.path.startsWith('fill.') ? { fillMeshFile: boxFile(28, 28, 6) } : {}),
         ...(s.path.startsWith('fill.mesh.') ? { fill: 'mesh' } : {}),

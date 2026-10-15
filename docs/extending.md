@@ -111,8 +111,9 @@ own for its openings, as `organiser.test.ts` has for Skådis, and a section in
 ## A new fitting
 
 A fitting is something in one piece that the appliance or its hose passes through: the hose
-port, the measured cutout, the fan mount, the clamps, the sliding insert and the cut round the
-appliance's model. Each kind is
+port, the measured cutout, the fan mount, the clamps, the sliding insert, the cut round the
+appliance's model and a whole piece of your own. A kind a wall has one of at most is placed with
+`placeOne` instead of `placeFittings`. Each kind is
 one file in `packages/core/src/fittings/` and one entry in `FITTINGS` (`fittings/index.ts`),
 whose order is the order the kinds are listed in: keep it the order they are placed in (step 2
 below). Write its `FittingDefinition`

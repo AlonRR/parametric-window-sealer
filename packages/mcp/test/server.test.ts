@@ -386,6 +386,36 @@ describe('window_sealer_plan_wall', () => {
     );
   });
 
+  it('a whole piece of your own: its file in base64, trimmed into its piece (#41)', async () => {
+    const { call, client } = await connect();
+    const corners = [0, 0, 0, 250, 0, 0, 250, 250, 0, 0, 250, 0, 0, 0, 5, 250, 0, 5, 250, 250, 5, 0, 250, 5];
+    const faces = [
+      0, 2, 1, 0, 3, 2, 4, 5, 6, 4, 6, 7, 0, 1, 5, 0, 5, 4, 1, 2, 6, 1, 6, 5, 2, 3, 7, 2, 7, 6, 3, 0, 4, 3, 4, 7,
+    ];
+    const bytes = Buffer.alloc(84 + 50 * 12);
+    bytes.writeUInt32LE(12, 80);
+    faces.forEach((c, i) => {
+      for (let a = 0; a < 3; a++) {
+        bytes.writeFloatLE(corners[3 * c + a] ?? 0, 84 + 50 * Math.floor(i / 3) + 12 + 12 * (i % 3) + 4 * a);
+      }
+    });
+    const file = bytes.toString('base64');
+    const r = await call('window_sealer_plan_wall', {
+      settings: { ...OPENING, customPiece: { file, column: 3, row: 2 } },
+    });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['settings'].customPiece).toEqual({ file, view: 'top', column: 3, row: 2 });
+    expect(r.data['summary'].customPiece).toEqual([
+      expect.stringMatching(/^Custom piece: the piece in column 3, row 2,/),
+    ]);
+    const plan = (await client.listTools()).tools.find((t) => t.name === 'window_sealer_plan_wall');
+    if (!plan) throw new Error('window_sealer_plan_wall expected');
+    const settings = (plan.inputSchema.properties as Record<string, any>)['settings'];
+    expect(settings.properties.customPiece.description).toBe(
+      'A whole piece of your own: its file in base64, the side facing the room, and its piece.',
+    );
+  });
+
   it('pieces with fills of their own (#21)', async () => {
     const { call } = await connect();
     const r = await call('window_sealer_plan_wall', {

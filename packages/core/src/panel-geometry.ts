@@ -14,10 +14,11 @@ import { DEFAULT_RIM } from './cutout.js';
 import { DEFAULT_CLAMP } from './clamp.js';
 import { DEFAULT_INSERT } from './insert.js';
 import { NO_MODEL } from './appliance-model.js';
+import { NO_CUSTOM_PIECE } from './custom-piece.js';
 import { DEFAULT_SOCKET } from './socket.js';
 import type { CutoutSetting, Rectangle, RimParams } from './cutout.js';
 import type { TapeFit } from './tape.js';
-import { patternedPanel, pieceOpenings } from './pattern.js';
+import { patternBorderMm, patternedPanel, pieceOpenings } from './pattern.js';
 import type { FillChoice } from './fill.js';
 import { organisedPanel, organiserOpenings } from './organiser.js';
 import { tileCells, tiledPanel } from './mesh-tile.js';
@@ -25,7 +26,7 @@ import type { PatternChoice, Point } from './pattern.js';
 import { plainPanel } from './panel.js';
 import { fittingIn, placedFittings } from './fittings/index.js';
 import type { InPiece, PlacedFitting } from './fittings/index.js';
-import { pinSlotsIn } from './joint.js';
+import { DEFAULT_JOINT, pinSlotsIn } from './joint.js';
 import type { JointParams, PinPlacement } from './joint.js';
 import { pinSlotCuts } from './joint-geometry.js';
 import { hollowCut } from './double.js';
@@ -204,6 +205,8 @@ export function buildPieces(
     clamps: [],
     inserts: [],
     model: NO_MODEL,
+    customPiece: NO_CUSTOM_PIECE,
+    borderMm: patternBorderMm(DEFAULT_JOINT),
     collar,
     socket: DEFAULT_SOCKET,
     rim,

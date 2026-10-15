@@ -23,7 +23,8 @@ import { modelFileOf } from './model-file.js';
 
 const engine = await loadEngine();
 
-// A wall of pieces up to 300 mm, with a port, a cutout, a fan, a clamp, an insert and a model.
+// A wall of pieces up to 300 mm, with a port, a cutout, a fan, a clamp, an insert, a model and a
+// custom piece.
 const params: Params = {
   ...EXAMPLE_PARAMS,
   openingWidthMm: 1200,
@@ -35,6 +36,15 @@ const params: Params = {
   clamps: [{ widthMm: 120, heightMm: 80, column: 2, row: 3 }],
   inserts: [{ widthMm: 100, heightMm: 80, column: 3, row: 3 }],
   model: { file: modelFileOf(engine.Manifold.cube([120, 50, 80])), view: 'front', column: 4, row: 2 },
+  // A plate with a hole through it, larger than any piece, to be trimmed to its piece.
+  customPiece: {
+    file: modelFileOf(
+      engine.Manifold.cube([320, 320, 5]).subtract(engine.Manifold.cylinder(7, 20, 20, 64).translate([160, 160, -1])),
+    ),
+    view: 'top',
+    column: 4,
+    row: 4,
+  },
 };
 const plan = planWall(params);
 const SEALS: Record<string, SealParams> = {
@@ -57,7 +67,7 @@ describe('every kind of fitting', () => {
   it('has a kind of its own', () => {
     const kinds = FITTINGS.map((f) => f.kind);
     expect(new Set(kinds).size).toBe(kinds.length);
-    expect(kinds).toEqual(['port', 'cutout', 'fan', 'clamp', 'insert', 'model']);
+    expect(kinds).toEqual(['port', 'cutout', 'fan', 'clamp', 'insert', 'model', 'custom']);
   });
 
   for (const [seal, sealParams] of Object.entries(SEALS)) {
@@ -134,12 +144,21 @@ describe('every kind of fitting', () => {
       clamp: JAWS,
       insert: SHUTTERS,
       model: [],
+      custom: [],
     });
   });
   it('without the TPU seal, prints only what a kind always needs: the port’s cap, the clamp’s jaws and the insert’s shutters', () => {
     const source = fittingSource({ ...params, seal: SEALS['tape'] ?? EXAMPLE_PARAMS.seal });
     const names = Object.fromEntries(FITTINGS.map((k) => [k.kind, k.parts(source, undefined).map((p) => p.name)]));
-    expect(names).toEqual({ port: ['cap-150-print-1'], cutout: [], fan: [], clamp: JAWS, insert: SHUTTERS, model: [] });
+    expect(names).toEqual({
+      port: ['cap-150-print-1'],
+      cutout: [],
+      fan: [],
+      clamp: JAWS,
+      insert: SHUTTERS,
+      model: [],
+      custom: [],
+    });
   });
   for (const kind of FITTINGS) {
     // A kind need print nothing (a fan is screwed straight on); what one prints is held to this.

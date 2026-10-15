@@ -32,6 +32,8 @@ type SheetSource = Pick<
   | 'clamps'
   | 'inserts'
   | 'model'
+  | 'customPiece'
+  | 'joint'
   | 'collar'
   | 'socket'
   | 'rim'
@@ -49,6 +51,7 @@ const FITTING_WORDS: Record<string, string> = {
   clamp: 'clamp',
   insert: 'sliding insert',
   model: 'model',
+  custom: 'custom piece',
 };
 
 // Why a piece is printed though the rest are cut, by column and row from 1; nothing if it is cut.
@@ -68,6 +71,7 @@ export const anyPrinted = (params: SheetSource): boolean =>
   params.sheet.source === 'printed' ||
   [params.ports, params.cutouts, params.fans, params.clamps, params.inserts].some((list) => list.length > 0) ||
   params.model.file !== '' ||
+  params.customPiece.file !== '' ||
   params.fill.kind !== 'sealed' ||
   params.pieceFills.some((f) => f.kind !== 'sealed');
 

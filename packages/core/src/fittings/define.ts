@@ -9,6 +9,7 @@ import type { Manifold } from 'manifold-3d';
 import type { ClampParams, ClampSetting } from '../clamp.js';
 import type { InsertParams, InsertSetting } from '../insert.js';
 import type { ModelSetting } from '../appliance-model.js';
+import type { CustomPieceSetting } from '../custom-piece.js';
 import type { CutoutSetting, Rectangle, RimParams } from '../cutout.js';
 import type { Engine } from '../engine.js';
 import type { FanSetting } from '../fan.js';
@@ -33,6 +34,8 @@ export interface FittingSource {
   clamps: readonly Required<ClampSetting>[];
   inserts: readonly Required<InsertSetting>[];
   model: ModelSetting; // the imported model of the appliance, placed; no file, none (#35)
+  customPiece: CustomPieceSetting; // a whole piece of your own, placed; no file, none (#41)
+  borderMm: number; // the border the joints take round a piece, kept a frame round a custom piece
   collar: CollarParams;
   socket: SocketParams; // how the hose ports hold the hose, and their caps and screens (#114)
   rim: RimParams;

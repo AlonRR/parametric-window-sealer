@@ -442,6 +442,34 @@ export const SETTINGS: readonly Setting[] = [
     help: "The model's piece: its row from 1 at the bottom; 0, with column 0, for the bottom row's middle piece.",
     whole: true,
   },
+  {
+    field: 'customPieceFile',
+    path: 'customPiece.file',
+    help:
+      'A whole piece of your own: an STL, OBJ or 3MF file in mm, as its bytes in base64; empty for none. It is ' +
+      'centred on its piece and trimmed to fit inside the border the joints take, which stays a frame as thick as the pieces.',
+    binary: true,
+  },
+  {
+    field: 'customPieceView',
+    path: 'customPiece.view',
+    help:
+      'Which side of the custom piece faces the room, as a modelling program names its views: top (seen from +Z, ' +
+      'Y up) to start with, as a piece is drawn lying flat; or front, back, left, right or bottom.',
+    values: MODEL_VIEWS,
+  },
+  {
+    field: 'customPieceColumn',
+    path: 'customPiece.column',
+    help: "The custom piece's column from 1 at the left, seen from the room; 0, with row 0, for the bottom row's middle piece.",
+    whole: true,
+  },
+  {
+    field: 'customPieceRow',
+    path: 'customPiece.row',
+    help: "The custom piece's row from 1 at the bottom; 0, with column 0, for the bottom row's middle piece.",
+    whole: true,
+  },
 ];
 
 // The value at a dotted path, such as `edges.track.widthMm`; undefined if it is not there.

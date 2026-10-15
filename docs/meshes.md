@@ -8,7 +8,7 @@ The parts that use a mesh:
 
 - cutting the wall round a model of the appliance (`mesh-appliance`, #35; below);
 - 3D tiles of your own, as the panel fill (`mesh-tiles`, #40; below);
-- a whole piece of your own (`mesh-custom-piece`, #41), still to come.
+- a whole piece of your own (`mesh-custom-piece`, #41; below).
 
 ## The files it reads
 
@@ -101,6 +101,26 @@ MCP server, `fill.mesh.file`, the file's bytes in base64, with `fill.kind` `mesh
 
 A wall can hold a model of the appliance and a tile: the last four files read are kept.
 
+## A whole piece of your own
+
+One piece of the wall can be a mesh of your own: on the page, under **Advanced: a whole piece of
+your own**; for the command, `--custom-piece piece.stl` with `--custom-piece-column` and
+`--custom-piece-row`; for the library and the MCP server, `customPiece.file`, the file's bytes in
+base64.
+
+- **Which side faces the room**, named as for the model; the top to start with, as a piece is drawn
+  lying flat to print (`--custom-piece-view`).
+- **Trimmed, not scaled.** The mesh is centred on its piece, its back on the panel's outside face,
+  and cut to the area inside the border the joints take (the slot's depth and 2 mm, 10 mm to start
+  with). The border stays a frame as thick as the pieces, so the piece slides into the strips, or
+  takes the dovetails, rails or flanges, as any other.
+- **It must cover that area**, seen from the room: one smaller would leave the wall open round it, so
+  it is refused, saying the size it needs. Draw it larger than the piece and let it be trimmed.
+- **One to a wall**, placed after the other fittings, starting in the bottom row's middle piece; no
+  other fitting, and no pattern, shares its piece.
+- **The plan** names the piece, the file's format, its size seen from the room and its depth, and
+  the frame. The piece's file name ends in `-custom-` and the mesh's size.
+
 ## For contributors
 
 `readMesh(bytes)` returns the mesh, indexed, in mm, with its size, its repairs and its notes, or the
@@ -116,3 +136,7 @@ The 3D tile is `packages/core/src/mesh-tile.ts`: `readMeshTile(file, view)` read
 sides, `tileCells` finds the whole cells in a piece on the lattice `organiserOpenings` uses, and
 `tiledPanel` sets the tiles in. It is the fill kind `mesh`, reached through `fillChoice` and
 `fillWords` (`fill.ts`) as the patterns and the boards are.
+
+The custom piece is `packages/core/src/custom-piece.ts`: `customPanel` trims the mesh into its frame
+and `customProblem` checks it covers its piece; `fittings/custom-piece.ts` makes it a fitting,
+placed after the model by `placeOne` (`fittings/place.ts`), which places both.

@@ -98,6 +98,10 @@ const FLAG_NAMES: Record<OwnField, string> = {
   modelView: 'model-view',
   modelColumn: 'model-column',
   modelRow: 'model-row',
+  customPieceFile: 'custom-piece', // names a file, read as its bytes (#41)
+  customPieceView: 'custom-piece-view',
+  customPieceColumn: 'custom-piece-column',
+  customPieceRow: 'custom-piece-row',
 };
 
 const PATTERN_FLAGS = new Map<string, string>(PATTERNS.flatMap((p) => p.sizes.map((s) => [s.field, s.flag])));

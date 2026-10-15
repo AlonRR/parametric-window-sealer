@@ -56,6 +56,7 @@ import {
   insertProblem,
   fanProblem,
   placeFittings,
+  placeCustomPiece,
   placeModel,
   portProblem,
 } from './fittings/index.js';
@@ -67,6 +68,9 @@ import { DEFAULT_INSERT, formatInserts, parseInserts } from './insert.js';
 import type { InsertParams, InsertSetting } from './insert.js';
 import { MODEL_VIEWS, NO_MODEL, readApplianceModel } from './appliance-model.js';
 import { NO_MESH_TILE, readMeshTile } from './mesh-tile.js';
+import { NO_CUSTOM_PIECE } from './custom-piece.js';
+import type { CustomPieceSetting } from './custom-piece.js';
+import { patternBorderMm } from './pattern.js';
 import type { ApplianceModel, ModelSetting } from './appliance-model.js';
 import type { InPiece } from './fittings/index.js';
 import { capitalised, hundredth, mm } from './words.js';
@@ -100,6 +104,7 @@ export interface Params {
   inserts: Required<InsertSetting>[]; // appliances in a sliding insert (#38); none to start with
   insert: InsertParams; // its shutters
   model: ModelSetting; // an imported model of the appliance to cut round (#35); none to start with
+  customPiece: CustomPieceSetting; // a whole piece of your own (#41); none to start with
   coupon: boolean; // the joint's test coupon in the download too (joint-lock, #110)
   sheet: SheetParams; // the pieces printed, or cut from sheet (sheet-pieces, #112)
   material: MaterialParams; // what the parts are printed in, and whether the wall is in sun (#113)
@@ -138,6 +143,7 @@ export const EXAMPLE_PARAMS: Params = {
   inserts: [],
   insert: DEFAULT_INSERT,
   model: NO_MODEL,
+  customPiece: NO_CUSTOM_PIECE,
   coupon: false,
   sheet: DEFAULT_SHEET,
   material: DEFAULT_MATERIAL,
@@ -236,6 +242,10 @@ export const FIELD_NAMES = [
   'modelView',
   'modelColumn',
   'modelRow',
+  'customPieceFile',
+  'customPieceView',
+  'customPieceColumn',
+  'customPieceRow',
   // Each pattern's sizes, as the patterns declare them (patterns/).
   ...PATTERN_FIELDS,
 ] as const;
@@ -768,21 +778,54 @@ const modelForm = (p: Params): FormValues => ({
   modelRow: String(p.model.row),
 });
 
-function readModel(r: FormReader): { given: ModelSetting; model: ApplianceModel | undefined } {
-  const file = r.values.modelFile ?? '';
+// A mesh in one piece, the model or a custom piece: its file, the side facing the room and its
+// piece, read only when there is a file.
+function readOneMesh(
+  r: FormReader,
+  fields: { file: FieldName; view: FieldName; column: FieldName; row: FieldName },
+  name: string,
+  startView: ModelSetting['view'],
+): { given: ModelSetting; model: ApplianceModel | undefined } {
+  const file = r.values[fields.file] ?? '';
   const used = file !== '';
-  const view = r.oneOfIfUsed('modelView', used, MODEL_VIEWS, NO_MODEL.view);
-  const column = r.numberIfUsed('modelColumn', used, 0, isWhole, WHOLE_MESSAGE);
-  const row = r.numberIfUsed('modelRow', used, 0, isWhole, WHOLE_MESSAGE);
+  const view = r.oneOfIfUsed(fields.view, used, MODEL_VIEWS, startView);
+  const column = r.numberIfUsed(fields.column, used, 0, isWhole, WHOLE_MESSAGE);
+  const row = r.numberIfUsed(fields.row, used, 0, isWhole, WHOLE_MESSAGE);
   if (used && isWhole(column) && isWhole(row) && (column === 0) !== (row === 0)) {
-    r.fail(column === 0 ? 'modelColumn' : 'modelRow', 'Give the model’s column and row, or 0 for both.');
+    r.fail(column === 0 ? fields.column : fields.row, `Give the ${name}’s column and row, or 0 for both.`);
   }
   const given = { file, view, column, row };
   if (!used) return { given, model: undefined };
   const read = readApplianceModel(file, view);
-  if (!read.ok) r.fail('modelFile', read.message);
+  if (!read.ok) r.fail(fields.file, read.message);
   return { given, model: read.ok ? read.model : undefined };
 }
+
+const readModel = (r: FormReader) =>
+  readOneMesh(
+    r,
+    { file: 'modelFile', view: 'modelView', column: 'modelColumn', row: 'modelRow' },
+    'model',
+    NO_MODEL.view,
+  );
+
+// A whole piece of your own (mesh-custom-piece, #41): as the model, its top facing the room to
+// start with; placed after it.
+
+const customPieceForm = (p: Params): FormValues => ({
+  customPieceFile: p.customPiece.file,
+  customPieceView: p.customPiece.view,
+  customPieceColumn: String(p.customPiece.column),
+  customPieceRow: String(p.customPiece.row),
+});
+
+const readCustomPiece = (r: FormReader) =>
+  readOneMesh(
+    r,
+    { file: 'customPieceFile', view: 'customPieceView', column: 'customPieceColumn', row: 'customPieceRow' },
+    'custom piece',
+    NO_CUSTOM_PIECE.view,
+  );
 
 // The panel fill (Q141) and each piece's own (#21). A pattern's sizes are read when the wall or
 // any piece uses it (C15), as the tape's are read only with a seal.
@@ -881,6 +924,7 @@ export function toFormValues(p: Params): FormValues {
     ...clampsForm(p),
     ...insertsForm(p),
     ...modelForm(p),
+    ...customPieceForm(p),
   };
 }
 
@@ -911,6 +955,7 @@ export function readParams(values: FormValues): ReadResult {
   const { clamp, given: givenClamps } = readClamps(r);
   const { insert, given: givenInserts } = readInserts(r);
   const { given: givenModel, model: modelRead } = readModel(r);
+  const { given: givenCustom, model: customRead } = readCustomPiece(r);
   if (r.ok) {
     // The edge strips must leave the pieces something to cover.
     const span = panelSpan(opening.openingWidthMm, opening.openingHeightMm, edges, joint, fit);
@@ -969,7 +1014,10 @@ export function readParams(values: FormValues): ReadResult {
   // place, a printed piece keeps every piece to the printer's size, before they are placed.
   const given = [givenPorts, givenCutouts, givenFans, givenClamps, givenInserts];
   const printedAnyway =
-    given.some((g) => g.length > 0) || modelRead !== undefined || pieceFills.some((f) => f.kind !== 'sealed');
+    given.some((g) => g.length > 0) ||
+    modelRead !== undefined ||
+    customRead !== undefined ||
+    pieceFills.some((f) => f.kind !== 'sealed');
   const toPlaceIn = { ...base, sheet: printedAnyway ? { ...sheet, source: 'printed' as const } : sheet };
   const none = {
     ports: [],
@@ -982,6 +1030,7 @@ export function readParams(values: FormValues): ReadResult {
     inserts: [],
     insert,
     model: NO_MODEL,
+    customPiece: NO_CUSTOM_PIECE,
   };
   const plan = r.ok ? planWall({ ...toPlaceIn, ...none }) : undefined;
   let ports: Required<PortSetting>[] = [];
@@ -1048,8 +1097,34 @@ export function readParams(values: FormValues): ReadResult {
     if (placing.ok) model = placing.placed;
     else r.fail('modelFile', placing.problem);
   }
+  let customPiece = givenCustom;
+  if (r.ok && plan !== undefined && customRead !== undefined) {
+    const earlier = [
+      { label: 'Port', placed: ports },
+      { label: 'Cutout', placed: cutouts },
+      { label: 'Fan', placed: fans },
+      { label: 'Clamp', placed: clamps },
+      { label: 'Insert', placed: inserts },
+      { label: 'Model', placed: model.file === '' ? [] : [model], alone: true as const },
+    ];
+    const placing = placeCustomPiece(plan, givenCustom, customRead, patternBorderMm(joint), earlier);
+    if (placing.ok) customPiece = placing.placed;
+    else r.fail('customPieceFile', placing.problem);
+  }
   if (r.ok && pieceFills.length > 0) {
-    const fitted = { ports, pieceFills: [], cutouts, rim, fans, clamps, clamp, inserts, insert, model };
+    const fitted = {
+      ports,
+      pieceFills: [],
+      cutouts,
+      rim,
+      fans,
+      clamps,
+      clamp,
+      inserts,
+      insert,
+      model,
+      customPiece,
+    };
     const problem = checkPieceFills(planWall({ ...toPlaceIn, ...fitted }), pieceFills);
     if (problem !== undefined) r.fail('pieceFills', problem);
   }
@@ -1057,7 +1132,7 @@ export function readParams(values: FormValues): ReadResult {
   if (!r.ok) return { ok: false, errors: r.errors };
   return {
     ok: true,
-    params: { ...base, ports, pieceFills, cutouts, rim, fans, clamps, clamp, inserts, insert, model },
+    params: { ...base, ports, pieceFills, cutouts, rim, fans, clamps, clamp, inserts, insert, model, customPiece },
   };
 }
 

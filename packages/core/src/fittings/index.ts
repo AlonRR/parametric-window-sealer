@@ -13,6 +13,9 @@ import { FAN_MOUNT } from './fan-mount.js';
 import { CLAMPS } from './clamps.js';
 import { SLIDING_INSERT } from './insert.js';
 import { APPLIANCE_MODEL } from './appliance-model.js';
+import { CUSTOM_PIECE } from './custom-piece.js';
+import { patternBorderMm } from '../pattern.js';
+import type { JointParams } from '../joint.js';
 
 export * from './define.js';
 export * from './place.js';
@@ -22,6 +25,7 @@ export * from './fan-mount.js';
 export * from './clamps.js';
 export * from './insert.js';
 export * from './appliance-model.js';
+export * from './custom-piece.js';
 
 export const FITTINGS: readonly FittingDefinition[] = [
   HOSE_PORT,
@@ -30,11 +34,12 @@ export const FITTINGS: readonly FittingDefinition[] = [
   CLAMPS,
   SLIDING_INSERT,
   APPLIANCE_MODEL,
+  CUSTOM_PIECE,
 ];
 
 // The fittings' source in a wall's parameters.
 export const fittingSource = (
-  params: Omit<FittingSource, 'tape' | 'sealKind'> & { seal: SealParams },
+  params: Omit<FittingSource, 'tape' | 'sealKind' | 'borderMm'> & { seal: SealParams; joint: JointParams },
 ): FittingSource => ({
   ports: params.ports,
   cutouts: params.cutouts,
@@ -42,6 +47,8 @@ export const fittingSource = (
   clamps: params.clamps,
   inserts: params.inserts,
   model: params.model,
+  customPiece: params.customPiece,
+  borderMm: patternBorderMm(params.joint),
   collar: params.collar,
   socket: params.socket,
   rim: params.rim,

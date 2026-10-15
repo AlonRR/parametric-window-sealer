@@ -17,6 +17,13 @@ listed under Unreleased.
 
 ### Added
 
+- A whole piece of your own: under **Advanced: a whole piece of your own**, an STL, OBJ or 3MF file of one
+  piece (`--custom-piece`, or `customPiece.file` in base64), its piece by column and row
+  (`--custom-piece-column`, `--custom-piece-row`). It is centred on its piece and trimmed to fit inside
+  the border the joints take, which stays a frame as thick as the pieces, so it joins the wall by any
+  joint; one smaller than that area is refused. Its top faces the room to start with
+  (`--custom-piece-view`). How: `docs/meshes.md`.
+
 - 3D tiles of your own as the panel fill: choose **3D tile of your own** and an STL, OBJ or 3MF file of
   one tile (`--mesh-tile`, or `fill.mesh.file` in base64), an organiser's own tile or a tile of a 3D
   pattern. Its box seen from the room is one cell: the tiles are set side by side in whole cells inside

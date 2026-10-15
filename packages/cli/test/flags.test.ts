@@ -10,8 +10,8 @@ const CUSTOM_PRINTER: Params = { ...EXAMPLE_PARAMS, printer: { kind: 'custom', w
 
 // A model of the appliance, for the settings read only with one: a binary STL box 120 × 50 × 80 mm,
 // in base64 as the setting holds it.
-function boxFile(): string {
-  const corners = [0, 0, 0, 120, 0, 0, 120, 50, 0, 0, 50, 0, 0, 0, 80, 120, 0, 80, 120, 50, 80, 0, 50, 80];
+function boxFile(x = 120, y = 50, z = 80): string {
+  const corners = [0, 0, 0, x, 0, 0, x, y, 0, 0, y, 0, 0, 0, z, x, 0, z, x, y, z, 0, y, z];
   const faces = [
     0, 2, 1, 0, 3, 2, 4, 5, 6, 4, 6, 7, 0, 1, 5, 0, 5, 4, 1, 2, 6, 1, 6, 5, 2, 3, 7, 2, 7, 6, 3, 0, 4, 3, 4, 7,
   ];
@@ -87,6 +87,7 @@ describe('the setting flags (Q90)', () => {
       'fill-style',
       'mesh-tile-view', // the side of a 3D tile facing the room (#40)
       'model-view', // the side of a model facing the room (#35)
+      'custom-piece-view', // the side of a custom piece facing the room (#41)
     ]);
   });
 
@@ -103,6 +104,7 @@ describe('the setting flags (Q90)', () => {
       ...(f.field === 'wall' ? { thicknessMm: '10' } : {}), // a double wall needs panels thick enough
       ...(f.path.startsWith('edges.roles.') ? { seal: 'tpu' } : {}), // an edge in a frame, a TPU gasket
       ...(f.path.startsWith('model.') ? { modelFile: boxFile() } : {}), // read only with a model
+      ...(f.path.startsWith('customPiece.') ? { customPieceFile: boxFile(400, 400, 400) } : {}), // and a custom piece
       ...(f.path.startsWith('fill.') ? { fillMeshFile: boxFile() } : {}), // a 3D tile's, read only with it
       ...(f.path.startsWith('fill.mesh.') ? { fill: 'mesh' } : {}),
     };

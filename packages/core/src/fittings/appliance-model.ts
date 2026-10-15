@@ -7,40 +7,21 @@ import { rimOuterMm } from '../cutout.js';
 import type { RimParams } from '../cutout.js';
 import type { JointParams } from '../joint.js';
 import type { GridLayout } from '../layout.js';
-import { defaultPortPiece } from '../port.js';
 import type { FittingDefinition } from './define.js';
+import { placeOne } from './place.js';
 import type { Placed } from './place.js';
 
 // The model in its piece: the piece given, or the starting piece as every fitting's; then its
 // room there; and a piece of its own, apart from the fittings placed before it.
-export function placeModel(
+export const placeModel = (
   plan: GridLayout,
   setting: ModelSetting,
   model: ApplianceModel,
   rim: RimParams,
   joint: JointParams,
   earlier: readonly Placed[] = [],
-): { ok: true; placed: ModelSetting } | { ok: false; problem: string } {
-  const start = defaultPortPiece(plan);
-  const at =
-    setting.column === 0 && setting.row === 0
-      ? { column: start.column + 1, row: start.row + 1 }
-      : { column: setting.column, row: setting.row };
-  const problem = modelProblem(plan, model, at, rim, joint);
-  if (problem !== undefined) return { ok: false, problem };
-  for (const kind of earlier) {
-    const other = kind.placed.findIndex((p) => p.column === at.column && p.row === at.row);
-    if (other >= 0) {
-      return {
-        ok: false,
-        problem:
-          `The model and ${kind.label.toLowerCase()} ${other + 1} are both in column ${at.column}, row ${at.row}; ` +
-          'give each its own piece.',
-      };
-    }
-  }
-  return { ok: true, placed: { ...setting, ...at } };
-}
+): { ok: true; placed: ModelSetting } | { ok: false; problem: string } =>
+  placeOne(plan, setting, 'The model', (at) => modelProblem(plan, model, at, rim, joint), earlier);
 
 // The model, read: the settings were checked when they were read, so a model that cannot be read
 // here is a caller's mistake.

@@ -13,7 +13,8 @@ the drawn tile (C215): the tile editor (`draw-tile`, #39), the Skådis board
 (`organiser-skadis`, #33), the openGrid board (`organiser-opengrid`, #34) and the Honeycomb
 Storage Wall board (`organiser-hsw`, #37) are built; Multiboard (#36) waits on Q159. For `v0.7.0`, the
 mesh reader (`mesh-import`, #42), the wall cut round a model of the appliance
-(`mesh-appliance`, #35) and 3D tiles of your own as the fill (`mesh-tiles`, #40) are built. Nothing has been test printed yet.
+(`mesh-appliance`, #35), 3D tiles of your own as the fill (`mesh-tiles`, #40) and a whole piece of
+your own (`mesh-custom-piece`, #41) are built: every `v0.7.0` item. Nothing has been test printed yet.
 
 ## The brief (the owner's request, 5 Oct 2026)
 

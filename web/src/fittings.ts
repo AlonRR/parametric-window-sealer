@@ -281,3 +281,60 @@ export function applianceModel(form: HTMLFormElement, changed: () => void): Form
     },
   };
 }
+
+// A whole piece of your own (mesh-custom-piece, #41): its file read as its bytes in base64 into the
+// hidden customPieceFile field, until "No piece of your own" takes it away; its piece as the
+// model's, written as 0 and 0 for the starting piece.
+export function customPiece(form: HTMLFormElement, changed: () => void): FormPart | null {
+  const box = form.querySelector<HTMLElement>('[data-testid="custom-piece"]');
+  const input = box?.querySelector<HTMLInputElement>('[data-part="custom-file"]');
+  const name = box?.querySelector<HTMLElement>('[data-testid="custom-piece-name"]');
+  const clear = box?.querySelector<HTMLButtonElement>('[data-part="custom-clear"]');
+  if (!box || !input || !name || !clear) return null;
+  let file = '';
+  const write = (text: string, column: string, row: string) => {
+    setValue(form, 'customPieceFile', text);
+    setValue(form, 'customPieceColumn', column);
+    setValue(form, 'customPieceRow', row);
+  };
+  return {
+    load() {
+      input.addEventListener('change', () => {
+        const chosen = input.files?.[0];
+        if (chosen === undefined) return;
+        name.textContent = `Reading ${chosen.name}…`;
+        const reader = new FileReader();
+        reader.addEventListener('load', () => {
+          const url = typeof reader.result === 'string' ? reader.result : '';
+          file = url.slice(url.indexOf(',') + 1); // after "data:…;base64,"
+          name.textContent = `Using ${chosen.name}.`;
+          changed();
+        });
+        reader.readAsDataURL(chosen);
+      });
+      clear.addEventListener('click', () => {
+        file = '';
+        input.value = '';
+        name.textContent = 'No file chosen yet.';
+        changed();
+      });
+    },
+    sync(): FieldErrors {
+      if (file === '') {
+        write('', '0', '0');
+        return {};
+      }
+      const [column, row] = [read(box, 'column'), read(box, 'row')];
+      const problem = pieceProblem(column, row, 'Custom piece');
+      if (problem !== undefined) {
+        write('!', '0', '0'); // a file the library refuses, so nothing is planned from it
+        return { customPieceFile: problem };
+      }
+      write(file, column === '' ? '0' : column, row === '' ? '0' : row);
+      return {};
+    },
+    placed(params) {
+      showPlacedPiece(box, params.customPiece.file === '' ? undefined : params.customPiece);
+    },
+  };
+}

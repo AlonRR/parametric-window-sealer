@@ -20,6 +20,7 @@ import { DEFAULT_RIM } from '../src/cutout.js';
 import { DEFAULT_CLAMP } from '../src/clamp.js';
 import { DEFAULT_INSERT } from '../src/insert.js';
 import { NO_MODEL } from '../src/appliance-model.js';
+import { NO_CUSTOM_PIECE } from '../src/custom-piece.js';
 import { DEFAULT_SHEET } from '../src/sheet.js';
 import { DEFAULT_MATERIAL } from '../src/material.js';
 import { DEFAULT_SOCKET } from '../src/socket.js';
@@ -54,6 +55,7 @@ describe('the starting values', () => {
       inserts: [], // #38
       insert: DEFAULT_INSERT,
       model: NO_MODEL, // #35
+      customPiece: NO_CUSTOM_PIECE, // #41
       coupon: false, // #110
       sheet: DEFAULT_SHEET, // #112
       material: DEFAULT_MATERIAL, // #113
@@ -313,6 +315,7 @@ describe('describePlan', () => {
       clamps: [], // #32
       inserts: [], // #38
       model: [], // #35
+      customPiece: [], // #41
       units: [], // #24
       seal: 'Seal: none.',
       fill: 'Fill: sealed.',
