@@ -6,7 +6,7 @@ files to print. It runs on your own machine, started by your agent's app over st
 sent anywhere. The geometry comes from the `parametric-window-sealer` library, which it
 installs with it.
 
-**Version 0.4.0, not yet test printed.** The joint and track sizes are starting values that a
+**Version 0.5.0, not yet test printed.** The joint and track sizes are starting values that a
 test print still has to confirm.
 
 ## Getting it
@@ -19,7 +19,7 @@ project, which puts `window-sealer-mcp` on your path:
 npm ci
 npm run build -w parametric-window-sealer -w parametric-window-sealer-mcp
 npm pack -w parametric-window-sealer -w parametric-window-sealer-mcp
-npm install -g ./parametric-window-sealer-0.4.0.tgz ./parametric-window-sealer-mcp-0.4.0.tgz
+npm install -g ./parametric-window-sealer-0.5.0.tgz ./parametric-window-sealer-mcp-0.5.0.tgz
 ```
 
 Then add it to your agent's app. Most take a list of MCP servers like this one:

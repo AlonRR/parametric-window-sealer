@@ -5,6 +5,6 @@ projects:
   - name:     Parametric window sealer
     kind:     build
     state:    active
-    next:     "v0.5.0 (C215): fit-test-print (#63), then joint-dovetail, joint-rails, joint-bolts (#29 to #31)"
+    next:     "v0.6.0 (C215): the organiser fills (#33, #34, #36, #37) and the drawn tile (#39)"
     trackers: [docs/status.md, docs/backlog.md]
     review:   2026-10-15

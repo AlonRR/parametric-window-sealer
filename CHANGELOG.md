@@ -9,9 +9,13 @@ API: the library, the command and the MCP server; `0.3.0` adds every P1 item: th
 printer list, the tape and TPU seals, the patterns and per-piece fills, the measured cutout, the
 window AC, the offline file and the measuring guide; `0.4.0` adds the exhaust fan, the SVG tile,
 the clamps and the sliding insert, and the thirteen changes from the design review against
-published work (Q153). Changes since the latest version are listed under Unreleased.
+published work (Q153); `0.5.0` adds the guided test print and three more joint styles: puzzle
+dovetails, sliding dovetail rails and bolted flanges (C215). Changes since the latest version are
+listed under Unreleased.
 
 ## [Unreleased]
+
+## [0.5.0] - 2026-10-15
 
 ### Added
 

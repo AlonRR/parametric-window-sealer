@@ -6,10 +6,10 @@ a fresh session resumes from here.
 Last updated: 15 Oct 2026. Phase: **P2** ([`backlog.md`](backlog.md)). `v0.3.0` holds every P1
 row; since then the code was made easy to extend (Q145) and P2 began (Q148, Q149): the fan mount
 (`fan-mount`, #28), the SVG tile (`svg-tile`, #27), the clamps (`clamps`, #32) and the sliding insert (`sliding-insert`, #38) are built. A design review against published work led to thirteen changes (Q153): a tighter joint that locks (`joint-lock`, #110), pieces cut from sheet (`sheet-pieces`, #112), material advice (`material-advice`, #113), a hose port that locks and closes (`hose-socket`, #114), seals that bend (`tpu-fin-seals`, #115), a filler between the sashes (`meeting-rail`, #116), weep holes against rain (`rain-face`, #117), a sash stop that lifts out by hand (`sash-stop`, #118), a double wall for winter (`double-wall`, #119), windows with no track (`compression-edge`, #120), the warnings before fitting (`safety-guidance`, #121) printing defaults against warping (`print-defaults`, #122) and stiffeners of bought aluminium angle on printed clips (`stiffener-strips`, #111, Q154) are built.
-All of it is released as `v0.4.0` (Q155). The next minor version, `v0.5.0`, is the joint tuned
-and in its other forms (C215): the guided test print (`fit-test-print`, #63, built) first (Q157), then
-the puzzle dovetails (built), the sliding rails (built) and the bolted flanges (built) (#29 to #31). Nothing has been
-test printed yet.
+All of it is released as `v0.4.0` (Q155). `v0.5.0` is the joint tuned and in its other forms
+(C215): the guided test print (`fit-test-print`, #63; Q157), puzzle dovetails, sliding dovetail
+rails and bolted flanges (#29 to #31). The next minor version, `v0.6.0`, is the organiser fills and
+the drawn tile (C215). Nothing has been test printed yet.
 
 ## The brief (the owner's request, 5 Oct 2026)
 
@@ -198,6 +198,9 @@ None at present. The next free ID is Q159.
 
 ## Repository follow-ups
 
+- **Pending (C215, Q123):** the `v0.5.0` tag on the release commit `chore(release): v0.5.0, the
+  joint` and its GitHub release, a pre-release (C63), asked of the session on the owner's machine
+  once the commit is on `main`; checked on GitHub afterwards.
 - **Done (Q155, Q123):** the `v0.4.0` tag on the release commit `chore(release): v0.4.0, the
   design review` (`f995be6`) and its GitHub release, made by the session on the owner's machine
   on 15 Oct 2026 (verified: GitHub lists the annotated tag `v0.4.0` on `f995be6`, signed by the
