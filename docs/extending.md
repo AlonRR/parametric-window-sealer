@@ -84,6 +84,28 @@ fields and flags, its settings, its starting tile, its reading, checking and wor
 `web/e2e/page-wiring.spec.ts` finds its controls on the running page; give the pattern a test file
 of its own for its tile's shape, as `grid.test.ts` has.
 
+## A new organiser
+
+An organiser board (Q9) is one file in `packages/core/src/organisers/` and one entry in
+`ORGANISERS` (`organisers/index.ts`), whose order is the page's, after the patterns. Declare it
+with `defineOrganiser`, as `skadis.ts` does:
+
+- `kind`, its name in the library's shape (`fill.kind`), the command's `--fill` and a piece's own
+  fill; `name`, on the page; `words`, in a sentence ("a Skådis pegboard"); and `accessories`, in a
+  message ("Skådis accessories");
+- `boardMm`, the thickness its accessories fit: the board is raised to it on the room side, and
+  pieces thicker than it are refused;
+- the lattice, `pitchXMm`, `pitchYMm` and `rowShiftMm`, as a pattern's tile has it;
+- `widthMm` and `heightMm`, one opening at its widest: it is cut only where all of that fits;
+- `cut(engine)`, one opening's solid, centred on x = y = 0, through a board lying on z = 0 with its
+  room face at `boardMm`, reaching 1 mm past both faces;
+- `describe`, its openings and their spacing in the plan.
+
+Nothing else changes: the settings, the command, the MCP server, the page's fill lists and its
+note, the plan, the pieces and the preview take it from `ORGANISERS`. Give it a test file of its
+own for its openings, as `organiser.test.ts` has for Skådis, and a section in
+[`organisers.md`](organisers.md) with its sizes and where they come from.
+
 ## A new fitting
 
 A fitting is something in one piece that the appliance or its hose passes through: the hose

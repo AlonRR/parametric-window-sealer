@@ -8,6 +8,7 @@ import {
   FIELD_NAMES,
   FILL_KINDS,
   MIN_BAR_MM,
+  ORGANISERS,
   PATTERNS,
   PATTERN_FIELDS,
   SEALED,
@@ -31,7 +32,7 @@ describe('the patterns', () => {
     expect(new Set(kinds).size).toBe(kinds.length);
     expect(new Set(fields).size).toBe(fields.length);
     expect(new Set(flags).size).toBe(flags.length);
-    expect(FILL_KINDS).toEqual(['sealed', ...kinds]);
+    expect(FILL_KINDS).toEqual(['sealed', ...kinds, ...ORGANISERS.map((o) => o.kind)]);
     expect(PATTERN_FIELDS).toEqual(fields);
     for (const field of fields) expect(FIELD_NAMES).toContain(field);
   });

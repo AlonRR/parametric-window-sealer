@@ -28,7 +28,8 @@ import type { CutoutSetting, RimParams } from './cutout.js';
 import { DEFAULT_TAPE, NO_SEAL, TAPE_GROOVE_PLAY_MM, TAPE_GROOVE_WALL_MM, tapeFit } from './tape.js';
 import type { SealKind, SealParams, TapeFit } from './tape.js';
 import { TPU_FIN_MM, gasketBaseMm, gasketFinsAcrossMm } from './tpu.js';
-import { FILL_KINDS, PATTERN_STYLES, SEALED } from './fill.js';
+import { FILL_KINDS, PATTERN_STYLES, SEALED, isPatternKind } from './fill.js';
+import { organiserOf } from './organisers/index.js';
 import { MIN_BAR_MM } from './pattern.js';
 import { readSvgDrawing } from './svg/drawing.js';
 import type { FillKind, FillParams } from './fill.js';
@@ -64,7 +65,7 @@ import type { ClampParams, ClampSetting } from './clamp.js';
 import { DEFAULT_INSERT, formatInserts, parseInserts } from './insert.js';
 import type { InsertParams, InsertSetting } from './insert.js';
 import type { InPiece } from './fittings/index.js';
-import { hundredth, mm } from './words.js';
+import { capitalised, hundredth, mm } from './words.js';
 
 export interface AxisChoice {
   mode: AxisMode;
@@ -429,9 +430,10 @@ function readWall(r: FormReader, thicknessMm: number, fill: FillKind): WallKind 
         `round a ${mm(DOUBLE_LEAST_GAP_MM)} mm air gap.`,
     );
   } else if (fill !== 'sealed') {
+    const what = organiserOf(fill)?.words ?? 'a pattern';
     r.fail(
       'wall',
-      'A double wall’s skins are too thin for a pattern across the wall: choose a sealed fill, or give single ' +
+      `A double wall’s skins are too thin for ${what} across the wall: choose a sealed fill, or give single ` +
         'pieces a pattern of their own; those are printed solid.',
     );
   }
@@ -765,7 +767,7 @@ function readFill(r: FormReader): { fill: FillParams; pieceFills: PieceFill[] } 
   if (!parsed.ok) r.fail('pieceFills', parsed.message);
   const pieceFills = parsed.ok ? parsed.fills : [];
   const used = (pattern: FillKind) => kind === pattern || pieceFills.some((f) => f.kind === pattern);
-  const patterned = FILL_KINDS.some((k) => k !== 'sealed' && used(k));
+  const patterned = FILL_KINDS.some((k) => isPatternKind(k) && used(k));
   // The SVG tile's drawing, read as its sizes are: only where it is used (svg-tile, #27).
   const drawing = r.values.fillDrawing ?? '';
   const read = readSvgDrawing(drawing);
@@ -788,6 +790,26 @@ function readFill(r: FormReader): { fill: FillParams; pieceFills: PieceFill[] } 
     ),
   };
   return { fill, pieceFills };
+}
+
+// An organiser's accessories fit one board's thickness: where the pieces are thinner the board
+// is raised to it, but a piece thicker than the board cannot be thinned to it.
+function checkBoards(r: FormReader, thicknessMm: number, kind: FillKind, pieceFills: readonly PieceFill[]) {
+  if (!Number.isFinite(thicknessMm)) return;
+  const tooThin = (k: FillKind) => {
+    const o = organiserOf(k);
+    return o !== undefined && o.boardMm < thicknessMm - 1e-9 ? o : undefined;
+  };
+  const said = (field: 'fill' | 'pieceFills', o: { accessories: string; boardMm: number }) =>
+    r.fail(
+      field,
+      `${o.accessories} fit a board ${mm(o.boardMm)} mm thick: make the pieces at most ${mm(o.boardMm)} mm thick, ` +
+        'or choose another fill.',
+    );
+  const wall = tooThin(kind);
+  if (wall !== undefined) said('fill', wall);
+  const own = pieceFills.map((f) => tooThin(f.kind)).find((o) => o !== undefined);
+  if (own !== undefined) said('pieceFills', own);
 }
 
 export function toFormValues(p: Params): FormValues {
@@ -841,13 +863,21 @@ export function readParams(values: FormValues): ReadResult {
   }
   const { fill, pieceFills } = readFill(r);
   const wall = readWall(r, thicknessMm, fill.kind);
-  if (sheet.source === 'sheet' && fill.kind !== 'sealed') {
+  const board = organiserOf(fill.kind);
+  if (sheet.source === 'sheet' && board !== undefined) {
+    r.fail(
+      'pieceSource',
+      `${capitalised(board.words)} for the whole wall is printed into every piece, so none would be cut: choose ` +
+        'a sealed fill, or give single pieces the board.',
+    );
+  } else if (sheet.source === 'sheet' && fill.kind !== 'sealed') {
     r.fail(
       'pieceSource',
       'A pattern for the whole wall is printed into every piece, so none would be cut: choose a sealed fill, or ' +
         'give single pieces a pattern of their own.',
     );
   }
+  checkBoards(r, thicknessMm, fill.kind, pieceFills);
 
   // What is placed in pieces, once everything else is sound: the ports, the cutouts, the fans and
   // the clamps, then each piece's own fill, each against the plan the ones before it allow.

@@ -9,7 +9,8 @@ row; since then the code was made easy to extend (Q145) and P2 began (Q148, Q149
 All of it is released as `v0.4.0` (Q155). `v0.5.0` is the joint tuned and in its other forms
 (C215): the guided test print (`fit-test-print`, #63; Q157), puzzle dovetails, sliding dovetail
 rails and bolted flanges (#29 to #31). The next minor version, `v0.6.0`, is the organiser fills and
-the drawn tile (C215): the tile editor (`draw-tile`, #39) is built. Nothing has been test printed yet.
+the drawn tile (C215): the tile editor (`draw-tile`, #39) and the Skådis board
+(`organiser-skadis`, #33) are built. Nothing has been test printed yet.
 
 ## The brief (the owner's request, 5 Oct 2026)
 
@@ -194,7 +195,14 @@ The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-None at present. The next free ID is Q159.
+- **Q159.** Multiboard (`organiser-multiboard`, #36): its licence (the MultiBuild licence,
+  updated 19 Dec 2025) allows personal use, and makes selling anything "derived from" its designs
+  need a paid tier, while the files this tool makes are the user's to sell (Q36). Its thread and
+  thickness are published only in community code, itself under that licence. Leave Multiboard out
+  (recommended), build it from the community's numbers with a warning about selling, or wait while
+  the owner asks MultiBuild? The other organisers do not wait on this.
+
+The next free ID is Q160.
 
 ## Repository follow-ups
 

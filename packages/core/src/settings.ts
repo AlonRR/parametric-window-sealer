@@ -11,6 +11,7 @@ import { EXAMPLE_PARAMS, readParams, toFormValues } from './params.js';
 import { PRINTER_IDS } from './printers.js';
 import { FILL_KINDS, PATTERN_STYLES } from './fill.js';
 import { PATTERNS } from './patterns/index.js';
+import { ORGANISERS } from './organisers/index.js';
 import { FANS } from './fan.js';
 import { PIECE_SOURCES } from './sheet.js';
 import { COLOURS, MATERIAL_KINDS } from './material.js';
@@ -306,9 +307,13 @@ export const SETTINGS: readonly Setting[] = [
   {
     field: 'fill',
     path: 'fill.kind',
-    help: `The panel fill: sealed, or a pattern: ${PATTERNS.map((p) => p.words)
-      .join(', ')
-      .replace(/, ([^,]*)$/, ' or $1')}.`,
+    help:
+      `The panel fill: sealed, or a pattern: ${PATTERNS.map((p) => p.words)
+        .join(', ')
+        .replace(/, ([^,]*)$/, ' or $1')}; or a board for an organiser's accessories: ` +
+      `${ORGANISERS.map((o) => o.words)
+        .join(', ')
+        .replace(/, ([^,]*)$/, ' or $1')}, cut through.`,
     values: FILL_KINDS,
   },
   {
@@ -332,7 +337,7 @@ export const SETTINGS: readonly Setting[] = [
     path: 'pieceFills',
     help:
       'Pieces with a fill of their own: for each, its column and row from 1 at the bottom left seen from the room, ' +
-      'its fill (sealed or a pattern) and optionally its style; the sizes are the wall’s.',
+      'its fill (sealed, a pattern or an organiser board) and, for a pattern, optionally its style; the sizes are the wall’s.',
     list: 'pieceFills',
   },
   {

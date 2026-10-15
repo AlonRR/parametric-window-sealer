@@ -25,7 +25,7 @@ import { readParams, toFormValues } from './params.js';
 import { longestStripMm, planParts, planWall } from './plan.js';
 import { describePlan } from './plan-text.js';
 import { tapeFit } from './tape.js';
-import { fillPattern } from './fill.js';
+import { fillChoice } from './fill.js';
 import { patternBorderMm } from './pattern.js';
 import { fillFor } from './piece-fill.js';
 import { gasketShapes, gasketSolid, tpuJoint } from './tpu.js';
@@ -108,7 +108,7 @@ export function buildExport(engine: Engine, params: Params): { pieces: ExportPie
   const plan = planWall(params);
   // Each piece's own fill, or the wall's (#21).
   const pattern = (cell: { column: number; row: number }) =>
-    fillPattern(fillFor(params, cell.column + 1, cell.row + 1), params.joint);
+    fillChoice(fillFor(params, cell.column + 1, cell.row + 1), params.joint);
   const fittings = placedFittings(fittingSource(params));
   const pins = {
     joint: params.joint,

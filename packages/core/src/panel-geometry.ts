@@ -17,6 +17,8 @@ import { DEFAULT_SOCKET } from './socket.js';
 import type { CutoutSetting, Rectangle, RimParams } from './cutout.js';
 import type { TapeFit } from './tape.js';
 import { patternedPanel, pieceOpenings } from './pattern.js';
+import type { FillChoice } from './fill.js';
+import { organisedPanel, organiserOpenings } from './organiser.js';
 import type { PatternChoice, Point } from './pattern.js';
 import { plainPanel } from './panel.js';
 import { fittingIn, placedFittings } from './fittings/index.js';
@@ -55,11 +57,12 @@ export interface PiecePins {
 }
 const OUTLINE_TALL_MM = 1000; // the outline cuts through whatever stands on the room side
 
-type PatternFor = PiecePattern | ((cell: { column: number; row: number }) => PiecePattern | undefined);
+type PatternFor = FillChoice | ((cell: { column: number; row: number }) => FillChoice | undefined);
 
 // Every piece of the plan, each with the fitting placed in it, if any (columns and rows from 1, as
 // in Params). With a pattern (patterns-core, #20), each piece gets the wall's pattern inside its
-// border, and stays solid that far clear of its fitting (Q134, Q137). The pattern can be given for
+// border, clear of the strips, and stays solid that far clear of its fitting; with an organiser's
+// board, its whole openings there, the board raised to its thickness. The pattern can be given for
 // each piece, by its column and row from 0 (params-advanced, #21). With pins, each piece has a slot
 // for each pin through the strips along its edges.
 export function buildPiecesWith(
@@ -102,7 +105,12 @@ export function buildPiecesWith(
         solid.delete();
         solid = hollowed;
       }
-      if (here !== undefined) {
+      if (here !== undefined && 'organiser' in here) {
+        // An organiser's board: whole openings only, the board raised inside the border.
+        const keepOut = fitting?.keepOut(size, here.borderMm);
+        const at = organiserOpenings(here.organiser, centre, cell, here.borderMm, keepOut);
+        solid = organisedPanel(engine, solid, here.organiser, at, size, here.borderMm, keepOut);
+      } else if (here !== undefined) {
         const keepOut = fitting?.keepOut(size, here.borderMm);
         const openings = pieceOpenings(engine, here.tile, centre, cell, here.borderMm, keepOut);
         try {

@@ -52,8 +52,8 @@ const PORT = z.strictObject({
 const PIECE_FILL = z.strictObject({
   column: z.number().int().min(1).describe('The column of the piece, from 1 at the left.'),
   row: z.number().int().min(1).describe('The row of the piece, from 1 at the bottom.'),
-  kind: choices(FILL_KINDS).describe('Its fill: sealed or a pattern.'),
-  style: choices(PATTERN_STYLES).optional().describe("Its style; the wall's if left out."),
+  kind: choices(FILL_KINDS).describe('Its fill: sealed, a pattern or an organiser board.'),
+  style: choices(PATTERN_STYLES).optional().describe("A pattern's style; the wall's if left out. A board has none."),
 });
 
 // A measured cutout (#23; C44): the appliance's outside, seen from the room, and its piece as a

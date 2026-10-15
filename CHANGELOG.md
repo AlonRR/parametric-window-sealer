@@ -17,6 +17,13 @@ listed under Unreleased.
 
 ### Added
 
+- Organiser boards, and the first of them, a Skådis pegboard: choose **Skådis pegboard** as the
+  fill, for the wall or a single piece (`--fill skadis`), and IKEA's SKÅDIS hooks and shelves hang
+  on it. Upright slots 5.2 × 15.2 mm, 40 mm apart in rows 20 mm apart, every other row shifted
+  20 mm, are cut through a board 4.8 mm thick, raised on the room side inside each piece's border
+  where the pieces are thinner; every slot is whole, on one grid across the wall. Pieces thicker than
+  the board are refused. How: `docs/organisers.md`. Not yet test printed.
+
 - A tile editor: under the SVG tile's file, Draw a tile draws the openings of one cell on a grid
   of squares, by clicking corners and circles or typing each point, beside the cell repeated as
   the wall repeats it. Each finished shape is used at once, as a chosen file is; Undo, Remove and

@@ -830,8 +830,13 @@
               <option value="sealed">Sealed</option>
               <!-- The library's patterns, filled in by the page (fill-registry, #96). -->
               <optgroup label="Patterns" data-part="pattern-list"></optgroup>
+              <!-- The library's organiser boards, filled in by the page. -->
+              <optgroup label="Organiser boards" data-part="organiser-list"></optgroup>
             </select>
           </label>
+          <span class="error" data-testid="error-fill"></span>
+          <!-- A note for each organiser's board, made by the page; only the chosen one's shows. -->
+          <div data-part="organiser-notes"></div>
           <!-- The SVG tile (svg-tile, #27): a drawing of one cell, its filled shapes the openings
             (docs/svg-tiles.md). The page reads the file and puts its text in fillDrawing. -->
           <div data-testid="svg-tile" data-show-when="fill=svg" hidden>
@@ -893,7 +898,8 @@
           </div>
           <input type="hidden" name="fillDrawing" />
           <span class="error" data-testid="error-fillDrawing"></span>
-          <div data-testid="fill-style" data-show-when="fill!=sealed" hidden>
+          <!-- A pattern's style: shown for the patterns only, a condition the page makes from them. -->
+          <div data-testid="fill-style" data-part="pattern-style" hidden>
             <label><input type="radio" name="fillStyle" value="relief" /> Relief</label>
             <p class="note">Cut into the face you see from the room; the wall stays sealed.</p>
             <label><input type="radio" name="fillStyle" value="through" /> Cut through</label>

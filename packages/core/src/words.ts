@@ -6,6 +6,9 @@ export const mm = (n: number): string => String(Math.round(n * 10) / 10);
 // A length to a hundredth of a mm, where a tenth would hide the difference: "0.85".
 export const hundredth = (n: number): string => String(Math.round(n * 100) / 100);
 
+// The start of a sentence: "A Skådis pegboard".
+export const capitalised = (words: string): string => words.charAt(0).toUpperCase() + words.slice(1);
+
 // "1 strip", "3 strips".
 export const plural = (count: number, one: string, many: string): string => `${count} ${count === 1 ? one : many}`;
 

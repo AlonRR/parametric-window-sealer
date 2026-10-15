@@ -3,7 +3,7 @@
 // an override sets a piece's fill and its style, the pattern's sizes staying the wall's (C26),
 // and the piece stays on the wall's lattice (C27). In the form and the command they are written
 // as `column,row=fill[:style]`, several separated by spaces, as the ports are (C28).
-import { FILL_KINDS, PATTERN_STYLES } from './fill.js';
+import { FILL_KINDS, PATTERN_STYLES, isPatternKind } from './fill.js';
 import type { FillKind, FillParams } from './fill.js';
 import type { PatternStyle } from './pattern.js';
 
@@ -11,7 +11,7 @@ export interface PieceFill {
   column: number; // from 1, the left seen from the room
   row: number; // from 1, the bottom
   kind: FillKind;
-  style?: PatternStyle; // the wall's style if left out
+  style?: PatternStyle; // a pattern's: the wall's style if left out; an organiser's board has none
 }
 
 const FORM = /^([1-9][0-9]*),([1-9][0-9]*)=([a-z]+)(?::([a-z]+))?$/;
@@ -25,7 +25,7 @@ export function parsePieceFills(text: string): { ok: true; fills: PieceFill[] } 
   for (const [i, word] of words.entries()) {
     const m = FORM.exec(word);
     const [kind, style] = [m?.[3], m?.[4]];
-    const fits = m !== null && isKind(kind) && (style === undefined || (isStyle(style) && kind !== 'sealed'));
+    const fits = m !== null && isKind(kind) && (style === undefined || (isStyle(style) && isPatternKind(kind)));
     if (!fits) {
       return {
         ok: false,

@@ -60,6 +60,17 @@ export type KeepOut =
 const CIRCLE_SEGMENTS = 128; // as the port is drawn (PORT_SEGMENTS)
 const MITER_LIMIT = 10; // keeps sharp corners sharp when an opening is shrunk and grown back
 
+// The zone kept solid round a fitting, in the piece's frame.
+export function keepOutZone(engine: Engine, keepOut: KeepOut): CrossSection {
+  const shape =
+    'radiusMm' in keepOut
+      ? engine.CrossSection.circle(keepOut.radiusMm, CIRCLE_SEGMENTS)
+      : engine.CrossSection.square([keepOut.widthMm, keepOut.heightMm], true);
+  const zone = shape.translate([keepOut.xMm, keepOut.yMm]);
+  shape.delete();
+  return zone;
+}
+
 // The tile's openings over a piece, in the piece's frame, before any border: every tile that
 // can reach the piece, laid on the lattice centred on the wall's centre.
 function tiledOver(engine: Engine, tile: PatternTile, centre: Point, piece: PieceArea): CrossSection {
@@ -106,14 +117,7 @@ export function pieceOpenings(
   };
   try {
     let allowed = keep(CrossSection.square(inner).translate([borderMm, borderMm]));
-    if (keepOut !== undefined) {
-      const shape =
-        'radiusMm' in keepOut
-          ? CrossSection.circle(keepOut.radiusMm, CIRCLE_SEGMENTS)
-          : CrossSection.square([keepOut.widthMm, keepOut.heightMm], true);
-      const zone = keep(keep(shape).translate([keepOut.xMm, keepOut.yMm]));
-      allowed = keep(allowed.subtract(zone));
-    }
+    if (keepOut !== undefined) allowed = keep(allowed.subtract(keep(keepOutZone(engine, keepOut))));
     const clipped = keep(keep(tiledOver(engine, tile, wallCentre, piece)).intersect(allowed));
     const half = tile.barMm / 2;
     const opened = keep(keep(clipped.offset(-half, 'Miter', MITER_LIMIT)).offset(half, 'Miter', MITER_LIMIT));

@@ -76,7 +76,7 @@ const FLAG_NAMES: Record<OwnField, string> = {
   tapeSides: 'tape-sides',
   tapePort: 'tape-port',
   tpuJoints: 'tpu-joints', // without --seal means the TPU seal (C39)
-  fill: 'fill', // sealed or a pattern (Q141)
+  fill: 'fill', // sealed, a pattern or an organiser board
   fillStyle: 'fill-style',
   reliefPct: 'relief-depth',
   fillDrawing: 'svg-tile', // names a file, whose text is the drawing; without --fill means the tile (#27)

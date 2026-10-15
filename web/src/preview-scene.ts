@@ -34,7 +34,7 @@ import { stripWidthMm } from 'parametric-window-sealer';
 import { crossSolid, pinSolid, planPins, stripSolid } from 'parametric-window-sealer';
 import { buildPiecesWith, fittingSource, placedFittings } from 'parametric-window-sealer';
 import { tpuJoint } from 'parametric-window-sealer';
-import { fillFor, fillPattern } from 'parametric-window-sealer';
+import { fillChoice, fillFor } from 'parametric-window-sealer';
 import { isCut, planParts, slotPins } from 'parametric-window-sealer';
 import type { Params } from 'parametric-window-sealer';
 
@@ -81,7 +81,7 @@ export function buildWallScene(engine: Engine, params: Params): Group {
   const [own, ownLook] = inTpu ? [tpuJoint(joint), TPU] : [joint, JOINT];
   // Each piece's own fill, or the wall's (params-advanced, #21).
   const pattern = (cell: { column: number; row: number }) =>
-    fillPattern(fillFor(params, cell.column + 1, cell.row + 1), joint);
+    fillChoice(fillFor(params, cell.column + 1, cell.row + 1), joint);
   const fittings = placedFittings(fittingSource(params));
   const pins = planPins(joints, joint);
   // A piece cut from sheet (#112) has no slots for the pins: its holes are drilled.

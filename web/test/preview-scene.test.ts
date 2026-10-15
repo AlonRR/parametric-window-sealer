@@ -117,6 +117,20 @@ describe('buildWallScene', () => {
     expect(download.every((n, i) => n > (drawn[i] ?? Infinity))).toBe(true);
     disposeWall(wall);
   });
+
+  it('draws a piece’s organiser board raised on its room side, as the download makes it (#33)', async () => {
+    const engine = await loadEngine();
+    const own = { ...EXAMPLE_PARAMS, pieceFills: [{ column: 1, row: 1, kind: 'skadis' as const }] };
+    const wall = buildWallScene(engine, own);
+    const top = (piece: Mesh | undefined) => {
+      piece?.geometry.computeBoundingBox();
+      return piece?.geometry.boundingBox?.max.z ?? 0;
+    };
+    const [board, sealed] = solidsOf(wall, 'piece');
+    expect(top(board)).toBeCloseTo(4.8, 4);
+    expect(top(sealed)).toBeCloseTo(own.thicknessMm, 4);
+    disposeWall(wall);
+  });
 });
 
 describe('a wall cut from sheet (sheet-pieces, #112)', () => {
