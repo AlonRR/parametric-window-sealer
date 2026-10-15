@@ -16,6 +16,8 @@ const GROUPS: Record<string, string> = {
   collar: "The hose port's collar, in mm. Starting values; a test print confirms them.",
   rim: 'The rim round each measured cutout, in mm. Starting values; a test print confirms them.',
   insert: "The sliding inserts' shutters, in mm: how far each slides and the clearance above and below.",
+  model:
+    'A 3D model of the appliance to cut the wall round: its file in base64, the side facing the room, and its piece.',
   clamp: "The clamps' jaws, in mm: how far each slides and how far its lip stands out. A test print confirms them.",
   seal:
     'The seal: none, foam tape, or gaskets printed in TPU to the tape’s size. Tape settings without a kind mean tape; ' +
@@ -106,16 +108,19 @@ function leaf(
   list?: ListKind,
   onOff = false,
   text = false,
+  whole = false,
 ): z.ZodType {
   const base = list
     ? z.array(ITEMS[list])
     : onOff
       ? z.boolean()
       : text
-        ? z.string() // the SVG tile's drawing: an SVG file's text
-        : values === undefined
-          ? z.number()
-          : choices(values);
+        ? z.string() // the SVG tile's drawing, or a model's file in base64
+        : whole
+          ? z.number().int().min(0) // a model's column or row
+          : values === undefined
+            ? z.number()
+            : choices(values);
   const described = base.describe(help);
   return required ? described : described.optional();
 }
@@ -146,7 +151,8 @@ export function settingsSchema(): z.ZodObject {
       if (next instanceof z.ZodType) throw new Error(`${s.path} sits inside the setting ${key}`);
       at = at[key] = next;
     }
-    at[last] = leaf(s.help, s.values, REQUIRED.has(s.path), s.list, s.onOff === true, s.text === true);
+    const text = s.text === true || s.binary === true;
+    at[last] = leaf(s.help, s.values, REQUIRED.has(s.path), s.list, s.onOff === true, text, s.whole === true);
   }
   return toSchema(tree, '').describe(
     "The window's settings in the library's shape; every length in mm. Only the opening is required; " +

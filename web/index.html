@@ -460,6 +460,11 @@
           <label>
             <input type="radio" name="appliance" value="insert" /> Something else, in a sliding insert
           </label>
+          <!-- A model of the appliance (mesh-appliance, #35): its file read into the hidden modelFile
+            field, its outline seen from the room cut through one piece with the cutout's rim. -->
+          <label>
+            <input type="radio" name="appliance" value="model" /> Something else: cut round its 3D model
+          </label>
           <!-- A window AC (window-ac, #24): the edge facing the unit meets it (C49, C50). -->
           <label><input type="radio" name="appliance" value="ac" /> Window air conditioner</label>
           <div data-testid="ac" data-show-when="appliance=ac" hidden>
@@ -618,6 +623,45 @@
             </p>
           </div>
           <span class="error" data-testid="error-inserts"></span>
+          <div data-testid="model" data-show-when="appliance=model" hidden>
+            <label>
+              The model’s file
+              <input type="file" accept=".stl,.obj,.3mf" data-part="model-file" />
+            </label>
+            <p class="note" data-testid="model-name">No file chosen yet.</p>
+            <p class="note">
+              An STL, OBJ or 3MF file of the appliance, drawn in mm. The wall is cut round its outline
+              seen from the room, 1 mm clear of it, with a rim round it on the room side, as a cutout's
+              (under Advanced). The file stays on your computer.
+            </p>
+            <label>
+              Which side of the model faces the room
+              <select name="modelView">
+                <option value="front">Its front: the front view, seen from −Y with Z up</option>
+                <option value="back">Its back</option>
+                <option value="left">Its left side</option>
+                <option value="right">Its right side: seen from +X with Z up</option>
+                <option value="top">Its top: the top view, seen from +Z with Y up</option>
+                <option value="bottom">Its underside</option>
+              </select>
+            </label>
+            <span class="error" data-testid="error-modelView"></span>
+            <label>
+              Column
+              <input data-part="column" inputmode="numeric" autocomplete="off" />
+            </label>
+            <label>
+              Row
+              <input data-part="row" inputmode="numeric" autocomplete="off" />
+            </label>
+            <p class="note">
+              The piece the model is centred in, counted from 1 at the bottom left, seen from the
+              room. It starts in the bottom row's middle piece.
+            </p>
+            <span class="error" data-testid="error-modelColumn"></span>
+            <span class="error" data-testid="error-modelRow"></span>
+          </div>
+          <span class="error" data-testid="error-modelFile"></span>
         </fieldset>
 
         <!-- The seal (seal-tape, #15): a choice starting at none (Q122), and foam tape from the
@@ -1248,6 +1292,10 @@
         <input type="hidden" name="fans" />
         <input type="hidden" name="clamps" />
         <input type="hidden" name="inserts" />
+        <!-- The model of the appliance: its file in base64, and its piece, 0 and 0 for the starting one. -->
+        <input type="hidden" name="modelFile" />
+        <input type="hidden" name="modelColumn" />
+        <input type="hidden" name="modelRow" />
         <!-- Every piece's own fill, written as the command's --piece-fill takes them (C28). -->
         <input type="hidden" name="pieceFills" />
       </form>
@@ -1268,6 +1316,7 @@
         <ul data-testid="plan-fans" data-plan="fans"></ul>
         <ul data-testid="plan-clamps" data-plan="clamps"></ul>
         <ul data-testid="plan-inserts" data-plan="inserts"></ul>
+        <ul data-testid="plan-model" data-plan="model"></ul>
         <ul data-testid="plan-units" data-plan="units"></ul>
         <p data-testid="plan-seal" data-plan="seal"></p>
         <p data-testid="plan-fill" data-plan="fill"></p>

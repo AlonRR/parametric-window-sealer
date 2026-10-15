@@ -8,6 +8,23 @@ import { SETTING_FLAGS, settingAt } from '../src/flags.js';
 const LISTED_PRINTER: Params = { ...EXAMPLE_PARAMS, printer: { kind: 'model', id: 'prusa-mk4s' } };
 const CUSTOM_PRINTER: Params = { ...EXAMPLE_PARAMS, printer: { kind: 'custom', widthMm: 250, heightMm: 210 } };
 
+// A model of the appliance, for the settings read only with one: a binary STL box 120 × 50 × 80 mm,
+// in base64 as the setting holds it.
+function boxFile(): string {
+  const corners = [0, 0, 0, 120, 0, 0, 120, 50, 0, 0, 50, 0, 0, 0, 80, 120, 0, 80, 120, 50, 80, 0, 50, 80];
+  const faces = [
+    0, 2, 1, 0, 3, 2, 4, 5, 6, 4, 6, 7, 0, 1, 5, 0, 5, 4, 1, 2, 6, 1, 6, 5, 2, 3, 7, 2, 7, 6, 3, 0, 4, 3, 4, 7,
+  ];
+  const bytes = Buffer.alloc(84 + 50 * 12);
+  bytes.writeUInt32LE(12, 80);
+  faces.forEach((c, i) => {
+    for (let a = 0; a < 3; a++) {
+      bytes.writeFloatLE(corners[3 * c + a] ?? 0, 84 + 50 * Math.floor(i / 3) + 12 + 12 * (i % 3) + 4 * a);
+    }
+  });
+  return bytes.toString('base64');
+}
+
 describe('the setting flags (Q90)', () => {
   it('one flag for each field of the page, and none without one', () => {
     const fields = Object.keys(toFormValues(EXAMPLE_PARAMS)).sort();
@@ -68,6 +85,7 @@ describe('the setting flags (Q90)', () => {
       'tpu-joints',
       'fill',
       'fill-style',
+      'model-view', // the side of a model facing the room (#35)
     ]);
   });
 
@@ -83,6 +101,7 @@ describe('the setting flags (Q90)', () => {
       ...(f.path.startsWith('fill.') && f.path !== 'fill.kind' ? { fill: 'grid' } : {}), // and with a pattern
       ...(f.field === 'wall' ? { thicknessMm: '10' } : {}), // a double wall needs panels thick enough
       ...(f.path.startsWith('edges.roles.') ? { seal: 'tpu' } : {}), // an edge in a frame, a TPU gasket
+      ...(f.path.startsWith('model.') ? { modelFile: boxFile() } : {}), // read only with a model
     };
     for (const value of f.values ?? []) {
       expect(readParams({ ...base, [f.field]: value })).toMatchObject({ ok: true });

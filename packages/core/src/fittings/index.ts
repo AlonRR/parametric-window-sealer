@@ -12,6 +12,7 @@ import { MEASURED_CUTOUT } from './measured-cutout.js';
 import { FAN_MOUNT } from './fan-mount.js';
 import { CLAMPS } from './clamps.js';
 import { SLIDING_INSERT } from './insert.js';
+import { APPLIANCE_MODEL } from './appliance-model.js';
 
 export * from './define.js';
 export * from './place.js';
@@ -20,8 +21,16 @@ export * from './measured-cutout.js';
 export * from './fan-mount.js';
 export * from './clamps.js';
 export * from './insert.js';
+export * from './appliance-model.js';
 
-export const FITTINGS: readonly FittingDefinition[] = [HOSE_PORT, MEASURED_CUTOUT, FAN_MOUNT, CLAMPS, SLIDING_INSERT];
+export const FITTINGS: readonly FittingDefinition[] = [
+  HOSE_PORT,
+  MEASURED_CUTOUT,
+  FAN_MOUNT,
+  CLAMPS,
+  SLIDING_INSERT,
+  APPLIANCE_MODEL,
+];
 
 // The fittings' source in a wall's parameters.
 export const fittingSource = (
@@ -32,6 +41,7 @@ export const fittingSource = (
   fans: params.fans,
   clamps: params.clamps,
   inserts: params.inserts,
+  model: params.model,
   collar: params.collar,
   socket: params.socket,
   rim: params.rim,

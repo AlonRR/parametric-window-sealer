@@ -1,9 +1,9 @@
 // What passes through the wall, on the page: the hose ports (hose-port, #12), the measured
-// cutout (measured-cutout, #23), the fan (fan-mount, #28), the clamps (clamps, #32) and the
-// sliding insert (#38). Their controls are not fields of their own: they are written into the
-// hidden fields as the command's --port, --cutout, --fan, --clamp and --insert take them (Q114,
-// C44), so the library checks them all. Each box shows only for its answer to "What is in the
-// window?" (data-show-when in the page).
+// cutout (measured-cutout, #23), the fan (fan-mount, #28), the clamps (clamps, #32), the
+// sliding insert (#38) and the model of the appliance (#35). Their controls are not fields of
+// their own: they are written into the hidden fields as the command's --port, --cutout, --fan,
+// --clamp, --insert and --model-file take them, so the library checks them all. Each
+// box shows only for its answer to "What is in the window?" (data-show-when in the page).
 import { FANS } from 'parametric-window-sealer';
 import type { FieldErrors } from 'parametric-window-sealer';
 import { option, setValue, valueOf } from './form-fields';
@@ -226,6 +226,58 @@ export function exhaustFan(form: HTMLFormElement): FormPart | null {
     },
     placed(params) {
       showPlacedPiece(box, params.fans[0]);
+    },
+  };
+}
+
+// A model of the appliance (mesh-appliance, #35): its file read as its bytes in base64 into the
+// hidden modelFile field, kept while another answer is chosen; its piece as the port's,
+// written as 0 and 0 for the starting piece. The side facing the room is a field of its own.
+export function applianceModel(form: HTMLFormElement, changed: () => void): FormPart | null {
+  const box = form.querySelector<HTMLElement>('[data-testid="model"]');
+  const input = box?.querySelector<HTMLInputElement>('[data-part="model-file"]');
+  const name = box?.querySelector<HTMLElement>('[data-testid="model-name"]');
+  if (!box || !input || !name) return null;
+  let file = '';
+  const write = (text: string, column: string, row: string) => {
+    setValue(form, 'modelFile', text);
+    setValue(form, 'modelColumn', column);
+    setValue(form, 'modelRow', row);
+  };
+  return {
+    load() {
+      input.addEventListener('change', () => {
+        const chosen = input.files?.[0];
+        if (chosen === undefined) return;
+        name.textContent = `Reading ${chosen.name}…`;
+        const reader = new FileReader();
+        reader.addEventListener('load', () => {
+          const url = typeof reader.result === 'string' ? reader.result : '';
+          file = url.slice(url.indexOf(',') + 1); // after "data:…;base64,"
+          name.textContent = `Using ${chosen.name}.`;
+          changed();
+        });
+        reader.readAsDataURL(chosen);
+      });
+    },
+    sync(): FieldErrors {
+      if (valueOf(form, 'appliance') !== 'model') {
+        write('', '0', '0');
+        return {};
+      }
+      const [column, row] = [read(box, 'column'), read(box, 'row')];
+      // A problem leaves a file the library refuses, so nothing is planned from it.
+      const problem =
+        file === '' ? 'Choose the model’s file: an STL, OBJ or 3MF file.' : pieceProblem(column, row, 'Model');
+      if (problem !== undefined) {
+        write('!', '0', '0');
+        return { modelFile: problem };
+      }
+      write(file, column === '' ? '0' : column, row === '' ? '0' : row);
+      return {};
+    },
+    placed(params) {
+      showPlacedPiece(box, params.model.file === '' ? undefined : params.model);
     },
   };
 }

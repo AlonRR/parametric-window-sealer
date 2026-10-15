@@ -13,6 +13,7 @@ import type { CollarParams, PortSetting } from './port.js';
 import { DEFAULT_RIM } from './cutout.js';
 import { DEFAULT_CLAMP } from './clamp.js';
 import { DEFAULT_INSERT } from './insert.js';
+import { NO_MODEL } from './appliance-model.js';
 import { DEFAULT_SOCKET } from './socket.js';
 import type { CutoutSetting, Rectangle, RimParams } from './cutout.js';
 import type { TapeFit } from './tape.js';
@@ -196,6 +197,7 @@ export function buildPieces(
     fans: [],
     clamps: [],
     inserts: [],
+    model: NO_MODEL,
     collar,
     socket: DEFAULT_SOCKET,
     rim,

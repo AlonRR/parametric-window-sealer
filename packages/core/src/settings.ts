@@ -16,16 +16,19 @@ import { FANS } from './fan.js';
 import { PIECE_SOURCES } from './sheet.js';
 import { COLOURS, MATERIAL_KINDS } from './material.js';
 import { PORT_LOCKS } from './socket.js';
+import { MODEL_VIEWS } from './appliance-model.js';
 import type { FieldName, FormValues, Params } from './params.js';
 
 export interface Setting {
   field: FieldName; // the page's field
   path: string; // where it sits in the library's shape, as `edges.track.widthMm`
   help: string; // in the page's words
-  values?: readonly string[]; // a choice; otherwise a length in mm, unless a list, on or off, or text
+  values?: readonly string[]; // a choice; otherwise a length in mm, unless one of the kinds below
   list?: ListKind; // a list in the shape, written in the form as the command's --port takes it
   onOff?: true; // true or false in the shape, written yes or no in the form
   text?: true; // text in the shape and in the form, as an SVG file's
+  binary?: true; // a file's bytes in base64 in the shape and in the form, as a 3D model's
+  whole?: true; // a whole number from 0, not a length: a column or a row
 }
 
 const DIVISION = ['equal', 'full-plus-filler'] as const;
@@ -349,8 +352,12 @@ export const SETTINGS: readonly Setting[] = [
       'stands round it on the room side, lined with the seal if there is one.',
     list: 'cutouts',
   },
-  { field: 'rimDepthMm', path: 'rim.depthMm', help: "How far a cutout's rim stands out on the room side." },
-  { field: 'rimWallMm', path: 'rim.wallMm', help: "The cutout's rim's wall." },
+  {
+    field: 'rimDepthMm',
+    path: 'rim.depthMm',
+    help: 'How far the rim round a cutout or a model stands out on the room side.',
+  },
+  { field: 'rimWallMm', path: 'rim.wallMm', help: 'The wall of the rim round a cutout or a model.' },
   { field: 'rimClearanceMm', path: 'rim.clearanceMm', help: 'Clearance per side between the appliance and the rim.' },
   {
     field: 'fans',
@@ -390,6 +397,34 @@ export const SETTINGS: readonly Setting[] = [
     field: 'insertClearanceMm',
     path: 'insert.clearanceMm',
     help: 'Clearance above and below the appliance in an insert.',
+  },
+  {
+    field: 'modelFile',
+    path: 'model.file',
+    help:
+      'A 3D model of the appliance to cut the wall round: an STL, OBJ or 3MF file in mm, as its bytes in base64; ' +
+      "empty for none. Its outline seen from the room is cut through one piece, with the cutout's rim round it.",
+    binary: true,
+  },
+  {
+    field: 'modelView',
+    path: 'model.view',
+    help:
+      'Which side of the model faces the room, as a modelling program names its views: front (seen from -Y, Z up), ' +
+      'back, left, right (seen from +X, Z up), top (seen from +Z, Y up) or bottom.',
+    values: MODEL_VIEWS,
+  },
+  {
+    field: 'modelColumn',
+    path: 'model.column',
+    help: "The model's piece: its column from 1 at the left, seen from the room; 0, with row 0, for the bottom row's middle piece.",
+    whole: true,
+  },
+  {
+    field: 'modelRow',
+    path: 'model.row',
+    help: "The model's piece: its row from 1 at the bottom; 0, with column 0, for the bottom row's middle piece.",
+    whole: true,
   },
 ];
 

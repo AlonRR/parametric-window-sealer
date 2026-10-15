@@ -65,8 +65,10 @@ describe('the server', () => {
       expect(node.description).toBe(s.help);
       if (s.onOff)
         expect(node.type).toBe('boolean'); // a place for the tape: true or false
-      else if (s.text)
-        expect(node.type).toBe('string'); // the SVG tile's drawing
+      else if (s.text || s.binary)
+        expect(node.type).toBe('string'); // the SVG tile's drawing; a model's file in base64
+      else if (s.whole)
+        expect(node).toMatchObject({ type: 'integer', minimum: 0 }); // the model's column and row
       else if (s.values) expect(node.enum).toEqual([...s.values]);
     }
     expect(settings.required).toEqual(['openingWidthMm', 'openingHeightMm']);
@@ -318,6 +320,44 @@ describe('window_sealer_plan_wall', () => {
     const page = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { drawing: '<html/>' } } });
     expect(page.isError).toBe(true);
     expect(page.text).toContain('The file is not an SVG drawing: it has no svg element at its root.');
+  });
+
+  it('a model of the appliance: its file in base64, cut round in its piece (#35)', async () => {
+    const { call } = await connect();
+    // A binary STL box 120 mm across, 50 mm deep and 80 mm high.
+    const corners = [
+      [0, 0, 0],
+      [120, 0, 0],
+      [120, 50, 0],
+      [0, 50, 0],
+      [0, 0, 80],
+      [120, 0, 80],
+      [120, 50, 80],
+      [0, 50, 80],
+    ];
+    const faces = [
+      0, 2, 1, 0, 3, 2, 4, 5, 6, 4, 6, 7, 0, 1, 5, 0, 5, 4, 1, 2, 6, 1, 6, 5, 2, 3, 7, 2, 7, 6, 3, 0, 4, 3, 4, 7,
+    ];
+    const bytes = Buffer.alloc(84 + 50 * 12);
+    bytes.writeUInt32LE(12, 80);
+    faces.forEach((c, i) => {
+      for (const [a, v] of (corners[c] ?? []).entries()) {
+        bytes.writeFloatLE(v, 84 + 50 * Math.floor(i / 3) + 12 + 12 * (i % 3) + 4 * a);
+      }
+    });
+    const file = bytes.toString('base64');
+    const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, model: { file, view: 'top' } } });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['settings'].model).toEqual({ file, view: 'top', column: 2, row: 1 });
+    expect(r.data['summary'].model).toEqual([
+      'Model: the appliance in the STL file, 120 × 50 mm seen from its top, in column 2, row 1, through an opening ' +
+        '1 mm clear of its outline, in a 15 mm rim.',
+    ]);
+    const bad = await call('window_sealer_plan_wall', {
+      settings: { ...OPENING, model: { file: 'bm90IGEgbWVzaA==' } },
+    });
+    expect(bad.isError).toBe(true);
+    expect(bad.text).toContain('The file is not a mesh: choose an STL, OBJ or 3MF file.');
   });
 
   it('pieces with fills of their own (#21)', async () => {

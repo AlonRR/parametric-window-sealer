@@ -14,6 +14,7 @@ import {
   toFormValues,
 } from '../src/index.js';
 import type { Params } from '../src/index.js';
+import { boxFile } from './model-file.js';
 
 const CUSTOM_PRINTER: Params = { ...EXAMPLE_PARAMS, printer: { kind: 'custom', widthMm: 250, heightMm: 210 } };
 const LISTED_PRINTER: Params = { ...EXAMPLE_PARAMS, printer: { kind: 'model', id: 'prusa-mk4s' } };
@@ -69,6 +70,7 @@ describe('SETTINGS: every setting on the page', () => {
         ...(s.path.startsWith('fill.') && s.path !== 'fill.kind' ? { fill: 'grid' } : {}),
         ...(s.field === 'wall' ? { thicknessMm: '10' } : {}), // a double wall needs panels thick enough (#119)
         ...(s.path.startsWith('edges.roles.') ? { seal: 'tpu' } : {}), // an edge in a frame, a TPU gasket (#120)
+        ...(s.path.startsWith('model.') ? { modelFile: boxFile(120, 50, 80) } : {}), // read only with a model (#35)
       };
       for (const value of s.values ?? []) {
         expect(readParams({ ...base, [s.field]: value })).toMatchObject({ ok: true });

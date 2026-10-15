@@ -19,10 +19,11 @@ import {
   tapeFit,
 } from '../src/index.js';
 import type { FittingDefinition, InPiece, Params, SealParams } from '../src/index.js';
+import { modelFileOf } from './model-file.js';
 
 const engine = await loadEngine();
 
-// A wall of pieces up to 300 mm, with a port, a cutout, a fan and a clamp.
+// A wall of pieces up to 300 mm, with a port, a cutout, a fan, a clamp, an insert and a model.
 const params: Params = {
   ...EXAMPLE_PARAMS,
   openingWidthMm: 1200,
@@ -33,6 +34,7 @@ const params: Params = {
   fans: [{ sizeMm: 120, column: 1, row: 4 }],
   clamps: [{ widthMm: 120, heightMm: 80, column: 2, row: 3 }],
   inserts: [{ widthMm: 100, heightMm: 80, column: 3, row: 3 }],
+  model: { file: modelFileOf(engine.Manifold.cube([120, 50, 80])), view: 'front', column: 4, row: 2 },
 };
 const plan = planWall(params);
 const SEALS: Record<string, SealParams> = {
@@ -55,7 +57,7 @@ describe('every kind of fitting', () => {
   it('has a kind of its own', () => {
     const kinds = FITTINGS.map((f) => f.kind);
     expect(new Set(kinds).size).toBe(kinds.length);
-    expect(kinds).toEqual(['port', 'cutout', 'fan', 'clamp', 'insert']);
+    expect(kinds).toEqual(['port', 'cutout', 'fan', 'clamp', 'insert', 'model']);
   });
 
   for (const [seal, sealParams] of Object.entries(SEALS)) {
@@ -131,12 +133,13 @@ describe('every kind of fitting', () => {
       fan: [],
       clamp: JAWS,
       insert: SHUTTERS,
+      model: [],
     });
   });
   it('without the TPU seal, prints only what a kind always needs: the port’s cap, the clamp’s jaws and the insert’s shutters', () => {
     const source = fittingSource({ ...params, seal: SEALS['tape'] ?? EXAMPLE_PARAMS.seal });
     const names = Object.fromEntries(FITTINGS.map((k) => [k.kind, k.parts(source, undefined).map((p) => p.name)]));
-    expect(names).toEqual({ port: ['cap-150-print-1'], cutout: [], fan: [], clamp: JAWS, insert: SHUTTERS });
+    expect(names).toEqual({ port: ['cap-150-print-1'], cutout: [], fan: [], clamp: JAWS, insert: SHUTTERS, model: [] });
   });
   for (const kind of FITTINGS) {
     // A kind need print nothing (a fan is screwed straight on); what one prints is held to this.

@@ -24,7 +24,7 @@ divides the opening into pieces your printer can make, joins them with connector
 cross pieces that hold by crush ribs and a filament pin, or with puzzle dovetails, sliding dovetail rails or bolted flanges ([`docs/joints.md`](docs/joints.md)), fits
 edge strips into the window's tracks, shows the wall in 3D and downloads
 every part as STL or 3MF. It fits a hose port that can lock and close ([`docs/hose-port.md`](docs/hose-port.md)), a measured cutout, an exhaust fan, an appliance held by
-clamps ([`docs/clamps.md`](docs/clamps.md)) or in a sliding insert ([`docs/sliding-insert.md`](docs/sliding-insert.md)) or a window air conditioner,
+clamps ([`docs/clamps.md`](docs/clamps.md)) or in a sliding insert ([`docs/sliding-insert.md`](docs/sliding-insert.md)), an appliance cut round from its 3D model ([`docs/meshes.md`](docs/meshes.md)) or a window air conditioner,
 cuts the pieces from sheet instead of printing them if you like ([`docs/sheet-pieces.md`](docs/sheet-pieces.md)),
 warns where the material you print in would get too hot ([`docs/materials.md`](docs/materials.md)),
 fills the gap between a window's two sashes ([`docs/sash-filler.md`](docs/sash-filler.md)),

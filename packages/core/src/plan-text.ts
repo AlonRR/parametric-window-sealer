@@ -23,6 +23,7 @@ import { fillWords } from './fill.js';
 import { fillFor } from './piece-fill.js';
 import { pieceLimit, planParts } from './plan.js';
 import {
+  APPLIANCE_MODEL,
   SLIDING_INSERT,
   CLAMPS,
   FAN_MOUNT,
@@ -56,6 +57,7 @@ export interface PlanText {
   fans: string[]; // one line for each fan (#28)
   clamps: string[]; // one line for each clamp (#32)
   inserts: string[]; // one line for each sliding insert (#38)
+  model: string[]; // the imported model of the appliance, if there is one (#35)
   units: string[]; // one line for each edge against a window AC (#24)
   seal: string;
   fill: string;
@@ -210,6 +212,7 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     fans: FAN_MOUNT.describe(fittingSource(params)),
     clamps: CLAMPS.describe(fittingSource(params)),
     inserts: SLIDING_INSERT.describe(fittingSource(params)),
+    model: APPLIANCE_MODEL.describe(fittingSource(params)),
     units: EDGES.filter((e) => params.edges.roles[e] === 'unit').map(
       (e) =>
         `Window AC: the ${e} edge ${e === 'bottom' ? 'stands on the unit’s top' : e === 'top' ? 'meets the unit’s underside' : 'meets the unit’s side'}.`,

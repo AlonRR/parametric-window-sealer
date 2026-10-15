@@ -8,6 +8,7 @@ import type { SocketParams } from '../socket.js';
 import type { Manifold } from 'manifold-3d';
 import type { ClampParams, ClampSetting } from '../clamp.js';
 import type { InsertParams, InsertSetting } from '../insert.js';
+import type { ModelSetting } from '../appliance-model.js';
 import type { CutoutSetting, Rectangle, RimParams } from '../cutout.js';
 import type { Engine } from '../engine.js';
 import type { FanSetting } from '../fan.js';
@@ -31,6 +32,7 @@ export interface FittingSource {
   fans: readonly Required<FanSetting>[];
   clamps: readonly Required<ClampSetting>[];
   inserts: readonly Required<InsertSetting>[];
+  model: ModelSetting; // the imported model of the appliance, placed; no file, none (#35)
   collar: CollarParams;
   socket: SocketParams; // how the hose ports hold the hose, and their caps and screens (#114)
   rim: RimParams;

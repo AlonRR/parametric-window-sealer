@@ -92,6 +92,10 @@ const FLAG_NAMES: Record<OwnField, string> = {
   inserts: 'insert', // repeatable, as --cutout (#38)
   insertTravelMm: 'insert-travel',
   insertClearanceMm: 'insert-clearance',
+  modelFile: 'model-file', // names a file, read as its bytes (#35)
+  modelView: 'model-view',
+  modelColumn: 'model-column',
+  modelRow: 'model-row',
 };
 
 const PATTERN_FLAGS = new Map<string, string>(PATTERNS.flatMap((p) => p.sizes.map((s) => [s.field, s.flag])));

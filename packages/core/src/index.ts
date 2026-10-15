@@ -47,5 +47,6 @@ export * from './cutout.js';
 export * from './fan.js';
 export * from './clamp.js';
 export * from './insert.js';
+export * from './appliance-model.js';
 export * from './measure.js';
 export * from './mesh/index.js';

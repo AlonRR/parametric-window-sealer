@@ -104,7 +104,11 @@ window-sealer --width 600 --height 1000 --printer-model prusa-mk4s
   opening and four screw holes for a fan of 80, 92, 120 or 140 mm, as its maker draws them;
   `--fan 120@2,1` places it, and `--fan` again adds one. `--insert 120x80` closes two printed shutters round an
   appliance from each side, give or take their travel (`--insert-travel`, 20 mm;
-  `--insert-clearance`, 1 mm above and below). `--clamp 120x80` grips an appliance
+  `--insert-clearance`, 1 mm above and below). `--model-file ac.stl` cuts the wall round a 3D
+  model of the appliance, an STL, OBJ or 3MF file in mm: its outline seen from the room, 1 mm clear,
+  with the cutout's rim; `--model-view` names the side facing the room (`front`, as a modelling
+  program's front view, to start with), and `--model-column` and `--model-row` its piece.
+  `--clamp 120x80` grips an appliance
   measured roughly with four printed jaws on M4 bolts, give or take their travel (`--clamp-travel`,
   10 mm; `--clamp-depth` for the jaws' lips); `--clamp 120x80@2,1` places it, and the jaws are
   among the files. `--collar-depth`, `--collar-wall`,

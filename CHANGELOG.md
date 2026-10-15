@@ -17,6 +17,13 @@ listed under Unreleased.
 
 ### Added
 
+- A wall cut round a 3D model of the appliance: choose **Something else: cut round its 3D model** and
+  its STL, OBJ or 3MF file (`--model-file`, or `model.file` in base64). The model is turned so the side
+  you name faces the room (`--model-view`, as a modelling program's views; the front to start with),
+  and its outline seen from the room is cut through one piece, 1 mm clear of it, with the measured
+  cutout's rim round it (`--model-column` and `--model-row` place it). The plan says what was repaired
+  in the file. How: `docs/meshes.md`.
+
 - Mesh import, in the library: `readMesh` reads an STL (binary or text), OBJ or 3MF file into one mesh
   in mm, repairs what it can without guessing the shape (corners welded, faces of no area dropped,
   faces and parts turned to face outward) and says what it repaired, and refuses a mesh with holes,

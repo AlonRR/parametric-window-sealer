@@ -11,7 +11,7 @@ import { run } from '../src/run.js';
 async function cli(
   args: string[],
   cwd = mkdtempSync(join(tmpdir(), 'window-sealer-')),
-  files: Record<string, string> = {},
+  files: Record<string, string | Uint8Array> = {},
 ) {
   for (const [name, text] of Object.entries(files)) writeFileSync(join(cwd, name), text);
   const out: string[] = [];
@@ -558,6 +558,117 @@ describe('clamps (clamps #32: --clamp, repeatable)', () => {
     const r = await cli(['--help']);
     expect(r.out.replace(/\s+/g, ' ')).toContain('--clamp <width>x<height>[@column,row]');
     expect(r.out.replace(/\s+/g, ' ')).toContain('Give --clamp again for each clamp.');
+  });
+});
+
+describe('a model of the appliance (mesh-appliance #35: --model-file <file>)', () => {
+  // A binary STL box 120 mm across (x), 50 mm deep (y) and 80 mm high (z).
+  const box = (x: number, y: number, z: number): Uint8Array => {
+    const corners = [
+      [0, 0, 0],
+      [x, 0, 0],
+      [x, y, 0],
+      [0, y, 0],
+      [0, 0, z],
+      [x, 0, z],
+      [x, y, z],
+      [0, y, z],
+    ];
+    const faces = [
+      [0, 2, 1],
+      [0, 3, 2],
+      [4, 5, 6],
+      [4, 6, 7],
+      [0, 1, 5],
+      [0, 5, 4],
+      [1, 2, 6],
+      [1, 6, 5],
+      [2, 3, 7],
+      [2, 7, 6],
+      [3, 0, 4],
+      [3, 4, 7],
+    ];
+    const bytes = new Uint8Array(84 + 50 * faces.length);
+    const view = new DataView(bytes.buffer);
+    view.setUint32(80, faces.length, true);
+    for (const [f, face] of faces.entries()) {
+      for (const [k, c] of face.entries()) {
+        for (const [a, v] of (corners[c] ?? []).entries()) view.setFloat32(84 + 50 * f + 12 + 12 * k + 4 * a, v, true);
+      }
+    }
+    return bytes;
+  };
+  const AC = { 'ac.stl': box(120, 50, 80) };
+
+  it('--model-file reads the file and cuts the wall round it in the starting piece, saying so', async () => {
+    const r = await cli([...OPENING, '--model-file', 'ac.stl', '--dry-run'], undefined, AC);
+    expect(r.code).toBe(0);
+    expect(r.out).toContain(
+      'Model: the appliance in the STL file, 120 × 80 mm seen from its front, in column 2, row 1, through an ' +
+        'opening 1 mm clear of its outline, in a 15 mm rim.',
+    );
+    expect(r.out).toContain('  piece-c2-r1-197.7x198.6-model-120x80.stl');
+  });
+
+  it('--model-view turns it; --model-column and --model-row place it; the file is kept in the settings', async () => {
+    const r = await cli(
+      [...OPENING, '--model-file', 'ac.stl', '--model-view', 'right', '--model-column', '1', '--model-row', '2'],
+      undefined,
+      AC,
+    );
+    expect(r.code).toBe(0);
+    const out = await cli(
+      [
+        ...OPENING,
+        '--model-file',
+        'ac.stl',
+        '--model-view',
+        'right',
+        '--model-column',
+        '1',
+        '--model-row',
+        '2',
+        '--dry-run',
+        '--json',
+      ],
+      undefined,
+      AC,
+    );
+    const { params, summary } = json(out.out);
+    expect(params.model).toEqual({
+      file: Buffer.from(AC['ac.stl']).toString('base64'),
+      view: 'right',
+      column: 1,
+      row: 2,
+    });
+    expect(summary.model).toEqual([expect.stringContaining('50 × 80 mm seen from its right side, in column 1, row 2')]);
+    const written = LISTED(join(r.cwd, 'window-sealer-600x1000')).filter((n) => n.includes('-model-'));
+    expect(written).toEqual([expect.stringMatching(/^piece-c1-r2-.*-model-50x80\.stl$/)]);
+  });
+
+  it('refuses a file it cannot read, one that is not a mesh, or one too big for its piece, naming the flag', async () => {
+    const missing = await cli([...OPENING, '--model-file', 'nowhere.stl', '--dry-run']);
+    expect(missing.code).toBe(2);
+    expect(missing.err).toMatch(/^--model-file: cannot read nowhere\.stl: /);
+    const text = await cli([...OPENING, '--model-file', 'notes.txt', '--dry-run'], undefined, { 'notes.txt': 'notes' });
+    expect(text.code).toBe(2);
+    expect(text.err).toContain('--model-file: The file is not a mesh: choose an STL, OBJ or 3MF file.');
+    const wide = await cli([...OPENING, '--model-file', 'wide.stl', '--dry-run'], undefined, {
+      'wide.stl': box(300, 50, 80),
+    });
+    expect(wide.code).toBe(2);
+    expect(wide.err).toContain(
+      '--model-file: The model’s outline, 300 × 80 mm seen from the room, needs a piece at least',
+    );
+  });
+
+  it('--help names the file and the piece, and does not print a starting file', async () => {
+    const r = await cli(['--help']);
+    const help = r.out.replace(/\s+/g, ' ');
+    expect(help).toContain('--model-file <file.stl|.obj|.3mf>');
+    expect(help).toContain('--model-view <front|back|left|right|top|bottom>');
+    expect(help).toContain('--model-column <n>');
+    expect(help).toContain('--model-row <n>');
   });
 });
 

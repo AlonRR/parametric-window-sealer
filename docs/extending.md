@@ -25,8 +25,10 @@ the command and a property in the MCP server's schema.
      sections goes after the reading in `readParams`; the checks keep their order, as the
      command and the MCP server list the problems in it.
 2. **The settings list** (`packages/core/src/settings.ts`): its entry in `SETTINGS`: the field,
-   its path in the library's shape, its help in the page's words, and its values if it is a
-   choice. The MCP server's schema is built from this list; a new group in the shape also wants
+   its path in the library's shape, its help in the page's words, and its kind if it is not a
+   length in mm: a choice's `values`, a `list`, `onOff`, `text` (an SVG file's text, which the
+   command reads from the file named), `binary` (a file's bytes in base64, as the appliance's
+   model; the command reads the file named) or `whole` (a whole number, as a column). The MCP server's schema is built from this list; a new group in the shape also wants
    its description in `GROUPS` in `packages/mcp/src/schema.ts`.
 3. **The command** (`packages/cli/src/flags.ts`): its flag in `FLAG_NAMES`.
 4. **The page** (`web/index.html`): a control named after the field, its label, and
@@ -109,7 +111,8 @@ own for its openings, as `organiser.test.ts` has for Skådis, and a section in
 ## A new fitting
 
 A fitting is something in one piece that the appliance or its hose passes through: the hose
-port, the measured cutout and the fan mount today, clamps or a sliding insert later. Each kind is
+port, the measured cutout, the fan mount, the clamps, the sliding insert and the cut round the
+appliance's model. Each kind is
 one file in `packages/core/src/fittings/` and one entry in `FITTINGS` (`fittings/index.ts`),
 whose order is the order the kinds are listed in: keep it the order they are placed in (step 2
 below). Write its `FittingDefinition`

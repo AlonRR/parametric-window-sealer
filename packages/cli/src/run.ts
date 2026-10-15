@@ -9,6 +9,7 @@ import {
   EXAMPLE_PARAMS,
   checkChoice,
   describePlan,
+  encodeModelFile,
   makeWall,
   planFiles,
   planWall,
@@ -102,13 +103,17 @@ function help(): string {
       ? lists[f.list]
       : f.text
         ? '<file.svg>'
-        : f.values === undefined
-          ? unit
-          : long
-            ? '<id>'
-            : `<${f.values.join('|')}>`;
-    // The opening has no starting value, and a drawing's is too long to show.
-    const start = f.flag === 'width' || f.flag === 'height' || f.text ? '' : starting[f.field];
+        : f.binary
+          ? '<file.stl|.obj|.3mf>'
+          : f.whole
+            ? '<n>'
+            : f.values === undefined
+              ? unit
+              : long
+                ? '<id>'
+                : `<${f.values.join('|')}>`;
+    // The opening has no starting value, and a drawing's or a model's is too long to show.
+    const start = f.flag === 'width' || f.flag === 'height' || f.text || f.binary ? '' : starting[f.field];
     const text = f.list
       ? `${f.help} Give --${f.flag} again for each ${each[f.list]}.`
       : long
@@ -233,13 +238,15 @@ export async function run(args: string[], io: Io): Promise<number> {
       else start = read;
     }
   }
-  // A text setting's flag names a file, whose text is the setting: the SVG tile's drawing (#27).
+  // A text setting's flag names a file, whose text is the setting: the SVG tile's drawing (#27); a
+  // binary one, a file whose bytes are: the appliance's model (#35).
   const flags: Flags = Object.fromEntries(SETTING_FLAGS.map((f) => [f.flag, text(f.flag)]));
   for (const f of SETTING_FLAGS) {
     const file = flags[f.flag];
-    if (f.text !== true || file === undefined) continue;
+    if ((f.text !== true && f.binary !== true) || file === undefined) continue;
     try {
-      flags[f.flag] = readFileSync(resolve(io.cwd, file), 'utf8');
+      const path = resolve(io.cwd, file);
+      flags[f.flag] = f.binary ? encodeModelFile(readFileSync(path)) : readFileSync(path, 'utf8');
     } catch (error) {
       problems.push({ flag: `--${f.flag}`, message: `cannot read ${file}: ${messageOf(error)}` });
     }

@@ -56,6 +56,7 @@ import {
   insertProblem,
   fanProblem,
   placeFittings,
+  placeModel,
   portProblem,
 } from './fittings/index.js';
 import { formatFans, parseFans } from './fan.js';
@@ -64,6 +65,8 @@ import { DEFAULT_CLAMP, formatClamps, parseClamps } from './clamp.js';
 import type { ClampParams, ClampSetting } from './clamp.js';
 import { DEFAULT_INSERT, formatInserts, parseInserts } from './insert.js';
 import type { InsertParams, InsertSetting } from './insert.js';
+import { MODEL_VIEWS, NO_MODEL, readApplianceModel } from './appliance-model.js';
+import type { ApplianceModel, ModelSetting } from './appliance-model.js';
 import type { InPiece } from './fittings/index.js';
 import { capitalised, hundredth, mm } from './words.js';
 
@@ -95,6 +98,7 @@ export interface Params {
   clamp: ClampParams; // their jaws
   inserts: Required<InsertSetting>[]; // appliances in a sliding insert (#38); none to start with
   insert: InsertParams; // its shutters
+  model: ModelSetting; // an imported model of the appliance to cut round (#35); none to start with
   coupon: boolean; // the joint's test coupon in the download too (joint-lock, #110)
   sheet: SheetParams; // the pieces printed, or cut from sheet (sheet-pieces, #112)
   material: MaterialParams; // what the parts are printed in, and whether the wall is in sun (#113)
@@ -132,6 +136,7 @@ export const EXAMPLE_PARAMS: Params = {
   clamp: DEFAULT_CLAMP,
   inserts: [],
   insert: DEFAULT_INSERT,
+  model: NO_MODEL,
   coupon: false,
   sheet: DEFAULT_SHEET,
   material: DEFAULT_MATERIAL,
@@ -224,6 +229,10 @@ export const FIELD_NAMES = [
   'inserts',
   'insertTravelMm',
   'insertClearanceMm',
+  'modelFile',
+  'modelView',
+  'modelColumn',
+  'modelRow',
   // Each pattern's sizes, as the patterns declare them (patterns/).
   ...PATTERN_FIELDS,
 ] as const;
@@ -743,6 +752,35 @@ function readInserts(r: FormReader): { insert: InsertParams; given: InsertSettin
   return { insert, given: parsed.ok ? parsed.inserts : [] };
 }
 
+// The imported model of the appliance (mesh-appliance, #35): its file, the side facing the room
+// and its piece, read only when there is a file; placed after the inserts.
+
+const WHOLE_MESSAGE = 'Enter a whole number, 0 or more.';
+const isWhole = (n: number) => Number.isInteger(n) && n >= 0;
+
+const modelForm = (p: Params): FormValues => ({
+  modelFile: p.model.file,
+  modelView: p.model.view,
+  modelColumn: String(p.model.column),
+  modelRow: String(p.model.row),
+});
+
+function readModel(r: FormReader): { given: ModelSetting; model: ApplianceModel | undefined } {
+  const file = r.values.modelFile ?? '';
+  const used = file !== '';
+  const view = r.oneOfIfUsed('modelView', used, MODEL_VIEWS, NO_MODEL.view);
+  const column = r.numberIfUsed('modelColumn', used, 0, isWhole, WHOLE_MESSAGE);
+  const row = r.numberIfUsed('modelRow', used, 0, isWhole, WHOLE_MESSAGE);
+  if (used && isWhole(column) && isWhole(row) && (column === 0) !== (row === 0)) {
+    r.fail(column === 0 ? 'modelColumn' : 'modelRow', 'Give the model’s column and row, or 0 for both.');
+  }
+  const given = { file, view, column, row };
+  if (!used) return { given, model: undefined };
+  const read = readApplianceModel(file, view);
+  if (!read.ok) r.fail('modelFile', read.message);
+  return { given, model: read.ok ? read.model : undefined };
+}
+
 // The panel fill (Q141) and each piece's own (#21). A pattern's sizes are read when the wall or
 // any piece uses it (C15), as the tape's are read only with a seal.
 
@@ -826,6 +864,7 @@ export function toFormValues(p: Params): FormValues {
     ...fansForm(p),
     ...clampsForm(p),
     ...insertsForm(p),
+    ...modelForm(p),
   };
 }
 
@@ -855,6 +894,7 @@ export function readParams(values: FormValues): ReadResult {
   const givenFans = readFans(r);
   const { clamp, given: givenClamps } = readClamps(r);
   const { insert, given: givenInserts } = readInserts(r);
+  const { given: givenModel, model: modelRead } = readModel(r);
   if (r.ok) {
     // The edge strips must leave the pieces something to cover.
     const span = panelSpan(opening.openingWidthMm, opening.openingHeightMm, edges, joint, fit);
@@ -906,9 +946,21 @@ export function readParams(values: FormValues): ReadResult {
   // Fittings and pieces' own patterns are placed against the plan they will be in: with any to
   // place, a printed piece keeps every piece to the printer's size, before they are placed.
   const given = [givenPorts, givenCutouts, givenFans, givenClamps, givenInserts];
-  const printedAnyway = given.some((g) => g.length > 0) || pieceFills.some((f) => f.kind !== 'sealed');
+  const printedAnyway =
+    given.some((g) => g.length > 0) || modelRead !== undefined || pieceFills.some((f) => f.kind !== 'sealed');
   const toPlaceIn = { ...base, sheet: printedAnyway ? { ...sheet, source: 'printed' as const } : sheet };
-  const none = { ports: [], pieceFills: [], cutouts: [], rim, fans: [], clamps: [], clamp, inserts: [], insert };
+  const none = {
+    ports: [],
+    pieceFills: [],
+    cutouts: [],
+    rim,
+    fans: [],
+    clamps: [],
+    clamp,
+    inserts: [],
+    insert,
+    model: NO_MODEL,
+  };
   const plan = r.ok ? planWall({ ...toPlaceIn, ...none }) : undefined;
   let ports: Required<PortSetting>[] = [];
   if (plan !== undefined && givenPorts.length > 0) {
@@ -961,14 +1013,30 @@ export function readParams(values: FormValues): ReadResult {
     if (placing.ok) inserts = placing.placed;
     else r.fail('inserts', placing.problem);
   }
+  let model = givenModel;
+  if (r.ok && plan !== undefined && modelRead !== undefined) {
+    const earlier = [
+      { label: 'Port', placed: ports },
+      { label: 'Cutout', placed: cutouts },
+      { label: 'Fan', placed: fans },
+      { label: 'Clamp', placed: clamps },
+      { label: 'Insert', placed: inserts },
+    ];
+    const placing = placeModel(plan, givenModel, modelRead, rim, joint, earlier);
+    if (placing.ok) model = placing.placed;
+    else r.fail('modelFile', placing.problem);
+  }
   if (r.ok && pieceFills.length > 0) {
-    const fitted = { ports, pieceFills: [], cutouts, rim, fans, clamps, clamp, inserts, insert };
+    const fitted = { ports, pieceFills: [], cutouts, rim, fans, clamps, clamp, inserts, insert, model };
     const problem = checkPieceFills(planWall({ ...toPlaceIn, ...fitted }), pieceFills);
     if (problem !== undefined) r.fail('pieceFills', problem);
   }
 
   if (!r.ok) return { ok: false, errors: r.errors };
-  return { ok: true, params: { ...base, ports, pieceFills, cutouts, rim, fans, clamps, clamp, inserts, insert } };
+  return {
+    ok: true,
+    params: { ...base, ports, pieceFills, cutouts, rim, fans, clamps, clamp, inserts, insert, model },
+  };
 }
 
 // A piece the wall has, and one fill for each piece.

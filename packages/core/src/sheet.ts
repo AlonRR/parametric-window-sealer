@@ -31,6 +31,7 @@ type SheetSource = Pick<
   | 'fans'
   | 'clamps'
   | 'inserts'
+  | 'model'
   | 'collar'
   | 'socket'
   | 'rim'
@@ -47,6 +48,7 @@ const FITTING_WORDS: Record<string, string> = {
   fan: 'fan mount',
   clamp: 'clamp',
   insert: 'sliding insert',
+  model: 'model',
 };
 
 // Why a piece is printed though the rest are cut, by column and row from 1; nothing if it is cut.
@@ -65,6 +67,7 @@ export const isCut = (params: SheetSource, cell: Pick<GridPiece, 'column' | 'row
 export const anyPrinted = (params: SheetSource): boolean =>
   params.sheet.source === 'printed' ||
   [params.ports, params.cutouts, params.fans, params.clamps, params.inserts].some((list) => list.length > 0) ||
+  params.model.file !== '' ||
   params.fill.kind !== 'sealed' ||
   params.pieceFills.some((f) => f.kind !== 'sealed');
 
