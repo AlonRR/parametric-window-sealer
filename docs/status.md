@@ -211,8 +211,13 @@ The first four rows were answered before questions carried IDs.
   Q159 decides and the next items becoming `v0.7.0` (recommended, so the versions stay in order);
   cut `v0.7.0` now with all of it and never tag `v0.6.0`; or keep the two releases apart, which
   `main`'s order makes awkward?
+- **Q161.** Other windows (`other-windows`, #43) was never specified. Sliders and hung windows have
+  tracks, and since `compression-edge` (#120) any frame with a flat reveal takes a wall pressed into
+  it: a casement's screen opening, a tilt-and-turn frame, and so also an awning or a hopper window
+  opened in its frame. Close #43 as covered, saying so in `docs/frame.md` (recommended); name the
+  window types still missing; or keep it open for later?
 
-The next free ID is Q161.
+The next free ID is Q162.
 
 ## Repository follow-ups
 
