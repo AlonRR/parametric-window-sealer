@@ -20,8 +20,9 @@ row below, and none needs the MVP rebuilt to add it. **Confirmed by the owner as
 
 **Released as `v0.1.0` on 5 Oct 2026**: every P0 row below is done. **`v0.2.0`, the same day,
 adds the three API rows that need no server** (`api-library`, `api-cli`, `api-mcp-local`; Q101),
-and **`v0.3.0`, the same day again, every P1 row** (C48). Nothing in any of them has been test
-printed yet. After `v0.3.0`, four rows were added at P1, ahead of P2, to make the code easy to
+and **`v0.3.0`, the same day again, every P1 row** (C48). **`v0.4.0`, on 15 Oct 2026, adds the
+P2 rows built so far and the design review's thirteen changes** (Q155). Nothing in any of them
+has been test printed yet. After `v0.3.0`, four rows were added at P1, ahead of P2, to make the code easy to
 extend (Q145): `code-tooling`, `code-params-page`, `fill-registry` and `fitting-registry`. On
 14 Oct, `ci-triggers` was added at P1 so that CI checks each commit once (Q147). P2 began the
 same day (Q148): `pattern-plugins` is covered by `fill-registry`, and `fan-mount` came first,

@@ -18,8 +18,8 @@ flame retardant; it has no wind, rain or UV rating.
 
 ## Status
 
-**Version 0.3.0: the wall with its fittings, seals and patterns, as a page and as an API; not
-yet test printed.** The page in `web/` takes the opening you can see and your window type,
+**Version 0.4.0: the wall with its fittings, seals and patterns, and the design review's changes,
+as a page and as an API; not yet test printed.** The page in `web/` takes the opening you can see and your window type,
 divides the opening into pieces your printer can make, joins them with connector strips and
 cross pieces that hold by crush ribs and a filament pin ([`docs/joints.md`](docs/joints.md)), fits
 edge strips into the window's tracks, shows the wall in 3D and downloads

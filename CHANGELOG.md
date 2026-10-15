@@ -7,10 +7,13 @@ All notable changes to this project are recorded here. The format follows
 The first version, `0.1.0`, is the MVP in [`docs/backlog.md`](docs/backlog.md); `0.2.0` adds the
 API: the library, the command and the MCP server; `0.3.0` adds every P1 item: the hose port, the
 printer list, the tape and TPU seals, the patterns and per-piece fills, the measured cutout, the
-window AC, the offline file and the measuring guide. Changes since the latest version are listed
-under Unreleased.
+window AC, the offline file and the measuring guide; `0.4.0` adds the exhaust fan, the SVG tile,
+the clamps and the sliding insert, and the thirteen changes from the design review against
+published work (Q153). Changes since the latest version are listed under Unreleased.
 
 ## [Unreleased]
+
+## [0.4.0] - 2026-10-15
 
 ### Added
 
