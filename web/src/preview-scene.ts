@@ -31,6 +31,7 @@ import type { Engine } from 'parametric-window-sealer';
 import { meshOf } from 'parametric-window-sealer';
 import { edgeStripSolid, edgeTapeSolid } from 'parametric-window-sealer';
 import { stripWidthMm } from 'parametric-window-sealer';
+import { patternBorderMm } from 'parametric-window-sealer';
 import { crossSolid, pinSolid, planPins, stripSolid } from 'parametric-window-sealer';
 import { buildPiecesWith, fittingSource, placedFittings } from 'parametric-window-sealer';
 import { tpuJoint } from 'parametric-window-sealer';
@@ -86,7 +87,8 @@ export function buildWallScene(engine: Engine, params: Params): Group {
   const pins = planPins(joints, joint);
   // A piece cut from sheet (#112) has no slots for the pins: its holes are drilled.
   const slotted = slotPins(params, plan, pins);
-  const built = buildPiecesWith(engine, plan, thicknessMm, fittings, pattern, { joint, pins: slotted });
+  const hollow = params.wall === 'double' ? { borderMm: patternBorderMm(joint) } : undefined;
+  const built = buildPiecesWith(engine, plan, thicknessMm, fittings, pattern, { joint, pins: slotted }, hollow);
   try {
     built.forEach((piece, i) => {
       const cell = plan.pieces[i];

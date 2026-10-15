@@ -686,6 +686,20 @@
             <input name="thicknessMm" inputmode="decimal" autocomplete="off" />
           </label>
           <span class="error" data-testid="error-thicknessMm"></span>
+          <!-- A double wall for winter (double-wall, #119): single to start with. -->
+          <label>
+            Wall
+            <select name="wall">
+              <option value="single">Single</option>
+              <option value="double">Double, hollow pieces for winter</option>
+            </select>
+          </label>
+          <p class="note" data-show-when="wall=double" hidden>
+            Each plain printed piece is hollow inside the panel thickness: two 1.2 mm skins round an
+            air gap, which roughly halves the heat lost through the wall. It needs panels at least
+            6.4 mm thick, and the track must take them.
+          </p>
+          <span class="error" data-testid="error-wall"></span>
           <!-- What the parts are printed in (material-advice, #113): the plan warns where it gets too hot. -->
           <label>
             Material
@@ -1122,6 +1136,7 @@
         <ul data-testid="plan-rail" data-plan="rail"></ul>
         <ul data-testid="plan-rain" data-plan="rain"></ul>
         <ul data-testid="plan-stop" data-plan="stop"></ul>
+        <ul data-testid="plan-double" data-plan="double"></ul>
         <ul data-testid="plan-warnings" data-plan="warnings"></ul>
         <p><button type="button" id="download-open">Download the pieces...</button></p>
         <!-- The offline file (offline-file, #25): the page as one file, offered here (C55). -->

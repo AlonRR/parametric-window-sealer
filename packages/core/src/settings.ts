@@ -108,6 +108,14 @@ export const SETTINGS: readonly Setting[] = [
   ...axis('height'),
   { field: 'thicknessMm', path: 'thicknessMm', help: 'Panel thickness; with pieces cut from sheet, the sheet’s.' },
   {
+    field: 'wall',
+    path: 'wall',
+    help:
+      'single, or double for winter: each plain printed piece hollow, two skins round an air gap, inside the ' +
+      'panel thickness.',
+    values: ['single', 'double'],
+  },
+  {
     field: 'pieceSource',
     path: 'sheet.source',
     help: 'The pieces printed, or cut from sheet: those with a fitting or a pattern of their own are still printed.',

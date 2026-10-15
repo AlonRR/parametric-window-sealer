@@ -23,6 +23,7 @@ import { longestStripMm, planParts, planWall } from './plan.js';
 import { describePlan } from './plan-text.js';
 import { tapeFit } from './tape.js';
 import { fillPattern } from './fill.js';
+import { patternBorderMm } from './pattern.js';
 import { fillFor } from './piece-fill.js';
 import { gasketShapes, gasketSolid, tpuJoint } from './tpu.js';
 import type { FieldErrors, Params } from './params.js';
@@ -104,7 +105,8 @@ export function buildExport(engine: Engine, params: Params): { pieces: ExportPie
     joint: params.joint,
     pins: slotPins(params, plan, planPins(planParts(params, plan).joints, params.joint)),
   };
-  const built = buildPiecesWith(engine, plan, params.thicknessMm, fittings, pattern, pins);
+  const hollow = params.wall === 'double' ? { borderMm: patternBorderMm(params.joint) } : undefined;
+  const built = buildPiecesWith(engine, plan, params.thicknessMm, fittings, pattern, pins, hollow);
   let pieces: ExportPiece[];
   try {
     pieces = built.flatMap((b, i) => {

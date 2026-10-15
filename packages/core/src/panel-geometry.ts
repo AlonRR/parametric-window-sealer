@@ -24,6 +24,7 @@ import type { InPiece, PlacedFitting } from './fittings/index.js';
 import { pinSlotsIn } from './joint.js';
 import type { JointParams, PinPlacement } from './joint.js';
 import { pinSlotCuts } from './joint-geometry.js';
+import { hollowCut } from './double.js';
 
 export { plainPanel } from './panel.js';
 export type { PanelSize } from './panel.js';
@@ -59,6 +60,7 @@ export function buildPiecesWith(
   fittings: readonly PlacedFitting[],
   pattern?: PatternFor,
   pins?: PiecePins,
+  hollow?: { borderMm: number }, // a double wall (#119): plain pieces hollow inside this border
 ): BuiltPiece[] {
   const built: BuiltPiece[] = [];
   // The wall's centre, where the pattern's tiles are centred (Q135).
@@ -80,6 +82,13 @@ export function buildPiecesWith(
         solid = slotted;
       }
       const here = typeof pattern === 'function' ? pattern(cell) : pattern;
+      if (hollow !== undefined && fitting === undefined && here === undefined) {
+        const air = hollowCut(engine, size, hollow.borderMm);
+        const hollowed = solid.subtract(air);
+        air.delete();
+        solid.delete();
+        solid = hollowed;
+      }
       if (here !== undefined) {
         const keepOut = fitting?.keepOut(size, here.borderMm);
         const openings = pieceOpenings(engine, here.tile, centre, cell, here.borderMm, keepOut);

@@ -8,6 +8,8 @@ import { describeMaterial, materialWarnings } from './material.js';
 import { describeRail, planRail } from './rail.js';
 import { describeRain } from './rain.js';
 import { describeStop } from './stop.js';
+import { describeDouble } from './double.js';
+import { patternBorderMm } from './pattern.js';
 import type { JointParams, JointPlan } from './joint.js';
 import type { Axis, GridLayout, Leftover } from './layout.js';
 import { tapeFit } from './tape.js';
@@ -57,6 +59,7 @@ export interface PlanText {
   rail: string[]; // the filler between the sashes, if there is one (#116)
   rain: string[]; // the weep holes, and keeping a window AC's tilt (#117)
   stop: string[]; // the sash stop, if there is one (#118)
+  double: string[]; // a double wall's skins, and what it gains (#119)
 }
 
 function describeLeftover(note: GridLayout['leftovers'][number], maxPieceMm: number, joint: JointParams): LeftoverText {
@@ -205,5 +208,11 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     rail: describeRail(params),
     rain: describeRain(params),
     stop: describeStop(params),
+    double: describeDouble({
+      wall: params.wall,
+      thicknessMm: params.thicknessMm,
+      borderMm: patternBorderMm(params.joint),
+      cutFromSheet: params.sheet.source === 'sheet',
+    }),
   };
 }

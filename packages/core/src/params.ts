@@ -43,6 +43,8 @@ import type { SocketParams } from './socket.js';
 import { DEFAULT_RAIL, railEdge, railLeastGapMm } from './rail.js';
 import type { RailParams } from './rail.js';
 import { DEFAULT_STOP, STOP_LEAST_MM, stopTrack } from './stop.js';
+import { DOUBLE_LEAST_GAP_MM, DOUBLE_SKIN_MM, WALL_KINDS, doubleLeastMm } from './double.js';
+import type { WallKind } from './double.js';
 import type { StopParams } from './stop.js';
 import { FormReader, SIZE_MESSAGE, SIZE_OR_ZERO_MESSAGE } from './form-reader.js';
 import { planWall } from './plan.js';
@@ -98,6 +100,7 @@ export interface Params {
   rail: RailParams; // the filler between the sashes (meeting-rail, #116); none to start with
   rain: boolean; // weep holes in the strips and a drip groove under the edge strips (rain-face, #117)
   stop: StopParams; // a strut in the sash's track that lifts out by hand (sash-stop, #118); none to start with
+  wall: WallKind; // single, or double with hollow pieces for winter (double-wall, #119)
 }
 
 // The page starts here: an example opening (Q42, labelled as an example, Q18), the default
@@ -133,6 +136,7 @@ export const EXAMPLE_PARAMS: Params = {
   rail: DEFAULT_RAIL,
   rain: true,
   stop: DEFAULT_STOP,
+  wall: 'single',
 };
 
 // Every field of the page's form. The page reads and writes these by name; the settings list
@@ -151,6 +155,7 @@ export const FIELD_NAMES = [
   'heightMode',
   'heightFiller',
   'thicknessMm',
+  'wall',
   'pieceSource',
   'sheetWidthMm',
   'sheetHeightMm',
@@ -302,6 +307,7 @@ function readDivision(r: FormReader): { width: AxisChoice; height: AxisChoice } 
 
 const panelForm = (p: Params): FormValues => ({
   thicknessMm: String(p.thicknessMm),
+  wall: p.wall,
   slotMm: String(p.joint.slotMm),
   slideMm: String(p.joint.slideMm),
   webMm: String(p.joint.webMm),
@@ -399,6 +405,27 @@ function readEdges(r: FormReader): EdgeParams {
     depthMm: { top: depthOf('top'), bottom: depthOf('bottom'), left: depthOf('left'), right: depthOf('right') },
   };
   return { window, roles, track };
+}
+
+// A double wall (double-wall, #119): its skins and the air between them must fit in the panel's
+// thickness, and they are too thin for a pattern across the wall.
+function readWall(r: FormReader, thicknessMm: number, fill: FillKind): WallKind {
+  const wall = r.oneOf('wall', WALL_KINDS);
+  if (wall === 'single' || !Number.isFinite(thicknessMm)) return wall;
+  if (thicknessMm < doubleLeastMm() - 1e-9) {
+    r.fail(
+      'wall',
+      `A double wall needs panels at least ${mm(doubleLeastMm())} mm thick: two ${mm(DOUBLE_SKIN_MM)} mm skins ` +
+        `round a ${mm(DOUBLE_LEAST_GAP_MM)} mm air gap.`,
+    );
+  } else if (fill !== 'sealed') {
+    r.fail(
+      'wall',
+      'A double wall’s skins are too thin for a pattern across the wall: choose a sealed fill, or give single ' +
+        'pieces a pattern of their own; those are printed solid.',
+    );
+  }
+  return wall;
 }
 
 // The sash stop (sash-stop, #118): it lies in the track beside the edge the sash presses on.
@@ -783,6 +810,7 @@ export function readParams(values: FormValues): ReadResult {
     if (span.heightMm <= 0) r.fail('openingHeightMm', 'Too small for the edge strips.');
   }
   const { fill, pieceFills } = readFill(r);
+  const wall = readWall(r, thicknessMm, fill.kind);
   if (sheet.source === 'sheet' && fill.kind !== 'sealed') {
     r.fail(
       'pieceSource',
@@ -812,6 +840,7 @@ export function readParams(values: FormValues): ReadResult {
     rail,
     rain,
     stop,
+    wall,
   };
   // Fittings and pieces' own patterns are placed against the plan they will be in: with any to
   // place, a printed piece keeps every piece to the printer's size, before they are placed.

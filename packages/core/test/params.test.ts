@@ -59,6 +59,7 @@ describe('the starting values', () => {
       rail: DEFAULT_RAIL, // #116
       rain: true, // #117
       stop: DEFAULT_STOP, // #118
+      wall: 'single', // #119
     });
   });
 
@@ -319,6 +320,7 @@ describe('describePlan', () => {
           'with that flange outside. A groove under each edge strip stops water creeping under it to the room.',
       ], // #117
       stop: [], // #118
+      double: [], // #119
     });
   });
 

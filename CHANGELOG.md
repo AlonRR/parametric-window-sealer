@@ -14,6 +14,13 @@ under Unreleased.
 
 ### Added
 
+- A double wall for winter: under The panel, Wall: Double (`--wall double`) makes each plain printed
+  piece hollow inside the panel's thickness, two 1.2 mm skins round a closed air gap with ribs at
+  most 20 mm apart, inside its solid border; pieces with a fitting or a pattern of their own stay
+  solid. It needs panels at least 6.4 mm thick and a sealed fill. The plan says what it gains, by
+  calculation: in 10 mm panels about 3.2 W/m²K against 4.5, and a dry room side up to 59 % room
+  humidity against 47 %. Why: `docs/double-wall.md`. Not yet test printed.
+
 - A sash stop: under The window, the gap along the sash's track from its edge to the frame
   (`--sash-stop`, 0 for none to start with) prints a strut that lies in that track, standing 10 mm
   out, so the sash cannot be opened further from outside; it lifts out by hand from inside, so an

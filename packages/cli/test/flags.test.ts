@@ -44,6 +44,7 @@ describe('the setting flags (Q90)', () => {
       'height-mode',
       'height-filler',
       'height-leftover',
+      'wall',
       'pieces',
       'material',
       'colour',
@@ -78,6 +79,7 @@ describe('the setting flags (Q90)', () => {
       // read only with tape; joints in TPU, with the TPU seal (C38)
       ...(f.path.startsWith('seal.tape.') ? { seal: f.field === 'tpuJoints' ? 'tpu' : 'tape' } : {}),
       ...(f.path.startsWith('fill.') && f.path !== 'fill.kind' ? { fill: 'grid' } : {}), // and with a pattern
+      ...(f.field === 'wall' ? { thicknessMm: '10' } : {}), // a double wall needs panels thick enough
     };
     for (const value of f.values ?? []) {
       expect(readParams({ ...base, [f.field]: value })).toMatchObject({ ok: true });
