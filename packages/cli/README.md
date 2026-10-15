@@ -71,6 +71,8 @@ window-sealer --width 600 --height 1000 --printer-model prusa-mk4s
   printer custom.
 - `--rain no` leaves out the weep holes in the strips and the drip groove under the edge strips,
   which are there to start with; why is in the repository's `docs/rain.md`.
+- Before fitting a wall, read the repository's `docs/safety.md`: it is not a fall barrier or a
+  lock, and must not block a bedroom's only escape window.
 - `--wall double` makes each plain printed piece hollow for winter, two skins round an air gap
   inside the panel's thickness (`--thickness 10`, say, as the track allows); why is in the
   repository's `docs/double-wall.md`.

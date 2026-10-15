@@ -6,6 +6,16 @@ something stops it closing: a window air conditioner, an exhaust fan, a hose.
 You enter the size of the open area and the largest part your printer can make, choose the
 panel style, and get a set of printable pieces that join together and fit the gap.
 
+## Before you fit it
+
+The wall is not a fall barrier, not a lock, and not for blocking a bedroom's only escape window
+unless it comes out in seconds by hand. Keep it from heaters, check for condensation in winter,
+and print it in PETG or ASA rather than PLA. The full list is on the page and in
+[`docs/safety.md`](docs/safety.md).
+
+This project claims no energy saving, and the wall is not airtight, weatherproof, secure, child-safe or
+flame retardant; it has no wind, rain or UV rating.
+
 ## Status
 
 **Version 0.3.0: the wall with its fittings, seals and patterns, as a page and as an API; not

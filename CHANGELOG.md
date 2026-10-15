@@ -14,6 +14,13 @@ under Unreleased.
 
 ### Added
 
+- Warnings before fitting: the page has a "Before you fit it" section, between the plan and the
+  download, and `docs/safety.md` the same seven lines with their evidence: not a fall barrier; an
+  escape window; a metal lock on a ground floor; condensation in winter; PLA in sun; plastics burn;
+  put the wall together whole, then set it in. The page and the README say what is not claimed: no
+  energy saving, and not airtight, weatherproof, secure, child-safe or flame retardant, with no wind,
+  rain or UV rating; a test fails if either makes one of those claims.
+
 - Windows with no track: Window type: A frame with no track (`--window frame`) puts all four edges
   in a frame, and any edge can be set to Pressed into a frame. Such an edge is shaped as one against
   a sash, and its printed TPU gasket, squeezed as the wall goes in, holds the wall, as Indow's
