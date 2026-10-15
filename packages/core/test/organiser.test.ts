@@ -59,7 +59,7 @@ describe('Skådis', () => {
       widthMm: 5.2,
       heightMm: 15.2,
     });
-    expect(ORGANISERS.map((o) => o.kind)).toEqual(['skadis']);
+    expect(ORGANISERS.map((o) => o.kind)).toContain('skadis');
     expect(FILL_KINDS).toContain('skadis');
     expect(SETTINGS.find((s) => s.field === 'fill')?.values).toContain('skadis');
   });

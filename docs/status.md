@@ -9,8 +9,8 @@ row; since then the code was made easy to extend (Q145) and P2 began (Q148, Q149
 All of it is released as `v0.4.0` (Q155). `v0.5.0` is the joint tuned and in its other forms
 (C215): the guided test print (`fit-test-print`, #63; Q157), puzzle dovetails, sliding dovetail
 rails and bolted flanges (#29 to #31). The next minor version, `v0.6.0`, is the organiser fills and
-the drawn tile (C215): the tile editor (`draw-tile`, #39) and the Skådis board
-(`organiser-skadis`, #33) are built. Nothing has been test printed yet.
+the drawn tile (C215): the tile editor (`draw-tile`, #39), the Skådis board
+(`organiser-skadis`, #33) and the openGrid board (`organiser-opengrid`, #34) are built. Nothing has been test printed yet.
 
 ## The brief (the owner's request, 5 Oct 2026)
 

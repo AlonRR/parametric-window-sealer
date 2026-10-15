@@ -34,7 +34,7 @@ makes a double wall for winter ([`docs/double-wall.md`](docs/double-wall.md)), h
 ([`docs/frame.md`](docs/frame.md)), rounds the pieces' corners against warping ([`docs/printing.md`](docs/printing.md)), stiffens a wide wall with bought
 aluminium angle on printed clips ([`docs/stiffeners.md`](docs/stiffeners.md)),
 seals the edges with foam tape or printed TPU gaskets whose fins bend ([`docs/seals.md`](docs/seals.md)), fills the pieces with a pattern or a tile of your
-own drawing, drawn on the page or in a drawing program ([`docs/svg-tiles.md`](docs/svg-tiles.md)), or turns pieces into a Skådis pegboard ([`docs/organisers.md`](docs/organisers.md)), and has a measuring guide with a guided test print that tunes the joint ([`docs/joints.md`](docs/joints.md)); it can also be saved as one file that works offline.
+own drawing, drawn on the page or in a drawing program ([`docs/svg-tiles.md`](docs/svg-tiles.md)), or turns pieces into a Skådis pegboard or an openGrid board ([`docs/organisers.md`](docs/organisers.md)), and has a measuring guide with a guided test print that tunes the joint ([`docs/joints.md`](docs/joints.md)); it can also be saved as one file that works offline.
 The same geometry is a library for Node.js and browsers, the `window-sealer` command and the
 `window-sealer-mcp` server for LLM agents (see [Developing](#developing)). The joint's fit and grip, and
 the example track sizes, are starting values that a test print still has to confirm. The site is

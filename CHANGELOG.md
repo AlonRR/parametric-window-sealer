@@ -17,6 +17,10 @@ listed under Unreleased.
 
 ### Added
 
+- An openGrid board, the second organiser board: choose **openGrid board** as the fill
+  (`--fill opengrid`) for openGrid's snaps and accessories. It matches openGrid's Full board: 6.8 mm
+  thick, its cells 28 mm apart each way, each an opening 25 mm across with a groove 26.4 mm across
+  behind each face, where the snaps click in. How: `docs/organisers.md`. Not yet test printed.
 - Organiser boards, and the first of them, a Skådis pegboard: choose **Skådis pegboard** as the
   fill, for the wall or a single piece (`--fill skadis`), and IKEA's SKÅDIS hooks and shelves hang
   on it. Upright slots 5.2 × 15.2 mm, 40 mm apart in rows 20 mm apart, every other row shifted
