@@ -26,7 +26,7 @@ import { DEFAULT_RIM, formatCutouts, parseCutouts } from './cutout.js';
 import type { CutoutSetting, RimParams } from './cutout.js';
 import { DEFAULT_TAPE, NO_SEAL, TAPE_GROOVE_PLAY_MM, TAPE_GROOVE_WALL_MM, tapeFit } from './tape.js';
 import type { SealKind, SealParams, TapeFit } from './tape.js';
-import { TPU_FIN_MM, gasketBaseMm } from './tpu.js';
+import { TPU_FIN_MM, gasketBaseMm, gasketFinsAcrossMm } from './tpu.js';
 import { FILL_KINDS, PATTERN_STYLES, SEALED } from './fill.js';
 import { MIN_BAR_MM } from './pattern.js';
 import { readSvgDrawing } from './svg/drawing.js';
@@ -433,7 +433,7 @@ function readSeal(r: FormReader): SealRead {
     r.fail(
       'tapeSqueezePct',
       `Squeezed to ${mm((tape.thicknessMm * tape.squeezePct) / 100)} mm, the tape would sit inside its ` +
-        `${mm(tape.grooveMm)} mm groove; squeeze it less or make the groove shallower.`,
+        `${mm(fit.grooveDepthMm)} mm groove; squeeze it less or make the groove shallower.`,
     );
   }
   return { seal, fit, sideTape };
@@ -520,6 +520,15 @@ function checkSealFits(r: FormReader, edges: EdgeParams, s: SealRead) {
         'tapeWidthMm',
         `Make it more than ${mm(2 * TPU_FIN_MM - TAPE_GROOVE_PLAY_MM)} mm: the gasket’s base holds two ` +
           `${mm(TPU_FIN_MM)} mm fins.`,
+      );
+    }
+    // The fins lean in over the base, so they must not meet at the top (tpu-fin-seals, #115).
+    const across = gasketFinsAcrossMm(tape.thicknessMm);
+    if (fit.grooveWidthMm < across - 1e-9 && r.errors.tapeWidthMm === undefined && base < tape.thicknessMm) {
+      r.fail(
+        'tapeWidthMm',
+        `Make it at least ${Math.ceil((across - TAPE_GROOVE_PLAY_MM) * 10) / 10} mm: the gasket’s fins, leaning in, ` +
+          'would cross.',
       );
     }
   }

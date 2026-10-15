@@ -620,7 +620,7 @@ describe('a tape seal (seal-tape #15; Q119 to Q132)', () => {
   it('--seal tape: the summary names the tape and how much of it', async () => {
     const r = await cli([...OPENING, '--seal', 'tape', '--dry-run']);
     expect(r.code).toBe(0);
-    expect(r.out).toContain('Seal: 9 × 4 mm foam tape along the edge strips’ outer faces: 3.2 m in all.');
+    expect(r.out).toContain('Seal: 9 × 4 mm closed-cell foam tape along the edge strips’ outer faces: 3.2 m in all.');
   });
 
   it('a tape flag without --seal means tape; with --tape-sides the strips are named by their track', async () => {
@@ -650,7 +650,9 @@ describe('the printed TPU seal (seal-tpu #22; C31 to C39)', () => {
   it('--seal tpu: the summary names the gaskets, and the dry run lists them', async () => {
     const r = await cli([...OPENING, '--seal', 'tpu', '--dry-run']);
     expect(r.code).toBe(0);
-    expect(r.out).toContain('Seal: printed TPU, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all.');
+    expect(r.out).toContain(
+      'Seal: printed TPU, 85A for the best recovery, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all.',
+    );
     expect(r.out).toMatch(/ {2}gasket-[0-9.]+x9\.5x4-tpu-print-[0-9]+\.stl/);
   });
 

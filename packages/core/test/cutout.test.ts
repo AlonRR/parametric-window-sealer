@@ -51,7 +51,8 @@ describe('the rules', () => {
   it('lined with the seal: it takes the clearance, and the wall grows by its groove (C43)', () => {
     expect(linedRim(DEFAULT_RIM, undefined)).toEqual(DEFAULT_RIM);
     expect(linedRim(DEFAULT_RIM, tapeFit(tape))).toEqual({ depthMm: 15, wallMm: 3.4, clearanceMm: 1 });
-    expect(linedRim(DEFAULT_RIM, tapeFit(tpu))).toEqual(linedRim(DEFAULT_RIM, tapeFit(tape)));
+    // Printed TPU's groove is 1.6 mm, deep enough for a gasket's fins to fold into (#115).
+    expect(linedRim(DEFAULT_RIM, tapeFit(tpu))).toEqual({ depthMm: 15, wallMm: 4, clearanceMm: 0.4 });
   });
 
   it('written as the appliance’s width x height, then optionally @column,row (C44)', () => {
@@ -300,17 +301,17 @@ describe('the plan and the files (C46)', () => {
       'Cutout: a 120 × 80 mm appliance, in column 2, row 1, through a 122 × 82 mm opening in a 15 mm rim, lined with the foam tape.',
     ]);
     expect(line(at(tpu))).toEqual([
-      'Cutout: a 120 × 80 mm appliance, in column 2, row 1, through a 122 × 82 mm opening in a 15 mm rim, lined with a TPU frame.',
+      'Cutout: a 120 × 80 mm appliance, in column 2, row 1, through a 120.8 × 80.8 mm opening in a 15 mm rim, lined with a TPU frame.',
     ]);
   });
 
   it('the seal’s line counts the tape round each rim, or the TPU frame', () => {
     const seal = (p: Params) => describePlan(planWall(p), p).seal;
     expect(seal(at(tape))).toBe(
-      'Seal: 9 × 4 mm foam tape along the edge strips’ outer faces, and round the cutout’s rim: 3.6 m in all.',
+      'Seal: 9 × 4 mm closed-cell foam tape along the edge strips’ outer faces, and round the cutout’s rim: 3.6 m in all.',
     );
     expect(seal(at(tpu))).toBe(
-      'Seal: printed TPU, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all, and a frame inside the cutout’s rim.',
+      'Seal: printed TPU, 85A for the best recovery, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all, and a frame inside the cutout’s rim.',
     );
   });
 

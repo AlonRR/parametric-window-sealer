@@ -93,12 +93,13 @@ window-sealer --width 600 --height 1000 --printer-model prusa-mk4s
   10 mm; `--clamp-depth` for the jaws' lips); `--clamp 120x80@2,1` places it, and the jaws are
   among the files. `--collar-depth`, `--collar-wall`,
   `--collar-clearance` and `--collar-lip` change the collar the hose end slides into.
-- `--seal tape` adds foam tape in a groove along each edge strip's face that the track, sash or
+- `--seal tape` adds closed-cell foam tape in a groove along each edge strip's face that the track, sash or
   sill presses; `--tape-width` and `--tape-thickness` set its size (9 × 4 mm to start with;
   any `--tape-*` flag alone means tape). `--tape-sides yes` puts it on the strips' sides in a
   track too, and `--tape-port yes` inside each hose port's collar; `--tape-groove` and
   `--tape-squeeze` change how deep its groove is and how far it is squeezed. `--seal tpu` prints
-  gaskets in TPU in the tape's place, to the same sizes, with a TPU sleeve in each collar where
+  gaskets in TPU in the tape's place, to the same sizes, their fins leaning in to fold flat into a
+  groove made deep enough for them, with a TPU sleeve in each collar where
   `--tape-port yes` says; `--tpu-joints yes` prints the joint strips and cross pieces in TPU
   too (alone, it means `--seal tpu`).
 - `--fill grid` gives the pieces a grid of square openings, cut into the room side

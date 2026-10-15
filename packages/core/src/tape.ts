@@ -13,6 +13,7 @@
 //
 // The shapes are in edge.ts, edge-geometry.ts and panel-geometry.ts; this file holds the rules.
 import type { CollarParams } from './port.js';
+import { foldedFinsMm } from './tpu.js';
 
 export interface TapeParams {
   widthMm: number;
@@ -69,14 +70,17 @@ export interface TapeFit {
 }
 
 // The same for the tape and for the TPU gaskets that take its place (C31).
+// With printed TPU, the groove is at least deep enough for the gasket's fins to fold flat inside it
+// (tpu-fin-seals, #115).
 export function tapeFit(seal: SealParams): TapeFit | undefined {
   if (seal.kind === 'none') return undefined;
   const t = seal.tape;
+  const depth = seal.kind === 'tpu' ? Math.max(t.grooveMm, foldedFinsMm(t)) : t.grooveMm;
   return {
     widthMm: t.widthMm,
     grooveWidthMm: t.widthMm + TAPE_GROOVE_PLAY_MM,
-    grooveDepthMm: t.grooveMm,
-    standOutMm: (t.thicknessMm * t.squeezePct) / 100 - t.grooveMm,
+    grooveDepthMm: depth,
+    standOutMm: Math.round(((t.thicknessMm * t.squeezePct) / 100 - depth) * 1e6) / 1e6,
     sides: t.sides,
     port: t.port,
   };

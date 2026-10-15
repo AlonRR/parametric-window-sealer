@@ -35,7 +35,9 @@ test('foam tape: 9 × 4 mm to start, a listed size or your own (Q121)', async ({
     '9.5 × 6.4 mm',
     'Your own size',
   ]);
-  await expect(seal(page)).toHaveText('Seal: 9 × 4 mm foam tape along the edge strips’ outer faces: 3.2 m in all.');
+  await expect(seal(page)).toHaveText(
+    'Seal: 9 × 4 mm closed-cell foam tape along the edge strips’ outer faces: 3.2 m in all.',
+  );
   // The tape and its groove take 2 mm at each track and at the sash (Q125, Q126).
   await expect(page.getByTestId('plan-span')).toHaveText(
     'Pieces and joints: 599 × 1009 mm, for a 600 × 1000 mm opening.',
@@ -43,11 +45,11 @@ test('foam tape: 9 × 4 mm to start, a listed size or your own (Q121)', async ({
   await expect(page.getByLabel('Width (mm)', { exact: true })).toBeHidden();
 
   await size(page).selectOption('9.5x4.8');
-  await expect(seal(page)).toContainText('Seal: 9.5 × 4.8 mm foam tape');
+  await expect(seal(page)).toContainText('Seal: 9.5 × 4.8 mm closed-cell foam tape');
   await size(page).selectOption('own');
   await page.getByLabel('Width (mm)', { exact: true }).fill('11');
   await page.getByLabel('Thickness (mm)', { exact: true }).fill('5');
-  await expect(seal(page)).toContainText('Seal: 11 × 5 mm foam tape');
+  await expect(seal(page)).toContainText('Seal: 11 × 5 mm closed-cell foam tape');
 
   await page.getByRole('radio', { name: 'None', exact: true }).check();
   await expect(seal(page)).toHaveText('Seal: none.');
@@ -60,7 +62,7 @@ test('the groove, the squeeze and the sides under Advanced, each refused with a 
   await expect(squeeze(page)).toHaveValue('50');
   await page.getByLabel('Also on the sides of the edge strips in a track').check();
   await expect(seal(page)).toHaveText(
-    'Seal: 9 × 4 mm foam tape along the edge strips’ outer faces and sides: 7.6 m in all.',
+    'Seal: 9 × 4 mm closed-cell foam tape along the edge strips’ outer faces and sides: 7.6 m in all.',
   );
 
   await squeeze(page).fill('25');
@@ -83,7 +85,7 @@ test('tape inside the hose port’s collar too (Q129)', async ({ page }) => {
   await page.getByText('Advanced: the seal').click();
   await page.getByLabel("Also inside each hose port's collar").check();
   await expect(seal(page)).toHaveText(
-    'Seal: 9 × 4 mm foam tape along the edge strips’ outer faces, and inside the hose port’s collar: 3.7 m in all.',
+    'Seal: 9 × 4 mm closed-cell foam tape along the edge strips’ outer faces, and inside the hose port’s collar: 3.7 m in all.',
   );
 });
 
@@ -118,14 +120,14 @@ test('printed TPU: gaskets to the seal’s size, and its joints in TPU under Adv
   await tpu(page).check();
   await expect(size(page)).toHaveValue('9x4');
   await expect(seal(page)).toHaveText(
-    'Seal: printed TPU, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all.',
+    'Seal: printed TPU, 85A for the best recovery, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all.',
   );
   await expect(page.getByText('Gaskets printed in TPU')).toBeVisible();
   await expect(page.getByText('Self-adhesive foam weather-seal tape')).toBeHidden();
   await page.getByText('Advanced: the seal').click();
   await page.getByLabel('Also the joint strips and cross pieces, in TPU').check();
   await expect(seal(page)).toHaveText(
-    'Seal: printed TPU, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all, and the joint strips and cross pieces in TPU.',
+    'Seal: printed TPU, 85A for the best recovery, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all, and the joint strips and cross pieces in TPU.',
   );
   await tape(page).check();
   await expect(page.getByTestId('error-tpuJoints')).toHaveText(

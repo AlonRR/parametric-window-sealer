@@ -136,12 +136,12 @@ function describeSeal(params: Params, parts: WallParts): string {
     const also = [...linings.map((l) => l.tpu), ...(tape.joints ? ['the joint strips and cross pieces in TPU'] : [])];
     const list = [gaskets, ...also];
     const last = list.length > 1 ? `, and ${list.pop() ?? ''}` : '';
-    return `Seal: printed TPU, ${list.join(', ')}${last}.`;
+    return `Seal: printed TPU, 85A for the best recovery, ${list.join(', ')}${last}.`;
   }
   const places = linings.map((l) => l.tape);
   const inPorts = places.length === 0 ? '' : `, and ${places.join(' and ')}`;
   const metres = Math.round(linings.reduce((n, l) => n + l.tapeMm, outer + sides) / 100) / 10;
-  return `Seal: ${mm(tape.widthMm)} × ${mm(tape.thicknessMm)} mm foam tape along the edge strips’ ${faces}${inPorts}: ${metres} m in all.`;
+  return `Seal: ${mm(tape.widthMm)} × ${mm(tape.thicknessMm)} mm closed-cell foam tape along the edge strips’ ${faces}${inPorts}: ${metres} m in all.`;
 }
 
 export function describePlan(plan: GridLayout, params: Params): PlanText {

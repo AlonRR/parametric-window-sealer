@@ -151,7 +151,7 @@ describe('window_sealer_plan_wall', () => {
       tape: { widthMm: 9, thicknessMm: 4, grooveMm: 1, squeezePct: 50, sides: true, port: false, joints: false },
     });
     expect(r.data['summary'].seal).toBe(
-      'Seal: 9 × 4 mm foam tape along the edge strips’ outer faces and sides: 7.6 m in all.',
+      'Seal: 9 × 4 mm closed-cell foam tape along the edge strips’ outer faces and sides: 7.6 m in all.',
     );
     const names = (r.data['files'] as { name: string }[]).map((f) => f.name);
     expect(names.some((n) => /^edge-[0-9.]+x13x11-track-10-print-[0-9]+\.stl$/.test(n))).toBe(true);
@@ -165,7 +165,7 @@ describe('window_sealer_plan_wall', () => {
     expect(r.isError).toBeFalsy();
     expect(r.data['settings'].seal).toMatchObject({ kind: 'tpu', tape: { joints: true } });
     expect(r.data['summary'].seal).toBe(
-      'Seal: printed TPU, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all, and the joint strips and cross pieces in TPU.',
+      'Seal: printed TPU, 85A for the best recovery, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all, and the joint strips and cross pieces in TPU.',
     );
     const names = (r.data['files'] as { name: string }[]).map((f) => f.name);
     expect(names.some((n) => /^gasket-[0-9.]+x9\.5x4-tpu-print-[0-9]+\.stl$/.test(n))).toBe(true);
@@ -185,7 +185,7 @@ describe('window_sealer_plan_wall', () => {
     expect(r.isError).toBeFalsy();
     expect(r.data['settings'].cutouts).toEqual([{ widthMm: 120, heightMm: 80, column: 2, row: 1 }]);
     expect(r.data['summary'].cutouts).toEqual([
-      'Cutout: a 120 × 80 mm appliance, in column 2, row 1, through a 122 × 82 mm opening in a 15 mm rim, lined with a TPU frame.',
+      'Cutout: a 120 × 80 mm appliance, in column 2, row 1, through a 120.8 × 80.8 mm opening in a 15 mm rim, lined with a TPU frame.',
     ]);
     const names = (r.data['files'] as { name: string }[]).map((f) => f.name);
     expect(names).toContain('frame-120x80-tpu-print-1.stl');

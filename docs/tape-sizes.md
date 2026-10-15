@@ -28,6 +28,8 @@ are sized for (Q125), is inside every stated range.
 - The same tape goes in every place chosen (Q130): the edge strips' outer face, and under
   Advanced their sides (Q127) and the inside of the hose port's collar (Q129). The joints
   between pieces are left to the printed TPU seal (Q128).
+- Buy closed-cell foam; how the tape and the printed TPU gaskets seal is in
+  [`seals.md`](seals.md).
 
 ## Sources
 

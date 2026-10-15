@@ -578,12 +578,15 @@
             <span class="error" data-testid="error-tapeWidthMm"></span>
             <span class="error" data-testid="error-tapeThicknessMm"></span>
             <p class="note" data-show-when="seal=tape">
-              Self-adhesive foam weather-seal tape. It goes in a groove along each edge strip's
-              outer face, where the track, the sash or the sill presses on it.
+              Self-adhesive closed-cell foam weather-seal tape: felt and open-cell foam let air
+              through. It goes in a groove along each edge strip's outer face, where the track, the
+              sash or the sill presses on it.
             </p>
             <p class="note" data-show-when="seal=tpu" hidden>
-              Gaskets printed in TPU, in place of tape of this size: each sits in the tape's groove
-              with two fins that fold as the wall goes in. Print them in TPU and the rest as usual.
+              Gaskets printed in TPU, in place of tape of this size: each sits in a groove with two
+              fins leaning in, which fold flat into it as the wall goes in, until the strip's face
+              stops them. TPU 85A springs back better than 95A, which is easier to print. Print the
+              gaskets in TPU and the rest as usual.
             </p>
           </div>
         </fieldset>
@@ -1004,8 +1007,8 @@
             <input name="tapeGrooveMm" inputmode="decimal" autocomplete="off" />
           </label>
           <p class="note">
-            The tape, or the gasket's base, sits in a groove 0.5 mm wider than the tape and this
-            deep; 0 for a flat face.
+            The tape sits in a groove 0.5 mm wider than the tape and this deep; 0 for a flat face.
+            A printed TPU gasket's groove is made deeper where its folded fins need the room.
           </p>
           <span class="error" data-testid="error-tapeGrooveMm"></span>
           <label>

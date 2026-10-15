@@ -42,8 +42,9 @@ import type { FormValues, Params, SealParams, TapeParams } from '../src/index.js
 const tpu = (over: Partial<TapeParams> = {}): SealParams => ({ kind: 'tpu', tape: { ...DEFAULT_TAPE, ...over } });
 
 describe('the rules', () => {
-  it('a seal of printed TPU fits as the tape does (C31)', () => {
-    expect(tapeFit(tpu())).toEqual(tapeFit({ kind: 'tape', tape: DEFAULT_TAPE }));
+  it('a seal of printed TPU fits as the tape does (C31), in a groove deep enough for its folded fins (#115)', () => {
+    const tape = tapeFit({ kind: 'tape', tape: DEFAULT_TAPE });
+    expect(tapeFit(tpu())).toEqual({ ...tape, grooveDepthMm: 1.6, standOutMm: 0.4 });
     expect(TPU_FIN_MM).toBe(0.8);
     expect(TPU_FIN_LEAN_DEG).toBe(20);
     expect(TPU_GRIP_MM).toBe(0.5);
@@ -53,22 +54,25 @@ describe('the rules', () => {
 });
 
 describe('the gasket (C32)', () => {
-  it('a base filling the 9.5 × 1 mm groove and two 0.8 mm fins up to 4 mm, leaning out 20°', async () => {
+  it('a 0.8 mm base across the 9.5 mm groove and two 0.8 mm fins up to 4 mm, leaning in 20° (#115)', async () => {
     const engine = await loadEngine();
     const fit = tapeFit(tpu());
     if (!fit) throw new Error('fit expected');
     const g = gasketSolid(engine, 100, fit, 4);
-    const lean = 3 * Math.tan((20 * Math.PI) / 180);
-    expect(g.volume()).toBeCloseTo(100 * (9.5 * 1 + 2 * 0.8 * 3), 6);
+    expect(g.volume()).toBeCloseTo(100 * (9.5 * 0.8 + 2 * 0.8 * 3.2), 3);
     const b = g.boundingBox();
     const box = [...Array.from(b.min), ...Array.from(b.max)];
     expect(box[0]).toBeCloseTo(0, 6);
-    expect(box[1]).toBeCloseTo(-lean, 6);
+    expect(box[1]).toBeCloseTo(0, 6); // leaning in, nothing past the groove's sides
     expect(box[2]).toBeCloseTo(0, 6); // standing on its base
     expect(box[3]).toBeCloseTo(100, 6);
-    expect(box[4]).toBeCloseTo(9.5 + lean, 6);
+    expect(box[4]).toBeCloseTo(9.5, 6);
     expect(box[5]).toBeCloseTo(4, 6);
     g.delete();
+    // On a groove too narrow for its height, the fins would cross at the top: refused, not built.
+    expect(() => gasketSolid(engine, 100, { ...fit, grooveWidthMm: 3 }, 4)).toThrow(/would cross at the top/);
+    const narrowest = gasketSolid(engine, 100, { ...fit, grooveWidthMm: 4 }, 4); // 3.93 mm is enough (control)
+    narrowest.delete();
   });
 
   it('one along each edge strip; with the sides, two more on each strip in a track', () => {
@@ -126,11 +130,11 @@ describe('the form', () => {
   });
 
   it('refuses a gasket with no room for its fins (C32)', () => {
-    expect(read({ seal: 'tpu', tapeThicknessMm: '1' })).toMatchObject({
+    expect(read({ seal: 'tpu', tapeThicknessMm: '0.8' })).toMatchObject({
       ok: false,
-      errors: { tapeThicknessMm: 'Make it more than 1 mm: the gasket’s fins stand on its 1 mm base.' },
+      errors: { tapeThicknessMm: 'Make it more than 0.8 mm: the gasket’s fins stand on its 0.8 mm base.' },
     });
-    expect(read({ seal: 'tpu', tapeThicknessMm: '1.1', tapeSqueezePct: '100' }).ok).toBe(true);
+    expect(read({ seal: 'tpu', tapeThicknessMm: '2', tapeSqueezePct: '100' }).ok).toBe(true);
     expect(read({ seal: 'tpu', tapeGrooveMm: '0', tapeThicknessMm: '0.8' })).toMatchObject({
       ok: false,
       errors: { tapeThicknessMm: 'Make it more than 0.8 mm: the gasket’s fins stand on its 0.8 mm base.' },
@@ -139,7 +143,12 @@ describe('the form', () => {
       ok: false,
       errors: { tapeWidthMm: 'Make it more than 1.1 mm: the gasket’s base holds two 0.8 mm fins.' },
     });
-    expect(read({ seal: 'tpu', tapeWidthMm: '1.2' }).ok).toBe(true);
+    // Leaning in, a 4 mm gasket's fins meet at the top unless its groove is 3.93 mm wide (#115).
+    expect(read({ seal: 'tpu', tapeWidthMm: '1.2' })).toMatchObject({
+      ok: false,
+      errors: { tapeWidthMm: 'Make it at least 3.5 mm: the gasket’s fins, leaning in, would cross.' },
+    });
+    expect(read({ seal: 'tpu', tapeWidthMm: '3.5', tapeSqueezePct: '75' }).ok).toBe(true);
     // Foam tape has no fins: the same sizes are its own business.
     expect(read({ seal: 'tape', tapeWidthMm: '1.1' }).ok).toBe(true);
   });
@@ -172,7 +181,7 @@ describe('the plan and the files', () => {
       ports: [{ hoseMm: 150, column: 2, row: 1 }],
     };
     expect(describePlan(planWall(p), p).seal).toBe(
-      'Seal: printed TPU, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all, a sleeve inside the hose port’s collar, and the joint strips and cross pieces in TPU.',
+      'Seal: printed TPU, 85A for the best recovery, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all, a sleeve inside the hose port’s collar, and the joint strips and cross pieces in TPU.',
     );
   });
 
@@ -183,11 +192,11 @@ describe('the plan and the files', () => {
     ];
     const two: Params = { ...EXAMPLE_PARAMS, seal: tpu({ port: true }), ports };
     expect(describePlan(planWall(two), two).seal).toBe(
-      'Seal: printed TPU, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all, and a sleeve inside each hose port’s collar.',
+      'Seal: printed TPU, 85A for the best recovery, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all, and a sleeve inside each hose port’s collar.',
     );
     const bare: Params = { ...two, seal: tpu() };
     expect(describePlan(planWall(bare), bare).seal).toBe(
-      'Seal: printed TPU, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all.',
+      'Seal: printed TPU, 85A for the best recovery, 9.5 × 4 mm gaskets along the edge strips’ outer faces: 3.2 m in all.',
     );
     const names = planFiles(two, { format: 'stl', packaging: 'separate' }).map((f) => f.name);
     expect(names).toContain('sleeve-150-tpu-print-2.stl');
@@ -231,7 +240,7 @@ describe('the plan and the files', () => {
     expect(across('strip-', plaParts)).toBeCloseTo(3 + 2 * 0.2 + 2 * 1.6, 5);
     expect(across('strip-', tpuParts)).toBeCloseTo(3 - 2 * 0.1 + 2 * 1.6, 5);
     expect(across('cross-', tpuParts)).toBeCloseTo(3 - 2 * 0.1 + 2 * 1.6, 5);
-    expect(across('gasket-', tpuParts)).toBeCloseTo(9.5 + 2 * 3 * Math.tan((20 * Math.PI) / 180), 5);
+    expect(across('gasket-', tpuParts)).toBeCloseTo(9.5, 5); // its fins lean in (#115)
     expect(across('sleeve-', tpuParts)).toBeCloseTo(154, 3); // a corner on each axis: 128 sides
   });
 });

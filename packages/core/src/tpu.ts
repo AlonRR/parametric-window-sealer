@@ -33,8 +33,23 @@ export const TPU_JOINT_FIT_MM = -0.1;
 
 export const tpuJoint = (joint: JointParams): JointParams => ({ ...joint, fitMm: TPU_JOINT_FIT_MM, gripMm: 0 });
 
-// The base fills the groove; with no groove, or a shallow one, it is a fin thick.
-export const gasketBaseMm = (fit: TapeFit): number => Math.max(fit.grooveDepthMm, TPU_FIN_MM);
+// The gasket's base is a fin thick at the foot of its groove, and its fins lean in over it, so that
+// squeezed they fold flat inside the groove and the strip's face bears before they are crushed
+// (tpu-fin-seals, #115).
+export const gasketBaseMm = (_fit?: TapeFit): number => TPU_FIN_MM;
+
+// How wide a gasket this tall must be for its fins, leaning in, not to meet at the top.
+export const gasketFinsAcrossMm = (heightMm: number): number =>
+  2 * (TPU_FIN_MM + (heightMm - TPU_FIN_MM) * Math.tan((TPU_FIN_LEAN_DEG * Math.PI) / 180));
+
+// How deep a groove must be to take the base and the fins folded flat on it: one fin's thickness,
+// or two where the fins are long enough to fold over each other.
+export function foldedFinsMm(t: { widthMm: number; thicknessMm: number }): number {
+  const across = t.widthMm + 0.5 - 2 * TPU_FIN_MM; // the groove between the fins' feet
+  const fin = t.thicknessMm - TPU_FIN_MM;
+  const overlap = 2 * fin > across + 1e-9;
+  return Math.round((overlap ? 3 : 2) * TPU_FIN_MM * 10) / 10;
+}
 
 export interface GasketShape {
   kind: 'gasket';
@@ -76,23 +91,24 @@ export function gasketShapes(strips: readonly EdgeStripPlacement[], fit: TapeFit
 }
 
 // A gasket lying as it prints: along X from 0, its base from y = 0 across the groove's width and
-// from z = 0, its fins up to its height, leaning out past both sides.
+// from z = 0, its fins up to its height, leaning in from both sides.
 export function gasketSolid(engine: Engine, lengthMm: number, fit: TapeFit, heightMm: number): Manifold {
   const [w, b, fin] = [fit.grooveWidthMm, gasketBaseMm(fit), TPU_FIN_MM];
   if (!(lengthMm > 0)) throw new RangeError(`A gasket must be longer than 0 mm, got ${lengthMm}`);
   if (!(w > 2 * fin)) throw new RangeError(`A ${w} mm base cannot hold two ${fin} mm fins`);
   if (!(heightMm > b)) throw new RangeError(`A ${heightMm} mm gasket leaves no fins above its ${b} mm base`);
   const lean = (heightMm - b) * Math.tan((TPU_FIN_LEAN_DEG * Math.PI) / 180);
+  if (2 * (fin + lean) > w + 1e-9) throw new RangeError(`A ${heightMm} mm gasket's fins would cross at the top`);
   const outline: [number, number][] = [
     [0, 0],
     [w, 0],
     [w, b],
-    [w + lean, heightMm],
-    [w - fin + lean, heightMm],
+    [w - lean, heightMm],
+    [w - fin - lean, heightMm],
     [w - fin, b],
     [fin, b],
-    [fin - lean, heightMm],
-    [-lean, heightMm],
+    [fin + lean, heightMm],
+    [lean, heightMm],
     [0, b],
   ];
   const section = new engine.CrossSection([outline], 'Positive');

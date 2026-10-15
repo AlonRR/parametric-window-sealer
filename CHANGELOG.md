@@ -70,6 +70,13 @@ under Unreleased.
 
 ### Changed
 
+- Printed TPU gaskets bend rather than squash: their two fins lean in over a 0.8 mm base and fold
+  flat into a groove made deep enough for them (1.6 mm for a 4 mm gasket), so the strip's face
+  stops them being crushed. A tape width too narrow for the fins is refused. The deeper groove
+  makes a hose port's TPU sleeve 0.6 mm thicker and brings a cutout's rim 0.6 mm nearer the
+  appliance. The plan names TPU 85A, which springs back better, and closed-cell foam for the
+  tape. Why: `docs/seals.md`. Not yet test printed.
+
 - The joint's starting values have ribs and pins (see Added), so the same settings now make pieces
   with a slot for each pin along the edges they share, and strips with ribs and pin holes. In the
   library, `JointParams` has two more fields, `gripMm` and `pins`, and `Params` has `coupon`;

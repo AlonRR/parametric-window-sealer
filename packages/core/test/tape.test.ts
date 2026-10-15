@@ -390,19 +390,21 @@ describe('the plan text', () => {
 
   it('names the tape, where it goes and how much: 3.2 m along the example slider', () => {
     // 610 + 610 + 996 + 996 mm of edge strip.
-    expect(line(params(tape()))).toBe('Seal: 9 × 4 mm foam tape along the edge strips’ outer faces: 3.2 m in all.');
+    expect(line(params(tape()))).toBe(
+      'Seal: 9 × 4 mm closed-cell foam tape along the edge strips’ outer faces: 3.2 m in all.',
+    );
   });
 
   it('with the sides, twice the strips in a track more: 7.6 m', () => {
     expect(line(params(tape({ sides: true })))).toBe(
-      'Seal: 9 × 4 mm foam tape along the edge strips’ outer faces and sides: 7.6 m in all.',
+      'Seal: 9 × 4 mm closed-cell foam tape along the edge strips’ outer faces and sides: 7.6 m in all.',
     );
   });
 
   it('with the port, round the inside of its collar', () => {
     const p = params(tape({ port: true }), [{ hoseMm: 150, column: 2, row: 1 }]);
     expect(line(p)).toBe(
-      'Seal: 9 × 4 mm foam tape along the edge strips’ outer faces, and inside the hose port’s collar: 3.7 m in all.',
+      'Seal: 9 × 4 mm closed-cell foam tape along the edge strips’ outer faces, and inside the hose port’s collar: 3.7 m in all.',
     );
   });
 });
