@@ -59,6 +59,9 @@ const FLAG_NAMES: Record<OwnField, string> = {
   collarWallMm: 'collar-wall',
   collarClearanceMm: 'collar-clearance',
   collarLipMm: 'collar-lip',
+  portLock: 'port-lock', // push, or twist: a ring on the hose end twists into the collar (#114)
+  portCap: 'port-cap',
+  portScreen: 'port-screen',
   seal: 'seal', // none, tape (Q122) or tpu (#22)
   tapeWidthMm: 'tape-width', // a tape flag without --seal means tape, as a printer size means custom
   tapeThicknessMm: 'tape-thickness',

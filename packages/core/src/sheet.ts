@@ -32,6 +32,7 @@ type SheetSource = Pick<
   | 'clamps'
   | 'inserts'
   | 'collar'
+  | 'socket'
   | 'rim'
   | 'clamp'
   | 'insert'

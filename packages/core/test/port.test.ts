@@ -163,8 +163,8 @@ describe('the wall with ports', () => {
   it('says what it makes', async () => {
     const wall = await makeWall(params, { format: '3mf', packaging: 'single' });
     expect(wall.summary.ports).toEqual([
-      'Hose port: a 150 mm hose end, in column 2, row 1.',
-      'Hose port: a 130 mm hose end, in column 1, row 4.',
+      'Hose port: a 150 mm hose end, in column 2, row 1. A cap closes the port when the AC is off.',
+      'Hose port: a 130 mm hose end, in column 1, row 4. A cap closes the port when the AC is off.',
     ]);
   });
 });

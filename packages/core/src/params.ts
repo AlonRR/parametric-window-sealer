@@ -38,6 +38,8 @@ import { DEFAULT_SHEET, PIECE_SOURCES } from './sheet.js';
 import type { SheetParams } from './sheet.js';
 import { COLOURS, DEFAULT_MATERIAL, MATERIAL_KINDS } from './material.js';
 import type { MaterialParams } from './material.js';
+import { DEFAULT_SOCKET, PORT_LOCKS } from './socket.js';
+import type { SocketParams } from './socket.js';
 import { FormReader, SIZE_MESSAGE, SIZE_OR_ZERO_MESSAGE } from './form-reader.js';
 import { planWall } from './plan.js';
 import {
@@ -88,6 +90,7 @@ export interface Params {
   coupon: boolean; // the joint's test coupon in the download too (joint-lock, #110)
   sheet: SheetParams; // the pieces printed, or cut from sheet (sheet-pieces, #112)
   material: MaterialParams; // what the parts are printed in, and whether the wall is in sun (#113)
+  socket: SocketParams; // how the hose ports hold the hose, with caps and screens (#114)
 }
 
 // The page starts here: an example opening (Q42, labelled as an example, Q18), the default
@@ -119,6 +122,7 @@ export const EXAMPLE_PARAMS: Params = {
   coupon: false,
   sheet: DEFAULT_SHEET,
   material: DEFAULT_MATERIAL,
+  socket: DEFAULT_SOCKET,
 };
 
 // Every field of the page's form. The page reads and writes these by name; the settings list
@@ -169,6 +173,9 @@ export const FIELD_NAMES = [
   'collarWallMm',
   'collarClearanceMm',
   'collarLipMm',
+  'portLock',
+  'portCap',
+  'portScreen',
   'seal',
   'tapeWidthMm',
   'tapeThicknessMm',
@@ -527,9 +534,15 @@ const portsForm = (p: Params): FormValues => ({
   collarWallMm: String(p.collar.wallMm),
   collarClearanceMm: String(p.collar.clearanceMm),
   collarLipMm: String(p.collar.lipMm),
+  portLock: p.socket.lock,
+  portCap: yesNo(p.socket.cap),
+  portScreen: yesNo(p.socket.screen),
 });
 
-function readPorts(r: FormReader, fit: TapeFit | undefined): { collar: CollarParams; given: PortSetting[] } {
+function readPorts(
+  r: FormReader,
+  fit: TapeFit | undefined,
+): { collar: CollarParams; socket: SocketParams; given: PortSetting[] } {
   const collar: CollarParams = {
     depthMm: r.size('collarDepthMm'),
     wallMm: r.size('collarWallMm'),
@@ -546,7 +559,12 @@ function readPorts(r: FormReader, fit: TapeFit | undefined): { collar: CollarPar
       `Make it at least ${mm(fit.grooveWidthMm)} mm, so the tape’s groove fits inside the collar.`,
     );
   }
-  return { collar, given };
+  const socket: SocketParams = {
+    lock: r.oneOf('portLock', PORT_LOCKS),
+    cap: r.oneOf('portCap', YES_NO) === 'yes',
+    screen: r.oneOf('portScreen', YES_NO) === 'yes',
+  };
+  return { collar, socket, given };
 }
 
 // The measured cutouts and their rim (measured-cutout, #23; C42): the clearance may be zero, as
@@ -695,7 +713,7 @@ export function readParams(values: FormValues): ReadResult {
   checkTrackWidth(r, thicknessMm, joint, edges, sealRead);
   checkPieceSize(r, printer, bedMarginMm, joint);
   checkSealFits(r, edges, sealRead);
-  const { collar, given: givenPorts } = readPorts(r, fit);
+  const { collar, socket, given: givenPorts } = readPorts(r, fit);
   const { rim, given: givenCutouts } = readCutouts(r, fit);
   const givenFans = readFans(r);
   const { clamp, given: givenClamps } = readClamps(r);
@@ -732,6 +750,7 @@ export function readParams(values: FormValues): ReadResult {
     coupon,
     sheet,
     material,
+    socket,
   };
   // Fittings and pieces' own patterns are placed against the plan they will be in: with any to
   // place, a printed piece keeps every piece to the printer's size, before they are placed.
@@ -742,7 +761,7 @@ export function readParams(values: FormValues): ReadResult {
   const plan = r.ok ? planWall({ ...toPlaceIn, ...none }) : undefined;
   let ports: Required<PortSetting>[] = [];
   if (plan !== undefined && givenPorts.length > 0) {
-    const check = (port: PortSetting & InPiece) => portProblem(plan, port, collar, fit, joint);
+    const check = (port: PortSetting & InPiece) => portProblem(plan, port, collar, fit, joint, socket);
     const placing = placeFittings(plan, { label: 'Port', plural: 'Ports', given: givenPorts, check });
     if (placing.ok) ports = placing.placed;
     else r.fail('ports', placing.problem);

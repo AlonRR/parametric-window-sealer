@@ -33,6 +33,7 @@ export const fittingSource = (
   clamps: params.clamps,
   inserts: params.inserts,
   collar: params.collar,
+  socket: params.socket,
   rim: params.rim,
   clamp: params.clamp,
   insert: params.insert,

@@ -120,23 +120,23 @@ describe('every kind of fitting', () => {
   const tpuSeal: SealParams = { kind: 'tpu', tape: { ...DEFAULT_TAPE, port: true } };
   const JAWS = ['jaw-138x21.3x15-print-2', 'jaw-69x21.3x15-print-2'];
   const SHUTTERS = ['shutter-32x89.4-print-2'];
-  it('with the TPU seal, prints a sleeve for the hose port, a frame for the cutout, nothing for the fan and the clamp’s jaws', () => {
+  it('with the TPU seal, prints a sleeve and a cap for the hose port, a frame for the cutout, nothing for the fan and the clamp’s jaws', () => {
     const tpu = tapeFit(tpuSeal);
     if (tpu === undefined) throw new Error('no fit for the TPU seal');
     const source = fittingSource({ ...params, seal: tpuSeal });
     const names = Object.fromEntries(FITTINGS.map((k) => [k.kind, k.parts(source, tpu).map((p) => p.name)]));
     expect(names).toEqual({
-      port: [expect.stringMatching(/^sleeve-150-tpu-print-1$/)],
+      port: ['sleeve-150-tpu-print-1', 'cap-150-print-1'], // a cap to start with (#114)
       cutout: [expect.stringMatching(/^frame-120x80-tpu-print-1$/)],
       fan: [],
       clamp: JAWS,
       insert: SHUTTERS,
     });
   });
-  it('without the TPU seal, prints only what a kind always needs: the clamp’s jaws and the insert’s shutters', () => {
+  it('without the TPU seal, prints only what a kind always needs: the port’s cap, the clamp’s jaws and the insert’s shutters', () => {
     const source = fittingSource({ ...params, seal: SEALS['tape'] ?? EXAMPLE_PARAMS.seal });
     const names = Object.fromEntries(FITTINGS.map((k) => [k.kind, k.parts(source, undefined).map((p) => p.name)]));
-    expect(names).toEqual({ port: [], cutout: [], fan: [], clamp: JAWS, insert: SHUTTERS });
+    expect(names).toEqual({ port: ['cap-150-print-1'], cutout: [], fan: [], clamp: JAWS, insert: SHUTTERS });
   });
   for (const kind of FITTINGS) {
     // A kind need print nothing (a fan is screwed straight on); what one prints is held to this.

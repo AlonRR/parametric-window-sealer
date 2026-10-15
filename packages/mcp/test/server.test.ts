@@ -504,7 +504,9 @@ describe('hose ports (hose-port #12; Q114: ports as a list)', () => {
     const settings = { ...OPENING, ports: [{ hoseMm: 150 }] };
     const planned = await call('window_sealer_plan_wall', { settings });
     expect(planned.isError).toBeFalsy();
-    expect(planned.data['summary'].ports).toEqual(['Hose port: a 150 mm hose end, in column 2, row 1.']);
+    expect(planned.data['summary'].ports).toEqual([
+      'Hose port: a 150 mm hose end, in column 2, row 1. A cap closes the port when the AC is off.',
+    ]);
     expect(planned.data['settings'].ports).toEqual([{ hoseMm: 150, column: 2, row: 1 }]);
     const made = await call('window_sealer_make_files', { settings: planned.data['settings'] });
     expect(made.isError).toBeFalsy();

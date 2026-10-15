@@ -4,6 +4,7 @@
 // with what the wall needs from it: each one in its piece, the piece's shape with it, the zone a
 // pattern keeps clear, its tag in the piece's file name, its seal for the preview, the parts
 // printed for it, and its lines and share of the seal in the plan.
+import type { SocketParams } from '../socket.js';
 import type { Manifold } from 'manifold-3d';
 import type { ClampParams, ClampSetting } from '../clamp.js';
 import type { InsertParams, InsertSetting } from '../insert.js';
@@ -31,6 +32,7 @@ export interface FittingSource {
   clamps: readonly Required<ClampSetting>[];
   inserts: readonly Required<InsertSetting>[];
   collar: CollarParams;
+  socket: SocketParams; // how the hose ports hold the hose, and their caps and screens (#114)
   rim: RimParams;
   clamp: ClampParams;
   insert: InsertParams;

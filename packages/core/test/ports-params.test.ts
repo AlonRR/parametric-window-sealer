@@ -120,8 +120,8 @@ describe('describePlan', () => {
     const r = read({ ports: '150@3,1 130@1,5' });
     if (!r.ok) throw new Error('settings');
     expect(describePlan(planWall(r.params), r.params).ports).toEqual([
-      'Hose port: a 150 mm hose end, in column 3, row 1.',
-      'Hose port: a 130 mm hose end, in column 1, row 5.',
+      'Hose port: a 150 mm hose end, in column 3, row 1. A cap closes the port when the AC is off.',
+      'Hose port: a 130 mm hose end, in column 1, row 5. A cap closes the port when the AC is off.',
     ]);
     expect(describePlan(planWall(EXAMPLE_PARAMS), EXAMPLE_PARAMS).ports).toEqual([]);
   });

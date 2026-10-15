@@ -21,6 +21,7 @@ import type { FrameShape, Rectangle } from './cutout.js';
 import type { JawShape } from './clamp.js';
 import type { ShutterShape } from './insert.js';
 import type { CouponShape } from './coupon.js';
+import type { CapShape, RingShape } from './socket.js';
 import { cutoutTag } from './cutout.js';
 import { portTag } from './port.js';
 import { hundredth } from './words.js';
@@ -97,12 +98,13 @@ export type WallPartShape = PartShape | EdgeShape | GasketShape | CouponShape;
 // Every part beside the pieces: the wall's own and the fittings', a sleeve in each hose port, a
 // frame in each cutout's rim and a clamp's jaws. A fitting with a new kind of part adds its shape
 // here and its name below; its solid stays in its own file (docs/extending.md, "A new fitting").
-export type AnyPartShape = WallPartShape | SleeveShape | FrameShape | JawShape | ShutterShape;
+export type AnyPartShape = WallPartShape | SleeveShape | FrameShape | JawShape | ShutterShape | RingShape | CapShape;
 
 // An edge strip's height depends on its track, so it is part of the name; with tape on its
 // sides, so is the track's depth, as two depths can give one size with grooves in different
 // places (Q127). A part printed in TPU says so (C37); a sleeve is named by its hose.
 export function partName(shape: AnyPartShape): string {
+  if (shape.kind === 'ring' || shape.kind === 'cap') return `${shape.kind}-${mm(shape.hoseMm)}-print-${shape.count}`;
   if (shape.kind === 'coupon') {
     const [first, last] = [shape.grips[0] ?? 0, shape.grips[shape.grips.length - 1] ?? 0];
     return `coupon-grip-${hundredth(first)}-to-${hundredth(last)}-print-${shape.count}`;

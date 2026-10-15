@@ -14,6 +14,12 @@ under Unreleased.
 
 ### Added
 
+- A hose port that locks and closes: under Advanced: the hose port, the hose can be held by a
+  printed ring clamped on its end with an M4 bolt, whose three pins twist into slots near the
+  collar's mouth (`--port-lock twist`); a cap for each port closes it while the AC is off
+  (`--port-cap`, on to start with); a screen of bars can fill its hole (`--port-screen`). How to fit
+  them: `docs/hose-port.md`. Not yet test printed.
+
 - Material advice: under The panel, the material (PETG to start with, ASA, or PLA for test fits),
   its colour and whether the wall gets sun (`--material`, `--colour`, `--sun`). The plan names it,
   says how hot the wall gets in sun, and warns where that, or a hose's exhaust, comes within 10 °C

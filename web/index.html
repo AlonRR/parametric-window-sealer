@@ -874,6 +874,29 @@
           </label>
           <p class="note">How far the panel reaches in past the collar: the hose end stops on it.</p>
           <span class="error" data-testid="error-collarLipMm"></span>
+          <!-- Holding and closing the port (hose-socket, #114). -->
+          <label>
+            Holding the hose
+            <select name="portLock">
+              <option value="push">Pushed into the collar</option>
+              <option value="twist">A ring on the hose end that twists in</option>
+            </select>
+          </label>
+          <p class="note">
+            The twist-lock prints a ring that clamps on the hose end with an M4 bolt; its three pins go
+            down slots near the collar's mouth and turn clockwise, so the hose cannot fall out.
+          </p>
+          <span class="error" data-testid="error-portLock"></span>
+          <label>
+            <input type="checkbox" name="portCap" value="yes" />
+            A cap to close the port while the AC is off
+          </label>
+          <span class="error" data-testid="error-portCap"></span>
+          <label>
+            <input type="checkbox" name="portScreen" value="yes" />
+            A screen of bars across the port's hole
+          </label>
+          <span class="error" data-testid="error-portScreen"></span>
           <div data-testid="extra-ports"></div>
           <p><button type="button" id="add-port" data-show-when="appliance=hose">Add another port</button></p>
         </details>

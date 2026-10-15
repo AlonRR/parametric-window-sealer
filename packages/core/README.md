@@ -61,6 +61,7 @@ Start from `EXAMPLE_PARAMS` and change what differs. Every length is in mm.
 | `edges`                                | The `window` (`'slider'` or `'hung'`), each edge's role (`'track'`, `'sash'`, `'sill'` or `'unit'`, against a window AC; `WINDOW_PRESETS`, `unitRoles`) and the `track`'s width, clearance and depth at each edge                                                   |
 | `ports`                                | Hose ports, none for a plain wall: each `{ hoseMm, column, row }`, the hose end's outside diameter (`COMMON_HOSE_MM`: 150 and 130) and its piece, from 1 at the bottom left seen from the room                     |
 | `collar`                               | The port's collar: `depthMm`, `wallMm`, `clearanceMm`, `lipMm` (`DEFAULT_COLLAR`)                                                                                                                                       |
+| `socket`                               | How each port holds the hose, `lock` `'push'` or `'twist'` (a printed ring that clamps on the hose end and twists in), and whether it has a `cap` and a `screen` (`DEFAULT_SOCKET`; `docs/hose-port.md`) |
 | `cutouts`                              | Measured cutouts, none to start with: each `{ widthMm, heightMm, column, row }`, the appliance's outside seen from the room and its piece, from 1 at the bottom left                                                    |
 | `rim`                                  | The rim round each cutout: `depthMm`, `wallMm`, `clearanceMm` (`DEFAULT_RIM`); lined with the seal when there is one                                                                                                   |
 | `fans`                                 | Fans from the list (`FANS`: 80, 92, 120 and 140 mm), none to start with: each `{ sizeMm, column, row }`, its piece from 1 at the bottom left                                                                           |
@@ -109,7 +110,9 @@ shapes (`plainPanel`, `portPanel`, `stripSolid`, `crossSolid`, `edgeStripSolid`)
 and pins (`ribPlacesMm`, `planPins`, `pinSlotsIn`, `pinSlotCuts`, `pinSolid`) and its test coupon
 (`couponShape`, `couponSolid`), the pieces cut from sheet (`isCut`, `printedFor`, `slotPins`,
 `describeSheet`, with `pieceLimit`, `printLimit` and `longestStripMm`), the material advice
-(`hottestC`, `describeMaterial`, `materialWarnings`, `GIVES_AT_C`), the hose
+(`hottestC`, `describeMaterial`, `materialWarnings`, `GIVES_AT_C`), the hose port's twist-lock,
+cap and screen (`socketEndMm`, `socketSlots`, `ringShapes`, `ringSolid`, `capShapes`, `capSolid`,
+`screenBars`), the hose
 port's rules (`checkPort`, `parsePorts`, `formatPorts`), the measured cutout's (`checkCutout`,
 `parseCutouts`, `formatCutouts`, `linedRim`, `cutoutPanel`, `frameShapes`, `frameSolid`), the fan mount's
 (`FANS`, `checkFan`, `parseFans`, `formatFans`, `fanPanel`), the clamps' (`checkClamp`, `parseClamps`,

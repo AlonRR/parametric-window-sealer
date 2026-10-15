@@ -13,6 +13,7 @@ import type { CollarParams, PortSetting } from './port.js';
 import { DEFAULT_RIM } from './cutout.js';
 import { DEFAULT_CLAMP } from './clamp.js';
 import { DEFAULT_INSERT } from './insert.js';
+import { DEFAULT_SOCKET } from './socket.js';
 import type { CutoutSetting, Rectangle, RimParams } from './cutout.js';
 import type { TapeFit } from './tape.js';
 import { patternedPanel, pieceOpenings } from './pattern.js';
@@ -126,6 +127,7 @@ export function buildPieces(
     clamps: [],
     inserts: [],
     collar,
+    socket: DEFAULT_SOCKET,
     rim,
     clamp: DEFAULT_CLAMP,
     insert: DEFAULT_INSERT,

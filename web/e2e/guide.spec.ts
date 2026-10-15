@@ -54,7 +54,9 @@ test('the third step follows what is in the window', async ({ page }) => {
   await page.getByRole('radio', { name: 'Portable AC hose' }).check();
   await expect(guide(page).getByRole('img', { name: /The end of a hose/ })).toBeVisible();
   await guide(page).getByLabel('Across the hose end (mm)').fill('142');
-  await expect(page.getByTestId('plan-ports')).toHaveText('Hose port: a 142 mm hose end, in column 2, row 1.');
+  await expect(page.getByTestId('plan-ports')).toHaveText(
+    'Hose port: a 142 mm hose end, in column 2, row 1. A cap closes the port when the AC is off.',
+  );
 
   await page.getByRole('radio', { name: 'Something else: a measured cutout' }).check();
   await expect(guide(page).getByRole('img', { name: /An appliance seen from the room/ })).toBeVisible();

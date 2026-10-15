@@ -13,7 +13,7 @@ yet test printed.** The page in `web/` takes the opening you can see and your wi
 divides the opening into pieces your printer can make, joins them with connector strips and
 cross pieces that hold by crush ribs and a filament pin ([`docs/joints.md`](docs/joints.md)), fits
 edge strips into the window's tracks, shows the wall in 3D and downloads
-every part as STL or 3MF. It fits a hose port, a measured cutout, an exhaust fan, an appliance held by
+every part as STL or 3MF. It fits a hose port that can lock and close ([`docs/hose-port.md`](docs/hose-port.md)), a measured cutout, an exhaust fan, an appliance held by
 clamps ([`docs/clamps.md`](docs/clamps.md)) or in a sliding insert ([`docs/sliding-insert.md`](docs/sliding-insert.md)) or a window air conditioner,
 cuts the pieces from sheet instead of printing them if you like ([`docs/sheet-pieces.md`](docs/sheet-pieces.md)),
 warns where the material you print in would get too hot ([`docs/materials.md`](docs/materials.md)),

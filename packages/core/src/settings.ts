@@ -14,6 +14,7 @@ import { PATTERNS } from './patterns/index.js';
 import { FANS } from './fan.js';
 import { PIECE_SOURCES } from './sheet.js';
 import { COLOURS, MATERIAL_KINDS } from './material.js';
+import { PORT_LOCKS } from './socket.js';
 import type { FieldName, FormValues, Params } from './params.js';
 
 export interface Setting {
@@ -190,6 +191,26 @@ export const SETTINGS: readonly Setting[] = [
     help: 'Clearance per side between the hose end and the collar.',
   },
   { field: 'collarLipMm', path: 'collar.lipMm', help: 'The lip the hose end stops against, inside the collar.' },
+  {
+    field: 'portLock',
+    path: 'socket.lock',
+    help: 'How a hose port holds the hose: pushed in, or by a printed ring that clamps on it and twists in.',
+    values: PORT_LOCKS,
+  },
+  {
+    field: 'portCap',
+    path: 'socket.cap',
+    help: 'A cap for each hose port, to close it while the AC is off: yes or no.',
+    values: YES_NO,
+    onOff: true,
+  },
+  {
+    field: 'portScreen',
+    path: 'socket.screen',
+    help: "Bars across each hose port's hole: yes or no.",
+    values: YES_NO,
+    onOff: true,
+  },
   {
     field: 'seal',
     path: 'seal.kind',

@@ -25,17 +25,25 @@ test('a hose: 150 mm in the bottom row’s middle piece, a listed size or your o
   await expect(page.getByLabel('Hose end, outside diameter')).toHaveValue('150');
   await expect(page.getByTestId('port-1').getByLabel('Column', { exact: true })).toHaveValue('2');
   await expect(page.getByTestId('port-1').getByLabel('Row', { exact: true })).toHaveValue('1');
-  await expect(ports(page)).toHaveText('Hose port: a 150 mm hose end, in column 2, row 1.');
+  await expect(ports(page)).toHaveText(
+    'Hose port: a 150 mm hose end, in column 2, row 1. A cap closes the port when the AC is off.',
+  );
   await expect(page.getByText('Measure across the outside of the end that goes into the port')).toBeVisible();
 
   await page.getByLabel('Hose end, outside diameter').selectOption('130');
-  await expect(ports(page)).toHaveText('Hose port: a 130 mm hose end, in column 2, row 1.');
+  await expect(ports(page)).toHaveText(
+    'Hose port: a 130 mm hose end, in column 2, row 1. A cap closes the port when the AC is off.',
+  );
   await page.getByLabel('Hose end, outside diameter').selectOption('own');
   await page.getByLabel('Your measurement (mm)').fill('142');
-  await expect(ports(page)).toHaveText('Hose port: a 142 mm hose end, in column 2, row 1.');
+  await expect(ports(page)).toHaveText(
+    'Hose port: a 142 mm hose end, in column 2, row 1. A cap closes the port when the AC is off.',
+  );
 
   await page.getByTestId('port-1').getByLabel('Column', { exact: true }).fill('3');
-  await expect(ports(page)).toHaveText('Hose port: a 142 mm hose end, in column 3, row 1.');
+  await expect(ports(page)).toHaveText(
+    'Hose port: a 142 mm hose end, in column 3, row 1. A cap closes the port when the AC is off.',
+  );
 });
 
 test('a piece too small for the port is said so, with what fixes it (Q108)', async ({ page }) => {
@@ -61,7 +69,7 @@ test('the collar and more ports under Advanced (Q107, Q113)', async ({ page }) =
   await extra.getByLabel('Column').fill('1');
   await extra.getByLabel('Row').fill('4');
   await expect(ports(page)).toHaveText(
-    'Hose port: a 150 mm hose end, in column 2, row 1.Hose port: a 150 mm hose end, in column 1, row 4.',
+    'Hose port: a 150 mm hose end, in column 2, row 1. A cap closes the port when the AC is off.Hose port: a 150 mm hose end, in column 1, row 4. A cap closes the port when the AC is off.',
   );
   await extra.getByLabel('Row').fill('1');
   await extra.getByLabel('Column').fill('2');
@@ -69,7 +77,9 @@ test('the collar and more ports under Advanced (Q107, Q113)', async ({ page }) =
     'Ports 1 and 2 are both in column 2, row 1; give each its own piece.',
   );
   await extra.getByRole('button', { name: 'Remove' }).click();
-  await expect(ports(page)).toHaveText('Hose port: a 150 mm hose end, in column 2, row 1.');
+  await expect(ports(page)).toHaveText(
+    'Hose port: a 150 mm hose end, in column 2, row 1. A cap closes the port when the AC is off.',
+  );
 });
 
 test('back to none removes the port', async ({ page }) => {
@@ -92,5 +102,32 @@ test('the port’s piece is in the download, named with its hose', async ({ page
   ]);
   const names = Object.keys(unzipSync(await readFile((await download.path()) ?? '')));
   expect(names).toContain('piece-c2-r1-197.7x198.6-port-150.stl');
-  expect(names).toHaveLength(15 + 6);
+  expect(names).toContain('cap-150-print-1.stl'); // a cap to start with (#114)
+  expect(names).toHaveLength(15 + 6 + 1);
+});
+
+test('the hose held by a ring that twists in, with a screen: the plan says so, the ring is printed', async ({
+  page,
+}) => {
+  await expect(page.getByTestId('engine-status')).toHaveAttribute('data-state', 'ready');
+  await hose(page).check();
+  await page.getByText('Advanced: the hose port').click();
+  await page.getByLabel('Holding the hose').selectOption('twist');
+  await page.getByLabel("A screen of bars across the port's hole").check();
+  await expect(ports(page)).toHaveText(
+    'Hose port: a 150 mm hose end, in column 2, row 1. A printed ring clamps on the hose end with an M4 bolt ' +
+      'at least 22 mm long, and twists into the collar, clockwise seen from the room. A cap closes the port ' +
+      'when the AC is off. A screen fills its hole.',
+  );
+  await page.getByRole('button', { name: 'Download the pieces' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Download the pieces' });
+  await dialog.getByRole('radio', { name: 'STL', exact: true }).check();
+  await dialog.getByRole('radio', { name: 'One zip file' }).check();
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    dialog.getByRole('button', { name: 'Download', exact: true }).click(),
+  ]);
+  const names = Object.keys(unzipSync(await readFile((await download.path()) ?? '')));
+  expect(names).toContain('ring-150-print-1.stl');
+  expect(names).toContain('cap-150-print-1.stl');
 });
