@@ -20,6 +20,7 @@ import type { GasketShape, SleeveShape } from './tpu.js';
 import type { FrameShape, Rectangle } from './cutout.js';
 import type { JawShape } from './clamp.js';
 import type { ShutterShape } from './insert.js';
+import type { SliderShape } from './slider.js';
 import type { CouponShape } from './coupon.js';
 import type { RailShape } from './rail.js';
 import type { StopShape } from './stop.js';
@@ -97,7 +98,8 @@ const fileOf = (piece: ExportPiece, extension: Format): string =>
 // The wall's own parts beside the pieces: the joints, the edge strips, the TPU seal's gaskets, the
 // filler between the sashes and the sash stop if there are any, and if asked for, the joint's test
 // coupon.
-export type WallPartShape = PartShape | EdgeShape | GasketShape | CouponShape | RailShape | StopShape | ClipShape;
+export type WallPartShape =
+  PartShape | EdgeShape | GasketShape | CouponShape | RailShape | StopShape | ClipShape | SliderShape;
 
 // Every part beside the pieces: the wall's own and the fittings', a sleeve in each hose port, a
 // frame in each cutout's rim and a clamp's jaws. A fitting with a new kind of part adds its shape
@@ -131,7 +133,7 @@ export function partName(shape: AnyPartShape): string {
   const height = shape.kind === 'edge' || shape.kind === 'gasket' ? `x${mm(shape.heightMm)}` : '';
   const side =
     shape.kind === 'edge' && shape.groove?.side !== undefined ? `-track-${mm(shape.groove.side.trackMm)}` : '';
-  const tpu = shape.kind === 'gasket' || (shape.kind !== 'edge' && shape.tpu === true) ? '-tpu' : '';
+  const tpu = shape.kind === 'gasket' || ('tpu' in shape && shape.tpu === true) ? '-tpu' : '';
   return `${shape.kind}-${mm(shape.lengthMm)}x${mm(shape.widthMm)}${height}${side}${tpu}-print-${shape.count}`;
 }
 

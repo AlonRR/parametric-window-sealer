@@ -16,10 +16,11 @@
 
 import type { GridLayout } from './layout.js';
 
-// H-strips between the pieces, or puzzle dovetails on their edges (joint-dovetail, #29): then the
-// pieces meet edge to edge and there are no strips or cross pieces; the edge strips stay.
-export type JointStyle = 'strips' | 'dovetails';
-export const JOINT_STYLES: readonly JointStyle[] = ['strips', 'dovetails'];
+// H-strips between the pieces, or puzzle dovetails on their edges (joint-dovetail, #29), or sliding
+// dovetail rails (joint-rails, #30): with either of those the pieces meet edge to edge and there are
+// no strips or cross pieces; the edge strips stay.
+export type JointStyle = 'strips' | 'dovetails' | 'rails';
+export const JOINT_STYLES: readonly JointStyle[] = ['strips', 'dovetails', 'rails'];
 
 export interface JointParams {
   style: JointStyle;
@@ -59,8 +60,8 @@ export const PIN_SLOT_MM = 2;
 // slot's mouth, and 1 mm of piece between its slot and the piece's edge.
 export const PIN_HOLD_MM = 4;
 
-// Puzzle dovetails take no width between the pieces: their fit is carved from the pieces' edges.
-export const jointWidthMm = (j: JointParams): number => (j.style === 'dovetails' ? 0 : j.webMm + j.slideMm);
+// Without strips the pieces meet: the dovetails' fit is carved from their edges, the rails stand on them.
+export const jointWidthMm = (j: JointParams): number => (j.style === 'strips' ? j.webMm + j.slideMm : 0);
 export const stripWidthMm = (j: JointParams): number => 2 * j.slotMm + j.webMm;
 export const stripThicknessMm = (j: JointParams, panelMm: number): number => panelMm + 2 * j.fitMm + 2 * j.flangeMm;
 
@@ -149,7 +150,7 @@ function stripSpans(lengths: number[], starts: number[], crossings: number[], j:
 // (track-edge, #11) that is jointStripInsetMm in edge.ts. A strip longer than maxStripMm, along a
 // piece larger than the printer makes (cut from sheet, #112), is split as the edge strips are.
 export function planJoints(layout: GridLayout, joint: JointParams, edgeInsetMm = 0, maxStripMm = Infinity): JointPlan {
-  if (joint.style === 'dovetails') return { strips: [], crosses: [] };
+  if (joint.style !== 'strips') return { strips: [], crosses: [] };
   const half = stripWidthMm(joint) / 2;
   const cols = runs(layout.columns, layout.columnJointsMm);
   const rows = runs(layout.rows, layout.rowJointsMm);

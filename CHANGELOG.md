@@ -15,6 +15,11 @@ published work (Q153). Changes since the latest version are listed under Unrelea
 
 ### Added
 
+- Sliding dovetail rails, a third joint style: Joint style: Sliding dovetail rails (`--joint-style
+  rails`). The pieces meet edge to edge, each with half a dovetail rail, 4 mm high, along every edge it
+  shares on its room side, and a printed slider slides along each pair, holding the pieces in and
+  across the wall's plane; it slides off to take the wall apart. The plan counts the sliders, and the
+  download has them (`slider-…`). How: `docs/joints.md`. Not yet test printed.
 - Puzzle dovetails, a joint style beside the H-strips: under Advanced: the joint between pieces, Joint
   style: Puzzle dovetails (`--joint-style dovetails`). The pieces meet edge to edge, and along each
   joint the one on the left, or below, has dovetail tabs, 6 mm deep, that press down into sockets in

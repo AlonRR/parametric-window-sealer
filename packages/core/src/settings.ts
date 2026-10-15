@@ -166,9 +166,9 @@ export const SETTINGS: readonly Setting[] = [
     field: 'jointStyle',
     path: 'joint.style',
     help:
-      'The joint between pieces: strips (H-strips, the pieces sliding into them) or dovetails (puzzle dovetails, ' +
-      'the pieces pressed into each other).',
-    values: ['strips', 'dovetails'],
+      'The joint between pieces: strips (H-strips, the pieces sliding into them), dovetails (puzzle dovetails, ' +
+      'the pieces pressed into each other) or rails (sliding dovetail rails on the pieces, held by printed sliders).',
+    values: ['strips', 'dovetails', 'rails'],
   },
   { field: 'slotMm', path: 'joint.slotMm', help: 'How deep a piece can go into a strip.' },
   { field: 'slideMm', path: 'joint.slideMm', help: 'How far a piece can move in its slot.' },

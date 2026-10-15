@@ -852,6 +852,7 @@
             <select name="jointStyle">
               <option value="strips">H-strips</option>
               <option value="dovetails">Puzzle dovetails</option>
+              <option value="rails">Sliding dovetail rails</option>
             </select>
           </label>
           <span class="error" data-testid="error-jointStyle"></span>
@@ -866,6 +867,12 @@
             with the fit as clearance all round. They hold in the wall's plane; across it only their
             fit holds them, so glue them for a lasting wall. No strips or cross pieces are printed;
             the slot and flanges below are the edge strips'.
+          </p>
+          <p class="note" data-show-when="jointStyle=rails" hidden>
+            Pieces meet edge to edge, each with half a dovetail rail along the edges it shares, on its
+            room side. A printed slider slides along each pair of halves and holds the two pieces in
+            and across the wall's plane; it slides off to take the wall apart. The fit is the slider's
+            clearance; the slot and flanges below are the edge strips'.
           </p>
           <label>
             Slot depth (mm)

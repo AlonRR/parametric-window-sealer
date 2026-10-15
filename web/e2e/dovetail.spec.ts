@@ -49,3 +49,23 @@ test('pieces cut from sheet are refused with them', async ({ page }) => {
     'Puzzle dovetails are printed: print the pieces, or choose the H-strips.',
   );
 });
+
+// Sliding dovetail rails (joint-rails, #30): the third joint style.
+test('sliding rails: the plan counts the sliders, and the download has them', async ({ page }) => {
+  await expect(page.getByTestId('engine-status')).toHaveAttribute('data-state', 'ready');
+  await page.getByLabel('Joint style').selectOption('rails');
+  await expect(page.getByLabel('Grip (mm per face)', { exact: true })).toBeHidden();
+  await expect(page.getByText('A printed slider slides along each pair of halves')).toBeVisible();
+  await expect(page.getByTestId('plan-joints')).toHaveText(/^Joints: sliding dovetail rails, 38 sliders in 4 lengths/);
+  await page.getByRole('button', { name: 'Download the pieces' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Download the pieces' });
+  await dialog.getByRole('radio', { name: 'STL', exact: true }).check();
+  await dialog.getByRole('radio', { name: 'One zip file' }).check();
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    dialog.getByRole('button', { name: 'Download', exact: true }).click(),
+  ]);
+  const names = Object.keys(unzipSync(await readFile((await download.path()) ?? '')));
+  expect(names.filter((n) => n.startsWith('slider-'))).toHaveLength(4);
+  expect(names.some((n) => n.startsWith('strip-') || n.startsWith('cross-'))).toBe(false);
+});

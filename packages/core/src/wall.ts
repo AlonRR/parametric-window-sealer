@@ -10,6 +10,7 @@ import { MEDIA_TYPES, checkChoice, meshOf, packageDownload, partName, taggedFile
 import type { AnyPartShape, DownloadChoice, DownloadFile, ExportPart, ExportPiece, WallPartShape } from './export.js';
 import { partShapes, planPins } from './joint.js';
 import { planDovetails } from './dovetail.js';
+import { sliderShapes, sliderSolid } from './slider.js';
 import { couponShape, couponSolid } from './coupon.js';
 import { planRail, railGasketLengths, railShapes, railSolid } from './rail.js';
 import { planStop, stopShapes, stopSolid } from './stop.js';
@@ -38,7 +39,7 @@ import type { PlanText } from './plan-text.js';
 // always the clamps' jaws (#32), the filler between the sashes if there is one, with printed TPU its
 // gaskets (#116), the sash stop if there is one (#118), and if asked for, the joint's test coupon (#110).
 function wallParts(params: Params, plan: GridLayout): FittingPart[] {
-  const { joints, edges } = planParts(params, plan);
+  const { joints, edges, sliders } = planParts(params, plan);
   const { joint, thicknessMm } = params;
   const fit = tapeFit(params.seal);
   const tpu = params.seal.kind === 'tpu' && fit !== undefined ? fit : undefined;
@@ -47,6 +48,7 @@ function wallParts(params: Params, plan: GridLayout): FittingPart[] {
   const railGaskets = railGasketLengths(rail, longestStripMm(params));
   const own: WallPartShape[] = [
     ...partShapes(joints, joint).map((s) => (inTpu ? { ...s, tpu: true as const } : s)),
+    ...sliderShapes(sliders, joint),
     ...edgeShapes(edges),
     ...(tpu === undefined ? [] : gasketShapes(edges, tpu, params.seal.tape.thicknessMm, railGaskets)),
     ...(rail === undefined ? [] : railShapes(rail)),
@@ -74,6 +76,8 @@ function wallParts(params: Params, plan: GridLayout): FittingPart[] {
         return stopSolid(engine, shape);
       case 'clip':
         return clipSolid(engine, joint);
+      case 'slider':
+        return sliderSolid(engine, shape.lengthMm, joint);
       default: {
         const unknown: never = shape;
         throw new Error(`No part of kind ${(unknown as WallPartShape).kind}`);
@@ -114,7 +118,20 @@ export function buildExport(engine: Engine, params: Params): { pieces: ExportPie
   const printed = (cell: { column: number; row: number }) => !isCut(params, cell);
   const dovetails =
     params.joint.style === 'dovetails' ? { joint: params.joint, tabs: planDovetails(plan, params.joint) } : undefined;
-  const built = buildPiecesWith(engine, plan, params.thicknessMm, fittings, pattern, pins, hollow, printed, dovetails);
+  const rails =
+    params.joint.style === 'rails' ? { joint: params.joint, sliders: planParts(params, plan).sliders } : undefined;
+  const built = buildPiecesWith(
+    engine,
+    plan,
+    params.thicknessMm,
+    fittings,
+    pattern,
+    pins,
+    hollow,
+    printed,
+    dovetails,
+    rails,
+  );
   let pieces: ExportPiece[];
   try {
     pieces = built.flatMap((b, i) => {

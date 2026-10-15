@@ -523,14 +523,16 @@ function readSeal(r: FormReader): SealRead {
   return { seal, fit, sideTape };
 }
 
-// Puzzle dovetails (#29) are printed, and have no strips: none in TPU, and no coupon for their grip.
-function checkDovetails(r: FormReader, joint: JointParams, sheet: SheetParams, seal: SealParams, coupon: boolean) {
-  if (joint.style !== 'dovetails') return;
-  if (sheet.source === 'sheet') {
-    r.fail('jointStyle', 'Puzzle dovetails are printed: print the pieces, or choose the H-strips.');
-  }
-  if (seal.kind === 'tpu' && seal.tape.joints) r.fail('tpuJoints', 'Puzzle dovetails have no strips to print in TPU.');
-  if (coupon) r.fail('coupon', 'The coupon tries the strips’ grip; puzzle dovetails have no strips.');
+// Puzzle dovetails (#29) and sliding rails (#30) are printed on the pieces, and have no strips: none
+// in TPU, and no coupon for their grip.
+const JOINT_NAMES = { dovetails: 'Puzzle dovetails', rails: 'Sliding rails' } as const;
+
+function checkJoinery(r: FormReader, joint: JointParams, sheet: SheetParams, seal: SealParams, coupon: boolean) {
+  if (joint.style === 'strips') return;
+  const name = JOINT_NAMES[joint.style];
+  if (sheet.source === 'sheet') r.fail('jointStyle', `${name} are printed: print the pieces, or choose the H-strips.`);
+  if (seal.kind === 'tpu' && seal.tape.joints) r.fail('tpuJoints', `${name} have no strips to print in TPU.`);
+  if (coupon) r.fail('coupon', `The coupon tries the strips’ grip; ${name.toLowerCase()} have no strips.`);
 }
 
 // An edge strip keeps walls as thick as the joint's flanges either side of its slot; a seal on
@@ -822,7 +824,7 @@ export function readParams(values: FormValues): ReadResult {
     );
   }
   const stop = readStop(r, edges);
-  checkDovetails(r, joint, sheet, seal, coupon);
+  checkJoinery(r, joint, sheet, seal, coupon);
   checkTrackWidth(r, thicknessMm, joint, edges, sealRead);
   checkPieceSize(r, printer, bedMarginMm, joint);
   checkSealFits(r, edges, sealRead);

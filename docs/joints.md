@@ -88,11 +88,34 @@ The stiffeners clip to the strips, so the plan says to choose the H-strips to st
 The edge strips still have their weep holes. The preview draws the pieces square, without their
 tabs.
 
+## Sliding dovetail rails
+
+**Joint style: Sliding dovetail rails** also joins the pieces without strips, and holds them both in
+and across the wall's plane. The pieces meet edge to edge. Each piece has half a dovetail rail
+along every edge it shares, standing on its room side and flush with the joint, so the two halves
+make one dovetail. A printed slider with a dovetail groove slides along each pair from the joint's
+end.
+
+- Each half rail is 4 mm high, 3 mm wide at the piece's face and 4 mm at its top, so its side leans
+  about 14° and prints without support.
+- The slider's groove takes the two halves with the fit (0.2 mm a face to start with) as clearance.
+  Its walls and floor are 2 mm, so with the starting fit it is 12.4 mm wide and 6.2 mm high. It
+  prints groove up.
+- There is one slider along each joint between two crossings. It stops 1 mm short of the slider
+  across it, and as far from the wall's edge as the H-strips stop from an edge strip. The rails run
+  as far as their slider.
+- The corners stay square, as with the dovetails, and the bed-side chamfer runs round each piece.
+
+To put the wall together, lay the pieces room side up, edge to edge, and slide a slider along each
+pair of rails from its end. To take it apart, slide them off. The same settings are refused as with
+the puzzle dovetails, and the same lines in the plan apply. The preview draws neither the rails nor
+the sliders.
+
 ## The settings
 
 | On the page | Command | Library and MCP server | Starts at |
 | --- | --- | --- | --- |
-| Joint style | `--joint-style strips` or `dovetails` | `joint.style` | strips |
+| Joint style | `--joint-style strips`, `dovetails` or `rails` | `joint.style` | strips |
 | Grip (mm per face) | `--grip` | `joint.gripMm` | 0.15; 0 leaves the strips without ribs |
 | Pin each strip | `--pins yes` or `no` | `joint.pins` | yes |
 | Add a test coupon to the download | `--coupon yes` or `no` | `coupon` | no |
@@ -109,3 +132,5 @@ while the pins are on.
   little small, which is what holds it.
 - That the dovetails' 0.2 mm a face lets them press together and hold, and how far a dovetailed
   wall steps at a joint in wind: a test print.
+- That a slider slides along its rails with 0.2 mm a face, and that the rails' 14° lean prints
+  clean: a test print.

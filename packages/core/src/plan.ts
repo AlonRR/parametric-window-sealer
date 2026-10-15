@@ -4,6 +4,8 @@ import { jointStripInsetMm, panelSpan, planEdges } from './edge.js';
 import type { EdgeStripPlacement } from './edge.js';
 import { jointWidthMm, minPieceMm, planJoints } from './joint.js';
 import { DOVETAIL } from './dovetail.js';
+import { planSliders } from './slider.js';
+import type { SliderPlacement } from './slider.js';
 import { anyPrinted } from './sheet.js';
 import type { JointPlan } from './joint.js';
 import { layoutGrid } from './layout.js';
@@ -27,8 +29,8 @@ function layoutFor(p: Params, max: PieceSize): GridLayout {
     maxPieceHeightMm: max.heightMm - room,
     minPieceMm: minPieceMm(p.joint), // Q76
     jointMm: jointWidthMm(p.joint),
-    // each piece moves half of it, from the middle; dovetailed pieces do not move
-    jointSpreadMm: p.joint.style === 'dovetails' ? 0 : p.joint.slideMm,
+    // each piece moves half of it, from the middle; pieces without strips do not move
+    jointSpreadMm: p.joint.style === 'strips' ? p.joint.slideMm : 0,
     width: p.width,
     height: p.height,
   });
@@ -71,6 +73,7 @@ export interface WallParts {
   plan: GridLayout;
   joints: JointPlan;
   edges: EdgeStripPlacement[];
+  sliders: SliderPlacement[]; // on sliding dovetail rails (#30)
 }
 
 // Everything the wall is made of, in the pieces' frame: the plan, the joint strips and
@@ -82,6 +85,7 @@ export function planParts(p: Params, plan: GridLayout = planWall(p)): WallParts 
   return {
     plan,
     joints: planJoints(plan, p.joint, jointStripInsetMm(p.joint), longest),
+    sliders: planSliders(plan, p.joint, jointStripInsetMm(p.joint), longest),
     edges: planEdges(span.widthMm, span.heightMm, p.edges, p.joint, longest, tape),
   };
 }

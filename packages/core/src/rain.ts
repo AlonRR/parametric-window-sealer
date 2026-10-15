@@ -27,9 +27,9 @@ export function describeRain(p: { rain: boolean; seal: SealParams; edges: EdgePa
   if (p.rain) {
     const drip =
       p.seal.kind === 'none' ? ' A groove under each edge strip stops water creeping under it to the room.' : '';
-    // Puzzle dovetails (#29) have no strips, only the edge strips.
+    // Puzzle dovetails (#29) and sliding rails (#30) have no strips, only the edge strips.
     const which =
-      p.joint.style === 'dovetails'
+      p.joint.style !== 'strips'
         ? 'every edge strip has weep holes in one flange to let water out of its slot'
         : 'every strip and edge strip has weep holes in one flange to let water out of its slots';
     lines.push(`Rain: ${which}; fit each with that flange outside.${drip}`);

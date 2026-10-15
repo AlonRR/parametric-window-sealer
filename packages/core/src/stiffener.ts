@@ -128,7 +128,7 @@ export function describeStiffeners(p: Params): string[] {
   if (plan === undefined) return [];
   const across = plan.axis === 'horizontal' ? 'across' : 'high';
   const start = `Stiffeners: the wall is ${mm(plan.spanMm)} mm ${across}, more than ${mm(STIFFEN_OVER_MM)}`;
-  if (p.joint.style === 'dovetails') {
+  if (p.joint.style !== 'strips') {
     return [`${start}; the stiffeners clip to the H-strips, so choose them to stiffen it.`];
   }
   if (!plan.pinned) return [`${start}; turn the pins on to clip a stiffener to it.`];

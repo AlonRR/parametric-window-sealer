@@ -3,6 +3,7 @@
 import { EDGES, edgeShapes, panelSpan } from './edge.js';
 import { PIN_MM, jointWidthMm, minPieceMm, partShapes, pinLengthMm } from './joint.js';
 import { describeDovetails } from './dovetail.js';
+import { describeSliders } from './slider.js';
 import { COUPON_SECTIONS, couponGrips } from './coupon.js';
 import { describeSheet } from './sheet.js';
 import { describeMaterial, materialWarnings } from './material.js';
@@ -187,7 +188,9 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     joints:
       params.joint.style === 'dovetails'
         ? describeDovetails(plan, params.joint)
-        : describeJoints(parts.joints, params.joint, params.thicknessMm, params.coupon),
+        : params.joint.style === 'rails'
+          ? describeSliders(parts.sliders, params.joint)
+          : describeJoints(parts.joints, params.joint, params.thicknessMm, params.coupon),
     edges: `Edges: ${plural(parts.edges.length, 'edge strip', 'edge strips')} in ${plural(shapes, 'shape', 'shapes')}.`,
     warnings: [
       ...plan.warnings.map((w) => {
