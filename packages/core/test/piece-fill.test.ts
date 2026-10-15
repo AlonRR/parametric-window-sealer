@@ -131,9 +131,11 @@ describe('the plan text', () => {
 describe('the files', () => {
   it('each piece is built with its own fill; the rest with the wall’s (C27)', async () => {
     const engine = await loadEngine();
-    const wall = buildExport(engine, { ...EXAMPLE_PARAMS, fill: grid });
+    // Without pins, so a sealed piece is a plain box.
+    const unpinned = { ...EXAMPLE_PARAMS, joint: { ...EXAMPLE_PARAMS.joint, pins: false } };
+    const wall = buildExport(engine, { ...unpinned, fill: grid });
     const one = buildExport(engine, {
-      ...EXAMPLE_PARAMS,
+      ...unpinned,
       fill: grid,
       pieceFills: [{ column: 2, row: 1, kind: 'sealed' }],
     });

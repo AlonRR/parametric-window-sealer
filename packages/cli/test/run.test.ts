@@ -98,7 +98,11 @@ describe('what it prints (Q87)', () => {
     expect(result.plan.pieces).toHaveLength(15);
     expect(result.out).toBe('window-sealer-600x1000/');
     expect(result.files).toHaveLength(21);
-    expect(result.files[0]).toEqual({ name: 'piece-c1-r1-197.7x198.6.stl', type: 'model/stl', bytes: 684 });
+    // The library's own file: a corner piece with its pins' slots (#110), more than a plain block's 684 bytes.
+    const wall = await makeWall(EXAMPLE_PARAMS, { format: 'stl', packaging: 'separate' });
+    const bytes = wall.files[0]?.bytes.length ?? 0;
+    expect(bytes).toBeGreaterThan(684);
+    expect(result.files[0]).toEqual({ name: 'piece-c1-r1-197.7x198.6.stl', type: 'model/stl', bytes });
   });
 
   it('--json: errors as JSON too, naming the flag and the setting', async () => {

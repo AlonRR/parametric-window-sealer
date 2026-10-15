@@ -13,12 +13,13 @@ test.beforeEach(async ({ page }) => {
 
 const guide = (page: Page) => page.getByTestId('guide');
 
-test('four steps, each with a drawing, filling the form as you type (C58, C59, C60)', async ({ page }) => {
+test('five steps, the first four with a drawing, filling the form as you type', async ({ page }) => {
   await expect(guide(page).getByRole('heading')).toHaveText([
     '1. The opening',
     '2. The track',
     '3. What passes through the wall',
     '4. A printed strip and piece',
+    '5. The grip', // joint-lock, #110
   ]);
   // A drawing for each thing to measure; the third step's follows what is in the window.
   for (const step of ['opening', 'track', 'test']) {
@@ -31,6 +32,13 @@ test('four steps, each with a drawing, filling the form as you type (C58, C59, C
   await expect(page.getByTestId('plan-span')).toContainText('for a 700 × 1000 mm opening');
   await guide(page).getByLabel('Track width, inside (mm)').fill('16');
   await expect(page.getByLabel('Track width (mm)')).toHaveValue('16');
+});
+
+test('the grip from the test coupon fills the joint’s grip (joint-lock, #110)', async ({ page }) => {
+  const step = guide(page).locator('section[data-step="grip"]');
+  await expect(step.getByLabel('Grip of the strip that held best (mm per face)')).toHaveValue('0.15');
+  await step.getByLabel('Grip of the strip that held best (mm per face)').fill('0.2');
+  await expect(page.getByLabel('Grip (mm per face)', { exact: true })).toHaveValue('0.2');
 });
 
 test('one track depth for every edge in a track (C61)', async ({ page }) => {

@@ -13,7 +13,7 @@
 
 import { EDGES, EXAMPLE_TRACK, WINDOW_PRESETS, panelSpan } from './edge.js';
 import type { EdgeName, EdgeParams, EdgeRole, WindowType } from './edge.js';
-import { DEFAULT_JOINT, jointWidthMm } from './joint.js';
+import { DEFAULT_JOINT, PIN_HOLD_MM, jointWidthMm } from './joint.js';
 import type { JointParams } from './joint.js';
 import type { AxisMode, FillerPosition, GridLayout, Leftover } from './layout.js';
 import { DEFAULT_MAX_PIECE, maxPieceSize } from './printer.js';
@@ -81,6 +81,7 @@ export interface Params {
   clamp: ClampParams; // their jaws
   inserts: Required<InsertSetting>[]; // appliances in a sliding insert (#38); none to start with
   insert: InsertParams; // its shutters
+  coupon: boolean; // the joint's test coupon in the download too (joint-lock, #110)
 }
 
 // The page starts here: an example opening (Q42, labelled as an example, Q18), the default
@@ -109,6 +110,7 @@ export const EXAMPLE_PARAMS: Params = {
   clamp: DEFAULT_CLAMP,
   inserts: [],
   insert: DEFAULT_INSERT,
+  coupon: false,
 };
 
 // Every field of the page's form. The page reads and writes these by name; the settings list
@@ -134,6 +136,9 @@ export const FIELD_NAMES = [
   'webMm',
   'flangeMm',
   'fitMm',
+  'gripMm',
+  'pins',
+  'coupon',
   'window',
   'topEdge',
   'bottomEdge',
@@ -258,7 +263,8 @@ function readDivision(r: FormReader): { width: AxisChoice; height: AxisChoice } 
 }
 
 // The panels' thickness and the joint between them (Q13, Q50 to Q53). The slide and the fit
-// may be zero: a joint that does not slide, or a printer that needs no clearance.
+// may be zero: a joint that does not slide, or a printer that needs no clearance; so may the grip,
+// for strips without ribs. A pin needs some slot beyond the slide to hold it (joint-lock, #110).
 
 const panelForm = (p: Params): FormValues => ({
   thicknessMm: String(p.thicknessMm),
@@ -267,9 +273,12 @@ const panelForm = (p: Params): FormValues => ({
   webMm: String(p.joint.webMm),
   flangeMm: String(p.joint.flangeMm),
   fitMm: String(p.joint.fitMm),
+  gripMm: String(p.joint.gripMm),
+  pins: yesNo(p.joint.pins),
+  coupon: yesNo(p.coupon),
 });
 
-function readPanel(r: FormReader): { thicknessMm: number; joint: JointParams } {
+function readPanel(r: FormReader): { thicknessMm: number; joint: JointParams; coupon: boolean } {
   const thicknessMm = r.size('thicknessMm');
   const joint: JointParams = {
     slotMm: r.size('slotMm'),
@@ -277,11 +286,20 @@ function readPanel(r: FormReader): { thicknessMm: number; joint: JointParams } {
     webMm: r.size('webMm'),
     flangeMm: r.size('flangeMm'),
     fitMm: r.sizeOrZero('fitMm'),
+    gripMm: r.sizeOrZero('gripMm'),
+    pins: r.oneOf('pins', YES_NO) === 'yes',
   };
+  const coupon = r.oneOf('coupon', YES_NO) === 'yes';
   if (joint.slideMm >= joint.slotMm) {
     r.fail('slideMm', 'Make it less than the slot depth, so a piece always stays in its slot.');
+  } else if (joint.pins && joint.slotMm - joint.slideMm < PIN_HOLD_MM - 1e-9) {
+    r.fail(
+      'pins',
+      `A pin needs the slot at least ${mm(PIN_HOLD_MM)} mm deeper than the slide; this one is ` +
+        `${mm(joint.slotMm - joint.slideMm)} mm deeper. Make the slot deeper or the slide shorter, or turn the pins off.`,
+    );
   }
-  return { thicknessMm, joint };
+  return { thicknessMm, joint, coupon };
 }
 
 // The window and its four edges (Q66, Q71, Q75). A track's depth is read only where the edge is
@@ -631,7 +649,7 @@ export function readParams(values: FormValues): ReadResult {
   const opening = readOpening(r);
   const { printer, bedMarginMm } = readPrinter(r);
   const { width, height } = readDivision(r);
-  const { thicknessMm, joint } = readPanel(r);
+  const { thicknessMm, joint, coupon } = readPanel(r);
   const edges = readEdges(r);
   const sealRead = readSeal(r);
   const { seal, fit } = sealRead;
@@ -653,7 +671,20 @@ export function readParams(values: FormValues): ReadResult {
 
   // What is placed in pieces, once everything else is sound: the ports, the cutouts, the fans and
   // the clamps, then each piece's own fill, each against the plan the ones before it allow.
-  const base = { ...opening, printer, bedMarginMm, width, height, thicknessMm, joint, edges, collar, seal, fill };
+  const base = {
+    ...opening,
+    printer,
+    bedMarginMm,
+    width,
+    height,
+    thicknessMm,
+    joint,
+    edges,
+    collar,
+    seal,
+    fill,
+    coupon,
+  };
   const none = { ports: [], pieceFills: [], cutouts: [], rim, fans: [], clamps: [], clamp, inserts: [], insert };
   const plan = r.ok ? planWall({ ...base, ...none }) : undefined;
   let ports: Required<PortSetting>[] = [];

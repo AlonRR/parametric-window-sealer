@@ -47,6 +47,7 @@ describe('the starting values', () => {
       clamp: DEFAULT_CLAMP,
       inserts: [], // #38
       insert: DEFAULT_INSERT,
+      coupon: false, // #110
     });
   });
 
@@ -94,14 +95,16 @@ describe('readParams', () => {
     }
   });
 
-  it('reads the joint under advanced (Q51), allowing no slide and no fit', () => {
-    const r = read({ slotMm: '10', slideMm: '0', webMm: '2.5', flangeMm: '2', fitMm: '0' });
+  it('reads the joint under advanced, allowing no slide, no fit and no grip', () => {
+    const r = read({ slotMm: '10', slideMm: '0', webMm: '2.5', flangeMm: '2', fitMm: '0', gripMm: '0' });
     expect(r.ok && r.params.joint).toEqual({
       slotMm: 10,
       slideMm: 0,
       webMm: 2.5,
       flangeMm: 2,
       fitMm: 0,
+      gripMm: 0,
+      pins: true,
     });
   });
 
@@ -282,7 +285,9 @@ describe('describePlan', () => {
       columns: 'Widths: 197.7, 197.7, 197.7 mm',
       rows: 'Heights: 198.6, 198.6, 198.6, 198.6, 198.6 mm',
       span: 'Pieces and joints: 603 × 1013 mm, for a 600 × 1000 mm opening.',
-      joints: 'Joints: 22 strips in 2 lengths, and 8 cross pieces; each joint 5 mm wide.',
+      joints:
+        'Joints: 22 strips in 2 lengths, and 8 cross pieces; each joint 5 mm wide. Pins: 44, each 6.6 mm of ' +
+        '1.75 mm filament, two through the middle of each strip.',
       edges: 'Edges: 18 edge strips in 3 shapes.',
       warnings: [],
       leftovers: [],
@@ -301,7 +306,10 @@ describe('describePlan', () => {
   it('rounds to 0.1 mm and uses the singular for one', () => {
     const row = planText({ ...EXAMPLE_PARAMS, openingWidthMm: 1000, openingHeightMm: 150 });
     expect(row.columns).toBe('Widths: 196.6, 196.6, 196.6, 196.6, 196.6 mm');
-    expect(row.joints).toBe('Joints: 4 strips in 1 length; each joint 5 mm wide.');
+    expect(row.joints).toBe(
+      'Joints: 4 strips in 1 length; each joint 5 mm wide. Pins: 8, each 6.6 mm of 1.75 mm filament, two ' +
+        'through the middle of each strip.',
+    );
     const one = planText({ ...EXAMPLE_PARAMS, openingWidthMm: 100, openingHeightMm: 150 });
     expect(one.headline).toBe('1 piece: 1 across, 1 up, 3 mm thick');
     expect(one.joints).toBe('No joints: the wall is one piece.');

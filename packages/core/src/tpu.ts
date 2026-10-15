@@ -27,10 +27,11 @@ export const TPU_FIN_LEAN_DEG = 20;
 // The sleeve is this much smaller than the hose, per side, so it grips it.
 export const TPU_GRIP_MM = 0.5;
 
-// A TPU joint's slot is this much narrower than the panel on each face, so it grips the panel.
+// A TPU joint's slot is this much narrower than the panel on each face, so it grips the panel
+// all along, and needs no ribs.
 export const TPU_JOINT_FIT_MM = -0.1;
 
-export const tpuJoint = (joint: JointParams): JointParams => ({ ...joint, fitMm: TPU_JOINT_FIT_MM });
+export const tpuJoint = (joint: JointParams): JointParams => ({ ...joint, fitMm: TPU_JOINT_FIT_MM, gripMm: 0 });
 
 // The base fills the groove; with no groove, or a shallow one, it is a fin thick.
 export const gasketBaseMm = (fit: TapeFit): number => Math.max(fit.grooveDepthMm, TPU_FIN_MM);

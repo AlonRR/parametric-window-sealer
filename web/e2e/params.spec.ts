@@ -25,7 +25,8 @@ test('opens with the example opening, labelled as one, and its plan', async ({ p
     'Pieces and joints: 603 × 1013 mm, for a 600 × 1000 mm opening.',
   );
   await expect(page.getByTestId('plan-joints')).toHaveText(
-    'Joints: 22 strips in 2 lengths, and 8 cross pieces; each joint 5 mm wide.',
+    'Joints: 22 strips in 2 lengths, and 8 cross pieces; each joint 5 mm wide. Pins: 44, each 6.6 mm of ' +
+      '1.75 mm filament, two through the middle of each strip.',
   );
   await expect(page.getByTestId('plan-edges')).toHaveText('Edges: 18 edge strips in 3 shapes.');
   await expect(page.getByLabel('Window type')).toHaveValue('slider');

@@ -34,8 +34,16 @@ const vertical = (strips: StripPlacement[]) => strips.filter((s) => s.axis === '
 const horizontal = (strips: StripPlacement[]) => strips.filter((s) => s.axis === 'horizontal');
 
 describe('the joint dimensions (Q51, Q56)', () => {
-  it('starts from the owner’s numbers: slot 8, slide 3, web 2, flanges 1.6, fit 0.2', () => {
-    expect(DEFAULT_JOINT).toEqual({ slotMm: 8, slideMm: 3, webMm: 2, flangeMm: 1.6, fitMm: 0.2 });
+  it('starts from the owner’s numbers: slot 8, slide 3, web 2, flanges 1.6, fit 0.2; ribs and pins from #110', () => {
+    expect(DEFAULT_JOINT).toEqual({
+      slotMm: 8,
+      slideMm: 3,
+      webMm: 2,
+      flangeMm: 1.6,
+      fitMm: 0.2,
+      gripMm: 0.15,
+      pins: true,
+    });
   });
 
   it('a joint takes the web plus the slide: each piece sits in the middle of its slide', () => {

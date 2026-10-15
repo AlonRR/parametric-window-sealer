@@ -5,7 +5,7 @@ a fresh session resumes from here.
 
 Last updated: 15 Oct 2026. Phase: **P2** ([`backlog.md`](backlog.md)). `v0.3.0` holds every P1
 row; since then the code was made easy to extend (Q145) and P2 began (Q148, Q149): the fan mount
-(`fan-mount`, #28), the SVG tile (`svg-tile`, #27), the clamps (`clamps`, #32) and the sliding insert (`sliding-insert`, #38) are built. A design review against published work led to thirteen changes (Q153), now first in line, starting with a tighter joint (`joint-lock`, #110).
+(`fan-mount`, #28), the SVG tile (`svg-tile`, #27), the clamps (`clamps`, #32) and the sliding insert (`sliding-insert`, #38) are built. A design review against published work led to thirteen changes (Q153), now first in line: the first, a tighter joint that locks (`joint-lock`, #110), is built; next, strips that stiffen (`stiffener-strips`, #111).
 Nothing has been test printed yet.
 
 ## The brief (the owner's request, 5 Oct 2026)
@@ -41,7 +41,7 @@ Nothing has been test printed yet.
 | Q10 | The fill is set **once for the whole wall by default**, with an **advanced tab for per-piece overrides** | 5 Oct 2026 |
 | Q11 | The opening is divided as a **grid** (rows and columns as needed), and the division mode ("all equal" or "full-size pieces plus one filler") is **chosen separately for width and height** | 5 Oct 2026 |
 | Q12 | The filler's **position is the user's choice** (start, end or middle), **or it is split in two for symmetry**. When the leftover is too small to print or hold, the page **warns and the user decides** | 5 Oct 2026 |
-| Q13 | Pieces join with **separate connector strips** by default (a tongue on each edge (dropped by Q50: the full edge slides in), an H-profile strip between pieces, a cross piece where four meet; removable, sealable in TPU, a few mm of slide per joint). **Puzzle dovetails, sliding dovetail rails and bolted flanges** are advanced options | 5 Oct 2026 |
+| Q13 | Pieces join with **separate connector strips** by default (a tongue on each edge (dropped by Q50: the full edge slides in), an H-profile strip between pieces, a cross piece where four meet; removable, sealable in TPU, a few mm of slide per joint). **Puzzle dovetails, sliding dovetail rails and bolted flanges** are advanced options. Since Q153 (R1, `joint-lock`) the strips hold by crush ribs and a filament pin, not friction alone ([`joints.md`](joints.md)) | 5 Oct 2026 |
 | Q14 | The wall is held **in the window track, clamped by the closed sash** (no screws). Track dimensions become parameters | 5 Oct 2026 |
 | Q15 | Appliances: **window AC**, **portable AC exhaust hose**, **exhaust fan**, and **no appliance** (a plain wall); more can be added later | 5 Oct 2026 |
 | Q16 | Fitting to the appliance, all as options: a **sliding insert** that closes in around it, a **measured cutout with a gasket**, **adjustable clamps** with slotted holes, and **standard ports** (round hose ports, fan mounts) chosen from a list | 5 Oct 2026 |

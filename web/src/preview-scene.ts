@@ -7,7 +7,8 @@
 // patterned fill (pattern-grid, #16) is drawn as it is printed. The printed TPU seal (seal-tpu,
 // #22) is drawn where the tape would be, squeezed as the tape is, in a dark grey of its own
 // (C36), and joint strips and cross pieces printed in TPU in the same grey. A measured cutout
-// (#23) is drawn in its piece, lined with the seal.
+// (#23) is drawn in its piece, lined with the seal. The pins through the strips (joint-lock, #110)
+// are drawn in their holes, in the pale colour of natural filament.
 //
 // Measured in spikes/viewer-benchmark/: what slows a preview is the number of triangles,
 // not the library. Plain pieces have 12 each; when patterns arrive, drawing them in full
@@ -29,14 +30,14 @@ import type { Engine } from 'parametric-window-sealer';
 import { meshOf } from 'parametric-window-sealer';
 import { edgeStripSolid, edgeTapeSolid } from 'parametric-window-sealer';
 import { stripWidthMm } from 'parametric-window-sealer';
-import { crossSolid, stripSolid } from 'parametric-window-sealer';
+import { crossSolid, pinSolid, planPins, stripSolid } from 'parametric-window-sealer';
 import { buildPiecesWith, fittingSource, placedFittings } from 'parametric-window-sealer';
 import { tpuJoint } from 'parametric-window-sealer';
 import { fillFor, fillPattern } from 'parametric-window-sealer';
 import { planParts } from 'parametric-window-sealer';
 import type { Params } from 'parametric-window-sealer';
 
-export type PartKind = 'piece' | 'strip' | 'cross' | 'edge' | 'tape' | 'tpu';
+export type PartKind = 'piece' | 'strip' | 'cross' | 'pin' | 'edge' | 'tape' | 'tpu';
 
 // Shared by every wall; never disposed, since every wall uses them.
 const PANEL = new MeshPhongMaterial({ color: 0x9aa7b5, shininess: 20 });
@@ -45,6 +46,7 @@ const OUTLINE = new LineBasicMaterial({ color: 0x3c4650 });
 const TAPE = new MeshPhongMaterial({ color: 0xd9822b, shininess: 5 });
 export const TPU_COLOUR = 0x2b2b2b;
 const TPU = new MeshPhongMaterial({ color: TPU_COLOUR, shininess: 10 });
+const PIN = new MeshPhongMaterial({ color: 0xe8e2d0, shininess: 30 });
 
 // A solid and its outline, at x, y in the wall; the solid is freed once copied.
 function add(wall: Group, solid: Manifold, kind: PartKind, x: number, y: number, look: Material) {
@@ -78,7 +80,8 @@ export function buildWallScene(engine: Engine, params: Params): Group {
   const pattern = (cell: { column: number; row: number }) =>
     fillPattern(fillFor(params, cell.column + 1, cell.row + 1), joint);
   const fittings = placedFittings(fittingSource(params));
-  const built = buildPiecesWith(engine, plan, thicknessMm, fittings, pattern);
+  const pins = planPins(joints, joint);
+  const built = buildPiecesWith(engine, plan, thicknessMm, fittings, pattern, { joint, pins });
   try {
     built.forEach((piece, i) => {
       const cell = plan.pieces[i];
@@ -98,6 +101,7 @@ export function buildWallScene(engine: Engine, params: Params): Group {
     for (const c of joints.crosses) {
       add(wall, crossSolid(engine, own, thicknessMm, 'wall'), 'cross', c.xMm - half, c.yMm - half, ownLook);
     }
+    for (const p of pins) add(wall, pinSolid(engine, joint, thicknessMm), 'pin', p.xMm, p.yMm, PIN);
     for (const e of edges) {
       const solid = edgeStripSolid(engine, e.lengthMm, e, joint, thicknessMm, e.edge);
       add(wall, solid, 'edge', e.xMm, e.yMm, JOINT);

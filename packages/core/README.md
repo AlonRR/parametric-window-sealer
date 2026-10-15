@@ -57,7 +57,7 @@ Start from `EXAMPLE_PARAMS` and change what differs. Every length is in mm.
 | `bedMarginMm`                          | How much smaller than a listed printer's bed the largest piece is, each way (`DEFAULT_BED_MARGIN_MM`, 10)                                                                                                                 |
 | `width`, `height`                      | How each direction is divided: `mode` `'equal'` or `'full-plus-filler'`; `filler` `'start'`, `'end'`, `'middle'` or `'split'`; `leftover` `'spread'`, `'equal'` or `'shorten'` for when full pieces leave less than a joint |
 | `thicknessMm`                          | The panels' thickness                                                                                                                                                                                                   |
-| `joint`                                | The strips' `slotMm`, `slideMm`, `webMm`, `flangeMm` and `fitMm` (`DEFAULT_JOINT`)                                                                                                                                      |
+| `joint`                                | The strips' `slotMm`, `slideMm`, `webMm`, `flangeMm` and `fitMm`; `gripMm`, how far their ribs reach past each panel face, and `pins`, a filament pin through each strip (`DEFAULT_JOINT`; `docs/joints.md`)                                                                                                                                      |
 | `edges`                                | The `window` (`'slider'` or `'hung'`), each edge's role (`'track'`, `'sash'`, `'sill'` or `'unit'`, against a window AC; `WINDOW_PRESETS`, `unitRoles`) and the `track`'s width, clearance and depth at each edge                                                   |
 | `ports`                                | Hose ports, none for a plain wall: each `{ hoseMm, column, row }`, the hose end's outside diameter (`COMMON_HOSE_MM`: 150 and 130) and its piece, from 1 at the bottom left seen from the room                     |
 | `collar`                               | The port's collar: `depthMm`, `wallMm`, `clearanceMm`, `lipMm` (`DEFAULT_COLLAR`)                                                                                                                                       |
@@ -71,6 +71,7 @@ Start from `EXAMPLE_PARAMS` and change what differs. Every length is in mm.
 | `seal`                                 | `{ kind: 'none' }`, `'tape'` or `'tpu'` (gaskets printed in TPU to the tape's size), with the `tape`'s `widthMm`, `thicknessMm` (`TAPE_SIZES`), `grooveMm`, `squeezePct`, whether it also goes on the strips' `sides` and in each `port`, and with TPU whether the `joints` are TPU too (`NO_SEAL`, `DEFAULT_TAPE`)   |
 | `fill`                                 | `{ kind: 'sealed' }`, or a pattern: `'grid'`, `'hexagon'`, `'brick'`, `'diamond'` or `'svg'` (`FILL_KINDS`), its `style` (`'relief'`, cut into the room side to `reliefPct` of the thickness, or `'through'`), each pattern's sizes in `grid`, `hexagon`, `brick`, `diamond` and `svg` (`SEALED` holds the starting ones; bars at least `MIN_BAR_MM`), and the SVG tile's `drawing`, the text of an SVG file (`SAMPLE_SVG_TILE` to start with) |
 | `pieceFills`                           | Pieces with a fill of their own, none to start with: each `{ column, row, kind, style? }`, from 1 at the bottom left seen from the room; the sizes stay the wall's (`fillFor` gives a piece's fill) |
+| `coupon`                               | `true` adds the joint's test coupon to the files: five short strips that try the grip |
 
 Wrong parameters throw a `ParamsError` whose `errors` names every wrong field with the page's
 message. `validateParams(params)` gives the same messages without building anything.
@@ -102,7 +103,9 @@ Everything `makeWall` uses is exported too: `planWall` and `planParts` (the layo
 and edges), `describePlan`, `readParams` and `toFormValues` (the page's form values), `readSettings`
 and `SETTINGS` (settings in the library's shape, possibly partial, and what each one is),
 `pieceLimit` (the largest piece a wall's printer allows), the
-shapes (`plainPanel`, `portPanel`, `stripSolid`, `crossSolid`, `edgeStripSolid`), the hose
+shapes (`plainPanel`, `portPanel`, `stripSolid`, `crossSolid`, `edgeStripSolid`), the joint's ribs
+and pins (`ribPlacesMm`, `planPins`, `pinSlotsIn`, `pinSlotCuts`, `pinSolid`) and its test coupon
+(`couponShape`, `couponSolid`), the hose
 port's rules (`checkPort`, `parsePorts`, `formatPorts`), the measured cutout's (`checkCutout`,
 `parseCutouts`, `formatCutouts`, `linedRim`, `cutoutPanel`, `frameShapes`, `frameSolid`), the fan mount's
 (`FANS`, `checkFan`, `parseFans`, `formatFans`, `fanPanel`), the clamps' (`checkClamp`, `parseClamps`,

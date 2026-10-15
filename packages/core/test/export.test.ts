@@ -48,11 +48,14 @@ function readModel(xml: string) {
 }
 
 // widthMm x heightMm is what the pieces and joints span. On the example slider the edges
-// add 3 mm across and 13 mm up to the opening (track-edge, #11), so the opening is less.
+// add 3 mm across and 13 mm up to the opening (track-edge, #11), so the opening is less. Without
+// pins, each piece is a plain block whose volume is known; the pins' slots are tested in
+// joint-lock.test.ts.
 async function exampleDownload(widthMm = 400, heightMm = 200): Promise<{ pieces: ExportPiece[]; parts: ExportPart[] }> {
   const engine = await loadEngine();
   return buildExport(engine, {
     ...EXAMPLE_PARAMS,
+    joint: { ...EXAMPLE_PARAMS.joint, pins: false },
     openingWidthMm: widthMm - 3,
     openingHeightMm: heightMm - 13,
   });
@@ -220,7 +223,7 @@ describe('3MF', () => {
       strip?.positions ?? new Float32Array(),
       strip?.triangles ?? new Uint32Array(),
     );
-    const expected = stripSolid(engine, 180.7, DEFAULT_JOINT, 3, 'print');
+    const expected = stripSolid(engine, 180.7, { ...DEFAULT_JOINT, pins: false }, 3, 'print'); // as exampleDownload
     expect(solid.volume()).toBeCloseTo(expected.volume(), 2);
     solid.delete();
     expected.delete();

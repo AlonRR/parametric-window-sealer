@@ -110,6 +110,25 @@ export const SETTINGS: readonly Setting[] = [
   { field: 'flangeMm', path: 'joint.flangeMm', help: 'Each face of the strip, over the panel.' },
   { field: 'fitMm', path: 'joint.fitMm', help: 'Clearance between each panel face and the strip.' },
   {
+    field: 'gripMm',
+    path: 'joint.gripMm',
+    help: "How far the ribs inside the strip's flanges reach past each panel face, to be squeezed; 0 for none.",
+  },
+  {
+    field: 'pins',
+    path: 'joint.pins',
+    help: "A pin of 1.75 mm filament through each strip's middle, so a piece cannot pull out: yes or no.",
+    values: YES_NO,
+    onOff: true,
+  },
+  {
+    field: 'coupon',
+    path: 'coupon',
+    help: 'A test coupon in the download too, five short strips that try the grip: yes or no.',
+    values: YES_NO,
+    onOff: true,
+  },
+  {
     field: 'window',
     path: 'edges.window',
     help: 'Window type; sets the four edges as the page does.',

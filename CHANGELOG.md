@@ -14,6 +14,14 @@ under Unreleased.
 
 ### Added
 
+- A joint that locks: the strips hold the pieces by small crush ribs inside their flanges, which
+  reach 0.15 mm past each face (the grip, under Advanced: the joint between pieces, `--grip`), and
+  a pin cut from 1.75 mm filament through each strip's middle and a slot in the piece stops a piece
+  pulling out while it can still slide (`--pins`, on to start with). The plan says how many pins to
+  cut and how long. A test coupon (`--coupon yes`) tries five grips side by side, and the measuring
+  guide gains a fifth step that takes the grip from it. How it works: `docs/joints.md`. Not yet
+  test printed.
+
 - A sliding insert: "Something else, in a sliding insert" under "What is in the window?" gives
   the appliance's piece an opening, two rails on its room face and two printed shutters that slide
   in from each side and close round it, its width give or take their travel (20 mm to start with),
@@ -40,6 +48,13 @@ under Unreleased.
   makers who space them 124.5 or 125 mm apart both fit. The command takes `--fan 120` or
   `--fan 120@2,1`, the library and the MCP server `fans: [{ sizeMm: 120 }]`. Not yet test
   printed.
+
+### Changed
+
+- The joint's starting values have ribs and pins (see Added), so the same settings now make pieces
+  with a slot for each pin along the edges they share, and strips with ribs and pin holes. In the
+  library, `JointParams` has two more fields, `gripMm` and `pins`, and `Params` has `coupon`;
+  `{ ...DEFAULT_JOINT, gripMm: 0, pins: false }` gives the joint as it was.
 
 ### Fixed
 

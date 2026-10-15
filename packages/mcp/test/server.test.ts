@@ -371,7 +371,7 @@ describe('window_sealer_make_files', () => {
     expect(r.data['files'][0]).toEqual({
       name: 'piece-c1-r1-197.7x198.6.stl',
       type: 'model/stl',
-      bytes: 684,
+      bytes: wall.files[0]?.bytes.length, // with its pins' slots (#110)
       path: join(folder, 'piece-c1-r1-197.7x198.6.stl'),
     });
     expect(r.content.some((c) => c.type === 'resource')).toBe(false);

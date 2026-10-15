@@ -1,9 +1,9 @@
-// The measuring guide (backlog item user-guide, #14; Q51, Q54). Chosen without asking (Q144;
-// docs/choices.md): four steps at the top of the form (C58), each with a drawing made for this
-// project (C59), whose fields fill the form's own as you type (C60). The guide sits inside the form,
-// so an edit here goes on to the form's own update once its value is copied across. One track depth
-// fills every edge in a track (C61); the last step works out the fit from a printed strip and piece
-// measured with calipers (C62).
+// The measuring guide (backlog item user-guide, #14): steps at the top of the form, each with a
+// drawing made for this project, whose fields fill the form's own as you type, so the guide never
+// holds a value the form does not. The guide sits inside the form, so an edit here goes on to the
+// form's own update once its value is copied across. One track depth fills every edge in a track;
+// the fourth step works out the fit from a printed strip and piece measured with calipers, and the
+// fifth takes the grip from the test coupon (joint-lock, #110). Why each is so: docs/choices.md.
 // Each step's text for what is in the window shows by the page's own data-show-when.
 import { EDGES, FIT_TARGET_MM, fitFromMeasured, measuredPlayMm } from 'parametric-window-sealer';
 import { setValue, valueOf } from './form-fields';

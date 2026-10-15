@@ -8,6 +8,7 @@ export * from './engine.js';
 export * from './export.js';
 export * from './joint.js';
 export * from './joint-geometry.js';
+export * from './coupon.js';
 export * from './layout.js';
 export * from './panel-geometry.js';
 export * from './fittings/index.js';

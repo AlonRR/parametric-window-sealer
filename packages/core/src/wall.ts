@@ -8,7 +8,8 @@ import { loadEngine } from './engine.js';
 import type { Engine } from './engine.js';
 import { MEDIA_TYPES, checkChoice, meshOf, packageDownload, partName, taggedFileName, wallLabel } from './export.js';
 import type { AnyPartShape, DownloadChoice, DownloadFile, ExportPart, ExportPiece, WallPartShape } from './export.js';
-import { partShapes } from './joint.js';
+import { partShapes, planPins } from './joint.js';
+import { couponShape, couponSolid } from './coupon.js';
 import { crossSolid, stripSolid } from './joint-geometry.js';
 import type { GridLayout } from './layout.js';
 import { buildPiecesWith } from './panel-geometry.js';
@@ -24,11 +25,11 @@ import { gasketShapes, gasketSolid, tpuJoint } from './tpu.js';
 import type { FieldErrors, Params } from './params.js';
 import type { PlanText } from './plan-text.js';
 
-// Every part beside the pieces, one shape with a count for identical ones (Q58), with its name
-// and its solid lying as it prints (Q53): the joint strips and cross pieces, in TPU if chosen
-// (C34), the edge strips, with the TPU seal its gaskets, and each fitting's parts: with the TPU
-// seal the sleeves for the hose ports (#22) and the frames for the cutouts (#23; C43), and
-// always the clamps' jaws (#32).
+// Every part beside the pieces, one shape with a count for identical ones so a file is printed as
+// many times as its name says, with its name and its solid lying as it prints: the joint strips and
+// cross pieces, in TPU if chosen, the edge strips, with the TPU seal its gaskets, and each fitting's
+// parts: with the TPU seal the sleeves for the hose ports (#22) and the frames for the cutouts (#23),
+// always the clamps' jaws (#32), and if asked for, the joint's test coupon (#110).
 function wallParts(params: Params, plan: GridLayout): FittingPart[] {
   const { joints, edges } = planParts(params, plan);
   const { joint, thicknessMm } = params;
@@ -39,6 +40,7 @@ function wallParts(params: Params, plan: GridLayout): FittingPart[] {
     ...partShapes(joints, joint).map((s) => (inTpu ? { ...s, tpu: true as const } : s)),
     ...edgeShapes(edges),
     ...(tpu === undefined ? [] : gasketShapes(edges, tpu, params.seal.tape.thicknessMm)),
+    ...(params.coupon ? [couponShape(joint)] : []),
   ];
   const solidOf = (engine: Engine, shape: WallPartShape) => {
     const strip = shape.kind !== 'edge' && 'tpu' in shape && shape.tpu === true ? tpuJoint(joint) : joint;
@@ -52,6 +54,8 @@ function wallParts(params: Params, plan: GridLayout): FittingPart[] {
       case 'gasket':
         if (fit === undefined) throw new Error('A gasket without a seal');
         return gasketSolid(engine, shape.lengthMm, fit, shape.heightMm);
+      case 'coupon':
+        return couponSolid(engine, shape, joint, thicknessMm);
       default: {
         const unknown: never = shape;
         throw new Error(`No part of kind ${(unknown as WallPartShape).kind}`);
@@ -77,7 +81,9 @@ export function buildExport(engine: Engine, params: Params): { pieces: ExportPie
   // Each piece's own fill, or the wall's (#21).
   const pattern = (cell: { column: number; row: number }) =>
     fillPattern(fillFor(params, cell.column + 1, cell.row + 1), params.joint);
-  const built = buildPiecesWith(engine, plan, params.thicknessMm, placedFittings(fittingSource(params)), pattern);
+  const fittings = placedFittings(fittingSource(params));
+  const pins = { joint: params.joint, pins: planPins(planParts(params, plan).joints, params.joint) };
+  const built = buildPiecesWith(engine, plan, params.thicknessMm, fittings, pattern, pins);
   let pieces: ExportPiece[];
   try {
     pieces = built.map((b, i) => {

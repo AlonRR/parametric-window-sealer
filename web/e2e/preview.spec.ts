@@ -73,8 +73,8 @@ test('redrawing frees the old pieces: graphics memory holds only the current wal
     await width.fill(value);
     await expect(preview(page)).toHaveAttribute('data-pieces', pieces);
   }
-  // 15 pieces, 22 strips, 8 cross pieces and 18 edge strips, each a solid and an outline.
-  await expect(preview(page)).toHaveAttribute('data-geometries', String(2 * (15 + 22 + 8 + 18)));
+  // 15 pieces, 22 strips, 8 cross pieces, 44 pins (#110) and 18 edge strips, each a solid and an outline.
+  await expect(preview(page)).toHaveAttribute('data-geometries', String(2 * (15 + 22 + 8 + 44 + 18)));
 });
 
 test('turns when dragged', async ({ page }) => {

@@ -8,7 +8,7 @@ import { Box3, LineSegments, Mesh, MeshPhongMaterial } from 'three';
 import type { Object3D } from 'three';
 import { describe, expect, it } from 'vitest';
 import { loadEngine } from 'parametric-window-sealer';
-import { EXAMPLE_PARAMS } from 'parametric-window-sealer';
+import { EXAMPLE_PARAMS, buildExport } from 'parametric-window-sealer';
 import { TPU_COLOUR, buildWallScene, disposeWall } from '../src/preview-scene';
 
 const solidsOf = (wall: Object3D, kind: string) =>
@@ -24,10 +24,11 @@ describe('buildWallScene', () => {
     expect(solidsOf(wall, 'piece')).toHaveLength(15);
     expect(solidsOf(wall, 'strip')).toHaveLength(2 * 5 + 4 * 3);
     expect(solidsOf(wall, 'cross')).toHaveLength(2 * 4);
+    expect(solidsOf(wall, 'pin')).toHaveLength(2 * 22); // two through each strip (#110)
     // Top and bottom 510 mm in three segments each, the sides 1000 mm in five.
     expect(solidsOf(wall, 'edge')).toHaveLength(2 * 3 + 2 * 5);
     const outlines = wall.children.filter((c) => c instanceof LineSegments);
-    expect(outlines).toHaveLength(15 + 22 + 8 + 16);
+    expect(outlines).toHaveLength(15 + 22 + 8 + 44 + 16);
     disposeWall(wall);
   });
 
@@ -65,6 +66,18 @@ describe('buildWallScene', () => {
     disposeWall(wall);
   });
 
+  it('draws the pins through the first strip’s middle, 2.5 mm in from each edge, right through it', async () => {
+    const engine = await loadEngine();
+    const wall = buildWallScene(engine, EXAMPLE_PARAMS);
+    const strip = new Box3().setFromObject(solidsOf(wall, 'strip')[0] as Mesh);
+    const [a, b] = solidsOf(wall, 'pin').map((p) => new Box3().setFromObject(p));
+    const middle = (strip.min.y + strip.max.y) / 2;
+    expect(rounded(a?.getCenter(new Box3().min).toArray() ?? [])).toEqual(rounded([strip.min.x + 2.5, middle, 1.5]));
+    expect(rounded(b?.getCenter(new Box3().min).toArray() ?? [])).toEqual(rounded([strip.max.x - 2.5, middle, 1.5]));
+    expect(rounded([a?.min.z ?? 0, a?.max.z ?? 0])).toEqual([-1.8, 3 + 1.8]);
+    disposeWall(wall);
+  });
+
   it('draws a strip along its joint and a cross piece centred on its crossing', async () => {
     const engine = await loadEngine();
     const wall = buildWallScene(engine, EXAMPLE_PARAMS);
@@ -96,9 +109,10 @@ describe('buildWallScene', () => {
     const engine = await loadEngine();
     const wall = buildWallScene(engine, EXAMPLE_PARAMS);
     expect(solidsOf(wall, 'piece')).toHaveLength(15);
-    for (const solid of solidsOf(wall, 'piece')) {
-      expect(solid.geometry.index?.count).toBe(12 * 3); // a plain panel: 12 triangles
-    }
+    // Each with its pins' slots (#110), as in the download.
+    const download = buildExport(engine, EXAMPLE_PARAMS).pieces.map((p) => p.mesh.triangles.length);
+    expect(solidsOf(wall, 'piece').map((solid) => solid.geometry.index?.count)).toEqual(download);
+    expect(download.every((n) => n > 12 * 3)).toBe(true); // more than a plain panel's 12 triangles
     disposeWall(wall);
   });
 });
@@ -114,7 +128,7 @@ describe('disposeWall', () => {
       });
     }
     disposeWall(wall);
-    expect(freed).toBe(2 * (15 + 22 + 8 + 18)); // a solid and an outline each
+    expect(freed).toBe(2 * (15 + 22 + 8 + 44 + 18)); // a solid and an outline each
     expect(wall.children).toHaveLength(0);
   });
 });

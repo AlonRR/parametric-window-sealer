@@ -20,8 +20,10 @@ import type { GasketShape, SleeveShape } from './tpu.js';
 import type { FrameShape, Rectangle } from './cutout.js';
 import type { JawShape } from './clamp.js';
 import type { ShutterShape } from './insert.js';
+import type { CouponShape } from './coupon.js';
 import { cutoutTag } from './cutout.js';
 import { portTag } from './port.js';
+import { hundredth } from './words.js';
 
 export interface MeshData {
   positions: Float32Array; // x, y, z per vertex, in mm
@@ -88,8 +90,9 @@ const fileOf = (piece: ExportPiece, extension: Format): string =>
     ? pieceFileName(piece.cell, extension, piece.hoseMm, piece.cutout)
     : taggedFileName(piece.cell, extension, piece.tag);
 
-// The wall's own parts beside the pieces: the joints, the edge strips and the TPU seal's gaskets.
-export type WallPartShape = PartShape | EdgeShape | GasketShape;
+// The wall's own parts beside the pieces: the joints, the edge strips, the TPU seal's gaskets and,
+// if asked for, the joint's test coupon.
+export type WallPartShape = PartShape | EdgeShape | GasketShape | CouponShape;
 
 // Every part beside the pieces: the wall's own and the fittings', a sleeve in each hose port, a
 // frame in each cutout's rim and a clamp's jaws. A fitting with a new kind of part adds its shape
@@ -100,6 +103,10 @@ export type AnyPartShape = WallPartShape | SleeveShape | FrameShape | JawShape |
 // sides, so is the track's depth, as two depths can give one size with grooves in different
 // places (Q127). A part printed in TPU says so (C37); a sleeve is named by its hose.
 export function partName(shape: AnyPartShape): string {
+  if (shape.kind === 'coupon') {
+    const [first, last] = [shape.grips[0] ?? 0, shape.grips[shape.grips.length - 1] ?? 0];
+    return `coupon-grip-${hundredth(first)}-to-${hundredth(last)}-print-${shape.count}`;
+  }
   if (shape.kind === 'sleeve') return `sleeve-${mm(shape.hoseMm)}-tpu-print-${shape.count}`;
   if (shape.kind === 'frame') return `frame-${mm(shape.widthMm)}x${mm(shape.heightMm)}-tpu-print-${shape.count}`;
   if (shape.kind === 'shutter') return `shutter-${mm(shape.widthMm)}x${mm(shape.heightMm)}-print-${shape.count}`;

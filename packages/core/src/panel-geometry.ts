@@ -20,6 +20,9 @@ import type { PatternChoice, Point } from './pattern.js';
 import { plainPanel } from './panel.js';
 import { fittingIn, placedFittings } from './fittings/index.js';
 import type { InPiece, PlacedFitting } from './fittings/index.js';
+import { pinSlotsIn } from './joint.js';
+import type { JointParams, PinPlacement } from './joint.js';
+import { pinSlotCuts } from './joint-geometry.js';
 
 export { plainPanel } from './panel.js';
 export type { PanelSize } from './panel.js';
@@ -34,18 +37,27 @@ export interface BuiltPiece {
 }
 
 export type PiecePattern = PatternChoice & { borderMm: number };
+
+// The pins through the strips (joint-lock, #110), in the wall's frame: each piece gets a slot for
+// each pin in it.
+export interface PiecePins {
+  joint: JointParams;
+  pins: readonly PinPlacement[];
+}
 type PatternFor = PiecePattern | ((cell: { column: number; row: number }) => PiecePattern | undefined);
 
 // Every piece of the plan, each with the fitting placed in it, if any (columns and rows from 1, as
 // in Params). With a pattern (patterns-core, #20), each piece gets the wall's pattern inside its
 // border, and stays solid that far clear of its fitting (Q134, Q137). The pattern can be given for
-// each piece, by its column and row from 0 (params-advanced, #21).
+// each piece, by its column and row from 0 (params-advanced, #21). With pins, each piece has a slot
+// for each pin through the strips along its edges.
 export function buildPiecesWith(
   engine: Engine,
   plan: GridLayout,
   thicknessMm: number,
   fittings: readonly PlacedFitting[],
   pattern?: PatternFor,
+  pins?: PiecePins,
 ): BuiltPiece[] {
   const built: BuiltPiece[] = [];
   // The wall's centre, where the pattern's tiles are centred (Q135).
@@ -58,6 +70,14 @@ export function buildPiecesWith(
       const size = { widthMm: cell.widthMm, heightMm: cell.heightMm, thicknessMm };
       const fitting = fittingIn(fittings, cell.column + 1, cell.row + 1);
       let solid = fitting === undefined ? plainPanel(engine, size) : fitting.solid(engine, size);
+      const slots = pins === undefined ? [] : pinSlotsIn(cell, pins.pins);
+      if (pins !== undefined && slots.length > 0) {
+        const cuts = pinSlotCuts(engine, size, slots, pins.joint);
+        const slotted = solid.subtract(cuts);
+        cuts.delete();
+        solid.delete();
+        solid = slotted;
+      }
       const here = typeof pattern === 'function' ? pattern(cell) : pattern;
       if (here !== undefined) {
         const keepOut = fitting?.keepOut(size, here.borderMm);

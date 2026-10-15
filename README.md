@@ -11,14 +11,15 @@ panel style, and get a set of printable pieces that join together and fit the ga
 **Version 0.3.0: the wall with its fittings, seals and patterns, as a page and as an API; not
 yet test printed.** The page in `web/` takes the opening you can see and your window type,
 divides the opening into pieces your printer can make, joins them with connector strips and
-cross pieces, fits edge strips into the window's tracks, shows the wall in 3D and downloads
+cross pieces that hold by crush ribs and a filament pin ([`docs/joints.md`](docs/joints.md)), fits
+edge strips into the window's tracks, shows the wall in 3D and downloads
 every part as STL or 3MF. It fits a hose port, a measured cutout, an exhaust fan, an appliance held by
 clamps ([`docs/clamps.md`](docs/clamps.md)) or in a sliding insert ([`docs/sliding-insert.md`](docs/sliding-insert.md)) or a window air conditioner,
 seals the edges with foam tape or printed TPU, fills the pieces with a pattern or a tile of your
 own drawing ([`docs/svg-tiles.md`](docs/svg-tiles.md)), and has a measuring guide; it can also be saved as one file that works offline.
 The same geometry is a library for Node.js and browsers, the `window-sealer` command and the
-`window-sealer-mcp` server for LLM agents (see [Developing](#developing)). The joint's fit and the
-example track sizes are starting values that a test print still has to confirm. The site is
+`window-sealer-mcp` server for LLM agents (see [Developing](#developing)). The joint's fit and grip, and
+the example track sizes, are starting values that a test print still has to confirm. The site is
 built on every push but not published yet (see [Publishing the site](#publishing-the-site));
 to run it on your own computer, see [Developing](#developing).
 

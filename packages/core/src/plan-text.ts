@@ -1,7 +1,8 @@
 // The plan in words, as the page, the command and the MCP server show it. Each line of the plan
 // is one key of PlanText; the page shows each in the element marked with that key (data-plan).
 import { EDGES, edgeShapes, panelSpan } from './edge.js';
-import { jointWidthMm, minPieceMm, partShapes } from './joint.js';
+import { PIN_MM, jointWidthMm, minPieceMm, partShapes, pinLengthMm } from './joint.js';
+import { COUPON_SECTIONS, couponGrips } from './coupon.js';
 import type { JointParams, JointPlan } from './joint.js';
 import type { Axis, GridLayout, Leftover } from './layout.js';
 import { tapeFit } from './tape.js';
@@ -19,7 +20,7 @@ import {
 } from './fittings/index.js';
 import type { WallParts } from './plan.js';
 import type { Params } from './params.js';
-import { listed, mm, plural, sum } from './words.js';
+import { hundredth, listed, mm, plural, sum } from './words.js';
 
 export interface LeftoverText {
   axis: Axis;
@@ -86,14 +87,26 @@ function describeLeftover(note: GridLayout['leftovers'][number], maxPieceMm: num
   };
 }
 
-function describeJoints(joints: JointPlan, joint: JointParams): string {
+// The joints, the pins to cut for them (joint-lock, #110), and the test coupon if asked for.
+function describeJoints(joints: JointPlan, joint: JointParams, thicknessMm: number, coupon: boolean): string {
+  const grips = couponGrips(joint.gripMm).map(hundredth);
+  const last = grips.pop() ?? '';
+  const test = coupon
+    ? ` Test coupon: ${COUPON_SECTIONS} sections, marked with 1 to ${COUPON_SECTIONS} notches, gripping by ` +
+      `${grips.join(', ')} and ${last} mm.`
+    : '';
   if (joints.strips.length === 0 && joints.crosses.length === 0) {
-    return 'No joints: the wall is one piece.';
+    return `No joints: the wall is one piece.${test}`;
   }
   const lengths = partShapes(joints, joint).filter((s) => s.kind === 'strip').length;
   const crosses =
     joints.crosses.length > 0 ? `, and ${plural(joints.crosses.length, 'cross piece', 'cross pieces')}` : '';
-  return `Joints: ${plural(joints.strips.length, 'strip', 'strips')} in ${plural(lengths, 'length', 'lengths')}${crosses}; each joint ${mm(jointWidthMm(joint))} mm wide.`;
+  const pins =
+    joint.pins && joints.strips.length > 0
+      ? ` Pins: ${2 * joints.strips.length}, each ${mm(pinLengthMm(joint, thicknessMm))} mm of ` +
+        `${hundredth(PIN_MM)} mm filament, two through the middle of each strip.`
+      : '';
+  return `Joints: ${plural(joints.strips.length, 'strip', 'strips')} in ${plural(lengths, 'length', 'lengths')}${crosses}; each joint ${mm(jointWidthMm(joint))} mm wide.${pins}${test}`;
 }
 
 // The tape (Q119, Q127, Q129): its size, where it goes, and how much the wall takes, along each
@@ -144,7 +157,7 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     columns: `Widths: ${plan.columns.map(mm).join(', ')} mm`,
     rows: `Heights: ${plan.rows.map(mm).join(', ')} mm`,
     span: `Pieces and joints: ${mm(span.widthMm)} × ${mm(span.heightMm)} mm, for a ${mm(params.openingWidthMm)} × ${mm(params.openingHeightMm)} mm opening.`,
-    joints: describeJoints(parts.joints, params.joint),
+    joints: describeJoints(parts.joints, params.joint, params.thicknessMm, params.coupon),
     edges: `Edges: ${plural(parts.edges.length, 'edge strip', 'edge strips')} in ${plural(shapes, 'shape', 'shapes')}.`,
     warnings: plan.warnings.map((w) => {
       const [where, dimension] = w.axis === 'width' ? ['Column', 'wide'] : ['Row', 'high'];

@@ -51,6 +51,9 @@ test('a file that is not a drawing is refused, with the reason', async ({ page }
 
 test('the downloaded pieces carry its openings', async ({ page }) => {
   await expect(page.getByTestId('engine-status')).toHaveAttribute('data-state', 'ready');
+  // Without the pins' slots (joint-lock, #110), so a sealed piece would be a plain box.
+  await page.getByText('Advanced: the joint between pieces').click();
+  await page.getByLabel('Pin each strip').uncheck();
   await fill(page).selectOption('svg');
   await page.getByRole('radio', { name: 'Cut through' }).check();
   await choose(page, 'squares.svg', SQUARES);

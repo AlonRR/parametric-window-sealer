@@ -49,8 +49,15 @@ test('its sizes under Advanced; a bar under 0.8 mm is refused (Q140, Q143)', asy
   await expect(page.getByTestId('plan-headline')).toHaveText('Fix the marked fields to see the plan.');
 });
 
+// Without the pins' slots (joint-lock, #110), so a sealed piece is a plain box.
+const unpin = async (page: Page) => {
+  await page.getByText('Advanced: the joint between pieces').click();
+  await page.getByLabel('Pin each strip').uncheck();
+};
+
 test('the downloaded pieces carry the openings, named as before', async ({ page }) => {
   await expect(page.getByTestId('engine-status')).toHaveAttribute('data-state', 'ready');
+  await unpin(page);
   const download = async () => {
     await page.getByRole('button', { name: 'Download the pieces' }).click();
     const dialog = page.getByRole('dialog', { name: 'Download the pieces' });
@@ -117,6 +124,7 @@ test('piece by piece: a map of the pieces, one given its own fill (params-advanc
   page,
 }) => {
   await expect(page.getByTestId('engine-status')).toHaveAttribute('data-state', 'ready');
+  await unpin(page);
   await fill(page).selectOption('grid');
   await page.getByText('Advanced: piece by piece').click();
   const map = page.getByTestId('piece-map');

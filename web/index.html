@@ -242,8 +242,9 @@
             </svg>
             <p>
               Print one joint strip and one piece from the download. With calipers, measure the
-              strip's slot across, between its flanges, and the piece's thickness. The guide works
-              out the fit that gives the joint the play it is meant to have.
+              strip's slot across, between its flanges and clear of the ribs inside them, and the
+              piece's thickness. The guide works out the fit that gives the joint the play it is
+              meant to have.
             </p>
             <label>
               Slot across, measured (mm)
@@ -255,6 +256,20 @@
             </label>
             <p data-testid="guide-fit" aria-live="polite"></p>
             <p><button type="button" data-part="use-fit" disabled>Use this fit</button></p>
+          </section>
+          <section data-step="grip">
+            <h3>5. The grip</h3>
+            <p>
+              In the joint's advanced settings below, tick Add a test coupon to the download, and
+              print the coupon as the strips will be printed. Push its tab into each of the five short
+              strips, from the side without notches. The one that takes the tab with a firm push and
+              holds it has the grip to use; the plan says each one's grip, and the notches say which
+              is which.
+            </p>
+            <label>
+              Grip of the strip that held best (mm per face)
+              <input data-fills="gripMm" inputmode="decimal" autocomplete="off" />
+            </label>
           </section>
         </details>
 
@@ -698,8 +713,10 @@
         <details>
           <summary>Advanced: the joint between pieces</summary>
           <p class="note">
-            Pieces join with strips that slide over their edges and hold by friction. These are
-            starting values: a test print shows whether to change them, the fit most of all.
+            Pieces join with strips that slide over their edges. Small ribs inside each strip are
+            squeezed by the piece, so it holds firm, and a pin through the strip stops it pulling
+            out. These are starting values: a test print shows whether to change them, the grip most
+            of all.
           </p>
           <label>
             Slot depth (mm)
@@ -733,10 +750,37 @@
             <input name="fitMm" inputmode="decimal" autocomplete="off" />
           </label>
           <p class="note">
-            The gap between each panel face and the strip. Raise it if strips are too tight; lower
-            it if they slip off.
+            The gap between each panel face and the flat of the strip, between its ribs.
           </p>
           <span class="error" data-testid="error-fitMm"></span>
+          <label>
+            Grip (mm per face)
+            <input name="gripMm" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="note">
+            How far the ribs reach past each panel face, to be squeezed as the piece goes in. Raise
+            it if pieces slip out; lower it if they will not go in. 0 leaves the strip without ribs.
+          </p>
+          <span class="error" data-testid="error-gripMm"></span>
+          <label>
+            <input type="checkbox" name="pins" value="yes" />
+            Pin each strip
+          </label>
+          <p class="note">
+            A pin cut from 1.75 mm filament goes through each strip's middle and a slot in the piece,
+            so the piece can still slide but cannot pull out. The plan says how many to cut.
+          </p>
+          <span class="error" data-testid="error-pins"></span>
+          <label>
+            <input type="checkbox" name="coupon" value="yes" />
+            Add a test coupon to the download
+          </label>
+          <p class="note">
+            Five short strips with a grip each, notched 1 to 5, and a tab as thick as the pieces.
+            Push the tab into each: the one that takes it with a firm push and holds it has the grip
+            to use.
+          </p>
+          <span class="error" data-testid="error-coupon"></span>
         </details>
 
         <details>

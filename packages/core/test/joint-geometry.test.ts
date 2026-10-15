@@ -10,6 +10,10 @@ import { DEFAULT_JOINT } from '../src/joint.js';
 import { crossSolid, stripSolid } from '../src/joint-geometry.js';
 import type { Manifold } from 'manifold-3d';
 
+// The strip's profile, without the ribs and pin holes a strip has from joint-lock (#110); those are
+// tested in joint-lock.test.ts.
+const PLAIN = { ...DEFAULT_JOINT, gripMm: 0, pins: false };
+
 const T = 3; // panel thickness
 const W = 18; // strip width: two 8 mm slots and a 2 mm web
 const THICK = 6.6; // 3 + 2 x 0.2 + 2 x 1.6
@@ -37,7 +41,7 @@ const bounds = (m: Manifold) => {
 describe('stripSolid', () => {
   it('in the wall, along a vertical joint: around the panel, proud of both faces', async () => {
     const engine = await loadEngine();
-    const s = stripSolid(engine, L, DEFAULT_JOINT, T, 'wall-vertical');
+    const s = stripSolid(engine, L, PLAIN, T, 'wall-vertical');
     expect(bounds(s)).toEqual([0, 0, -1.8, W, L, T + 1.8]);
     expect(s.volume()).toBeCloseTo(STRIP_VOLUME, 6);
     expect(s.genus()).toBe(0);
@@ -46,7 +50,7 @@ describe('stripSolid', () => {
 
   it('in the wall, along a horizontal joint: the same strip turned', async () => {
     const engine = await loadEngine();
-    const s = stripSolid(engine, L, DEFAULT_JOINT, T, 'wall-horizontal');
+    const s = stripSolid(engine, L, PLAIN, T, 'wall-horizontal');
     expect(bounds(s)).toEqual([0, 0, -1.8, L, W, T + 1.8]);
     expect(s.volume()).toBeCloseTo(STRIP_VOLUME, 6);
     s.delete();
@@ -54,12 +58,12 @@ describe('stripSolid', () => {
 
   it('downloaded, it stands on its two flanges (Q53): only their edges touch the bed', async () => {
     const engine = await loadEngine();
-    const s = stripSolid(engine, L, DEFAULT_JOINT, T, 'print');
+    const s = stripSolid(engine, L, PLAIN, T, 'print');
     expect(bounds(s)).toEqual([0, 0, 0, L, THICK, W]);
     expect(s.volume()).toBeCloseTo(STRIP_VOLUME, 6);
     expect(s.slice(0.05).area()).toBeCloseTo(2 * 1.6 * L, 6);
     // Control: lying flat, the whole flange would lie on the bed.
-    const flat = stripSolid(engine, L, DEFAULT_JOINT, T, 'wall-vertical').translate([0, 0, 1.8]);
+    const flat = stripSolid(engine, L, PLAIN, T, 'wall-vertical').translate([0, 0, 1.8]);
     expect(flat.slice(0.05).area()).toBeCloseTo(W * L, 6);
     s.delete();
     flat.delete();
@@ -67,7 +71,7 @@ describe('stripSolid', () => {
 
   it('a panel edge slides into a slot with the fit to spare, as far as the web', async () => {
     const engine = await loadEngine();
-    const s = stripSolid(engine, L, DEFAULT_JOINT, T, 'wall-vertical');
+    const s = stripSolid(engine, L, PLAIN, T, 'wall-vertical');
     // The right slot runs from the web (x = 10) to the strip's edge (x = 18).
     const panel = (fromX: number, thickness: number) =>
       box(engine, [fromX, 0, (T - thickness) / 2], [fromX + 40, L, (T + thickness) / 2]);
@@ -85,7 +89,7 @@ describe('stripSolid', () => {
     ['negative length', -5],
   ])('refuses %s', async (_label, length) => {
     const engine = await loadEngine();
-    expect(() => stripSolid(engine, length, DEFAULT_JOINT, T, 'print')).toThrow(RangeError);
+    expect(() => stripSolid(engine, length, PLAIN, T, 'print')).toThrow(RangeError);
   });
 });
 

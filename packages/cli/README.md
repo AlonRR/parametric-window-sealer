@@ -35,7 +35,7 @@ window-sealer --width 600 --height 1000
 Widths: 197.7, 197.7, 197.7 mm
 Heights: 198.6, 198.6, 198.6, 198.6, 198.6 mm
 Pieces and joints: 603 × 1013 mm, for a 600 × 1000 mm opening.
-Joints: 22 strips in 2 lengths, and 8 cross pieces; each joint 5 mm wide.
+Joints: 22 strips in 2 lengths, and 8 cross pieces; each joint 5 mm wide. Pins: 44, each 6.6 mm of 1.75 mm filament, two through the middle of each strip.
 Edges: 18 edge strips in 3 shapes.
 
 Wrote 21 files to window-sealer-600x1000/:

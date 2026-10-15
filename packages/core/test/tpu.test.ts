@@ -48,7 +48,7 @@ describe('the rules', () => {
     expect(TPU_FIN_LEAN_DEG).toBe(20);
     expect(TPU_GRIP_MM).toBe(0.5);
     expect(TPU_JOINT_FIT_MM).toBe(-0.1);
-    expect(tpuJoint(DEFAULT_JOINT)).toEqual({ ...DEFAULT_JOINT, fitMm: -0.1 });
+    expect(tpuJoint(DEFAULT_JOINT)).toEqual({ ...DEFAULT_JOINT, fitMm: -0.1, gripMm: 0 });
   });
 });
 
