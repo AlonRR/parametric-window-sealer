@@ -112,7 +112,9 @@ describe('the clip, standing on its end as it prints', () => {
       expect(probe(clip, 12, 3.5, 10)).toBe(0); // the slot for the 2 mm leg, with 0.3 mm to slide
       expect(probe(clip, 12, 5.7, 10)).toBeGreaterThan(0); // the lip over it
       expect(probe(clip, 23.3, 3.5, 10)).toBeGreaterThan(0); // the back wall
-      expect(probe(clip, 1, 5.7, 10)).toBe(0); // open at the corner, where the other leg stands up
+      expect(probe(clip, 3, 5.7, 10)).toBe(0); // open at the corner, where the other leg stands up
+      expect(probe(clip, 3, 1.2, 10)).toBeGreaterThan(0); // the base under it
+      expect(probe(clip, 4.15, 5.7, 10)).toBe(0); // 0.3 mm of play beside that leg
     } finally {
       clip.delete();
     }
