@@ -5,7 +5,7 @@ a fresh session resumes from here.
 
 Last updated: 15 Oct 2026. Phase: **P2** ([`backlog.md`](backlog.md)). `v0.3.0` holds every P1
 row; since then the code was made easy to extend (Q145) and P2 began (Q148, Q149): the fan mount
-(`fan-mount`, #28), the SVG tile (`svg-tile`, #27), the clamps (`clamps`, #32) and the sliding insert (`sliding-insert`, #38) are built. A design review against published work led to thirteen changes (Q153), now first in line: the first, a tighter joint that locks (`joint-lock`, #110), is built; next, strips that stiffen (`stiffener-strips`, #111).
+(`fan-mount`, #28), the SVG tile (`svg-tile`, #27), the clamps (`clamps`, #32) and the sliding insert (`sliding-insert`, #38) are built. A design review against published work led to thirteen changes (Q153), now first in line: a tighter joint that locks (`joint-lock`, #110) and pieces cut from sheet (`sheet-pieces`, #112) are built. Strips that stiffen (`stiffener-strips`, #111) wait on Q154, as the review's fins would not stiffen the wall.
 Nothing has been test printed yet.
 
 ## The brief (the owner's request, 5 Oct 2026)
@@ -186,7 +186,7 @@ The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-None.
+- **Q154.** R2 (`stiffener-strips`, #111) as the review wrote it, a fin on the strips, would not stiffen the wall: the strips stop at every crossing, so the fins would be short separate pieces rather than one beam, and a fin standing out from a strip's face would overhang as the strips print (verified: `planJoints` in `joint.ts`, the print pose in `joint-geometry.ts`). Which stiffener should be built instead? **A:** printed fin bars joined across each crossing by two pins: all printed, many parts, its stiffness unknown until tested. **B (recommended):** a bought aluminium angle (about 20 × 20 × 2 mm) or wooden batten across the wall's short span on the room side, held to the strips by printed clips through the pin holes, the plan saying how many, how long and where; about 0.17 mm of bend over 600 mm at 135 Pa against about 2.7 mm for a 30 mm PLA fin even as one piece (inferred, beam formulas); an L rather than an M. **C:** advice only, the plan asking for a bought stiffener above 500 mm. Until it is answered, R3 onward go ahead in their order.
 
 ## Repository follow-ups
 

@@ -61,6 +61,14 @@ export const stripThicknessMm = (j: JointParams, panelMm: number): number => pan
 // two crossings is at least as long as it is wide (Q37, Q76).
 export const minPieceMm = (j: JointParams): number => 2 * j.slotMm + stripWidthMm(j);
 
+// The fewest equal segments no longer than the printer can make, butted end to end, so they all
+// print alike and need not line up with the joints: each as [where it starts, its length].
+export function evenSegments(fromMm: number, lengthMm: number, maxMm: number): [number, number][] {
+  const count = Math.max(1, Math.ceil(lengthMm / maxMm - 1e-9));
+  const each = lengthMm / count;
+  return Array.from({ length: count }, (_, i) => [fromMm + i * each, each]);
+}
+
 // Where the ribs stand along a strip: an even number, so none is at the middle where the pins go.
 export function ribPlacesMm(lengthMm: number): number[] {
   const count = Math.max(2, 2 * Math.round(lengthMm / (2 * RIB_PITCH_MM)));
@@ -130,26 +138,29 @@ function stripSpans(lengths: number[], starts: number[], crossings: number[], j:
 }
 
 // edgeInsetMm: how far short of the wall's outer edge a strip stops; with edge strips
-// (track-edge, #11) that is jointStripInsetMm in edge.ts.
-export function planJoints(layout: GridLayout, joint: JointParams, edgeInsetMm = 0): JointPlan {
+// (track-edge, #11) that is jointStripInsetMm in edge.ts. A strip longer than maxStripMm, along a
+// piece larger than the printer makes (cut from sheet, #112), is split as the edge strips are.
+export function planJoints(layout: GridLayout, joint: JointParams, edgeInsetMm = 0, maxStripMm = Infinity): JointPlan {
   const half = stripWidthMm(joint) / 2;
   const cols = runs(layout.columns, layout.columnJointsMm);
   const rows = runs(layout.rows, layout.rowJointsMm);
+  const pieces = (spans: { from: number; length: number }[]) =>
+    spans.flatMap((s) => evenSegments(s.from, s.length, maxStripMm));
   const strips: StripPlacement[] = [
     ...cols.centres.flatMap((x) =>
-      stripSpans(layout.rows, rows.starts, rows.centres, joint, edgeInsetMm).map((s) => ({
+      pieces(stripSpans(layout.rows, rows.starts, rows.centres, joint, edgeInsetMm)).map(([from, lengthMm]) => ({
         axis: 'vertical' as const,
         xMm: x - half,
-        yMm: s.from,
-        lengthMm: s.length,
+        yMm: from,
+        lengthMm,
       })),
     ),
     ...rows.centres.flatMap((y) =>
-      stripSpans(layout.columns, cols.starts, cols.centres, joint, edgeInsetMm).map((s) => ({
+      pieces(stripSpans(layout.columns, cols.starts, cols.centres, joint, edgeInsetMm)).map(([from, lengthMm]) => ({
         axis: 'horizontal' as const,
-        xMm: s.from,
+        xMm: from,
         yMm: y - half,
-        lengthMm: s.length,
+        lengthMm,
       })),
     ),
   ];

@@ -163,6 +163,19 @@ describe('--dry-run (Q89)', () => {
     }
   });
 
+  it('--pieces sheet, or a sheet size alone: the pieces to cut are listed, not written (#112)', async () => {
+    for (const flags of [
+      ['--pieces', 'sheet'],
+      ['--sheet-width', '1000'],
+    ]) {
+      const r = await cli([...OPENING, ...flags, '--dry-run']);
+      expect(r.code, flags.join(' ')).toBe(0);
+      expect(r.out).toContain('1 piece: 1 across, 1 up, 3 mm thick');
+      expect(r.out).toContain('Cut from 3 mm sheet: 1 piece of 603 × 1013 mm.');
+      expect(r.out).not.toContain('piece-c1-r1');
+    }
+  });
+
   it("prints the plan's lines in the library's order", async () => {
     const every = ['--port', '150@1,1', '--cutout', '120x80@3,1', '--seal', 'tape', '--fill', 'grid'];
     const r = await cli([...OPENING, ...every, '--piece-fill', '2,2=sealed', '--bottom-edge', 'unit', '--dry-run']);

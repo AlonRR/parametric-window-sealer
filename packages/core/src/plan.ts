@@ -3,6 +3,7 @@
 import { jointStripInsetMm, panelSpan, planEdges } from './edge.js';
 import type { EdgeStripPlacement } from './edge.js';
 import { jointWidthMm, minPieceMm, planJoints } from './joint.js';
+import { anyPrinted } from './sheet.js';
 import type { JointPlan } from './joint.js';
 import { layoutGrid } from './layout.js';
 import type { GridLayout } from './layout.js';
@@ -26,13 +27,33 @@ function layoutFor(p: Params, max: PieceSize): GridLayout {
   });
 }
 
-// The largest piece the plan uses. A listed printer's bed is turned where that needs fewer
-// pieces, as a piece can be turned on the bed; on a tie it stays as listed (Q116).
-export function pieceLimit(p: Params): PieceSize {
+// A size turned where that needs fewer pieces, as a piece can be turned on a bed or a sheet; on a
+// tie it stays as given, so the plan does not change without a gain.
+function turnedIfFewer(p: Params, asGiven: PieceSize): PieceSize {
+  if (asGiven.widthMm === asGiven.heightMm) return asGiven;
+  const turned = { widthMm: asGiven.heightMm, heightMm: asGiven.widthMm };
+  return layoutFor(p, turned).pieces.length < layoutFor(p, asGiven).pieces.length ? turned : asGiven;
+}
+
+// The largest piece the printer makes. A listed printer's bed is turned where that needs fewer
+// pieces, as a piece can be turned on the bed.
+export function printLimit(p: Params): PieceSize {
   const asListed = maxPieceSize(p.printer, p.bedMarginMm);
-  if (p.printer.kind !== 'model' || asListed.widthMm === asListed.heightMm) return asListed;
-  const turned = { widthMm: asListed.heightMm, heightMm: asListed.widthMm };
-  return layoutFor(p, turned).pieces.length < layoutFor(p, asListed).pieces.length ? turned : asListed;
+  return p.printer.kind === 'model' ? turnedIfFewer(p, asListed) : asListed;
+}
+
+// The largest piece the plan uses: the printer's, or with the pieces cut from sheet and none of
+// them printed, the sheet's, turned as a printer's bed is (sheet-pieces, #112).
+export function pieceLimit(p: Params): PieceSize {
+  if (anyPrinted(p)) return printLimit(p);
+  return turnedIfFewer(p, { widthMm: p.sheet.widthMm, heightMm: p.sheet.heightMm });
+}
+
+// The longest strip the printer makes: a strip can be turned on the bed, so the longer side of its
+// largest piece.
+export function longestStripMm(p: Params): number {
+  const max = maxPieceSize(p.printer, p.bedMarginMm);
+  return Math.max(max.widthMm, max.heightMm);
 }
 
 export function planWall(p: Params): GridLayout {
@@ -46,15 +67,14 @@ export interface WallParts {
 }
 
 // Everything the wall is made of, in the pieces' frame: the plan, the joint strips and
-// cross pieces, and the edge strips.
+// cross pieces, and the edge strips, each strip no longer than the printer makes.
 export function planParts(p: Params, plan: GridLayout = planWall(p)): WallParts {
-  const max = pieceLimit(p);
+  const longest = longestStripMm(p);
   const tape = tapeFit(p.seal);
   const span = panelSpan(p.openingWidthMm, p.openingHeightMm, p.edges, p.joint, tape);
   return {
     plan,
-    joints: planJoints(plan, p.joint, jointStripInsetMm(p.joint)),
-    // A strip can be turned on the bed, so the longer side of the largest piece limits it.
-    edges: planEdges(span.widthMm, span.heightMm, p.edges, p.joint, Math.max(max.widthMm, max.heightMm), tape),
+    joints: planJoints(plan, p.joint, jointStripInsetMm(p.joint), longest),
+    edges: planEdges(span.widthMm, span.heightMm, p.edges, p.joint, longest, tape),
   };
 }

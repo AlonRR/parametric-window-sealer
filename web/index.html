@@ -660,6 +660,29 @@
             <input name="thicknessMm" inputmode="decimal" autocomplete="off" />
           </label>
           <span class="error" data-testid="error-thicknessMm"></span>
+          <!-- Pieces cut from sheet (sheet-pieces, #112): only the strips and fittings printed. -->
+          <label><input type="radio" name="pieceSource" value="printed" checked /> Print the pieces</label>
+          <label><input type="radio" name="pieceSource" value="sheet" /> Cut the pieces from sheet</label>
+          <span class="error" data-testid="error-pieceSource"></span>
+          <div data-testid="sheet" data-show-when="pieceSource=sheet" hidden>
+            <p class="note">
+              Polycarbonate, acrylic, foam board or corrugated plastic, cut by hand to the sizes the plan
+              lists; the strips, edge strips and any piece with a fitting or a pattern of its own are
+              printed. Measure the sheet with calipers and give its thickness above: sheets are sold
+              a little off their nominal size.
+            </p>
+            <label>
+              Sheet width (mm)
+              <input name="sheetWidthMm" inputmode="decimal" autocomplete="off" />
+            </label>
+            <span class="error" data-testid="error-sheetWidthMm"></span>
+            <label>
+              Sheet height (mm)
+              <input name="sheetHeightMm" inputmode="decimal" autocomplete="off" />
+            </label>
+            <span class="error" data-testid="error-sheetHeightMm"></span>
+            <p class="note">The largest piece cut from it; it can be turned.</p>
+          </div>
         </fieldset>
 
         <!-- The panel fill (pattern-grid, #16): sealed to start with, or a pattern from the
@@ -1007,6 +1030,7 @@
         <p data-testid="plan-seal" data-plan="seal"></p>
         <p data-testid="plan-fill" data-plan="fill"></p>
         <ul data-testid="plan-piece-fills" data-plan="pieceFills"></ul>
+        <ul data-testid="plan-sheet" data-plan="sheet"></ul>
         <ul data-testid="plan-warnings" data-plan="warnings"></ul>
         <p><button type="button" id="download-open">Download the pieces...</button></p>
         <!-- The offline file (offline-file, #25): the page as one file, offered here (C55). -->

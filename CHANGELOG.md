@@ -14,6 +14,13 @@ under Unreleased.
 
 ### Added
 
+- Pieces cut from sheet: "Cut the pieces from sheet" under The panel (`--pieces sheet`) prints only
+  the strips, cross pieces, edge strips and any piece with a fitting or a pattern of its own; the
+  plan lists the pieces to cut by size, and the download leaves them out. Cut pieces can be as large
+  as the sheet (1000 × 2000 mm to start with, `--sheet-width`, `--sheet-height`) while no piece is
+  printed, and a strip longer than the printer makes is printed in segments. How to cut and fit
+  them: `docs/sheet-pieces.md`. Not yet test printed.
+
 - A joint that locks: the strips hold the pieces by small crush ribs inside their flanges, which
   reach 0.15 mm past each face (the grip, under Advanced: the joint between pieces, `--grip`), and
   a pin cut from 1.75 mm filament through each strip's middle and a slot in the piece stops a piece

@@ -3,6 +3,7 @@
 import { EDGES, edgeShapes, panelSpan } from './edge.js';
 import { PIN_MM, jointWidthMm, minPieceMm, partShapes, pinLengthMm } from './joint.js';
 import { COUPON_SECTIONS, couponGrips } from './coupon.js';
+import { describeSheet } from './sheet.js';
 import type { JointParams, JointPlan } from './joint.js';
 import type { Axis, GridLayout, Leftover } from './layout.js';
 import { tapeFit } from './tape.js';
@@ -47,6 +48,7 @@ export interface PlanText {
   seal: string;
   fill: string;
   pieceFills: string[]; // one line for each piece with a fill of its own (#21)
+  sheet: string[]; // with pieces cut from sheet (#112): what to cut, what to print, the pins to drill
 }
 
 function describeLeftover(note: GridLayout['leftovers'][number], maxPieceMm: number, joint: JointParams): LeftoverText {
@@ -177,6 +179,7 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     ),
     seal: describeSeal(params, parts),
     fill: `Fill: ${fillWords(params.fill, params.thicknessMm)}`,
+    sheet: describeSheet(params, plan, params.joint.pins ? 2 * parts.joints.strips.length : 0),
     pieceFills: params.pieceFills.map(
       (f) => `Column ${f.column}, row ${f.row}: ${fillWords(fillFor(params, f.column, f.row), params.thicknessMm)}`,
     ),

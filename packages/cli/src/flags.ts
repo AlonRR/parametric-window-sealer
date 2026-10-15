@@ -29,6 +29,9 @@ const FLAG_NAMES: Record<OwnField, string> = {
   heightFiller: 'height-filler',
   heightLeftover: 'height-leftover',
   thicknessMm: 'thickness',
+  pieceSource: 'pieces', // printed, or cut from sheet (#112)
+  sheetWidthMm: 'sheet-width', // a sheet size without --pieces means cutting from sheet
+  sheetHeightMm: 'sheet-height',
   slotMm: 'slot',
   slideMm: 'slide',
   webMm: 'web',

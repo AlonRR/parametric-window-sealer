@@ -12,6 +12,7 @@ import { PRINTER_IDS } from './printers.js';
 import { FILL_KINDS, PATTERN_STYLES } from './fill.js';
 import { PATTERNS } from './patterns/index.js';
 import { FANS } from './fan.js';
+import { PIECE_SOURCES } from './sheet.js';
 import type { FieldName, FormValues, Params } from './params.js';
 
 export interface Setting {
@@ -103,7 +104,15 @@ export const SETTINGS: readonly Setting[] = [
   { field: 'customHeightMm', path: 'printer.heightMm', help: "A custom printer's largest piece: its height." },
   ...axis('width'),
   ...axis('height'),
-  { field: 'thicknessMm', path: 'thicknessMm', help: 'Panel thickness.' },
+  { field: 'thicknessMm', path: 'thicknessMm', help: 'Panel thickness; with pieces cut from sheet, the sheet’s.' },
+  {
+    field: 'pieceSource',
+    path: 'sheet.source',
+    help: 'The pieces printed, or cut from sheet: those with a fitting or a pattern of their own are still printed.',
+    values: PIECE_SOURCES,
+  },
+  { field: 'sheetWidthMm', path: 'sheet.widthMm', help: 'The sheet’s width: the widest piece cut from it.' },
+  { field: 'sheetHeightMm', path: 'sheet.heightMm', help: 'The sheet’s height: the tallest piece cut from it.' },
   { field: 'slotMm', path: 'joint.slotMm', help: 'How deep a piece can go into a strip.' },
   { field: 'slideMm', path: 'joint.slideMm', help: 'How far a piece can move in its slot.' },
   { field: 'webMm', path: 'joint.webMm', help: "The wall between the strip's two slots." },
@@ -392,6 +401,11 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
     const id = given('id');
     params.printer = { kind: 'model', id: typeof id === 'string' ? id : '' };
   }
+  // A sheet's size without a source means cutting the pieces from it.
+  const sheet = input['sheet'];
+  if (isObject(sheet) && !('source' in sheet) && ('widthMm' in sheet || 'heightMm' in sheet)) {
+    params.sheet = { ...params.sheet, source: 'sheet' };
+  }
   const seal = input['seal'];
   if (isObject(seal) && !('kind' in seal) && 'tape' in seal) {
     // Joints in TPU mean the TPU seal (C39); any other tape setting, tape.
@@ -415,6 +429,9 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
     values.printer = 'custom';
   }
   if (overrides.printer === undefined && overrides.printerModel !== undefined) values.printer = 'model';
+  if (overrides.pieceSource === undefined && (overrides.sheetWidthMm ?? overrides.sheetHeightMm) !== undefined) {
+    values.pieceSource = 'sheet';
+  }
   const tapeOverride = SETTINGS.some((s) => s.path.startsWith('seal.tape.') && overrides[s.field] !== undefined);
   if (overrides.seal === undefined && tapeOverride) values.seal = overrides.tpuJoints === 'yes' ? 'tpu' : 'tape';
   for (const p of PATTERNS) {

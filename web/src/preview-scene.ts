@@ -8,7 +8,8 @@
 // #22) is drawn where the tape would be, squeezed as the tape is, in a dark grey of its own
 // (C36), and joint strips and cross pieces printed in TPU in the same grey. A measured cutout
 // (#23) is drawn in its piece, lined with the seal. The pins through the strips (joint-lock, #110)
-// are drawn in their holes, in the pale colour of natural filament.
+// are drawn in their holes, in the pale colour of natural filament. Pieces cut from sheet (#112) are
+// drawn in a pale blue, so the wall shows which to cut and which to print.
 //
 // Measured in spikes/viewer-benchmark/: what slows a preview is the number of triangles,
 // not the library. Plain pieces have 12 each; when patterns arrive, drawing them in full
@@ -34,7 +35,7 @@ import { crossSolid, pinSolid, planPins, stripSolid } from 'parametric-window-se
 import { buildPiecesWith, fittingSource, placedFittings } from 'parametric-window-sealer';
 import { tpuJoint } from 'parametric-window-sealer';
 import { fillFor, fillPattern } from 'parametric-window-sealer';
-import { planParts } from 'parametric-window-sealer';
+import { isCut, planParts, slotPins } from 'parametric-window-sealer';
 import type { Params } from 'parametric-window-sealer';
 
 export type PartKind = 'piece' | 'strip' | 'cross' | 'pin' | 'edge' | 'tape' | 'tpu';
@@ -47,6 +48,8 @@ const TAPE = new MeshPhongMaterial({ color: 0xd9822b, shininess: 5 });
 export const TPU_COLOUR = 0x2b2b2b;
 const TPU = new MeshPhongMaterial({ color: TPU_COLOUR, shininess: 10 });
 const PIN = new MeshPhongMaterial({ color: 0xe8e2d0, shininess: 30 });
+export const SHEET_COLOUR = 0xc8dce8;
+const SHEET = new MeshPhongMaterial({ color: SHEET_COLOUR, shininess: 40 });
 
 // A solid and its outline, at x, y in the wall; the solid is freed once copied.
 function add(wall: Group, solid: Manifold, kind: PartKind, x: number, y: number, look: Material) {
@@ -81,12 +84,14 @@ export function buildWallScene(engine: Engine, params: Params): Group {
     fillPattern(fillFor(params, cell.column + 1, cell.row + 1), joint);
   const fittings = placedFittings(fittingSource(params));
   const pins = planPins(joints, joint);
-  const built = buildPiecesWith(engine, plan, thicknessMm, fittings, pattern, { joint, pins });
+  // A piece cut from sheet (#112) has no slots for the pins: its holes are drilled.
+  const slotted = slotPins(params, plan, pins);
+  const built = buildPiecesWith(engine, plan, thicknessMm, fittings, pattern, { joint, pins: slotted });
   try {
     built.forEach((piece, i) => {
       const cell = plan.pieces[i];
       if (!cell) throw new Error('The plan and the built pieces differ');
-      add(wall, piece.solid, 'piece', cell.xMm, cell.yMm, PANEL);
+      add(wall, piece.solid, 'piece', cell.xMm, cell.yMm, isCut(params, cell) ? SHEET : PANEL);
     });
   } catch (error) {
     disposeWall(wall);

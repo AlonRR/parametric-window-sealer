@@ -34,6 +34,8 @@ import type { FillKind, FillParams } from './fill.js';
 import { PATTERNS, PATTERN_FIELDS, patternSizes, sizesOf } from './patterns/index.js';
 import { formatPieceFills, parsePieceFills } from './piece-fill.js';
 import type { PieceFill } from './piece-fill.js';
+import { DEFAULT_SHEET, PIECE_SOURCES } from './sheet.js';
+import type { SheetParams } from './sheet.js';
 import { FormReader, SIZE_MESSAGE, SIZE_OR_ZERO_MESSAGE } from './form-reader.js';
 import { planWall } from './plan.js';
 import {
@@ -82,6 +84,7 @@ export interface Params {
   inserts: Required<InsertSetting>[]; // appliances in a sliding insert (#38); none to start with
   insert: InsertParams; // its shutters
   coupon: boolean; // the joint's test coupon in the download too (joint-lock, #110)
+  sheet: SheetParams; // the pieces printed, or cut from sheet (sheet-pieces, #112)
 }
 
 // The page starts here: an example opening (Q42, labelled as an example, Q18), the default
@@ -111,6 +114,7 @@ export const EXAMPLE_PARAMS: Params = {
   inserts: [],
   insert: DEFAULT_INSERT,
   coupon: false,
+  sheet: DEFAULT_SHEET,
 };
 
 // Every field of the page's form. The page reads and writes these by name; the settings list
@@ -129,6 +133,9 @@ export const FIELD_NAMES = [
   'heightMode',
   'heightFiller',
   'thicknessMm',
+  'pieceSource',
+  'sheetWidthMm',
+  'sheetHeightMm',
   'widthLeftover',
   'heightLeftover',
   'slotMm',
@@ -276,9 +283,12 @@ const panelForm = (p: Params): FormValues => ({
   gripMm: String(p.joint.gripMm),
   pins: yesNo(p.joint.pins),
   coupon: yesNo(p.coupon),
+  pieceSource: p.sheet.source,
+  sheetWidthMm: String(p.sheet.widthMm),
+  sheetHeightMm: String(p.sheet.heightMm),
 });
 
-function readPanel(r: FormReader): { thicknessMm: number; joint: JointParams; coupon: boolean } {
+function readPanel(r: FormReader): { thicknessMm: number; joint: JointParams; coupon: boolean; sheet: SheetParams } {
   const thicknessMm = r.size('thicknessMm');
   const joint: JointParams = {
     slotMm: r.size('slotMm'),
@@ -290,6 +300,14 @@ function readPanel(r: FormReader): { thicknessMm: number; joint: JointParams; co
     pins: r.oneOf('pins', YES_NO) === 'yes',
   };
   const coupon = r.oneOf('coupon', YES_NO) === 'yes';
+  // The sheet's size is read only for pieces cut from sheet, as a custom printer's only for one.
+  const source = r.oneOf('pieceSource', PIECE_SOURCES);
+  const cut = source === 'sheet';
+  const sheet: SheetParams = {
+    source,
+    widthMm: r.numberIfUsed('sheetWidthMm', cut, DEFAULT_SHEET.widthMm, positive, SIZE_MESSAGE),
+    heightMm: r.numberIfUsed('sheetHeightMm', cut, DEFAULT_SHEET.heightMm, positive, SIZE_MESSAGE),
+  };
   if (joint.slideMm >= joint.slotMm) {
     r.fail('slideMm', 'Make it less than the slot depth, so a piece always stays in its slot.');
   } else if (joint.pins && joint.slotMm - joint.slideMm < PIN_HOLD_MM - 1e-9) {
@@ -299,7 +317,7 @@ function readPanel(r: FormReader): { thicknessMm: number; joint: JointParams; co
         `${mm(joint.slotMm - joint.slideMm)} mm deeper. Make the slot deeper or the slide shorter, or turn the pins off.`,
     );
   }
-  return { thicknessMm, joint, coupon };
+  return { thicknessMm, joint, coupon, sheet };
 }
 
 // The window and its four edges (Q66, Q71, Q75). A track's depth is read only where the edge is
@@ -649,7 +667,7 @@ export function readParams(values: FormValues): ReadResult {
   const opening = readOpening(r);
   const { printer, bedMarginMm } = readPrinter(r);
   const { width, height } = readDivision(r);
-  const { thicknessMm, joint, coupon } = readPanel(r);
+  const { thicknessMm, joint, coupon, sheet } = readPanel(r);
   const edges = readEdges(r);
   const sealRead = readSeal(r);
   const { seal, fit } = sealRead;
@@ -668,6 +686,13 @@ export function readParams(values: FormValues): ReadResult {
     if (span.heightMm <= 0) r.fail('openingHeightMm', 'Too small for the edge strips.');
   }
   const { fill, pieceFills } = readFill(r);
+  if (sheet.source === 'sheet' && fill.kind !== 'sealed') {
+    r.fail(
+      'pieceSource',
+      'A pattern for the whole wall is printed into every piece, so none would be cut: choose a sealed fill, or ' +
+        'give single pieces a pattern of their own.',
+    );
+  }
 
   // What is placed in pieces, once everything else is sound: the ports, the cutouts, the fans and
   // the clamps, then each piece's own fill, each against the plan the ones before it allow.
@@ -684,9 +709,15 @@ export function readParams(values: FormValues): ReadResult {
     seal,
     fill,
     coupon,
+    sheet,
   };
+  // Fittings and pieces' own patterns are placed against the plan they will be in: with any to
+  // place, a printed piece keeps every piece to the printer's size, before they are placed.
+  const given = [givenPorts, givenCutouts, givenFans, givenClamps, givenInserts];
+  const printedAnyway = given.some((g) => g.length > 0) || pieceFills.some((f) => f.kind !== 'sealed');
+  const toPlaceIn = { ...base, sheet: printedAnyway ? { ...sheet, source: 'printed' as const } : sheet };
   const none = { ports: [], pieceFills: [], cutouts: [], rim, fans: [], clamps: [], clamp, inserts: [], insert };
-  const plan = r.ok ? planWall({ ...base, ...none }) : undefined;
+  const plan = r.ok ? planWall({ ...toPlaceIn, ...none }) : undefined;
   let ports: Required<PortSetting>[] = [];
   if (plan !== undefined && givenPorts.length > 0) {
     const check = (port: PortSetting & InPiece) => portProblem(plan, port, collar, fit, joint);
@@ -740,7 +771,7 @@ export function readParams(values: FormValues): ReadResult {
   }
   if (r.ok && pieceFills.length > 0) {
     const fitted = { ports, pieceFills: [], cutouts, rim, fans, clamps, clamp, inserts, insert };
-    const problem = checkPieceFills(planWall({ ...base, ...fitted }), pieceFills);
+    const problem = checkPieceFills(planWall({ ...toPlaceIn, ...fitted }), pieceFills);
     if (problem !== undefined) r.fail('pieceFills', problem);
   }
 

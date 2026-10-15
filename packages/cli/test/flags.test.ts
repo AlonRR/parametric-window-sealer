@@ -44,6 +44,7 @@ describe('the setting flags (Q90)', () => {
       'height-mode',
       'height-filler',
       'height-leftover',
+      'pieces',
       'pins',
       'coupon',
       'window',

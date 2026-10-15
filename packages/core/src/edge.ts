@@ -20,6 +20,7 @@
 // sill, a flat face with the seal on it (C49). Where the unit is, seen from the room, sets which
 // edge meets it (C50): below the wall, as in a slider, or beside it, as in a hung window (C53).
 
+import { evenSegments } from './joint.js';
 import type { JointParams } from './joint.js';
 import type { TapeFit } from './tape.js';
 
@@ -141,13 +142,6 @@ export interface EdgeStripPlacement {
   tape?: EdgeTape;
 }
 
-// The fewest equal segments no longer than the printer can make (Q73).
-function segments(fromMm: number, lengthMm: number, maxMm: number): [number, number][] {
-  const count = Math.max(1, Math.ceil(lengthMm / maxMm - 1e-9));
-  const each = lengthMm / count;
-  return Array.from({ length: count }, (_, i) => [fromMm + i * each, each]);
-}
-
 // How far an edge's squeezed tape stands out from its strip; nothing without tape.
 const standOutMm = (profile: EdgeProfile): number => profile.tape?.standOutMm ?? 0;
 
@@ -175,7 +169,7 @@ export function planEdges(
   const across = edges.window === 'slider' ? [outer.left, outer.right] : [mouth.left, mouth.right];
   const up = edges.window === 'slider' ? [mouth.bottom, mouth.top] : [outer.bottom, outer.top];
   const run = (edge: EdgeName, profile: EdgeProfile, [from, to]: number[], place: (at: number) => [number, number]) =>
-    segments(from ?? 0, (to ?? 0) - (from ?? 0), maxLengthMm).map(([at, lengthMm]) => {
+    evenSegments(from ?? 0, (to ?? 0) - (from ?? 0), maxLengthMm).map(([at, lengthMm]) => {
       const [xMm, yMm] = place(at);
       const strip: EdgeStripPlacement = {
         edge,

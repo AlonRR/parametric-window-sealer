@@ -9,7 +9,7 @@ import type { Object3D } from 'three';
 import { describe, expect, it } from 'vitest';
 import { loadEngine } from 'parametric-window-sealer';
 import { EXAMPLE_PARAMS, buildExport } from 'parametric-window-sealer';
-import { TPU_COLOUR, buildWallScene, disposeWall } from '../src/preview-scene';
+import { SHEET_COLOUR, TPU_COLOUR, buildWallScene, disposeWall } from '../src/preview-scene';
 
 const solidsOf = (wall: Object3D, kind: string) =>
   wall.children.filter((c): c is Mesh => c instanceof Mesh && c.userData.kind === kind);
@@ -114,6 +114,25 @@ describe('buildWallScene', () => {
     expect(solidsOf(wall, 'piece').map((solid) => solid.geometry.index?.count)).toEqual(download);
     expect(download.every((n) => n > 12 * 3)).toBe(true); // more than a plain panel's 12 triangles
     disposeWall(wall);
+  });
+});
+
+describe('a wall cut from sheet (sheet-pieces, #112)', () => {
+  it('draws the pieces to cut in the sheet’s colour, without slots, and a printed one as before', async () => {
+    const engine = await loadEngine();
+    const sheet = { ...EXAMPLE_PARAMS.sheet, source: 'sheet' as const };
+    const one = buildWallScene(engine, { ...EXAMPLE_PARAMS, sheet });
+    const [cut] = solidsOf(one, 'piece');
+    if (cut === undefined) throw new Error('no piece');
+    expect(solidsOf(one, 'piece')).toHaveLength(1);
+    expect((cut.material as MeshPhongMaterial).color.getHex()).toBe(SHEET_COLOUR);
+    expect(cut.geometry.index?.count).toBe(12 * 3); // a plain block
+    disposeWall(one);
+    const ported = buildWallScene(engine, { ...EXAMPLE_PARAMS, sheet, ports: [{ hoseMm: 150, column: 2, row: 1 }] });
+    const colours = solidsOf(ported, 'piece').map((p) => (p.material as MeshPhongMaterial).color.getHex());
+    expect(colours.filter((c) => c === SHEET_COLOUR)).toHaveLength(14);
+    expect(colours.filter((c) => c !== SHEET_COLOUR)).toHaveLength(1);
+    disposeWall(ported);
   });
 });
 

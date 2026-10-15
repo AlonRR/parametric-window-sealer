@@ -15,6 +15,7 @@ cross pieces that hold by crush ribs and a filament pin ([`docs/joints.md`](docs
 edge strips into the window's tracks, shows the wall in 3D and downloads
 every part as STL or 3MF. It fits a hose port, a measured cutout, an exhaust fan, an appliance held by
 clamps ([`docs/clamps.md`](docs/clamps.md)) or in a sliding insert ([`docs/sliding-insert.md`](docs/sliding-insert.md)) or a window air conditioner,
+cuts the pieces from sheet instead of printing them if you like ([`docs/sheet-pieces.md`](docs/sheet-pieces.md)),
 seals the edges with foam tape or printed TPU, fills the pieces with a pattern or a tile of your
 own drawing ([`docs/svg-tiles.md`](docs/svg-tiles.md)), and has a measuring guide; it can also be saved as one file that works offline.
 The same geometry is a library for Node.js and browsers, the `window-sealer` command and the

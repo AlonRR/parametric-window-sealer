@@ -10,6 +10,7 @@ import { MEDIA_TYPES, checkChoice, meshOf, packageDownload, partName, taggedFile
 import type { AnyPartShape, DownloadChoice, DownloadFile, ExportPart, ExportPiece, WallPartShape } from './export.js';
 import { partShapes, planPins } from './joint.js';
 import { couponShape, couponSolid } from './coupon.js';
+import { isCut, slotPins } from './sheet.js';
 import { crossSolid, stripSolid } from './joint-geometry.js';
 import type { GridLayout } from './layout.js';
 import { buildPiecesWith } from './panel-geometry.js';
@@ -74,28 +75,35 @@ export function wallPartShapes(params: Params, plan: GridLayout = planWall(param
   return wallParts(params, plan).map((p) => p.shape);
 }
 
-// Every piece in its cell, and one strip, cross piece or edge strip per shape, lying as it
-// prints (Q53, Q58).
+// Every printed piece in its cell, and one strip, cross piece or edge strip per shape, lying as it
+// prints, its file printed as many times as its name says. Pieces cut from sheet (#112) are not in
+// the download; the plan lists them.
 export function buildExport(engine: Engine, params: Params): { pieces: ExportPiece[]; parts: ExportPart[] } {
   const plan = planWall(params);
   // Each piece's own fill, or the wall's (#21).
   const pattern = (cell: { column: number; row: number }) =>
     fillPattern(fillFor(params, cell.column + 1, cell.row + 1), params.joint);
   const fittings = placedFittings(fittingSource(params));
-  const pins = { joint: params.joint, pins: planPins(planParts(params, plan).joints, params.joint) };
+  const pins = {
+    joint: params.joint,
+    pins: slotPins(params, plan, planPins(planParts(params, plan).joints, params.joint)),
+  };
   const built = buildPiecesWith(engine, plan, params.thicknessMm, fittings, pattern, pins);
   let pieces: ExportPiece[];
   try {
-    pieces = built.map((b, i) => {
+    pieces = built.flatMap((b, i) => {
       const cell = plan.pieces[i];
       if (!cell) throw new Error('The plan and the built pieces differ');
-      return {
-        cell,
-        mesh: meshOf(b.solid),
-        ...(b.hoseMm === undefined ? {} : { hoseMm: b.hoseMm }),
-        ...(b.cutout === undefined ? {} : { cutout: b.cutout }),
-        ...(b.tag === undefined ? {} : { tag: b.tag }),
-      };
+      if (isCut(params, cell)) return [];
+      return [
+        {
+          cell,
+          mesh: meshOf(b.solid),
+          ...(b.hoseMm === undefined ? {} : { hoseMm: b.hoseMm }),
+          ...(b.cutout === undefined ? {} : { cutout: b.cutout }),
+          ...(b.tag === undefined ? {} : { tag: b.tag }),
+        },
+      ];
     });
   } finally {
     for (const b of built) b.solid.delete();
@@ -172,10 +180,12 @@ export function planFiles(params: Params, choice: DownloadChoice): PlannedFile[]
   const type = MEDIA_TYPES[choice.format];
   const fittings = placedFittings(fittingSource(params));
   return [
-    ...plan.pieces.map((cell) => {
-      const tag = fittingIn(fittings, cell.column + 1, cell.row + 1)?.tag;
-      return { name: taggedFileName(cell, choice.format, tag), type };
-    }),
+    ...plan.pieces
+      .filter((cell) => !isCut(params, cell))
+      .map((cell) => {
+        const tag = fittingIn(fittings, cell.column + 1, cell.row + 1)?.tag;
+        return { name: taggedFileName(cell, choice.format, tag), type };
+      }),
     ...wallParts(params, plan).map((part) => ({ name: `${part.name}.${choice.format}`, type })),
   ];
 }

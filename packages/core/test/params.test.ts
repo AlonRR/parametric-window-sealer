@@ -19,6 +19,7 @@ import { SEALED } from '../src/fill.js';
 import { DEFAULT_RIM } from '../src/cutout.js';
 import { DEFAULT_CLAMP } from '../src/clamp.js';
 import { DEFAULT_INSERT } from '../src/insert.js';
+import { DEFAULT_SHEET } from '../src/sheet.js';
 
 const example = toFormValues(EXAMPLE_PARAMS);
 const read = (over: FormValues) => readParams({ ...example, ...over });
@@ -48,6 +49,7 @@ describe('the starting values', () => {
       inserts: [], // #38
       insert: DEFAULT_INSERT,
       coupon: false, // #110
+      sheet: DEFAULT_SHEET, // #112
     });
   });
 
@@ -300,6 +302,7 @@ describe('describePlan', () => {
       seal: 'Seal: none.',
       fill: 'Fill: sealed.',
       pieceFills: [],
+      sheet: [], // every piece printed (#112)
     });
   });
 
