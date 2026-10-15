@@ -196,9 +196,12 @@ The next free ID is Q157.
 
 ## Repository follow-ups
 
-- **Pending (Q155, Q123):** the `v0.4.0` tag on the release commit `chore(release): v0.4.0, the
-  design review` and its GitHub release, a pre-release (C63), asked of the session on the
-  owner's machine once the commit is on `main`; checked on GitHub afterwards.
+- **Done (Q155, Q123):** the `v0.4.0` tag on the release commit `chore(release): v0.4.0, the
+  design review` (`f995be6`) and its GitHub release, made by the session on the owner's machine
+  on 15 Oct 2026 (verified: GitHub lists the annotated tag `v0.4.0` on `f995be6`, signed by the
+  owner's key and marked verified, and the release "v0.4.0, the design review" with the
+  CHANGELOG's 0.4.0 section as its notes). It is marked a pre-release, as the earlier ones are
+  (C63).
 - **Done (C48, Q123):** the `v0.3.0` tag on the release commit `chore(release): v0.3.0, every
   P1 item` (`d0268fd`) and its GitHub release, made by the session on the owner's machine on
   6 Oct 2026 (verified: GitHub lists the annotated tag `v0.3.0` on `d0268fd`, signed by the
