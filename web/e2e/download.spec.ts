@@ -60,7 +60,8 @@ test('STL in one zip: an STL for each of the 15 pieces and each strip shape', as
   ]);
   expect(download.suggestedFilename()).toBe('window-sealer-600x1000-stl.zip');
   const names = Object.keys(unzipSync(await readFile((await download.path()) ?? '')));
-  expect(names).toHaveLength(15 + 6);
+  expect(names).toHaveLength(15 + 6 + 1); // with the stiffeners' clips (#111)
+  expect(names).toContain('stiffener-clip-print-4.stl');
   expect(names).toContain('piece-c3-r5-197.7x198.6.stl');
   expect(names).toContain('strip-182.6x18-print-10.stl');
   expect(names).toContain('cross-18x18-print-8.stl');
@@ -100,8 +101,8 @@ test('3MF in one file holding every piece, strip shape and cross piece', async (
   const files = unzipSync(await readFile((await download.path()) ?? ''));
   expect(Object.keys(files).sort()).toEqual(['3D/3dModel.model', '[Content_Types].xml', '_rels/.rels']);
   const model = strFromU8(files['3D/3dModel.model'] ?? new Uint8Array());
-  expect([...model.matchAll(/<object /g)]).toHaveLength(15 + 6);
-  expect([...model.matchAll(/<item /g)]).toHaveLength(15 + 22 + 8 + 18);
+  expect([...model.matchAll(/<object /g)]).toHaveLength(15 + 6 + 1); // with the stiffeners' clips (#111)
+  expect([...model.matchAll(/<item /g)]).toHaveLength(15 + 22 + 8 + 18 + 4);
   expect(model).toContain('name="cross-18x18-print-8"');
 });
 

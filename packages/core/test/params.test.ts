@@ -60,6 +60,7 @@ describe('the starting values', () => {
       rain: true, // #117
       stop: DEFAULT_STOP, // #118
       wall: 'single', // #119
+      stiffen: true, // #111
     });
   });
 
@@ -325,6 +326,12 @@ describe('describePlan', () => {
       printing:
         'Printing: the pieces’ corners are rounded 3 mm and their bed-side edges chamfered 1 mm against warping. ' +
         'In PETG, add a 5 mm brim if the corners lift.', // #122
+      stiffeners: [
+        'Stiffeners: the wall is 603 mm across, more than 500, so stiffen it with 2 lengths of 20 × 20 × 2 mm ' +
+          'aluminium angle, each 593 mm long, across its room side through rows 2 and 4. 4 printed clips hold ' +
+          'them on the joint strips there: cut those strips’ 8 pins 9 mm long instead of 6.6, to go through the ' +
+          'clips too, then slide each angle into its clips, its flat leg against the wall.',
+      ], // #111
     });
   });
 

@@ -26,7 +26,9 @@ describe('makeWall', () => {
     expect(wall.summary.headline).toBe('15 pieces: 3 across, 5 up, 3 mm thick');
     expect(wall.files.map((f) => f.name)).toEqual(['window-sealer-600x1000-stl.zip']);
     const names = Object.keys(unzipSync(wall.files[0]?.bytes ?? new Uint8Array()));
-    expect(names).toHaveLength(15 + 6); // the pieces, 2 strip shapes, the cross, 3 edge shapes
+    // The pieces, 2 strip shapes, the cross, 3 edge shapes, and the stiffeners' clips (#111).
+    expect(names).toHaveLength(15 + 6 + 1);
+    expect(names).toContain('stiffener-clip-print-4.stl');
     expect(names).toContain('cross-18x18-print-8.stl');
   });
 
@@ -36,13 +38,13 @@ describe('makeWall', () => {
     const model = strFromU8(
       unzipSync(wall.files[0]?.bytes ?? new Uint8Array())['3D/3dModel.model'] ?? new Uint8Array(),
     );
-    expect([...model.matchAll(/<item /g)]).toHaveLength(15 + 22 + 8 + 18);
+    expect([...model.matchAll(/<item /g)]).toHaveLength(15 + 22 + 8 + 18 + 4); // with 4 stiffener clips
   });
 
   it('uses an engine it is given', async () => {
     const engine = await loadEngine();
     const wall = await makeWall(EXAMPLE_PARAMS, { format: 'stl', packaging: 'separate' }, { engine });
-    expect(wall.files).toHaveLength(15 + 6);
+    expect(wall.files).toHaveLength(15 + 6 + 1);
   });
 
   it('refuses what the page marks, naming each field', async () => {
@@ -132,7 +134,7 @@ describe('planFiles', () => {
   it('answers at once, without the engine', () => {
     const files = planFiles(EXAMPLE_PARAMS, { format: 'stl', packaging: 'separate' });
     expect(Array.isArray(files)).toBe(true);
-    expect(files).toHaveLength(15 + 6);
+    expect(files).toHaveLength(15 + 6 + 1);
   });
 
   it('refuses what makeWall refuses', () => {

@@ -36,7 +36,10 @@ const wall = await api.makeWall(api.EXAMPLE_PARAMS, { format: '3mf', packaging: 
 check('makes the example wall: 15 pieces', wall.plan.pieces.length === 15);
 check('and its one 3MF file', wall.files.length === 1 && wall.files[0].name === 'window-sealer-600x1000.3mf');
 const model = strFromU8(unzipSync(wall.files[0].bytes)['3D/3dModel.model'] ?? new Uint8Array());
-check('holding every copy: 15 panels, 22 strips, 8 crosses, 18 edges', [...model.matchAll(/<item /g)].length === 63);
+check(
+  'holding every copy: 15 panels, 22 strips, 8 crosses, 18 edges, 4 stiffener clips',
+  [...model.matchAll(/<item /g)].length === 67,
+);
 
 console.log("the README's promises:");
 const readme = readFileSync(join(here, 'README.md'), 'utf8');

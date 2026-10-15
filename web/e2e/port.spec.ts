@@ -103,7 +103,7 @@ test('the port’s piece is in the download, named with its hose', async ({ page
   const names = Object.keys(unzipSync(await readFile((await download.path()) ?? '')));
   expect(names).toContain('piece-c2-r1-197.7x198.6-port-150.stl');
   expect(names).toContain('cap-150-print-1.stl'); // a cap to start with (#114)
-  expect(names).toHaveLength(15 + 6 + 1);
+  expect(names).toHaveLength(15 + 6 + 2); // and the stiffeners' clips (#111)
 });
 
 test('the hose held by a ring that twists in, with a screen: the plan says so, the ring is printed', async ({

@@ -90,13 +90,13 @@ try {
   const first = sealer(['--width', '600', '--height', '1000']);
   const printed = first.stdout.split('\n');
   check(`${sample.length} sample lines, all printed`, sample.length > 10 && sample.every((l) => printed.includes(l)));
-  check('and the 21 files written', readdirSync(join(work, 'window-sealer-600x1000')).length === 21);
+  check('and the 22 files written', readdirSync(join(work, 'window-sealer-600x1000')).length === 22);
 
   console.log('exit status:');
   check('1 when the folder exists (Q88)', sealer(['--width', '600', '--height', '1000']).status === 1);
   check('2 without the opening (Q85)', sealer([]).status === 2);
   const json = JSON.parse(sealer(['--width', '600', '--height', '1000', '--dry-run', '--json']).stdout);
-  check('--json --dry-run: 21 files, nothing written (Q87, Q89)', json.ok && json.dryRun && json.files.length === 21);
+  check('--json --dry-run: 22 files, nothing written (Q87, Q89)', json.ok && json.dryRun && json.files.length === 22);
 } catch (error) {
   check(`the install and the runs (${error.message.split('\n')[0]})`, false);
 } finally {

@@ -23,6 +23,7 @@ import type { ShutterShape } from './insert.js';
 import type { CouponShape } from './coupon.js';
 import type { RailShape } from './rail.js';
 import type { StopShape } from './stop.js';
+import type { ClipShape } from './stiffener.js';
 import type { CapShape, RingShape } from './socket.js';
 import { cutoutTag } from './cutout.js';
 import { portTag } from './port.js';
@@ -96,7 +97,7 @@ const fileOf = (piece: ExportPiece, extension: Format): string =>
 // The wall's own parts beside the pieces: the joints, the edge strips, the TPU seal's gaskets, the
 // filler between the sashes and the sash stop if there are any, and if asked for, the joint's test
 // coupon.
-export type WallPartShape = PartShape | EdgeShape | GasketShape | CouponShape | RailShape | StopShape;
+export type WallPartShape = PartShape | EdgeShape | GasketShape | CouponShape | RailShape | StopShape | ClipShape;
 
 // Every part beside the pieces: the wall's own and the fittings', a sleeve in each hose port, a
 // frame in each cutout's rim and a clamp's jaws. A fitting with a new kind of part adds its shape
@@ -116,6 +117,7 @@ export function partName(shape: AnyPartShape): string {
     const part = shape.part === 'whole' ? '' : `-${shape.part}`;
     return `rail${part}-${mm(shape.lengthMm)}x${mm(shape.depthMm)}x${mm(shape.heightMm)}-print-${shape.count}`;
   }
+  if (shape.kind === 'clip') return `stiffener-clip-print-${shape.count}`;
   if (shape.kind === 'stop') {
     const part = shape.part === 'whole' ? '' : `-${shape.part}`;
     return `stop${part}-${mm(shape.lengthMm)}x${mm(shape.widthMm)}x${mm(shape.heightMm)}-print-${shape.count}`;

@@ -38,7 +38,7 @@ Pieces and joints: 603 × 1013 mm, for a 600 × 1000 mm opening.
 Joints: 22 strips in 2 lengths, and 8 cross pieces; each joint 5 mm wide. Pins: 44, each 6.6 mm of 1.75 mm filament, two through the middle of each strip.
 Edges: 18 edge strips in 3 shapes.
 
-Wrote 21 files to window-sealer-600x1000/:
+Wrote 22 files to window-sealer-600x1000/:
   piece-c1-r1-197.7x198.6.stl
   ...
   strip-182.6x18-print-10.stl
@@ -47,6 +47,7 @@ Wrote 21 files to window-sealer-600x1000/:
   edge-200x14x10-print-5.stl
   edge-200x15x10-print-5.stl
   edge-152.5x14x10-print-8.stl
+  stiffener-clip-print-4.stl
 ```
 
 Each panel has its own file; a strip, cross or edge file is one shape, and its name says how
@@ -73,6 +74,8 @@ window-sealer --width 600 --height 1000 --printer-model prusa-mk4s
   which are there to start with; why is in the repository's `docs/rain.md`.
 - Before fitting a wall, read the repository's `docs/safety.md`: it is not a fall barrier or a
   lock, and must not block a bedroom's only escape window.
+- `--stiffen no` leaves out the stiffeners: lengths of aluminium angle on printed clips, which a
+  wall more than 500 mm across gets to start with; why is in the repository's `docs/stiffeners.md`.
 - `--wall double` makes each plain printed piece hollow for winter, two skins round an air gap
   inside the panel's thickness (`--thickness 10`, say, as the track allows); why is in the
   repository's `docs/double-wall.md`.

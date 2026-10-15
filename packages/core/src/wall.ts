@@ -12,6 +12,7 @@ import { partShapes, planPins } from './joint.js';
 import { couponShape, couponSolid } from './coupon.js';
 import { planRail, railGasketLengths, railShapes, railSolid } from './rail.js';
 import { planStop, stopShapes, stopSolid } from './stop.js';
+import { clipShapes, clipSolid, planStiffeners } from './stiffener.js';
 import { isCut, slotPins } from './sheet.js';
 import { crossSolid, stripSolid } from './joint-geometry.js';
 import type { GridLayout } from './layout.js';
@@ -49,6 +50,7 @@ function wallParts(params: Params, plan: GridLayout): FittingPart[] {
     ...(tpu === undefined ? [] : gasketShapes(edges, tpu, params.seal.tape.thicknessMm, railGaskets)),
     ...(rail === undefined ? [] : railShapes(rail)),
     ...stopShapesFor(params),
+    ...clipShapes(planStiffeners(params)),
     ...(params.coupon ? [couponShape(joint)] : []),
   ];
   const solidOf = (engine: Engine, shape: WallPartShape) => {
@@ -69,6 +71,8 @@ function wallParts(params: Params, plan: GridLayout): FittingPart[] {
         return railSolid(engine, shape);
       case 'stop':
         return stopSolid(engine, shape);
+      case 'clip':
+        return clipSolid(engine, joint);
       default: {
         const unknown: never = shape;
         throw new Error(`No part of kind ${(unknown as WallPartShape).kind}`);

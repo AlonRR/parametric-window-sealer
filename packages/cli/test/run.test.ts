@@ -77,8 +77,9 @@ describe('what it prints (Q87)', () => {
     const r = await cli(OPENING);
     expect(r.out).toContain('15 pieces: 3 across, 5 up, 3 mm thick');
     expect(r.out).toContain('Joints: 22 strips in 2 lengths, and 8 cross pieces; each joint 5 mm wide.');
-    expect(r.out).toContain('Wrote 21 files to window-sealer-600x1000/');
+    expect(r.out).toContain('Wrote 22 files to window-sealer-600x1000/'); // with the stiffeners' clips (#111)
     expect(r.out).toContain('  cross-18x18-print-8.stl');
+    expect(r.out).toContain('  stiffener-clip-print-4.stl');
   });
 
   it('a leftover note with its options and the flag that changes it', async () => {
@@ -97,7 +98,7 @@ describe('what it prints (Q87)', () => {
     expect(result.summary.headline).toBe('15 pieces: 3 across, 5 up, 3 mm thick');
     expect(result.plan.pieces).toHaveLength(15);
     expect(result.out).toBe('window-sealer-600x1000/');
-    expect(result.files).toHaveLength(21);
+    expect(result.files).toHaveLength(22);
     // The library's own file: a corner piece with its pins' slots (#110), more than a plain block's 684 bytes.
     const wall = await makeWall(EXAMPLE_PARAMS, { format: 'stl', packaging: 'separate' });
     const bytes = wall.files[0]?.bytes.length ?? 0;
@@ -147,7 +148,7 @@ describe('an existing folder (Q88)', () => {
     expect(forced.code).toBe(0);
     expect(readFileSync(join(folder, 'notes.txt'), 'utf8')).toBe('mine');
     expect(readFileSync(join(folder, 'cross-18x18-print-8.stl'), 'utf8')).not.toBe('stale');
-    expect(readdirSync(folder)).toHaveLength(21 + 1);
+    expect(readdirSync(folder)).toHaveLength(22 + 1);
   });
 });
 
@@ -157,7 +158,7 @@ describe('--dry-run (Q89)', () => {
     expect(r.code).toBe(0);
     expect(LISTED(r.cwd)).toEqual([]);
     expect(r.out).toContain('15 pieces: 3 across, 5 up, 3 mm thick');
-    expect(r.out).toContain('Would write 21 files to window-sealer-600x1000/');
+    expect(r.out).toContain('Would write 22 files to window-sealer-600x1000/');
     for (const f of planFiles(EXAMPLE_PARAMS, { format: 'stl', packaging: 'separate' })) {
       expect(r.out).toContain(`  ${f.name}`);
     }

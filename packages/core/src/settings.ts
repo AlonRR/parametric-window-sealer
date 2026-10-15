@@ -153,6 +153,15 @@ export const SETTINGS: readonly Setting[] = [
     values: YES_NO,
     onOff: true,
   },
+  {
+    field: 'stiffen',
+    path: 'stiffen',
+    help:
+      'Stiffen a wall more than 500 mm across its short span with bought 20 × 20 × 2 mm aluminium angle on ' +
+      'printed clips: yes or no.',
+    values: YES_NO,
+    onOff: true,
+  },
   { field: 'slotMm', path: 'joint.slotMm', help: 'How deep a piece can go into a strip.' },
   { field: 'slideMm', path: 'joint.slideMm', help: 'How far a piece can move in its slot.' },
   { field: 'webMm', path: 'joint.webMm', help: "The wall between the strip's two slots." },

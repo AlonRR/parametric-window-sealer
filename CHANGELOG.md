@@ -14,6 +14,12 @@ under Unreleased.
 
 ### Added
 
+- Stiffeners, as the owner chose (Q154): a wall more than 500 mm across its short span is stiffened
+  by bought 20 × 20 × 2 mm aluminium angle on its room side (`--stiffen`, on to start with). The
+  plan says how many lengths, how long and through which rows; a printed clip on each strip a
+  length crosses holds it, pinned by the strip's own pins cut 2.4 mm longer. How: `docs/stiffeners.md`.
+  Not yet test printed.
+
 - Warnings before fitting: the page has a "Before you fit it" section, between the plan and the
   download, and `docs/safety.md` the same seven lines with their evidence: not a fall barrier; an
   escape window; a metal lock on a ground floor; condensation in winter; PLA in sun; plastics burn;

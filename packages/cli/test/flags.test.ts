@@ -50,6 +50,7 @@ describe('the setting flags (Q90)', () => {
       'colour',
       'sun',
       'rain',
+      'stiffen',
       'pins',
       'coupon',
       'window',

@@ -11,6 +11,7 @@ import { describeStop } from './stop.js';
 import { describeDouble } from './double.js';
 import { describeFrame } from './frame.js';
 import { describePrinting } from './piece-print.js';
+import { describeStiffeners } from './stiffener.js';
 import { patternBorderMm } from './pattern.js';
 import type { JointParams, JointPlan } from './joint.js';
 import type { Axis, GridLayout, Leftover } from './layout.js';
@@ -64,6 +65,7 @@ export interface PlanText {
   double: string[]; // a double wall's skins, and what it gains (#119)
   frame: string[]; // what holds a wall pressed into a frame with no track (#120)
   printing: string; // what is done against warping, and brim advice for the material (#122)
+  stiffeners: string[]; // the aluminium angle to buy, where it goes, and its clips (#111)
 }
 
 function describeLeftover(note: GridLayout['leftovers'][number], maxPieceMm: number, joint: JointParams): LeftoverText {
@@ -220,5 +222,6 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     }),
     frame: describeFrame(params),
     printing: describePrinting(params.material.kind),
+    stiffeners: describeStiffeners(params),
   };
 }

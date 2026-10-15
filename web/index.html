@@ -745,6 +745,17 @@
             stops water creeping under them.
           </p>
           <span class="error" data-testid="error-rain"></span>
+          <!-- Stiffeners (stiffener-strips, #111): on to start with, where a span is over 500 mm. -->
+          <label>
+            <input type="checkbox" name="stiffen" value="yes" />
+            Stiffen a wall over 500 mm across with aluminium angle
+          </label>
+          <p class="note">
+            A printed wall that wide bends in wind. The plan says how many lengths of 20 × 20 × 2 mm
+            aluminium angle to buy and where they go, on its room side; printed clips hold them on the
+            joint strips, pinned by the strips' own pins.
+          </p>
+          <span class="error" data-testid="error-stiffen"></span>
           <!-- Pieces cut from sheet (sheet-pieces, #112): only the strips and fittings printed. -->
           <label><input type="radio" name="pieceSource" value="printed" checked /> Print the pieces</label>
           <label><input type="radio" name="pieceSource" value="sheet" /> Cut the pieces from sheet</label>
@@ -1146,6 +1157,7 @@
         <ul data-testid="plan-double" data-plan="double"></ul>
         <ul data-testid="plan-frame" data-plan="frame"></ul>
         <p data-testid="plan-printing" data-plan="printing"></p>
+        <ul data-testid="plan-stiffeners" data-plan="stiffeners"></ul>
         <ul data-testid="plan-warnings" data-plan="warnings"></ul>
         <p><button type="button" id="download-open">Download the pieces...</button></p>
         <!-- The offline file (offline-file, #25): the page as one file, offered here (C55). -->
