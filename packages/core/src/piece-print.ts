@@ -3,7 +3,7 @@
 // corners rounded and its bed-side edge chamfered, both inside the strips' slots where they do not
 // show, and the plan gives brim advice for the material. Whatever stands on a piece's room side, a
 // collar or a frame, is kept as it was.
-import type { Manifold } from 'manifold-3d';
+import type { CrossSection, Manifold } from 'manifold-3d';
 import type { Engine } from './engine.js';
 import type { MaterialKind } from './material.js';
 import type { PanelSize } from './panel.js';
@@ -37,6 +37,30 @@ export function printReady(engine: Engine, solid: Manifold, size: PanelSize): Ma
   const keep = foot.add(body);
   const ready = solid.intersect(keep);
   for (const m of [bed, full, foot, tall, body, keep, solid]) m.delete();
+  return ready;
+}
+
+// A piece whose outline is not a plain rectangle, a puzzle-dovetailed one (#29), made ready: its
+// chamfer in steps that follow the outline in and out of its tabs and sockets, each step as thick as
+// a fine layer, and its corners kept square, as four meet at a crossing with nothing over them.
+// Takes the solid and frees it; the outline stays the caller's.
+export const CHAMFER_STEPS = 4;
+
+export function printReadyOutline(engine: Engine, solid: Manifold, shape: CrossSection): Manifold {
+  const c = PIECE_CHAMFER_MM;
+  const step = c / CHAMFER_STEPS;
+  const made: { delete(): void }[] = [];
+  const slabs = Array.from({ length: CHAMFER_STEPS }, (_, k) => {
+    const inset = shape.offset(-(c - (k + 0.5) * step), 'Miter');
+    const slab = inset.extrude(step);
+    made.push(inset, slab);
+    return slab.translate([0, 0, k * step]);
+  });
+  const tall = shape.extrude(ABOVE_MM);
+  const body = tall.translate([0, 0, c]);
+  const keep = engine.Manifold.union([...slabs, body]);
+  const ready = solid.intersect(keep);
+  for (const m of [...made, ...slabs, tall, body, keep, solid]) m.delete();
   return ready;
 }
 

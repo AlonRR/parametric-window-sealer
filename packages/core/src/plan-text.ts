@@ -2,6 +2,7 @@
 // is one key of PlanText; the page shows each in the element marked with that key (data-plan).
 import { EDGES, edgeShapes, panelSpan } from './edge.js';
 import { PIN_MM, jointWidthMm, minPieceMm, partShapes, pinLengthMm } from './joint.js';
+import { describeDovetails } from './dovetail.js';
 import { COUPON_SECTIONS, couponGrips } from './coupon.js';
 import { describeSheet } from './sheet.js';
 import { describeMaterial, materialWarnings } from './material.js';
@@ -183,7 +184,10 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     columns: `Widths: ${plan.columns.map(mm).join(', ')} mm`,
     rows: `Heights: ${plan.rows.map(mm).join(', ')} mm`,
     span: `Pieces and joints: ${mm(span.widthMm)} × ${mm(span.heightMm)} mm, for a ${mm(params.openingWidthMm)} × ${mm(params.openingHeightMm)} mm opening.`,
-    joints: describeJoints(parts.joints, params.joint, params.thicknessMm, params.coupon),
+    joints:
+      params.joint.style === 'dovetails'
+        ? describeDovetails(plan, params.joint)
+        : describeJoints(parts.joints, params.joint, params.thicknessMm, params.coupon),
     edges: `Edges: ${plural(parts.edges.length, 'edge strip', 'edge strips')} in ${plural(shapes, 'shape', 'shapes')}.`,
     warnings: [
       ...plan.warnings.map((w) => {

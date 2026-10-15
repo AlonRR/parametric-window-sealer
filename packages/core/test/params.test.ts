@@ -111,6 +111,7 @@ describe('readParams', () => {
   it('reads the joint under advanced, allowing no slide, no fit and no grip', () => {
     const r = read({ slotMm: '10', slideMm: '0', webMm: '2.5', flangeMm: '2', fitMm: '0', gripMm: '0' });
     expect(r.ok && r.params.joint).toEqual({
+      style: 'strips', // H-strips; puzzle dovetails are the other (#29)
       slotMm: 10,
       slideMm: 0,
       webMm: 2.5,

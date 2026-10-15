@@ -13,7 +13,8 @@
 
 import { EDGES, EXAMPLE_TRACK, WINDOW_PRESETS, panelSpan } from './edge.js';
 import type { EdgeName, EdgeParams, EdgeRole, WindowType } from './edge.js';
-import { DEFAULT_JOINT, PIN_HOLD_MM, jointWidthMm } from './joint.js';
+import { DOVETAIL } from './dovetail.js';
+import { DEFAULT_JOINT, JOINT_STYLES, PIN_HOLD_MM, jointWidthMm } from './joint.js';
 import type { JointParams } from './joint.js';
 import type { AxisMode, FillerPosition, GridLayout, Leftover } from './layout.js';
 import { DEFAULT_MAX_PIECE, maxPieceSize } from './printer.js';
@@ -168,6 +169,7 @@ export const FIELD_NAMES = [
   'stiffen',
   'widthLeftover',
   'heightLeftover',
+  'jointStyle',
   'slotMm',
   'slideMm',
   'webMm',
@@ -311,6 +313,7 @@ function readDivision(r: FormReader): { width: AxisChoice; height: AxisChoice } 
 const panelForm = (p: Params): FormValues => ({
   thicknessMm: String(p.thicknessMm),
   wall: p.wall,
+  jointStyle: p.joint.style,
   slotMm: String(p.joint.slotMm),
   slideMm: String(p.joint.slideMm),
   webMm: String(p.joint.webMm),
@@ -340,6 +343,7 @@ function readPanel(r: FormReader): {
 } {
   const thicknessMm = r.size('thicknessMm');
   const joint: JointParams = {
+    style: r.oneOf('jointStyle', JOINT_STYLES),
     slotMm: r.size('slotMm'),
     slideMm: r.sizeOrZero('slideMm'),
     webMm: r.size('webMm'),
@@ -519,6 +523,16 @@ function readSeal(r: FormReader): SealRead {
   return { seal, fit, sideTape };
 }
 
+// Puzzle dovetails (#29) are printed, and have no strips: none in TPU, and no coupon for their grip.
+function checkDovetails(r: FormReader, joint: JointParams, sheet: SheetParams, seal: SealParams, coupon: boolean) {
+  if (joint.style !== 'dovetails') return;
+  if (sheet.source === 'sheet') {
+    r.fail('jointStyle', 'Puzzle dovetails are printed: print the pieces, or choose the H-strips.');
+  }
+  if (seal.kind === 'tpu' && seal.tape.joints) r.fail('tpuJoints', 'Puzzle dovetails have no strips to print in TPU.');
+  if (coupon) r.fail('coupon', 'The coupon tries the strips’ grip; puzzle dovetails have no strips.');
+}
+
 // An edge strip keeps walls as thick as the joint's flanges either side of its slot; a seal on
 // its sides takes the clearance's place, its groove cut into those walls (Q127).
 function checkTrackWidth(r: FormReader, thicknessMm: number, joint: JointParams, edges: EdgeParams, s: SealRead) {
@@ -533,7 +547,8 @@ function checkTrackWidth(r: FormReader, thicknessMm: number, joint: JointParams,
 
 // A piece must be wider than the joint beside it, or no layout exists.
 function checkPieceSize(r: FormReader, printer: PrinterChoice, bedMarginMm: number, joint: JointParams) {
-  const jointMm = jointWidthMm(joint);
+  // Puzzle dovetails (#29) take no width between pieces, but their tabs take room on the bed.
+  const jointMm = joint.style === 'dovetails' ? DOVETAIL.depthMm : jointWidthMm(joint);
   if (printer.kind === 'custom' && Number.isFinite(jointMm)) {
     for (const [field, value] of [
       ['customWidthMm', printer.widthMm],
@@ -807,6 +822,7 @@ export function readParams(values: FormValues): ReadResult {
     );
   }
   const stop = readStop(r, edges);
+  checkDovetails(r, joint, sheet, seal, coupon);
   checkTrackWidth(r, thicknessMm, joint, edges, sealRead);
   checkPieceSize(r, printer, bedMarginMm, joint);
   checkSealFits(r, edges, sealRead);

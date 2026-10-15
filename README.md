@@ -21,7 +21,7 @@ flame retardant; it has no wind, rain or UV rating.
 **Version 0.4.0: the wall with its fittings, seals and patterns, and the design review's changes,
 as a page and as an API; not yet test printed.** The page in `web/` takes the opening you can see and your window type,
 divides the opening into pieces your printer can make, joins them with connector strips and
-cross pieces that hold by crush ribs and a filament pin ([`docs/joints.md`](docs/joints.md)), fits
+cross pieces that hold by crush ribs and a filament pin, or with puzzle dovetails ([`docs/joints.md`](docs/joints.md)), fits
 edge strips into the window's tracks, shows the wall in 3D and downloads
 every part as STL or 3MF. It fits a hose port that can lock and close ([`docs/hose-port.md`](docs/hose-port.md)), a measured cutout, an exhaust fan, an appliance held by
 clamps ([`docs/clamps.md`](docs/clamps.md)) or in a sliding insert ([`docs/sliding-insert.md`](docs/sliding-insert.md)) or a window air conditioner,

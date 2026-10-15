@@ -15,6 +15,13 @@ published work (Q153). Changes since the latest version are listed under Unrelea
 
 ### Added
 
+- Puzzle dovetails, a joint style beside the H-strips: under Advanced: the joint between pieces, Joint
+  style: Puzzle dovetails (`--joint-style dovetails`). The pieces meet edge to edge, and along each
+  joint the one on the left, or below, has dovetail tabs, 6 mm deep, that press down into sockets in
+  its neighbour, with the fit carved from both. No strips or cross pieces are printed; the pieces are
+  planned 6 mm smaller than the printer makes, for the tabs. They hold in the wall's plane only, which
+  the plan says. Not with pieces cut from sheet, joint strips in TPU or the coupon. How:
+  `docs/joints.md`. Not yet test printed.
 - A guided test print: in the measuring guide's fifth step, The grip, a button puts the test coupon
   in the download, and after printing it you press the section that held the tab, or say that it
   slipped out of every one or went into none. The guide sets that grip, or moves the grip so the

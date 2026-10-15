@@ -16,7 +16,13 @@
 
 import type { GridLayout } from './layout.js';
 
+// H-strips between the pieces, or puzzle dovetails on their edges (joint-dovetail, #29): then the
+// pieces meet edge to edge and there are no strips or cross pieces; the edge strips stay.
+export type JointStyle = 'strips' | 'dovetails';
+export const JOINT_STYLES: readonly JointStyle[] = ['strips', 'dovetails'];
+
 export interface JointParams {
+  style: JointStyle;
   slotMm: number; // how deep a piece can go into the strip
   slideMm: number; // how far a piece can move in its slot
   webMm: number; // the wall between the two slots
@@ -28,6 +34,7 @@ export interface JointParams {
 
 // The owner's starting numbers, adjustable under advanced (Q51).
 export const DEFAULT_JOINT: JointParams = {
+  style: 'strips',
   slotMm: 8,
   slideMm: 3,
   webMm: 2,
@@ -52,7 +59,8 @@ export const PIN_SLOT_MM = 2;
 // slot's mouth, and 1 mm of piece between its slot and the piece's edge.
 export const PIN_HOLD_MM = 4;
 
-export const jointWidthMm = (j: JointParams): number => j.webMm + j.slideMm;
+// Puzzle dovetails take no width between the pieces: their fit is carved from the pieces' edges.
+export const jointWidthMm = (j: JointParams): number => (j.style === 'dovetails' ? 0 : j.webMm + j.slideMm);
 export const stripWidthMm = (j: JointParams): number => 2 * j.slotMm + j.webMm;
 export const stripThicknessMm = (j: JointParams, panelMm: number): number => panelMm + 2 * j.fitMm + 2 * j.flangeMm;
 
@@ -141,6 +149,7 @@ function stripSpans(lengths: number[], starts: number[], crossings: number[], j:
 // (track-edge, #11) that is jointStripInsetMm in edge.ts. A strip longer than maxStripMm, along a
 // piece larger than the printer makes (cut from sheet, #112), is split as the edge strips are.
 export function planJoints(layout: GridLayout, joint: JointParams, edgeInsetMm = 0, maxStripMm = Infinity): JointPlan {
+  if (joint.style === 'dovetails') return { strips: [], crosses: [] };
   const half = stripWidthMm(joint) / 2;
   const cols = runs(layout.columns, layout.columnJointsMm);
   const rows = runs(layout.rows, layout.rowJointsMm);

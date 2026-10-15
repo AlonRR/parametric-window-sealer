@@ -56,10 +56,43 @@ If none held, say how:
 Then print the coupon again. Measuring a printed strip's slot with calipers, in the guide's fourth
 step, gives the fit in one go and can save a print.
 
+## Puzzle dovetails instead of strips
+
+Under **Advanced: the joint between pieces**, **Joint style: Puzzle dovetails** joins the pieces
+without strips. The pieces meet edge to edge. Along each joint, the piece on the left, or below,
+has dovetail tabs that press down into sockets in its neighbour.
+
+- Each tab is 6 mm deep, 8 mm wide where it leaves its piece and 12 mm at its head. There is one
+  about every 60 mm of joint, centred in equal lengths, and none within 14 mm of a joint's end.
+- The fit is carved from both pieces all along each joint, tabs and edges alike: 0.2 mm a face to
+  start with. The wall's outer edges stay where they are, in their edge strips.
+- The tabs reach 6 mm past a piece, so the plan makes each piece 6 mm smaller than the printer could
+  print, leaving room on the bed for them.
+- The corners stay square, as four meet where joints cross with nothing over them. The 1 mm chamfer
+  along the bed side follows the tabs and the sockets, in four steps of 0.25 mm.
+
+To put the wall together, lay the pieces face down and press each tab down into its neighbour's
+socket. **They hold the pieces together in the wall's plane; across it only their fit holds them**,
+so a wall pushed by the wind can step at a joint. Glue them for a lasting wall, or choose the
+H-strips, which hold both ways and come apart.
+
+With puzzle dovetails there are no strips, so the plan refuses three settings and leaves the pins
+unused:
+
+- **Pieces cut from sheet:** the tabs and sockets need printing.
+- **Joint strips in TPU:** there are no joint strips to print.
+- **The test coupon:** it tries the strips' grip.
+- **The pins:** they have nothing to pin.
+
+The stiffeners clip to the strips, so the plan says to choose the H-strips to stiffen a wide wall.
+The edge strips still have their weep holes. The preview draws the pieces square, without their
+tabs.
+
 ## The settings
 
 | On the page | Command | Library and MCP server | Starts at |
 | --- | --- | --- | --- |
+| Joint style | `--joint-style strips` or `dovetails` | `joint.style` | strips |
 | Grip (mm per face) | `--grip` | `joint.gripMm` | 0.15; 0 leaves the strips without ribs |
 | Pin each strip | `--pins yes` or `no` | `joint.pins` | yes |
 | Add a test coupon to the download | `--coupon yes` or `no` | `coupon` | no |
@@ -74,3 +107,5 @@ while the pins are on.
   owner's step. The coupon is there to find the grip.
 - That a 1.75 mm filament pin stays in a 1.8 mm printed hole: printed holes usually come out a
   little small, which is what holds it.
+- That the dovetails' 0.2 mm a face lets them press together and hold, and how far a dovetailed
+  wall steps at a joint in wind: a test print.

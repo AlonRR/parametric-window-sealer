@@ -25,7 +25,9 @@ import { pinSlotsIn } from './joint.js';
 import type { JointParams, PinPlacement } from './joint.js';
 import { pinSlotCuts } from './joint-geometry.js';
 import { hollowCut } from './double.js';
-import { printReady } from './piece-print.js';
+import { printReady, printReadyOutline } from './piece-print.js';
+import { dovetailOutline } from './dovetail.js';
+import type { PieceDovetails } from './dovetail.js';
 
 export { plainPanel } from './panel.js';
 export type { PanelSize } from './panel.js';
@@ -47,6 +49,8 @@ export interface PiecePins {
   joint: JointParams;
   pins: readonly PinPlacement[];
 }
+const OUTLINE_TALL_MM = 1000; // the outline cuts through whatever stands on the room side
+
 type PatternFor = PiecePattern | ((cell: { column: number; row: number }) => PiecePattern | undefined);
 
 // Every piece of the plan, each with the fitting placed in it, if any (columns and rows from 1, as
@@ -63,6 +67,7 @@ export function buildPiecesWith(
   pins?: PiecePins,
   hollow?: { borderMm: number }, // a double wall (#119): plain pieces hollow inside this border
   printed: (cell: { column: number; row: number }) => boolean = () => true, // not cut from sheet (#112)
+  dovetails?: PieceDovetails, // puzzle dovetails (#29): tabs and sockets on the edges pieces share
 ): BuiltPiece[] {
   const built: BuiltPiece[] = [];
   // The wall's centre, where the pattern's tiles are centred (Q135).
@@ -100,9 +105,29 @@ export function buildPiecesWith(
           openings.delete();
         }
       }
-      // Rounded corners and a chamfer against warping (#122), on a piece to print; one cut from sheet
-      // is cut square.
-      if (printed(cell)) solid = printReady(engine, solid, size);
+      // With puzzle dovetails, the tabs beyond its cell are added, and the piece is cut to its
+      // outline: its sockets, and the fit's clearance along every edge it shares.
+      const outline = dovetails === undefined ? undefined : dovetailOutline(engine, plan, cell, dovetails);
+      try {
+        if (outline !== undefined) {
+          const cellSquare = engine.CrossSection.square([cell.widthMm, cell.heightMm]);
+          const tabs = outline.subtract(cellSquare);
+          // A piece with no tabs of its own has nothing to add: an empty outline extrudes to nothing.
+          const tabSolid = tabs.isEmpty() ? undefined : tabs.extrude(thicknessMm);
+          const shape = outline.extrude(OUTLINE_TALL_MM);
+          const added = tabSolid === undefined ? solid : solid.add(tabSolid);
+          const cut = added.intersect(shape);
+          for (const m of new Set([cellSquare, tabs, tabSolid, shape, added, solid])) m?.delete();
+          solid = cut;
+        }
+        // Rounded corners and a chamfer against warping (#122), on a piece to print; one cut from
+        // sheet is cut square. A dovetailed one keeps square corners, its chamfer following its tabs.
+        if (printed(cell)) {
+          solid = outline === undefined ? printReady(engine, solid, size) : printReadyOutline(engine, solid, outline);
+        }
+      } finally {
+        outline?.delete();
+      }
       built.push({
         column: cell.column,
         row: cell.row,

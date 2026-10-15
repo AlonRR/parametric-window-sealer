@@ -5,6 +5,7 @@
 // outside. They are on both sides of a joint strip's web, so it goes either way up; only the face
 // matters. A groove under each edge strip with no seal there breaks the path of water creeping
 // under it. A window AC is tilted outward to drain, and the wall must not level it.
+import type { JointParams } from './joint.js';
 import { RIB_PITCH_MM } from './joint.js';
 import type { EdgeParams } from './edge.js';
 import { EDGES } from './edge.js';
@@ -21,15 +22,17 @@ export function weepPlacesMm(lengthMm: number): number[] {
   return Array.from({ length: count }, (_, i) => ((i + 0.5) * lengthMm) / count);
 }
 
-export function describeRain(p: { rain: boolean; seal: SealParams; edges: EdgeParams }): string[] {
+export function describeRain(p: { rain: boolean; seal: SealParams; edges: EdgeParams; joint: JointParams }): string[] {
   const lines: string[] = [];
   if (p.rain) {
     const drip =
       p.seal.kind === 'none' ? ' A groove under each edge strip stops water creeping under it to the room.' : '';
-    lines.push(
-      'Rain: every strip and edge strip has weep holes in one flange to let water out of its slots; fit each ' +
-        `with that flange outside.${drip}`,
-    );
+    // Puzzle dovetails (#29) have no strips, only the edge strips.
+    const which =
+      p.joint.style === 'dovetails'
+        ? 'every edge strip has weep holes in one flange to let water out of its slot'
+        : 'every strip and edge strip has weep holes in one flange to let water out of its slots';
+    lines.push(`Rain: ${which}; fit each with that flange outside.${drip}`);
   }
   if (EDGES.some((e) => p.edges.roles[e] === 'unit')) {
     lines.push(

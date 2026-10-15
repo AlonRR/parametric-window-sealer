@@ -9,6 +9,7 @@ import type { Engine } from './engine.js';
 import { MEDIA_TYPES, checkChoice, meshOf, packageDownload, partName, taggedFileName, wallLabel } from './export.js';
 import type { AnyPartShape, DownloadChoice, DownloadFile, ExportPart, ExportPiece, WallPartShape } from './export.js';
 import { partShapes, planPins } from './joint.js';
+import { planDovetails } from './dovetail.js';
 import { couponShape, couponSolid } from './coupon.js';
 import { planRail, railGasketLengths, railShapes, railSolid } from './rail.js';
 import { planStop, stopShapes, stopSolid } from './stop.js';
@@ -111,7 +112,9 @@ export function buildExport(engine: Engine, params: Params): { pieces: ExportPie
   };
   const hollow = params.wall === 'double' ? { borderMm: patternBorderMm(params.joint) } : undefined;
   const printed = (cell: { column: number; row: number }) => !isCut(params, cell);
-  const built = buildPiecesWith(engine, plan, params.thicknessMm, fittings, pattern, pins, hollow, printed);
+  const dovetails =
+    params.joint.style === 'dovetails' ? { joint: params.joint, tabs: planDovetails(plan, params.joint) } : undefined;
+  const built = buildPiecesWith(engine, plan, params.thicknessMm, fittings, pattern, pins, hollow, printed, dovetails);
   let pieces: ExportPiece[];
   try {
     pieces = built.flatMap((b, i) => {

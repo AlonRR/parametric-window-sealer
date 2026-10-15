@@ -53,6 +53,7 @@ const probe = (solid: Manifold, x: number, y: number, z: number, size = 0.1) => 
 describe('the joint’s starting values', () => {
   it('grip each panel face by 0.15 mm at the ribs, and pin each strip', () => {
     expect(DEFAULT_JOINT).toEqual({
+      style: 'strips', // H-strips; puzzle dovetails are the other (#29)
       slotMm: 8,
       slideMm: 3,
       webMm: 2,

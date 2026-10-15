@@ -162,6 +162,14 @@ export const SETTINGS: readonly Setting[] = [
     values: YES_NO,
     onOff: true,
   },
+  {
+    field: 'jointStyle',
+    path: 'joint.style',
+    help:
+      'The joint between pieces: strips (H-strips, the pieces sliding into them) or dovetails (puzzle dovetails, ' +
+      'the pieces pressed into each other).',
+    values: ['strips', 'dovetails'],
+  },
   { field: 'slotMm', path: 'joint.slotMm', help: 'How deep a piece can go into a strip.' },
   { field: 'slideMm', path: 'joint.slideMm', help: 'How far a piece can move in its slot.' },
   { field: 'webMm', path: 'joint.webMm', help: "The wall between the strip's two slots." },

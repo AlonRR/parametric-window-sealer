@@ -3,6 +3,7 @@
 import { jointStripInsetMm, panelSpan, planEdges } from './edge.js';
 import type { EdgeStripPlacement } from './edge.js';
 import { jointWidthMm, minPieceMm, planJoints } from './joint.js';
+import { DOVETAIL } from './dovetail.js';
 import { anyPrinted } from './sheet.js';
 import type { JointPlan } from './joint.js';
 import { layoutGrid } from './layout.js';
@@ -12,16 +13,22 @@ import type { PieceSize } from './printer.js';
 import { tapeFit } from './tape.js';
 import type { Params } from './params.js';
 
+// Puzzle dovetails (#29) reach this far beyond a piece's cell on its right and upper edges, so the
+// cells are planned that much smaller than the printer makes.
+export const tabRoomMm = (p: Params): number => (p.joint.style === 'dovetails' ? DOVETAIL.depthMm : 0);
+
 function layoutFor(p: Params, max: PieceSize): GridLayout {
   const span = panelSpan(p.openingWidthMm, p.openingHeightMm, p.edges, p.joint, tapeFit(p.seal));
+  const room = tabRoomMm(p);
   return layoutGrid({
     widthMm: span.widthMm,
     heightMm: span.heightMm,
-    maxPieceWidthMm: max.widthMm,
-    maxPieceHeightMm: max.heightMm,
+    maxPieceWidthMm: max.widthMm - room,
+    maxPieceHeightMm: max.heightMm - room,
     minPieceMm: minPieceMm(p.joint), // Q76
     jointMm: jointWidthMm(p.joint),
-    jointSpreadMm: p.joint.slideMm, // each piece moves half of it, from the middle (Q56)
+    // each piece moves half of it, from the middle; dovetailed pieces do not move
+    jointSpreadMm: p.joint.style === 'dovetails' ? 0 : p.joint.slideMm,
     width: p.width,
     height: p.height,
   });

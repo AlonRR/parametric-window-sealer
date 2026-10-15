@@ -38,6 +38,7 @@ const FLAG_NAMES: Record<OwnField, string> = {
   sun: 'sun',
   rain: 'rain', // weep holes and drip grooves (#117), yes to start with
   stiffen: 'stiffen', // aluminium angle on printed clips over 500 mm (#111), yes to start with
+  jointStyle: 'joint-style', // strips, or puzzle dovetails (#29)
   slotMm: 'slot',
   slideMm: 'slide',
   webMm: 'web',

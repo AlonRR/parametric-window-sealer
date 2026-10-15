@@ -36,6 +36,7 @@ const horizontal = (strips: StripPlacement[]) => strips.filter((s) => s.axis ===
 describe('the joint dimensions (Q51, Q56)', () => {
   it('starts from the owner’s numbers: slot 8, slide 3, web 2, flanges 1.6, fit 0.2; ribs and pins from #110', () => {
     expect(DEFAULT_JOINT).toEqual({
+      style: 'strips', // H-strips; puzzle dovetails are the other (#29)
       slotMm: 8,
       slideMm: 3,
       webMm: 2,

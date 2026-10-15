@@ -51,6 +51,7 @@ describe('the setting flags (Q90)', () => {
       'sun',
       'rain',
       'stiffen',
+      'joint-style', // puzzle dovetails (#29)
       'pins',
       'coupon',
       'window',

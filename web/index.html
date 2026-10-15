@@ -263,7 +263,7 @@
             <p data-testid="guide-fit" aria-live="polite"></p>
             <p><button type="button" data-part="use-fit" disabled>Use this fit</button></p>
           </section>
-          <section data-step="grip">
+          <section data-step="grip" data-show-when="jointStyle=strips">
             <h3>5. The grip</h3>
             <p>
               Print the test coupon as the strips will be printed: five short strips, marked with one
@@ -847,11 +847,25 @@
 
         <details>
           <summary>Advanced: the joint between pieces</summary>
-          <p class="note">
+          <label>
+            Joint style
+            <select name="jointStyle">
+              <option value="strips">H-strips</option>
+              <option value="dovetails">Puzzle dovetails</option>
+            </select>
+          </label>
+          <span class="error" data-testid="error-jointStyle"></span>
+          <p class="note" data-show-when="jointStyle=strips">
             Pieces join with strips that slide over their edges. Small ribs inside each strip are
             squeezed by the piece, so it holds firm, and a pin through the strip stops it pulling
             out. These are starting values: a test print shows whether to change them, the grip most
             of all.
+          </p>
+          <p class="note" data-show-when="jointStyle=dovetails" hidden>
+            Pieces meet edge to edge, and dovetail tabs on one press down into sockets in the next,
+            with the fit as clearance all round. They hold in the wall's plane; across it only their
+            fit holds them, so glue them for a lasting wall. No strips or cross pieces are printed;
+            the slot and flanges below are the edge strips'.
           </p>
           <label>
             Slot depth (mm)
@@ -859,6 +873,7 @@
           </label>
           <p class="note">How deep a piece can go into a strip.</p>
           <span class="error" data-testid="error-slotMm"></span>
+          <div data-show-when="jointStyle=strips">
           <label>
             Slide (mm)
             <input name="slideMm" inputmode="decimal" autocomplete="off" />
@@ -874,6 +889,7 @@
           </label>
           <p class="note">The wall between the strip's two slots.</p>
           <span class="error" data-testid="error-webMm"></span>
+          </div>
           <label>
             Flanges (mm)
             <input name="flangeMm" inputmode="decimal" autocomplete="off" />
@@ -888,6 +904,7 @@
             The gap between each panel face and the flat of the strip, between its ribs.
           </p>
           <span class="error" data-testid="error-fitMm"></span>
+          <div data-show-when="jointStyle=strips">
           <label>
             Grip (mm per face)
             <input name="gripMm" inputmode="decimal" autocomplete="off" />
@@ -916,6 +933,7 @@
             to use.
           </p>
           <span class="error" data-testid="error-coupon"></span>
+          </div>
         </details>
 
         <details>
