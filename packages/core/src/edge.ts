@@ -25,14 +25,17 @@ import type { JointParams } from './joint.js';
 import type { TapeFit } from './tape.js';
 
 export type EdgeName = 'top' | 'bottom' | 'left' | 'right';
-export type EdgeRole = 'track' | 'sash' | 'sill' | 'unit';
-export type WindowType = 'slider' | 'hung';
+// An edge pressed into a frame with no track (compression-edge, #120) is shaped as one against a
+// sash, a flat face with the seal on it; its printed TPU gasket, squeezed, is what holds the wall.
+export type EdgeRole = 'track' | 'sash' | 'sill' | 'unit' | 'frame';
+export type WindowType = 'slider' | 'hung' | 'frame';
 
 export const EDGES: readonly EdgeName[] = ['top', 'bottom', 'left', 'right'];
 
 export const WINDOW_PRESETS: Record<WindowType, Record<EdgeName, EdgeRole>> = {
   slider: { top: 'track', bottom: 'track', left: 'track', right: 'sash' },
   hung: { top: 'sash', bottom: 'sill', left: 'track', right: 'track' },
+  frame: { top: 'frame', bottom: 'frame', left: 'frame', right: 'frame' },
 };
 
 // Where a window AC is, seen from the room: the edge facing it meets it.
@@ -44,8 +47,9 @@ export function unitRoles(window: WindowType, place: UnitPlace): Record<EdgeName
   return { ...WINDOW_PRESETS[window], [FACING[place]]: 'unit' };
 }
 
-// In a slider the wall stands on the unit; in a hung window the unit stands beside it (C53).
-export const defaultUnitPlace = (window: WindowType): UnitPlace => (window === 'slider' ? 'below' : 'right');
+// In a slider the wall stands on the unit, and in a hung window the unit stands beside it, as each
+// is usually opened; in a frame with no track, the unit stands on the sill and the wall above it.
+export const defaultUnitPlace = (window: WindowType): UnitPlace => (window === 'hung' ? 'right' : 'below');
 
 export interface TrackParams {
   widthMm: number; // one width for every edge strip (Q72)

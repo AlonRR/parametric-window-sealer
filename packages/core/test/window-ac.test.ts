@@ -51,7 +51,13 @@ describe('an edge against the unit (C49)', () => {
     expect(r).toMatchObject({ ok: true, params: { edges: { roles: { bottom: 'unit' } } } });
     if (r.ok) expect(readParams(toFormValues(r.params))).toEqual(r);
     for (const edge of ['top', 'bottom', 'left', 'right']) {
-      expect(SETTINGS.find((s) => s.path === `edges.roles.${edge}`)?.values).toEqual(['track', 'sash', 'sill', 'unit']);
+      expect(SETTINGS.find((s) => s.path === `edges.roles.${edge}`)?.values).toEqual([
+        'track',
+        'sash',
+        'sill',
+        'unit',
+        'frame',
+      ]); // a frame since #120
     }
   });
 

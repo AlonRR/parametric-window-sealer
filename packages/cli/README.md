@@ -66,7 +66,7 @@ window-sealer --width 600 --height 1000 --printer-model prusa-mk4s
 - The files go into one folder named after the wall, or `--out <folder>`. If the folder exists
   it stops, unless `--force`, which replaces the files it writes and leaves any others there.
 - `--dry-run` prints the plan and the files it would write, and writes nothing.
-- `--window slider` or `hung` sets the four edges as the page does; an edge flag such as
+- `--window slider`, `hung` or `frame` sets the four edges as the page does; an edge flag such as
   `--top-edge track` then changes one. A `--printer-width` or `--printer-height` makes the
   printer custom.
 - `--rain no` leaves out the weep holes in the strips and the drip groove under the edge strips,

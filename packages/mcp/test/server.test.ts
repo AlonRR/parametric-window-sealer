@@ -101,7 +101,7 @@ describe('window_sealer_list_settings', () => {
     });
     expect(settings.find((s) => s.path === 'edges.window')).toMatchObject({
       startsAt: 'slider',
-      choices: ['slider', 'hung'],
+      choices: ['slider', 'hung', 'frame'],
     });
     expect(settings.find((s) => s.path === 'openingWidthMm')?.startsAt).toBeNull();
     expect(JSON.parse(r.text)).toEqual(r.data);

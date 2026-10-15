@@ -80,6 +80,7 @@ describe('the setting flags (Q90)', () => {
       ...(f.path.startsWith('seal.tape.') ? { seal: f.field === 'tpuJoints' ? 'tpu' : 'tape' } : {}),
       ...(f.path.startsWith('fill.') && f.path !== 'fill.kind' ? { fill: 'grid' } : {}), // and with a pattern
       ...(f.field === 'wall' ? { thicknessMm: '10' } : {}), // a double wall needs panels thick enough
+      ...(f.path.startsWith('edges.roles.') ? { seal: 'tpu' } : {}), // an edge in a frame, a TPU gasket
     };
     for (const value of f.values ?? []) {
       expect(readParams({ ...base, [f.field]: value })).toMatchObject({ ok: true });

@@ -301,7 +301,7 @@ describe('usage', () => {
     expect(r.code).toBe(0);
     for (const f of SETTING_FLAGS) expect(r.out).toContain(`--${f.flag} `);
     expect(r.out).toMatch(/--slot <mm> +How deep a piece can go into a strip\. \(8\)/);
-    expect(r.out).toMatch(/--window <slider\|hung> +.*\(slider\)/);
+    expect(r.out).toMatch(/--window <slider\|hung\|frame> +[\s\S]*?as the page does\. \(slider\)/);
     expect(r.out).toContain('Exit status: 0 done, 1 could not write, 2 wrong options or settings.');
   });
 
@@ -602,7 +602,7 @@ describe('a window AC (window-ac #24; C49 to C53)', () => {
 
   it('--help lists the role among each edge’s choices', async () => {
     const r = await cli(['--help']);
-    expect(r.out).toMatch(/--right-edge <track\|sash\|sill\|unit>/);
+    expect(r.out).toMatch(/--right-edge <track\|sash\|sill\|unit\|frame>/);
   });
 });
 

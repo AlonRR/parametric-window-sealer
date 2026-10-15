@@ -68,6 +68,7 @@ describe('SETTINGS: every setting on the page', () => {
         ...(s.path.startsWith('seal.tape.') ? { seal: s.field === 'tpuJoints' ? 'tpu' : 'tape' } : {}),
         ...(s.path.startsWith('fill.') && s.path !== 'fill.kind' ? { fill: 'grid' } : {}),
         ...(s.field === 'wall' ? { thicknessMm: '10' } : {}), // a double wall needs panels thick enough (#119)
+        ...(s.path.startsWith('edges.roles.') ? { seal: 'tpu' } : {}), // an edge in a frame, a TPU gasket (#120)
       };
       for (const value of s.values ?? []) {
         expect(readParams({ ...base, [s.field]: value })).toMatchObject({ ok: true });

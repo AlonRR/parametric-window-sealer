@@ -230,8 +230,8 @@ export type ReadResult = { ok: true; params: Params } | { ok: false; errors: Fie
 const MODES: readonly AxisMode[] = ['equal', 'full-plus-filler'];
 const FILLERS: readonly FillerPosition[] = ['start', 'end', 'middle', 'split'];
 const LEFTOVERS: readonly Leftover[] = ['spread', 'equal', 'shorten'];
-const WINDOWS: readonly WindowType[] = ['slider', 'hung'];
-const ROLES: readonly EdgeRole[] = ['track', 'sash', 'sill', 'unit'];
+const WINDOWS: readonly WindowType[] = ['slider', 'hung', 'frame'];
+const ROLES: readonly EdgeRole[] = ['track', 'sash', 'sill', 'unit', 'frame'];
 const SEALS: readonly SealKind[] = ['none', 'tape', 'tpu'];
 const PRINTER_KINDS = ['default', 'custom', 'model'] as const;
 const YES_NO = ['no', 'yes'] as const;
@@ -794,6 +794,12 @@ export function readParams(values: FormValues): ReadResult {
   const sealRead = readSeal(r);
   const { seal, fit } = sealRead;
   const rail = readRail(r, edges, seal);
+  if (EDGES.some((e) => edges.roles[e] === 'frame') && seal.kind !== 'tpu') {
+    r.fail(
+      'seal',
+      'An edge pressed into a frame is held by the squeeze of its printed TPU gasket: choose printed TPU as the seal.',
+    );
+  }
   const stop = readStop(r, edges);
   checkTrackWidth(r, thicknessMm, joint, edges, sealRead);
   checkPieceSize(r, printer, bedMarginMm, joint);

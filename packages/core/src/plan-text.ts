@@ -9,6 +9,7 @@ import { describeRail, planRail } from './rail.js';
 import { describeRain } from './rain.js';
 import { describeStop } from './stop.js';
 import { describeDouble } from './double.js';
+import { describeFrame } from './frame.js';
 import { patternBorderMm } from './pattern.js';
 import type { JointParams, JointPlan } from './joint.js';
 import type { Axis, GridLayout, Leftover } from './layout.js';
@@ -60,6 +61,7 @@ export interface PlanText {
   rain: string[]; // the weep holes, and keeping a window AC's tilt (#117)
   stop: string[]; // the sash stop, if there is one (#118)
   double: string[]; // a double wall's skins, and what it gains (#119)
+  frame: string[]; // what holds a wall pressed into a frame with no track (#120)
 }
 
 function describeLeftover(note: GridLayout['leftovers'][number], maxPieceMm: number, joint: JointParams): LeftoverText {
@@ -214,5 +216,6 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
       borderMm: patternBorderMm(params.joint),
       cutFromSheet: params.sheet.source === 'sheet',
     }),
+    frame: describeFrame(params),
   };
 }

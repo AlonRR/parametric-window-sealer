@@ -30,7 +30,7 @@ export interface Setting {
 const DIVISION = ['equal', 'full-plus-filler'] as const;
 const FILLER = ['start', 'end', 'middle', 'split'] as const;
 const LEFTOVER = ['spread', 'equal', 'shorten'] as const;
-const ROLE = ['track', 'sash', 'sill', 'unit'] as const;
+const ROLE = ['track', 'sash', 'sill', 'unit', 'frame'] as const;
 const YES_NO = ['no', 'yes'] as const;
 
 // The settings that are lists, and the shape of each item: what each field holds.
@@ -72,7 +72,9 @@ const patternSettings = (): Setting[] =>
 const edge = (name: 'top' | 'bottom' | 'left' | 'right'): Setting => ({
   field: `${name}Edge`,
   path: `edges.roles.${name}`,
-  help: `The ${name} edge: in a track, pressed by the sash, on a flat sill, or against a window AC (unit).`,
+  help:
+    `The ${name} edge: in a track, pressed by the sash, on a flat sill, against a window AC (unit), or pressed ` +
+    'into a frame with no track, held by its TPU gasket.',
   values: ROLE,
 });
 
@@ -178,8 +180,10 @@ export const SETTINGS: readonly Setting[] = [
   {
     field: 'window',
     path: 'edges.window',
-    help: 'Window type; sets the four edges as the page does.',
-    values: ['slider', 'hung'],
+    help:
+      'Window type: a slider, a hung window, or a frame with no track (a casement screen opening, a tilt-and-turn ' +
+      'frame); sets the four edges as the page does.',
+    values: ['slider', 'hung', 'frame'],
   },
   edge('top'),
   edge('bottom'),

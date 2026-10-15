@@ -14,6 +14,13 @@ under Unreleased.
 
 ### Added
 
+- Windows with no track: Window type: A frame with no track (`--window frame`) puts all four edges
+  in a frame, and any edge can be set to Pressed into a frame. Such an edge is shaped as one against
+  a sash, and its printed TPU gasket, squeezed as the wall goes in, holds the wall, as Indow's
+  inserts hold by a compression tube; it needs the printed TPU seal. For casement screen openings and
+  tilt-and-turn frames. The page now shows the seal's errors. How: `docs/frame.md`. Not yet test
+  printed.
+
 - A double wall for winter: under The panel, Wall: Double (`--wall double`) makes each plain printed
   piece hollow inside the panel's thickness, two 1.2 mm skins round a closed air gap with ribs at
   most 20 mm apart, inside its solid border; pieces with a fitting or a pattern of their own stay

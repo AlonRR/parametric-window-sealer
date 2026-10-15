@@ -298,12 +298,14 @@
             <select name="window">
               <option value="slider">Horizontal slider</option>
               <option value="hung">Single- or double-hung</option>
+              <option value="frame">A frame with no track: casement, tilt-and-turn</option>
             </select>
           </label>
           <p class="note">
             Sets what each edge of the wall does. Change any edge below if your window differs.
             Each edge gets an edge strip: in a track it fills the track; against the sash or on a
-            sill it gives a flat face.
+            sill it gives a flat face. Pressed into a frame with no track, it gives a flat face whose
+            printed TPU gasket, squeezed as the wall goes in, holds the wall.
           </p>
           <label>
             Top edge
@@ -312,6 +314,7 @@
               <option value="sash">Pressed by the sash</option>
               <option value="sill">On a flat sill</option>
               <option value="unit">Against a window AC</option>
+              <option value="frame">Pressed into a frame</option>
             </select>
           </label>
           <label>
@@ -326,6 +329,7 @@
               <option value="sash">Pressed by the sash</option>
               <option value="sill">On a flat sill</option>
               <option value="unit">Against a window AC</option>
+              <option value="frame">Pressed into a frame</option>
             </select>
           </label>
           <label>
@@ -340,6 +344,7 @@
               <option value="sash">Pressed by the sash</option>
               <option value="sill">On a flat sill</option>
               <option value="unit">Against a window AC</option>
+              <option value="frame">Pressed into a frame</option>
             </select>
           </label>
           <label>
@@ -354,6 +359,7 @@
               <option value="sash">Pressed by the sash</option>
               <option value="sill">On a flat sill</option>
               <option value="unit">Against a window AC</option>
+              <option value="frame">Pressed into a frame</option>
             </select>
           </label>
           <label>
@@ -612,6 +618,7 @@
               gaskets in TPU and the rest as usual.
             </p>
           </div>
+          <span class="error" data-testid="error-seal"></span>
         </fieldset>
 
         <fieldset>
@@ -1137,6 +1144,7 @@
         <ul data-testid="plan-rain" data-plan="rain"></ul>
         <ul data-testid="plan-stop" data-plan="stop"></ul>
         <ul data-testid="plan-double" data-plan="double"></ul>
+        <ul data-testid="plan-frame" data-plan="frame"></ul>
         <ul data-testid="plan-warnings" data-plan="warnings"></ul>
         <p><button type="button" id="download-open">Download the pieces...</button></p>
         <!-- The offline file (offline-file, #25): the page as one file, offered here (C55). -->

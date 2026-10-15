@@ -321,6 +321,7 @@ describe('describePlan', () => {
       ], // #117
       stop: [], // #118
       double: [], // #119
+      frame: [], // #120
     });
   });
 
