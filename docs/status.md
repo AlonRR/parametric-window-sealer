@@ -6,7 +6,10 @@ a fresh session resumes from here.
 Last updated: 15 Oct 2026. Phase: **P2** ([`backlog.md`](backlog.md)). `v0.3.0` holds every P1
 row; since then the code was made easy to extend (Q145) and P2 began (Q148, Q149): the fan mount
 (`fan-mount`, #28), the SVG tile (`svg-tile`, #27), the clamps (`clamps`, #32) and the sliding insert (`sliding-insert`, #38) are built. A design review against published work led to thirteen changes (Q153): a tighter joint that locks (`joint-lock`, #110), pieces cut from sheet (`sheet-pieces`, #112), material advice (`material-advice`, #113), a hose port that locks and closes (`hose-socket`, #114), seals that bend (`tpu-fin-seals`, #115), a filler between the sashes (`meeting-rail`, #116), weep holes against rain (`rain-face`, #117), a sash stop that lifts out by hand (`sash-stop`, #118), a double wall for winter (`double-wall`, #119), windows with no track (`compression-edge`, #120), the warnings before fitting (`safety-guidance`, #121) printing defaults against warping (`print-defaults`, #122) and stiffeners of bought aluminium angle on printed clips (`stiffener-strips`, #111, Q154) are built.
-All of it is released as `v0.4.0` (Q155). Nothing has been test printed yet.
+All of it is released as `v0.4.0` (Q155). The next minor version, `v0.5.0`, is the joint tuned
+and in its other forms (C215): the guided test print (`fit-test-print`, #63) first (Q157), then
+the puzzle dovetails, the sliding rails and the bolted flanges (#29 to #31). Nothing has been
+test printed yet.
 
 ## The brief (the owner's request, 5 Oct 2026)
 
@@ -173,6 +176,9 @@ All of it is released as `v0.4.0` (Q155). Nothing has been test printed yet.
 | Q153 | **All thirteen design changes, R1 to R13, from the review against published work** ([`research/design-review.md`](research/design-review.md)), each its own backlog item at P1 (#110 to #122), built in the review's order starting with a tighter joint that locks. They change Q13's friction fit (R1), turn Q6's silence on materials into advice (R4) and refine its seals (R6), and take the wall beyond the track (R11, extending Q14). It also answers Q152, what to build next. Asked: "153 yes to all" | 15 Oct 2026 |
 | Q154 | R2 (`stiffener-strips`, #111) is built as **bought 20 × 20 × 2 mm aluminium angle on printed clips** (B): across a span over 500 mm on the room side, held to the strips by printed clips pinned through the strips' own pin holes, the plan saying how many lengths, how long and where ([`stiffeners.md`](stiffeners.md)). The review's fins were not built: the strips stop at every crossing, and a fin would overhang as they print. Asked: "154 b" | 15 Oct 2026 |
 | Q155 | **Release `v0.4.0`** once the design review's thirteen changes are in: a minor version, with the library, the command and the MCP server at **0.4.0** too. It holds the P2 rows built since `v0.3.0` (the fan mount, the SVG tile, the clamps, the sliding insert), the code made easy to extend (Q145) and R1 to R13 (Q153). The tag and the GitHub release go to the session on the owner's machine (Q123); a pre-release, as nothing in it has been test printed (C63). Asked without an ID at the time ("A release?"); answered "yes do it" | 15 Oct 2026 |
+| Q156 | `PROJECT.yml` follows **the next minor version's release goal**: its `next` names `v0.5.0` and what it holds (C215), and its `state` is `active`, the value the owner's other projects use for work under way (C216). Asked: "156 the next minor version release goal" | 15 Oct 2026 |
+| Q157 | **Build the guided test print (`fit-test-print`, #63) next**, while the owner prints the joint's test coupon, **then keep working through the issues and completing them as before**: a branch, a pull request and a fast-forward merge for each, the choices logged (Q144). Asked: "157 yes", and "keep working thru issues and completing them like you had done before" | 15 Oct 2026 |
+| Q158 | **Issue #1 ("Adding API and MCP") is closed as completed**: the library, the command and the MCP server are built (#45 to #47), and the hosted API stays parked in #48. Asked: "158 yes" | 15 Oct 2026 |
 | Q149 | P2 goes on with **`svg-tile`** (#27), an SVG tile of the user's own as a pattern, its SVG read with a parsing library the agent chooses and logs (C98), **then `clamps`** (#32), the second new fitting. Asked whether to go ahead: "149 yes" | 14 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
@@ -188,11 +194,7 @@ The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-- **Q156.** What should `PROJECT.yml`'s `state` be now that the design review's changes are
-  built? It still says `not-designed`, and its `next` still points at those changes. Asked
-  without an ID on 15 Oct 2026.
-
-The next free ID is Q157.
+None at present. The next free ID is Q159.
 
 ## Repository follow-ups
 
