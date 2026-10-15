@@ -17,6 +17,7 @@ export * from './rain.js';
 export * from './stop.js';
 export * from './double.js';
 export * from './frame.js';
+export * from './piece-print.js';
 export * from './layout.js';
 export * from './panel-geometry.js';
 export * from './fittings/index.js';

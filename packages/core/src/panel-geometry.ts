@@ -25,6 +25,7 @@ import { pinSlotsIn } from './joint.js';
 import type { JointParams, PinPlacement } from './joint.js';
 import { pinSlotCuts } from './joint-geometry.js';
 import { hollowCut } from './double.js';
+import { printReady } from './piece-print.js';
 
 export { plainPanel } from './panel.js';
 export type { PanelSize } from './panel.js';
@@ -61,6 +62,7 @@ export function buildPiecesWith(
   pattern?: PatternFor,
   pins?: PiecePins,
   hollow?: { borderMm: number }, // a double wall (#119): plain pieces hollow inside this border
+  printed: (cell: { column: number; row: number }) => boolean = () => true, // not cut from sheet (#112)
 ): BuiltPiece[] {
   const built: BuiltPiece[] = [];
   // The wall's centre, where the pattern's tiles are centred (Q135).
@@ -82,7 +84,7 @@ export function buildPiecesWith(
         solid = slotted;
       }
       const here = typeof pattern === 'function' ? pattern(cell) : pattern;
-      if (hollow !== undefined && fitting === undefined && here === undefined) {
+      if (hollow !== undefined && fitting === undefined && here === undefined && printed(cell)) {
         const air = hollowCut(engine, size, hollow.borderMm);
         const hollowed = solid.subtract(air);
         air.delete();
@@ -98,6 +100,9 @@ export function buildPiecesWith(
           openings.delete();
         }
       }
+      // Rounded corners and a chamfer against warping (#122), on a piece to print; one cut from sheet
+      // is cut square.
+      if (printed(cell)) solid = printReady(engine, solid, size);
       built.push({
         column: cell.column,
         row: cell.row,

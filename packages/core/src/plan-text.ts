@@ -10,6 +10,7 @@ import { describeRain } from './rain.js';
 import { describeStop } from './stop.js';
 import { describeDouble } from './double.js';
 import { describeFrame } from './frame.js';
+import { describePrinting } from './piece-print.js';
 import { patternBorderMm } from './pattern.js';
 import type { JointParams, JointPlan } from './joint.js';
 import type { Axis, GridLayout, Leftover } from './layout.js';
@@ -62,6 +63,7 @@ export interface PlanText {
   stop: string[]; // the sash stop, if there is one (#118)
   double: string[]; // a double wall's skins, and what it gains (#119)
   frame: string[]; // what holds a wall pressed into a frame with no track (#120)
+  printing: string; // what is done against warping, and brim advice for the material (#122)
 }
 
 function describeLeftover(note: GridLayout['leftovers'][number], maxPieceMm: number, joint: JointParams): LeftoverText {
@@ -217,5 +219,6 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
       cutFromSheet: params.sheet.source === 'sheet',
     }),
     frame: describeFrame(params),
+    printing: describePrinting(params.material.kind),
   };
 }

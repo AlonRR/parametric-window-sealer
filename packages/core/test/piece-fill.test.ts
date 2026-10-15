@@ -13,8 +13,11 @@ import {
   fillFor,
   formatPieceFills,
   loadEngine,
+  meshOf,
+  plainPanel,
   parsePieceFills,
   planWall,
+  printReady,
   readParams,
   readSettings,
   toFormValues,
@@ -142,7 +145,12 @@ describe('the files', () => {
     const tris = (e: typeof wall) => e.pieces.map((p) => p.mesh.triangles.length);
     const [a, b] = [tris(wall), tris(one)];
     const at = one.pieces.findIndex((p) => p.cell.column === 1 && p.cell.row === 0);
-    expect(b[at]).toBe(12 * 3); // a sealed box: 12 triangles
+    // A sealed piece as printed, its corners rounded and its bed-side edge chamfered (#122).
+    const cell = one.pieces[at]?.cell;
+    const size = { widthMm: cell?.widthMm ?? 0, heightMm: cell?.heightMm ?? 0, thicknessMm: 3 };
+    const ready = printReady(engine, plainPanel(engine, size), size);
+    expect(b[at]).toBe(meshOf(ready).triangles.length);
+    ready.delete();
     expect(b.filter((_, i) => i !== at)).toEqual(a.filter((_, i) => i !== at));
   });
 });

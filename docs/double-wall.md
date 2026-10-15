@@ -16,6 +16,7 @@ the MCP server: `wall`). With **Double, hollow pieces for winter**:
 - **Ribs** run up the piece, evenly, at most 20 mm apart, so the room side's skin bridges no more
   than that as it prints.
 - **A piece with a fitting**, or with a pattern of its own, is printed solid.
+- **The preview** draws the pieces solid, as the air inside cannot be seen; the files are hollow.
 
 The wall keeps the thickness you set, and it must still fit your track. A 15 mm track takes a
 panel of up to 10.4 mm with the starting joint, so a 10 mm double wall has a 7.6 mm gap. A double

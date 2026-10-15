@@ -322,6 +322,9 @@ describe('describePlan', () => {
       stop: [], // #118
       double: [], // #119
       frame: [], // #120
+      printing:
+        'Printing: the pieces’ corners are rounded 3 mm and their bed-side edges chamfered 1 mm against warping. ' +
+        'In PETG, add a 5 mm brim if the corners lift.', // #122
     });
   });
 

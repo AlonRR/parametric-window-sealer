@@ -105,14 +105,16 @@ describe('buildWallScene', () => {
     disposeWall(wall);
   });
 
-  it('draws the pieces the download writes: same triangles as the built pieces', async () => {
+  it('draws the pieces the download writes, square: their rounded corners and chamfer left out', async () => {
     const engine = await loadEngine();
     const wall = buildWallScene(engine, EXAMPLE_PARAMS);
     expect(solidsOf(wall, 'piece')).toHaveLength(15);
-    // Each with its pins' slots (#110), as in the download.
+    const drawn = solidsOf(wall, 'piece').map((solid) => solid.geometry.index?.count ?? 0);
+    // Each with its pins' slots (#110), so more than a plain panel's 12 triangles.
+    expect(drawn.every((n) => n > 12 * 3)).toBe(true);
+    // The download's have more still: their corners rounded and their bed-side edges chamfered (#122).
     const download = buildExport(engine, EXAMPLE_PARAMS).pieces.map((p) => p.mesh.triangles.length);
-    expect(solidsOf(wall, 'piece').map((solid) => solid.geometry.index?.count)).toEqual(download);
-    expect(download.every((n) => n > 12 * 3)).toBe(true); // more than a plain panel's 12 triangles
+    expect(download.every((n, i) => n > (drawn[i] ?? Infinity))).toBe(true);
     disposeWall(wall);
   });
 });

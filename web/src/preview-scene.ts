@@ -31,7 +31,6 @@ import type { Engine } from 'parametric-window-sealer';
 import { meshOf } from 'parametric-window-sealer';
 import { edgeStripSolid, edgeTapeSolid } from 'parametric-window-sealer';
 import { stripWidthMm } from 'parametric-window-sealer';
-import { patternBorderMm } from 'parametric-window-sealer';
 import { crossSolid, pinSolid, planPins, stripSolid } from 'parametric-window-sealer';
 import { buildPiecesWith, fittingSource, placedFittings } from 'parametric-window-sealer';
 import { tpuJoint } from 'parametric-window-sealer';
@@ -87,8 +86,19 @@ export function buildWallScene(engine: Engine, params: Params): Group {
   const pins = planPins(joints, joint);
   // A piece cut from sheet (#112) has no slots for the pins: its holes are drilled.
   const slotted = slotPins(params, plan, pins);
-  const hollow = params.wall === 'double' ? { borderMm: patternBorderMm(joint) } : undefined;
-  const built = buildPiecesWith(engine, plan, thicknessMm, fittings, pattern, { joint, pins: slotted }, hollow);
+  // The pieces drawn square and solid: their 3 mm rounded corners, 1 mm chamfer and a double wall's
+  // air are too small or hidden to see at the preview's scale, and leaving them out keeps it quick.
+  // The download has them (#119, #122).
+  const built = buildPiecesWith(
+    engine,
+    plan,
+    thicknessMm,
+    fittings,
+    pattern,
+    { joint, pins: slotted },
+    undefined,
+    () => false,
+  );
   try {
     built.forEach((piece, i) => {
       const cell = plan.pieces[i];

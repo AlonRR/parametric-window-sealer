@@ -18,6 +18,7 @@ import {
   portHoleMm,
   portPanel,
   portPieceMm,
+  printReady,
 } from '../src/index.js';
 
 const engine = await loadEngine();
@@ -139,7 +140,8 @@ describe('the wall with ports', () => {
         if (cell === undefined) throw new Error('a piece not in the plan');
         const port = params.ports.find((p) => p.column === b.column + 1 && p.row === b.row + 1);
         const size = { widthMm: cell.widthMm, heightMm: cell.heightMm, thicknessMm: 3 };
-        const expected = port ? portPanel(engine, size, port.hoseMm, DEFAULT_COLLAR) : plainPanel(engine, size);
+        const solid = port ? portPanel(engine, size, port.hoseMm, DEFAULT_COLLAR) : plainPanel(engine, size);
+        const expected = printReady(engine, solid, size); // as printed (#122)
         expect(b.hoseMm, `c${b.column + 1} r${b.row + 1}`).toBe(port?.hoseMm);
         expect(b.solid.volume()).toBeCloseTo(expected.volume(), 3);
         expect(b.solid.genus()).toBe(port ? 1 : 0);

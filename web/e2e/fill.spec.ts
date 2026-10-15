@@ -13,6 +13,9 @@ test.beforeEach(async ({ page }) => {
 const fill = (page: Page) => page.locator('select[name="fill"]');
 const line = (page: Page) => page.getByTestId('plan-fill');
 
+// A sealed piece's STL as printed: under 300 triangles of 50 bytes, after an 84-byte header.
+const PLAIN_MAX_BYTES = 84 + 50 * 300;
+
 test('starts sealed (Q141)', async ({ page }) => {
   await expect(fill(page)).toHaveValue('sealed');
   await expect(page.getByRole('radio', { name: 'Relief' })).toBeHidden();
@@ -75,9 +78,11 @@ test('the downloaded pieces carry the openings, named as before', async ({ page 
   const grid = await download();
   expect(Object.keys(grid).sort()).toEqual(Object.keys(sealed).sort());
   const piece = 'piece-c1-r1-197.7x198.6.stl';
-  // A sealed piece is a box: 12 triangles, 684 bytes. With the grid it has many more.
-  expect(sealed[piece]?.length).toBe(684);
-  expect(grid[piece]?.length ?? 0).toBeGreaterThan(10 * 684);
+  // A sealed piece as printed has a few hundred triangles, for its rounded corners and its chamfer
+  // (#122). With the grid it has many more.
+  const [plain, patterned] = [sealed[piece]?.length ?? 0, grid[piece]?.length ?? 0];
+  expect(plain).toBeLessThan(PLAIN_MAX_BYTES);
+  expect(patterned).toBeGreaterThan(3 * plain);
 });
 
 test('the hexagon: a honeycomb; under Advanced only its sizes show (C13 to C17)', async ({ page }) => {
@@ -147,8 +152,9 @@ test('piece by piece: a map of the pieces, one given its own fill (params-advanc
     dialog.getByRole('button', { name: 'Download', exact: true }).click(),
   ]);
   const files = unzipSync(await readFile((await file.path()) ?? ''));
-  expect(files['piece-c2-r1-197.7x198.6.stl']?.length).toBe(684);
-  expect(files['piece-c1-r1-197.7x198.6.stl']?.length ?? 0).toBeGreaterThan(10 * 684);
+  const plain = files['piece-c2-r1-197.7x198.6.stl']?.length ?? 0;
+  expect(plain).toBeLessThan(PLAIN_MAX_BYTES);
+  expect(files['piece-c1-r1-197.7x198.6.stl']?.length ?? 0).toBeGreaterThan(3 * plain);
   await page.keyboard.press('Escape');
 
   await own.selectOption('');

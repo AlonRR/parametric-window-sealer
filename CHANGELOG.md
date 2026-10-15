@@ -109,6 +109,11 @@ under Unreleased.
 
 ### Changed
 
+- Printing defaults against warping: every printed piece has its corners rounded 3 mm and a 1 mm
+  chamfer along its bed-side edge, both inside the strips' slots; a collar or rim on the room side
+  is untouched, and pieces cut from sheet stay square. The plan gives brim advice for the material.
+  How: `docs/printing.md`. Not yet test printed.
+
 - Printed TPU gaskets bend rather than squash: their two fins lean in over a 0.8 mm base and fold
   flat into a groove made deep enough for them (1.6 mm for a 4 mm gasket), so the strip's face
   stops them being crushed. A tape width too narrow for the fins is refused. The deeper groove

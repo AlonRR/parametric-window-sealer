@@ -31,7 +31,7 @@ fills the gap between a window's two sashes ([`docs/sash-filler.md`](docs/sash-f
 drains rain out of its joints ([`docs/rain.md`](docs/rain.md)),
 stops the sash opening further with a strut that lifts out by hand ([`docs/sash-stop.md`](docs/sash-stop.md)),
 makes a double wall for winter ([`docs/double-wall.md`](docs/double-wall.md)), holds in a frame with no track
-([`docs/frame.md`](docs/frame.md)),
+([`docs/frame.md`](docs/frame.md)), rounds the pieces' corners against warping ([`docs/printing.md`](docs/printing.md)),
 seals the edges with foam tape or printed TPU gaskets whose fins bend ([`docs/seals.md`](docs/seals.md)), fills the pieces with a pattern or a tile of your
 own drawing ([`docs/svg-tiles.md`](docs/svg-tiles.md)), and has a measuring guide; it can also be saved as one file that works offline.
 The same geometry is a library for Node.js and browsers, the `window-sealer` command and the

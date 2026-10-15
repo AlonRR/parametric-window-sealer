@@ -106,7 +106,8 @@ export function buildExport(engine: Engine, params: Params): { pieces: ExportPie
     pins: slotPins(params, plan, planPins(planParts(params, plan).joints, params.joint)),
   };
   const hollow = params.wall === 'double' ? { borderMm: patternBorderMm(params.joint) } : undefined;
-  const built = buildPiecesWith(engine, plan, params.thicknessMm, fittings, pattern, pins, hollow);
+  const printed = (cell: { column: number; row: number }) => !isCut(params, cell);
+  const built = buildPiecesWith(engine, plan, params.thicknessMm, fittings, pattern, pins, hollow, printed);
   let pieces: ExportPiece[];
   try {
     pieces = built.flatMap((b, i) => {

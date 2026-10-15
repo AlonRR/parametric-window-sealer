@@ -67,6 +67,7 @@ test('the downloaded pieces carry its openings', async ({ page }) => {
     dialog.getByRole('button', { name: 'Download', exact: true }).click(),
   ]);
   const files = unzipSync(await readFile((await file.path()) ?? ''));
-  // A sealed piece is a box: 12 triangles, 684 bytes. With the tile's openings it has many more.
-  expect(files['piece-c1-r1-197.7x198.6.stl']?.length ?? 0).toBeGreaterThan(10 * 684);
+  // A sealed piece as printed has under 300 triangles, for its rounded corners and its chamfer (#122).
+  // With the tile's openings it has many more.
+  expect(files['piece-c1-r1-197.7x198.6.stl']?.length ?? 0).toBeGreaterThan(3 * (84 + 50 * 300));
 });

@@ -7,6 +7,8 @@ import { describe, expect, it } from 'vitest';
 import { loadEngine } from '../src/engine.js';
 import type { Engine } from '../src/engine.js';
 import { buildExport } from '../src/wall.js';
+import { plainPanel } from '../src/panel.js';
+import { printReady } from '../src/piece-print.js';
 import { meshOf, packageDownload, partFileName, pieceFileName, to3mf, toStl, wallLabel } from '../src/export.js';
 import type { ExportPart, ExportPiece } from '../src/export.js';
 import { DEFAULT_JOINT } from '../src/joint.js';
@@ -122,7 +124,11 @@ describe('STL', () => {
     const stl = readStl(toStl(piece.mesh, 'p'));
     const tris = Uint32Array.from({ length: stl.count * 3 }, (_, i) => i);
     const solid = solidFromTriangles(engine, stl.positions, tris);
-    expect(solid.volume()).toBeCloseTo(197.5 * 200 * 3, 3);
+    // A plain piece, its corners rounded and its bed-side edge chamfered (#122).
+    const size = { widthMm: 197.5, heightMm: 200, thicknessMm: 3 };
+    const ready = printReady(engine, plainPanel(engine, size), size);
+    expect(solid.volume()).toBeCloseTo(ready.volume(), 3);
+    ready.delete();
     expect(solid.genus()).toBe(0);
     solid.delete();
     for (const n of stl.normals) expect(Math.hypot(...(n as [number, number, number]))).toBeCloseTo(1, 5);
@@ -154,7 +160,10 @@ describe('3MF', () => {
     for (const [i, o] of objects.entries()) {
       const solid = solidFromTriangles(engine, o.positions, o.triangles);
       const cell = pieces[i]?.cell;
-      expect(solid.volume()).toBeCloseTo((cell?.widthMm ?? 0) * (cell?.heightMm ?? 0) * 3, 1);
+      const size = { widthMm: cell?.widthMm ?? 0, heightMm: cell?.heightMm ?? 0, thicknessMm: 3 };
+      const ready = printReady(engine, plainPanel(engine, size), size); // as printed (#122)
+      expect(solid.volume()).toBeCloseTo(ready.volume(), 1);
+      ready.delete();
       solid.delete();
     }
     expect([...model.matchAll(/<item objectid="(\d+)" transform="([^"]+)"\/>/g)]).toHaveLength(pieces.length);
