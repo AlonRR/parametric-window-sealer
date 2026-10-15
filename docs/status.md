@@ -198,9 +198,11 @@ None at present. The next free ID is Q159.
 
 ## Repository follow-ups
 
-- **Pending (C215, Q123):** the `v0.5.0` tag on the release commit `chore(release): v0.5.0, the
-  joint` and its GitHub release, a pre-release (C63), asked of the session on the owner's machine
-  once the commit is on `main`; checked on GitHub afterwards.
+- **Done (C215, Q123):** the `v0.5.0` tag on the release commit `chore(release): v0.5.0, the
+  joint` (`680224a`) and its GitHub release, made by the session on the owner's machine on 15 Oct
+  2026 (verified: GitHub lists the annotated tag `v0.5.0` on `680224a`, signed by the owner's key
+  and marked verified, and the release "v0.5.0, the joint" with the CHANGELOG's 0.5.0 section as
+  its notes). It is marked a pre-release, as the earlier ones are (C63).
 - **Done (Q155, Q123):** the `v0.4.0` tag on the release commit `chore(release): v0.4.0, the
   design review` (`f995be6`) and its GitHub release, made by the session on the owner's machine
   on 15 Oct 2026 (verified: GitHub lists the annotated tag `v0.4.0` on `f995be6`, signed by the
