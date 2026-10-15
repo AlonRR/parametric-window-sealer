@@ -205,8 +205,14 @@ The first four rows were answered before questions carried IDs.
   thickness are published only in community code, itself under that licence. Leave Multiboard out
   (recommended), build it from the community's numbers with a warning about selling, or wait while
   the owner asks MultiBuild? The other organisers do not wait on this.
+- **Q160.** The releases: every `v0.7.0` item is built and on `main`, on top of the `v0.6.0` items,
+  but `v0.6.0` was not cut, as it waits on Q159. Cut one release, `v0.6.0`, from `main` now with
+  everything built since `v0.5.0` (the organisers, the drawn tile and the meshes), Multiboard as
+  Q159 decides and the next items becoming `v0.7.0` (recommended, so the versions stay in order);
+  cut `v0.7.0` now with all of it and never tag `v0.6.0`; or keep the two releases apart, which
+  `main`'s order makes awkward?
 
-The next free ID is Q160.
+The next free ID is Q161.
 
 ## Repository follow-ups
 
