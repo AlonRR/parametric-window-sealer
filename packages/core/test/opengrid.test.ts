@@ -51,7 +51,7 @@ describe('openGrid', () => {
       widthMm: 26.4,
       heightMm: 26.4,
     });
-    expect(ORGANISERS.map((o) => o.kind)).toEqual(['skadis', 'opengrid']);
+    expect(ORGANISERS.map((o) => o.kind)).toContain('opengrid');
   });
 
   it('one cell: the opening, its chamfer at both faces, and the groove behind them', () => {

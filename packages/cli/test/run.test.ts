@@ -302,7 +302,8 @@ describe('usage', () => {
     expect(r.code).toBe(0);
     for (const f of SETTING_FLAGS) expect(r.out).toContain(`--${f.flag} `);
     expect(r.out).toMatch(/--slot <mm> +How deep a piece can go into a strip\. \(8\)/);
-    expect(r.out).toMatch(/--window <slider\|hung\|frame> +[\s\S]*?as the page does\. \(slider\)/);
+    // Wherever its lines break: the flag column is as wide as the longest flag.
+    expect(r.out.replace(/\s+/g, ' ')).toMatch(/--window <slider\|hung\|frame> .*?as the page does\. \(slider\)/);
     expect(r.out).toContain('Exit status: 0 done, 1 could not write, 2 wrong options or settings.');
   });
 

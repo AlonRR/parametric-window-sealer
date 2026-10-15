@@ -1,6 +1,7 @@
-// Organiser boards on the page: Skådis (organiser-skadis, #33) and openGrid (organiser-opengrid, #34)
-// in the fill's list after the patterns, each with its note and no style, and its line in the plan;
-// refused on pieces thicker than the board; a piece of its own; its slots in the downloaded pieces.
+// Organiser boards on the page: Skådis (organiser-skadis, #33), openGrid (organiser-opengrid, #34) and
+// the Honeycomb Storage Wall (organiser-hsw, #37) in the fill's list after the patterns, each with its
+// note and no style, and its line in the plan; refused on pieces thicker than the board; a piece of
+// its own; its slots in the downloaded pieces.
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
@@ -21,6 +22,7 @@ test('Skådis in the fill’s list, with its note and no style; its line in the 
   await expect(fill(page).locator('optgroup[label="Organiser boards"] option')).toHaveText([
     'Skådis pegboard',
     'openGrid board',
+    'Honeycomb Storage Wall',
   ]);
   await fill(page).selectOption('skadis');
   await expect(page.getByText('For Skådis accessories: a board 4.8 mm thick')).toBeVisible();
@@ -39,6 +41,16 @@ test('openGrid: its note and its line in the plan', async ({ page }) => {
     'Fill: an openGrid board: cells 25 mm across with a groove 26.4 mm across behind each face, 28 mm apart ' +
       'each way, as openGrid’s Full board, in a board 6.8 mm thick, raised 3.8 mm on the room side inside each ' +
       'piece’s border; cut through: air passes through the wall.',
+  );
+});
+
+test('the Honeycomb Storage Wall: its note and its line in the plan', async ({ page }) => {
+  await fill(page).selectOption('hsw');
+  await expect(page.getByText('For Honeycomb Storage Wall inserts: a board 8 mm thick')).toBeVisible();
+  await expect(line(page)).toHaveText(
+    'Fill: a Honeycomb Storage Wall board: hexagonal cells 20 mm across their flats, flats at the top and ' +
+      'bottom, 23.6 mm apart, each widening to 22 mm behind a ledge 5.1 mm in, in a board 8 mm thick, raised ' +
+      '5 mm on the room side inside each piece’s border; cut through: air passes through the wall.',
   );
 });
 

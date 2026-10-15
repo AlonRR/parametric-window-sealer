@@ -6,7 +6,8 @@ still join, seal at their edges and fit the window as before; inside each piece'
 board's openings are cut through, every one of them whole.
 
 The owner chose four systems to offer (Q9): Skådis, openGrid, Multiboard and the Honeycomb Storage
-Wall. Skådis and openGrid are built; the others follow.
+Wall. Skådis, openGrid and the Honeycomb Storage Wall are built; Multiboard waits on a question
+about its licence (Q159).
 
 ## Using one
 
@@ -79,8 +80,33 @@ panel it stands 3.8 mm proud. The face chamfer's corners follow from the chamfer
 openGrid's own tiles also have pockets along their edges for small connectors that join tile to
 tile. The wall's pieces join with their own joints instead, so those pockets are left out.
 
+## Honeycomb Storage Wall
+
+For the inserts of RostaP's [Honeycomb Storage Wall](https://www.printables.com/model/152592), a
+wall of hexagonal cells that printed inserts clip into. Its page gives no sizes; these were measured
+from the author's own wall file, and agree with three community versions of it (relayed). The
+board uses none of his files, only these sizes. His files are under a non-commercial licence (CC
+BY-NC), which covers the files, not a board made to the same sizes (inferred; not legal advice).
+
+| | mm | From |
+|---|---|---|
+| Board | 8.0 thick | The author's wall |
+| Cell | A hexagon 20.0 across its flats, 23.1 across its corners | The author's wall |
+| Spacing | 23.6 between neighbours: 20 mm cells and 3.6 mm walls | The author's wall |
+| Profile, from the room face | A 0.4 mm chamfer over the first 0.5 mm; 20.0 across to 5.1 mm in; widening to 22.0 by 6.0 mm in; 22.0 to the back | The author's wall |
+
+The inserts' clips pass the 20 mm front of a cell and catch behind the ledge where it widens to
+22 mm. Some community versions make the back 21.8 mm; the author's own wall is 22.0, which the
+board follows. The cells' flats are at the top and bottom, so each column of cells runs straight up,
+as the author's pictures show (inferred from the pictures): an accessory that spans two cells finds
+them where it expects. At the default 3 mm panel the board stands 5 mm proud.
+
 ## Not yet confirmed
 
 - No test print yet: whether IKEA's hooks slide on and hold, and whether the slots print clean
-  standing upright; whether openGrid's snaps click in and hold.
+  standing upright; whether openGrid's snaps click in and hold; whether the Honeycomb Storage
+  Wall's inserts clip in.
+- Printed with the room face up, the Honeycomb Storage Wall's ledge narrows from 22 to 20 mm over
+  0.9 mm, an overhang 48° from upright, a little past the 45° most printers manage without support
+  (inferred): it may want a test print, or printing the pieces face down.
 - The Skådis slot sizes against a real IKEA board, with calipers.

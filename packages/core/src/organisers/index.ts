@@ -3,14 +3,16 @@
 // settings, the command's --fill, the MCP server's schema, the page's fill list and the plan take
 // it from here (docs/extending.md, "A new organiser").
 import type { OrganiserDefinition } from './define.js';
+import { HSW } from './hsw.js';
 import { OPENGRID } from './opengrid.js';
 import { SKADIS } from './skadis.js';
 
 export * from './define.js';
 export * from './skadis.js';
 export * from './opengrid.js';
+export * from './hsw.js';
 
-export const ORGANISERS = [SKADIS, OPENGRID] as const;
+export const ORGANISERS = [SKADIS, OPENGRID, HSW] as const;
 
 export type Organiser = (typeof ORGANISERS)[number];
 export type OrganiserKind = Organiser['kind'];

@@ -17,6 +17,10 @@ listed under Unreleased.
 
 ### Added
 
+- A Honeycomb Storage Wall board, the third organiser board: choose **Honeycomb Storage Wall** as the
+  fill (`--fill hsw`) for its inserts. It matches the author's own wall: 8 mm thick, hexagonal cells
+  20 mm across their flats and 23.6 mm apart, each widening from 20 to 22 mm behind a ledge 5.1 mm in,
+  where the inserts' clips catch. How: `docs/organisers.md`. Not yet test printed.
 - An openGrid board, the second organiser board: choose **openGrid board** as the fill
   (`--fill opengrid`) for openGrid's snaps and accessories. It matches openGrid's Full board: 6.8 mm
   thick, its cells 28 mm apart each way, each an opening 25 mm across with a groove 26.4 mm across
