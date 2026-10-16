@@ -5,6 +5,6 @@ projects:
   - name:     Parametric window sealer
     kind:     build
     state:    active
-    next:     "the owner makes the repo public (Q162); release v0.7.0 (C299): shutter-rails and sash-wedge built"
+    next:     "the v0.7.0 tag by ogpc (Q123); going public (Q162); then the P3 window types (#160 to #163)"
     trackers: [docs/status.md, docs/backlog.md]
     review:   2026-10-16

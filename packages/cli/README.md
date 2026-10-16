@@ -6,7 +6,7 @@ print. It takes the settings the project's web page has, as flags or from a JSON
 scripts, batch use and LLM agents. The geometry comes from the `parametric-window-sealer`
 library, which it installs with it.
 
-**Version 0.6.0, not yet test printed.** The joint and track sizes are starting values that a
+**Version 0.7.0, not yet test printed.** The joint and track sizes are starting values that a
 test print still has to confirm.
 
 ## Getting it
@@ -19,7 +19,7 @@ project, or with `-g` for every project:
 npm ci
 npm run build -w parametric-window-sealer -w parametric-window-sealer-cli
 npm pack -w parametric-window-sealer -w parametric-window-sealer-cli
-npm install ./parametric-window-sealer-0.6.0.tgz ./parametric-window-sealer-cli-0.6.0.tgz
+npm install ./parametric-window-sealer-0.7.0.tgz ./parametric-window-sealer-cli-0.7.0.tgz
 ```
 
 ## Use

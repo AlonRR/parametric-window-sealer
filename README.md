@@ -18,8 +18,8 @@ flame retardant; it has no wind, rain or UV rating.
 
 ## Status
 
-**Version 0.6.0: the wall with its fittings, seals and patterns, the design review's changes, four joint styles,
-organiser boards and meshes of your own, as a page and as an API; not yet test printed.** The page in `web/` takes the opening you can see and your window type,
+**Version 0.7.0: the wall with its fittings, seals and patterns, the design review's changes, four joint styles,
+organiser boards, meshes of your own and a wedge for a tilted or turned sash, as a page and as an API; not yet test printed.** The page in `web/` takes the opening you can see and your window type,
 divides the opening into pieces your printer can make, joins them with connector strips and
 cross pieces that hold by crush ribs and a filament pin, or with puzzle dovetails, sliding dovetail rails or bolted flanges ([`docs/joints.md`](docs/joints.md)), fits
 edge strips into the window's tracks, shows the wall in 3D and downloads

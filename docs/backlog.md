@@ -24,7 +24,9 @@ and **`v0.3.0`, the same day again, every P1 row** (C48). **`v0.4.0`, on 15 Oct 
 P2 rows built so far and the design review's thirteen changes** (Q155). **`v0.5.0`, the same day,
 the joint tuned and in its other forms**: `fit-test-print` (Q157), `joint-dovetail`, `joint-rails`
 and `joint-bolts` (C215). **`v0.6.0`, on 16 Oct 2026, everything built since** (Q160): the
-drawn tile, the organiser boards (Multiboard built but not offered yet, Q159) and the meshes. Nothing in any of them
+drawn tile, the organiser boards (Multiboard built but not offered yet, Q159) and the meshes.
+**`v0.7.0`, the same day, two window types from the survey** (C299): `shutter-rails` and
+`sash-wedge`. Nothing in any of them
 has been test printed yet. After `v0.3.0`, four rows were added at P1, ahead of P2, to make the code easy to
 extend (Q145): `code-tooling`, `code-params-page`, `fill-registry` and `fitting-registry`. On
 14 Oct, `ci-triggers` was added at P1 so that CI checks each commit once (Q147). P2 began the

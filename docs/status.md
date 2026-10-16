@@ -18,7 +18,8 @@ piece of your own (`mesh-custom-piece`, #41). The next minor version, `v0.7.0`, 
 types the survey found missing (Q161; [`research/window-types.md`](research/window-types.md)): a wall
 in a roller shutter's guide rails (`shutter-rails`, #158), built, then the wedge a sash opened part way
 leaves (`sash-wedge`, #159) (C299), both its forms built, the tilted and the turned
-([`wedge.md`](wedge.md)): `v0.7.0` is complete, its release next. Nothing has been test printed yet.
+([`wedge.md`](wedge.md)): `v0.7.0`, on 16 Oct 2026, is the release of both. Nothing has been test
+printed yet.
 
 ## The brief (the owner's request, 5 Oct 2026)
 
@@ -218,6 +219,10 @@ The next free ID is Q163.
   ([GitHub's steps](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/setting-repository-visibility#changing-a-repositorys-visibility)).
   The history was reviewed again first (`.repo-status`). Pending until the owner says it is done.
   Serving the page on GitHub Pages stays a separate switch of his (Q43; the README's steps).
+- **Pending (C299, Q123):** the `v0.7.0` tag on the release commit `chore(release): v0.7.0, the
+  roller shutter and the sash wedge` and its GitHub release, a pre-release (C63), asked of the
+  session on the owner's machine he names `ogpc` once the commit is on `main`; checked on GitHub
+  afterwards.
 - **Done (Q160, Q123):** the `v0.6.0` tag on the release commit `chore(release): v0.6.0, the
   organisers and the meshes` (`9f4c248`) and its GitHub release, made by the session on the
   owner's machine he names `ogpc` on 16 Oct 2026 (verified: GitHub lists the annotated tag `v0.6.0`

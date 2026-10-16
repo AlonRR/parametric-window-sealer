@@ -12,10 +12,13 @@ the clamps and the sliding insert, and the thirteen changes from the design revi
 published work (Q153); `0.5.0` adds the guided test print and three more joint styles: puzzle
 dovetails, sliding dovetail rails and bolted flanges (C215); `0.6.0` adds the drawn tile, three
 organiser boards (and Multiboard, built but not offered yet) and meshes of your own: a model of the
-appliance, 3D tiles and a whole piece (Q160). Changes since the latest version are listed under
-Unreleased.
+appliance, 3D tiles and a whole piece (Q160); `0.7.0` adds two window types from the survey of
+window types: a wall in a roller shutter's guide rails, and a wedge for a sash tilted or turned part
+way (C299). Changes since the latest version are listed under Unreleased.
 
 ## [Unreleased]
+
+## [0.7.0] - 2026-10-16
 
 ### Added
 

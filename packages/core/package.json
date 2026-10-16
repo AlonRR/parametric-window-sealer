@@ -1,6 +1,6 @@
 {
   "name": "parametric-window-sealer",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Parametric, 3D-printable panels that close off the part of a window left open around a window air conditioner, fan or hose: the geometry as a library for Node.js and browsers.",
   "license": "MPL-2.0",
   "type": "module",
