@@ -17,6 +17,16 @@ listed under Unreleased.
 
 ### Added
 
+- A Multiboard board, the fourth organiser board, built but not offered yet (Q159): the command takes
+  `--fill multiboard` and a piece's own `2,1=multiboard`, and the library `fill.kind: "multiboard"`;
+  the page, the command's help and the MCP server leave it out while a question about Multiboard's
+  licence is open. It matches Multiboard's tiles: 6.2 mm thick, octagonal holes 23.4 mm across with a
+  thread of 2.5 mm a turn at the cells' centres, 25 mm apart, and round holes 6 mm across with a
+  thread of 3.125 mm a turn at their corners. Its threads make the files about 20 times larger than
+  the openGrid board's. How: `docs/organisers.md`. Not yet test printed.
+- For a new organiser board, openings of a second kind on its lattice (`others`), and a board built
+  but not offered yet (`hidden`, with `OFFERED_ORGANISERS` and `OFFERED_FILL_KINDS`): `docs/extending.md`.
+
 - A whole piece of your own: under **Advanced: a whole piece of your own**, an STL, OBJ or 3MF file of one
   piece (`--custom-piece`, or `customPiece.file` in base64), its piece by column and row
   (`--custom-piece-column`, `--custom-piece-row`). It is centred on its piece and trimmed to fit inside

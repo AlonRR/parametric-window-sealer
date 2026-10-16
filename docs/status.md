@@ -11,7 +11,8 @@ All of it is released as `v0.4.0` (Q155). `v0.5.0` is the joint tuned and in its
 rails and bolted flanges (#29 to #31). The next minor version, `v0.6.0`, is the organiser fills and
 the drawn tile (C215): the tile editor (`draw-tile`, #39), the Skådis board
 (`organiser-skadis`, #33), the openGrid board (`organiser-opengrid`, #34) and the Honeycomb
-Storage Wall board (`organiser-hsw`, #37) are built; Multiboard (#36) waits on Q159. For `v0.7.0`, the
+Storage Wall board (`organiser-hsw`, #37) are built, and the Multiboard board
+(`organiser-multiboard`, #36) is built and not offered yet, while its licence is open (Q159, Q162). For `v0.7.0`, the
 mesh reader (`mesh-import`, #42), the wall cut round a model of the appliance
 (`mesh-appliance`, #35), 3D tiles of your own as the fill (`mesh-tiles`, #40) and a whole piece of
 your own (`mesh-custom-piece`, #41) are built: every `v0.7.0` item. Nothing has been test printed yet.
@@ -202,9 +203,15 @@ The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-None at present.
+- **Q162.** Multiboard (#36) is built and hidden in the interface (Q159), but its sizes are in the
+  code and in `docs/organisers.md`, so a public repository publishes them. MultiBuild's licence never
+  mentions dimensions, and the same sizes are already public under open licences (BSD-2-Clause,
+  CERN-OHL-W); but its "Designs" include "documentation", and it binds products "derived from a
+  Design". When the repository goes public: keep Multiboard in it, hidden as now (recommended; not
+  legal advice); take it out first, keeping it only on the owner's own forge until the licence is
+  settled; or offer it on the page too?
 
-The next free ID is Q162.
+The next free ID is Q163.
 
 ## Repository follow-ups
 

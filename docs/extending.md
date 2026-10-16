@@ -101,12 +101,18 @@ with `defineOrganiser`, as `skadis.ts` does:
 - `widthMm` and `heightMm`, one opening at its widest: it is cut only where all of that fits;
 - `cut(engine)`, one opening's solid, centred on x = y = 0, through a board lying on z = 0 with its
   room face at `boardMm`, reaching 1 mm past both faces;
-- `describe`, its openings and their spacing in the plan.
+- `describe`, its openings and their spacing in the plan;
+- `others`, if the board has openings of a second kind on the same lattice (Multiboard's small
+  holes at its cells' corners): for each, its offset from the board's own openings, its box and its
+  cut, given as the board's own are;
+- `hidden: true`, to build it but not offer it yet: the page's lists, the command's help and the
+  MCP server's schema take `OFFERED_ORGANISERS` and `OFFERED_FILL_KINDS`, which leave it out, while
+  the library and the command still take it by name.
 
 Nothing else changes: the settings, the command, the MCP server, the page's fill lists and its
 note, the plan, the pieces and the preview take it from `ORGANISERS`. Give it a test file of its
-own for its openings, as `organiser.test.ts` has for Skådis, and a section in
-[`organisers.md`](organisers.md) with its sizes and where they come from.
+own for its openings, as `organiser.test.ts` has for Skådis (`multiboard.test.ts` for a thread),
+and a section in [`organisers.md`](organisers.md) with its sizes and where they come from.
 
 ## A new fitting
 

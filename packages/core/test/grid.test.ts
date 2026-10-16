@@ -10,6 +10,7 @@ import {
   EXAMPLE_PARAMS,
   FILL_KINDS,
   MIN_BAR_MM,
+  OFFERED_FILL_KINDS,
   SEALED,
   SETTINGS,
   buildExport,
@@ -145,14 +146,14 @@ describe('the files', () => {
 describe('settings in the library’s shape', () => {
   it('lists the fill’s settings', () => {
     const fill = SETTINGS.filter((s) => s.path.startsWith('fill'));
-    expect(fill.find((s) => s.path === 'fill.kind')?.values).toEqual(FILL_KINDS);
+    expect(fill.find((s) => s.path === 'fill.kind')?.values).toEqual(OFFERED_FILL_KINDS);
     expect(
       // The fill's own settings and the grid's; each other pattern's are checked in its own test.
       fill
         .filter((s) => !/^fill\.[a-z]+\./.test(s.path) || s.path.startsWith('fill.grid.'))
         .map((s) => [s.path, s.values ?? null]),
     ).toEqual([
-      ['fill.kind', FILL_KINDS],
+      ['fill.kind', OFFERED_FILL_KINDS],
       ['fill.style', ['relief', 'through']],
       ['fill.reliefPct', null],
       ['fill.grid.openingMm', null],

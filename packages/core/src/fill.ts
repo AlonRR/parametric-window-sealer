@@ -24,6 +24,10 @@ export const FILL_KINDS: readonly FillKind[] = [
   'mesh',
 ];
 
+// The fills the page, the command's help and the MCP server's schema offer: a hidden organiser's
+// board is read by name only.
+export const OFFERED_FILL_KINDS: readonly FillKind[] = FILL_KINDS.filter((k) => organiserOf(k)?.hidden !== true);
+
 // A fill with a pattern's style and depth: a pattern, not sealed and not an organiser's board.
 export const isPatternKind = (kind: FillKind): kind is PatternKind => patternOf(kind) !== undefined;
 

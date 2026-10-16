@@ -1,14 +1,20 @@
 // Per-piece fills (params-advanced, #21): one list for a piece, its fill and style together (C29),
 // and the map of the wall's pieces, the top row first as the wall is seen. The choice is written
 // into the hidden pieceFills field as the command's --piece-fill takes it (C28).
-import { ORGANISERS, PATTERNS, PATTERN_STYLES, formatPieceFills, parsePieceFills } from 'parametric-window-sealer';
+import {
+  OFFERED_ORGANISERS,
+  PATTERNS,
+  PATTERN_STYLES,
+  formatPieceFills,
+  parsePieceFills,
+} from 'parametric-window-sealer';
 import type { PatternStyle, PieceFill } from 'parametric-window-sealer';
 import { option, setValue, valueOf } from './form-fields';
 
 const STYLE_NAMES: Record<PatternStyle, string> = { relief: 'relief', through: 'cut through' };
 
-// Sealed, then each of the library's patterns in each style, then each organiser's board, then the
-// 3D tile.
+// Sealed, then each of the library's patterns in each style, then each organiser's board offered,
+// then the 3D tile.
 function fillChoices(choice: HTMLSelectElement): void {
   const options = [option('', 'As the wall'), option('sealed', 'Sealed')];
   for (const pattern of PATTERNS) {
@@ -16,7 +22,7 @@ function fillChoices(choice: HTMLSelectElement): void {
       options.push(option(`${pattern.kind}:${style}`, `${pattern.name}, ${STYLE_NAMES[style]}`));
     }
   }
-  for (const organiser of ORGANISERS) options.push(option(organiser.kind, organiser.name));
+  for (const organiser of OFFERED_ORGANISERS) options.push(option(organiser.kind, organiser.name));
   options.push(option('mesh', '3D tile of your own'));
   choice.replaceChildren(...options);
 }

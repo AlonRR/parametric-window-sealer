@@ -9,9 +9,9 @@ import { EDGES, WINDOW_PRESETS } from './edge.js';
 import type { WindowType } from './edge.js';
 import { EXAMPLE_PARAMS, readParams, toFormValues } from './params.js';
 import { PRINTER_IDS } from './printers.js';
-import { FILL_KINDS, PATTERN_STYLES } from './fill.js';
+import { OFFERED_FILL_KINDS, PATTERN_STYLES } from './fill.js';
 import { PATTERNS } from './patterns/index.js';
-import { ORGANISERS } from './organisers/index.js';
+import { OFFERED_ORGANISERS } from './organisers/index.js';
 import { FANS } from './fan.js';
 import { PIECE_SOURCES } from './sheet.js';
 import { COLOURS, MATERIAL_KINDS } from './material.js';
@@ -314,10 +314,10 @@ export const SETTINGS: readonly Setting[] = [
       `The panel fill: sealed, or a pattern: ${PATTERNS.map((p) => p.words)
         .join(', ')
         .replace(/, ([^,]*)$/, ' or $1')}; or a board for an organiser's accessories: ` +
-      `${ORGANISERS.map((o) => o.words)
+      `${OFFERED_ORGANISERS.map((o) => o.words)
         .join(', ')
         .replace(/, ([^,]*)$/, ' or $1')}, cut through; or a 3D tile of your own (mesh).`,
-    values: FILL_KINDS,
+    values: OFFERED_FILL_KINDS,
   },
   {
     field: 'fillStyle',

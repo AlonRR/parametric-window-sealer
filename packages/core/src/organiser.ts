@@ -54,6 +54,37 @@ export function organiserOpenings(
   return found;
 }
 
+// One kind of a board's openings in a piece: its cut, and where each goes.
+export interface BoardOpenings {
+  cut: (engine: Engine) => Manifold;
+  at: Point[];
+}
+
+// Each kind of the board's openings in a piece: its own on its lattice, then each other kind on the
+// same lattice offset, each whole and clear of the fitting as organiserOpenings places them.
+export function boardOpenings(
+  o: OrganiserDefinition,
+  wallCentre: Point,
+  piece: PieceArea,
+  borderMm: number,
+  keepOut?: KeepOut,
+): BoardOpenings[] {
+  const [cx, cy] = wallCentre;
+  return [
+    { cut: (engine: Engine) => o.cut(engine), at: organiserOpenings(o, wallCentre, piece, borderMm, keepOut) },
+    ...(o.others ?? []).map((other) => ({
+      cut: (engine: Engine) => other.cut(engine),
+      at: organiserOpenings(
+        { ...o, widthMm: other.widthMm, heightMm: other.heightMm },
+        [cx + other.offsetXMm, cy + other.offsetYMm],
+        piece,
+        borderMm,
+        keepOut,
+      ),
+    })),
+  ];
+}
+
 // The piece with its board: where the piece is thinner than the board, raised on the room side to
 // the board's thickness inside its border and clear of its fitting, so the joint strips still fit
 // its edges; then each opening cut through. A piece with no whole opening is left as it is. Takes
@@ -62,12 +93,12 @@ export function organisedPanel(
   engine: Engine,
   solid: Manifold,
   o: OrganiserDefinition,
-  openings: readonly Point[],
+  openings: readonly BoardOpenings[],
   size: { widthMm: number; heightMm: number; thicknessMm: number },
   borderMm: number,
   keepOut?: KeepOut,
 ): Manifold {
-  if (openings.length === 0) return solid;
+  if (openings.every((kind) => kind.at.length === 0)) return solid;
   const { CrossSection, Manifold: M } = engine;
   const temporary: { delete(): void }[] = [];
   const keep = <T extends { delete(): void }>(made: T): T => {
@@ -87,9 +118,12 @@ export function organisedPanel(
       const pad = keep(keep(area.extrude(o.boardMm - size.thicknessMm)).translate([0, 0, size.thicknessMm]));
       body = keep(solid.add(pad));
     }
-    const one = keep(o.cut(engine));
-    const cuts = keep(M.compose(openings.map(([x, y]) => keep(one.translate([x, y, 0])))));
-    return body.subtract(cuts);
+    const placed = openings.flatMap((kind) => {
+      if (kind.at.length === 0) return [];
+      const one = keep(kind.cut(engine));
+      return kind.at.map(([x, y]) => keep(one.translate([x, y, 0])));
+    });
+    return body.subtract(keep(M.compose(placed)));
   } finally {
     for (const m of temporary) m.delete();
     solid.delete();

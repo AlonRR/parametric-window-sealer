@@ -1,7 +1,7 @@
 // The settings as an input schema, in the library's own shape (Q99), built from the library's
 // SETTINGS so the server describes each one in the page's words and cannot miss one. Every
 // setting may be left out and then starts where the page starts, except the opening.
-import { FANS, FILL_KINDS, PATTERNS, PATTERN_STYLES, SETTINGS } from 'parametric-window-sealer';
+import { FANS, OFFERED_FILL_KINDS, PATTERNS, PATTERN_STYLES, SETTINGS } from 'parametric-window-sealer';
 import type { ListKind } from 'parametric-window-sealer';
 import * as z from 'zod';
 
@@ -57,7 +57,7 @@ const PORT = z.strictObject({
 const PIECE_FILL = z.strictObject({
   column: z.number().int().min(1).describe('The column of the piece, from 1 at the left.'),
   row: z.number().int().min(1).describe('The row of the piece, from 1 at the bottom.'),
-  kind: choices(FILL_KINDS).describe('Its fill: sealed, a pattern, an organiser board or the 3D tile.'),
+  kind: choices(OFFERED_FILL_KINDS).describe('Its fill: sealed, a pattern, an organiser board or the 3D tile.'),
   style: choices(PATTERN_STYLES).optional().describe("A pattern's style; the wall's if left out. A board has none."),
 });
 

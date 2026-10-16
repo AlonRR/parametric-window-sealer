@@ -1,7 +1,8 @@
 // Organiser boards on the page: Skådis (organiser-skadis, #33), openGrid (organiser-opengrid, #34) and
 // the Honeycomb Storage Wall (organiser-hsw, #37) in the fill's list after the patterns, each with its
 // note and no style, and its line in the plan; refused on pieces thicker than the board; a piece of
-// its own; its slots in the downloaded pieces.
+// its own; its slots in the downloaded pieces. Multiboard (organiser-multiboard, #36), built but not
+// offered yet, is not in the list.
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';

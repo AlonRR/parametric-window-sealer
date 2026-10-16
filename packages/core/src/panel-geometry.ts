@@ -20,7 +20,7 @@ import type { CutoutSetting, Rectangle, RimParams } from './cutout.js';
 import type { TapeFit } from './tape.js';
 import { patternBorderMm, patternedPanel, pieceOpenings } from './pattern.js';
 import type { FillChoice } from './fill.js';
-import { organisedPanel, organiserOpenings } from './organiser.js';
+import { boardOpenings, organisedPanel } from './organiser.js';
 import { tileCells, tiledPanel } from './mesh-tile.js';
 import type { PatternChoice, Point } from './pattern.js';
 import { plainPanel } from './panel.js';
@@ -116,7 +116,7 @@ export function buildPiecesWith(
       } else if (here !== undefined && 'organiser' in here) {
         // An organiser's board: whole openings only, the board raised inside the border.
         const keepOut = fitting?.keepOut(size, here.borderMm);
-        const at = organiserOpenings(here.organiser, centre, cell, here.borderMm, keepOut);
+        const at = boardOpenings(here.organiser, centre, cell, here.borderMm, keepOut);
         solid = organisedPanel(engine, solid, here.organiser, at, size, here.borderMm, keepOut);
       } else if (here !== undefined) {
         const keepOut = fitting?.keepOut(size, here.borderMm);

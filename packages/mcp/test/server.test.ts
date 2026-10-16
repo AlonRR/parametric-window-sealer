@@ -635,3 +635,20 @@ describe('a printer from the list (printer-presets #13)', () => {
     expect(r.data['summary'].headline).toBe('24 pieces: 4 across, 6 up, 3 mm thick');
   });
 });
+
+describe('Multiboard, built but not offered for now (organiser-multiboard, #36)', () => {
+  it('the schema leaves it out of the fill’s choices, the wall’s and a piece’s, and refuses it', async () => {
+    const { client, call } = await connect();
+    const plan = (await client.listTools()).tools.find((t) => t.name === 'window_sealer_plan_wall');
+    if (!plan) throw new Error('window_sealer_plan_wall expected');
+    const settings = (plan.inputSchema.properties as Record<string, any>)['settings'];
+    const kinds: string[] = settings.properties.fill.properties.kind.enum;
+    expect(kinds).toContain('hsw');
+    expect(kinds).not.toContain('multiboard');
+    expect(settings.properties.pieceFills.items.properties.kind.enum).toEqual(kinds);
+    expect(JSON.stringify(plan.inputSchema)).not.toMatch(/multiboard/i);
+    const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { kind: 'multiboard' } } });
+    expect(r.isError).toBe(true);
+    expect(r.text).toContain('hsw');
+  });
+});

@@ -46,7 +46,7 @@ describe('the Honeycomb Storage Wall', () => {
     expect(HSW.pitchXMm).toBeCloseTo(23.6 * Math.sqrt(3), 9);
     expect(HSW.rowShiftMm).toBeCloseTo((23.6 * Math.sqrt(3)) / 2, 9);
     expect(HSW.widthMm).toBeCloseTo(44 / Math.sqrt(3), 9);
-    expect(ORGANISERS.map((o) => o.kind)).toEqual(['skadis', 'opengrid', 'hsw']);
+    expect(ORGANISERS.map((o) => o.kind)).toEqual(['skadis', 'opengrid', 'hsw', 'multiboard']);
   });
 
   it('one cell: 20 mm across its flats, the flats at the top and bottom, a ledge 5.1 mm in', () => {

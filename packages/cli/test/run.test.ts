@@ -990,3 +990,20 @@ describe('per-piece fills (params-advanced #21; C26 to C28)', () => {
     expect(help.out.replace(/\s+/g, ' ')).toContain('Give --piece-fill again for each piece.');
   });
 });
+
+describe('Multiboard, built but not offered for now (organiser-multiboard, #36)', () => {
+  it('--help leaves it out of --fill’s choices and words', async () => {
+    const help = await cli(['--help']);
+    expect(help.out).not.toMatch(/multiboard/i);
+    expect(help.out.replace(/\s+/g, ' ')).toContain('a Honeycomb Storage Wall board');
+  });
+
+  it('--fill multiboard still plans the board, and a piece can have it', async () => {
+    const r = await cli([...OPENING, '--fill', 'multiboard', '--piece-fill', '2,1=sealed', '--dry-run']);
+    expect(r.code).toBe(0);
+    expect(r.out).toContain('Fill: a Multiboard board: octagonal holes 23.4 mm across');
+    const own = await cli([...OPENING, '--piece-fill', '2,1=multiboard', '--dry-run']);
+    expect(own.code).toBe(0);
+    expect(own.out).toContain('Column 2, row 1: a Multiboard board:');
+  });
+});

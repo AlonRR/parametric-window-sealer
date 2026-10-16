@@ -6,8 +6,9 @@ still join, seal at their edges and fit the window as before; inside each piece'
 board's openings are cut through, every one of them whole.
 
 The owner chose four systems to offer (Q9): Skådis, openGrid, Multiboard and the Honeycomb Storage
-Wall. Skådis, openGrid and the Honeycomb Storage Wall are built; Multiboard waits on a question
-about its licence (Q159).
+Wall. All four are built. Skådis, openGrid and the Honeycomb Storage Wall are offered; Multiboard is
+not offered yet, while a question about its licence is open (Q159): the page, the command's help
+and the MCP server leave it out, and the library and the command take it by name.
 
 ## Using one
 
@@ -101,12 +102,72 @@ board follows. The cells' flats are at the top and bottom, so each column of cel
 as the author's pictures show (inferred from the pictures): an accessory that spans two cells finds
 them where it expects. At the default 3 mm panel the board stands 5 mm proud.
 
+## Multiboard (built, not offered yet)
+
+For the parts of [Multiboard](https://www.multiboard.io/), MultiBuild's modular wall system: its
+snaps, bolts, pegs and the bins and holders that hang on them, matching its tiles. It is built in
+full and **not offered yet** (Q159): the command takes `--fill multiboard`, a piece's own board
+`2,1=multiboard`, and the library `fill.kind: "multiboard"`; the page's lists, the command's help
+and the MCP server's schema leave it out until the question about its licence, below, is settled.
+
+MultiBuild's own pages give the 25 mm grid
+([core parts](https://docs.multibuild.io/beginner-section/core-parts-documentation)), that a tile
+is the same from both faces and has both kinds of hole 25 mm apart
+([8×8 core tile](https://thangs.com/m/974214)), and that its parts carry a tolerance of 0.25 mm
+([printing guidelines](https://docs.multibuild.io/beginner-section/printing-guidelines)); they
+give none of the holes' sizes. Those come from community models (relayed): one that measured
+MultiBuild's own CAD files in 2026 ([stuff](https://github.com/SeanOC/stuff), its
+`multibuild` folder), two from 2024
+([multiboard-parametric](https://github.com/shaggyone/multiboard-parametric) and its fork
+[multiboard-parametric-stacked](https://github.com/asciipip/multiboard-parametric-stacked)), and
+the bolts' threads in two more ([QuackWorks](https://github.com/AndyLevesque/QuackWorks),
+[ScrewMultiboard](https://github.com/dmitrii-galantsev/ScrewMultiboard)). Nothing of their code or
+files is used here, only the sizes.
+
+| | mm | From |
+|---|---|---|
+| Grid | 25 each way: the large holes at the cells' centres, the small ones at their corners | MultiBuild's pages; the models |
+| Board | 6.2 thick, the same from both faces; 6.4 in the 2024 models | The 2026 measurement; a snap's height |
+| Large hole | Octagonal, its flats square to the board's sides: 23.4 across its flats at each face, narrowing to 21.4 by 2.0 in, and 21.4 between | Every model |
+| Large thread | A groove from 21.4 out to 22.5 across, 1.6 wide at the hole's side and 0.5 at its root (90° between its flanks), 2.5 a turn, right-handed, through the board | The 2026 measurement; the 2024 models within 0.1 |
+| Small hole | Round, 6.0 across, its mouths widening at 45° to 8.0 at each face; 7.5 with a straight band in the 2024 fork | The 2026 measurement |
+| Small thread | A groove from 6.0 out to 7.0 across, 2.5 wide at the hole's side and 0.625 at its root, 3.125 a turn, right-handed; 3.0 a turn in four other models | The 2026 measurement |
+| Clearance | None on the board: Multiboard's parts carry their own 0.25 | MultiBuild's printing guidelines |
+
+The large holes take the snaps and bolts by their thread; the small ones take pegs, small threads
+and ordinary pegboard accessories, as MultiBuild's core parts page says. A snap also leans on the
+taper behind the far face, so the board keeps it at both faces. Every hole is whole and clear of a
+fitting on its own: a small hole may stand at the edge of the board where its large neighbours do
+not fit. At the default 3 mm panel the board stands 3.2 mm proud.
+
+Its threads make the files heavy: the example wall's 15 pieces are 63 MB as STL files and 13.5 MB
+as one 3MF file, against 3.3 MB and 0.6 MB with the openGrid board, and take about 15 times as long
+to make (verified 16 Oct 2026, in Node). Each thread is swept round its hole in 10° steps, within
+0.05 mm of a true helix.
+
+Left out: the teeth and notches along a tile's edges, which join tile to tile (the wall's pieces
+join with their own joints instead), and two variants in MultiBuild's files, a large hole "with
+side holes" and a small hole "with side bumps", whose sizes and purpose are not published.
+
+**Its licence, and why it is not offered yet.** MultiBuild's
+[licence](https://multibuild.io/license) lets anyone use its designs for personal, non-commercial
+use, and asks for a commercial subscription to sell physical products "produced or derived from a
+Design"; its "Designs" include "drawings, documentation and manuals". It never mentions dimensions,
+measurements or compatibility, so whether a board made to the same sizes, using none of its files,
+falls under it is not settled, nor how that sits with the statement that the files this tool makes
+are the user's to sell (Q36). Of the community models, one carries no licence, one follows
+Multiboard's, one is CC BY-NC-SA with its snap under Multiboard's, one is BSD-2-Clause with sizes
+matching the first's, and one carves its Multiboard sizes out of its MIT licence (relayed). This is
+the owner's question (Q159, Q162), not legal advice.
+
 ## Not yet confirmed
 
 - No test print yet: whether IKEA's hooks slide on and hold, and whether the slots print clean
   standing upright; whether openGrid's snaps click in and hold; whether the Honeycomb Storage
-  Wall's inserts clip in.
+  Wall's inserts clip in; whether Multiboard's snaps, bolts and pegs screw and push in.
 - Printed with the room face up, the Honeycomb Storage Wall's ledge narrows from 22 to 20 mm over
   0.9 mm, an overhang 48° from upright, a little past the 45° most printers manage without support
   (inferred): it may want a test print, or printing the pieces face down.
 - The Skådis slot sizes against a real IKEA board, with calipers.
+- Multiboard's thickness (6.2 or 6.4 mm), its small holes' thread (3.125 or 3.0 mm a turn) and their
+  mouths (8.0 or 7.5 mm), against a genuine tile or MultiBuild's own files.
