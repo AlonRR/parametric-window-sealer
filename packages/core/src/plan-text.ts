@@ -37,6 +37,8 @@ import {
 import type { WallParts } from './plan.js';
 import type { Params } from './params.js';
 import { hundredth, listed, mm, plural, sum } from './words.js';
+import { requireTiltSetup, tiltPartNames } from './tilt.js';
+import { describeWedge, wedgeGasketRuns } from './wedge-print.js';
 
 export interface LeftoverText {
   axis: Axis;
@@ -73,6 +75,7 @@ export interface PlanText {
   double: string[]; // a double wall's skins, and what it gains (#119)
   frame: string[]; // what holds a wall pressed into a frame with no track (#120)
   shutter: string[]; // how a wall behind a roller shutter sits in its rails, and the shutter on it (#158)
+  wedge: string[]; // a tilted sash's wedge, in place of a wall (#159)
   printing: string; // what is done against warping, and brim advice for the material (#122)
   stiffeners: string[]; // the aluminium angle to buy, where it goes, and its clips (#111)
 }
@@ -175,7 +178,67 @@ function describeSeal(params: Params, parts: WallParts): string {
   return `Seal: ${mm(tape.widthMm)} × ${mm(tape.thicknessMm)} mm closed-cell foam tape along the edge strips’ ${faces}${inPorts}: ${metres} m in all.`;
 }
 
+// A piece of the wedge's shorter than the joints need, as a wall's are said.
+const small = (what: string) => (w: { index: number; lengthMm: number; minPieceMm: number }) =>
+  `${what} piece ${w.index + 1} is ${mm(w.lengthMm)} mm long, under the ${mm(w.minPieceMm)} mm the joints need.`;
+
+// A tilted sash's plan (sash-wedge, #159): the wedge's, in the places a wall's lines go; the grid's
+// widths and heights have none.
+function describeTilt(params: Params): PlanText {
+  const { wedge, port, profile, panelMm } = requireTiltSetup(params);
+  const names = tiltPartNames(params);
+  const count = (pick: (name: string) => boolean) => names.filter((p) => pick(p.name)).reduce((n, p) => n + p.count, 0);
+  const gaskets = count((name) => name.startsWith('gasket-'));
+  const parts = count((name) => !name.startsWith('gasket-'));
+  const { side, top } = wedge;
+  return {
+    headline:
+      gaskets > 0
+        ? `A wedge for a tilted sash: ${parts} parts and ${gaskets} TPU gaskets to print.`
+        : `A wedge for a tilted sash: ${parts} parts to print.`,
+    columns: '',
+    rows: '',
+    span: `For a ${mm(params.openingWidthMm)} × ${mm(params.openingHeightMm)} mm opening, the sash ${mm(params.tilt.gapMm)} mm in at the top.`,
+    joints: `Joints: ${2 * side.chain.jointsMm.length + top.chain.jointsMm.length} joint strips.`,
+    edges: `Edges: ${count((name) => /^wedge-(leg|top-edge)-/.test(name))} edge strips and 2 corner pieces.`,
+    warnings: [
+      ...side.chain.warnings.map(small('A triangle’s')),
+      ...top.chain.warnings.map(small('The top strip’s')),
+      ...materialWarnings(params.material, params.ports.length > 0),
+    ],
+    leftovers: [],
+    ports: [],
+    cutouts: [],
+    fans: [],
+    clamps: [],
+    inserts: [],
+    model: [],
+    customPiece: [],
+    units: [],
+    seal: '',
+    fill: '',
+    pieceFills: [],
+    sheet: [],
+    material: describeMaterial(params.material),
+    rail: [],
+    rain: [],
+    stop: [],
+    double: [],
+    frame: [],
+    shutter: [],
+    wedge: describeWedge(
+      wedge,
+      port,
+      wedgeGasketRuns(wedge, profile, panelMm),
+      params.seal.kind === 'tpu' ? 'tpu' : 'tape',
+    ),
+    printing: describePrinting(params.material.kind),
+    stiffeners: [],
+  };
+}
+
 export function describePlan(plan: GridLayout, params: Params): PlanText {
+  if (params.edges.window === 'tilt') return describeTilt(params);
   const count = plan.pieces.length;
   const max = pieceLimit(params);
   const parts = planParts(params, plan);
@@ -240,6 +303,7 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     }),
     frame: describeFrame(params),
     shutter: describeShutter(params),
+    wedge: [],
     printing: describePrinting(params.material.kind),
     stiffeners: describeStiffeners(params),
   };

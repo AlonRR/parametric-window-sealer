@@ -84,7 +84,8 @@ at the top**, **d**, from the frame to the tilted sash.
    the frame and the sash.
 3. The corners between the faces, and the flattened port.
 4. The parts as files to print, and the plan's lines, in the library (C312, C313); then the setting
-   on the page, the command and the MCP server, and the guide.
+   on the page, the command and the MCP server (C314 to C316), and the guide
+   ([`../wedge.md`](../wedge.md)).
 
 Then the turned form, on the same parts.
 

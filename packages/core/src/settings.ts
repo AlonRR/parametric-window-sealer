@@ -204,9 +204,17 @@ export const SETTINGS: readonly Setting[] = [
     path: 'edges.window',
     help:
       'Window type: a slider, a hung window, a frame with no track (a casement screen opening, a tilt-and-turn ' +
-      'frame), or a wall behind a roller shutter, in its guide rails; sets the four edges, and for a shutter the ' +
+      'frame), a wall behind a roller shutter, in its guide rails, or a sash tilted in at the top (tilt-and-turn ' +
+      'in tilt, a hopper), closed by a wedge in place of a wall; sets the four edges, and for a shutter the ' +
       "rail's starting sizes, as the page does.",
-    values: ['slider', 'hung', 'frame', 'shutter'],
+    values: ['slider', 'hung', 'frame', 'shutter', 'tilt'],
+  },
+  {
+    field: 'tiltGapMm',
+    path: 'tilt.gapMm',
+    help:
+      "For a tilted sash: the gap at the top, from the frame to the sash's outer face, as its stays hold it. The " +
+      "opening is the frame's, seen inside it.",
   },
   edge('top'),
   edge('bottom'),

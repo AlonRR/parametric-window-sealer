@@ -48,6 +48,7 @@ const FLAG_NAMES: Record<OwnField, string> = {
   pins: 'pins',
   coupon: 'coupon',
   window: 'window',
+  tiltGapMm: 'tilt-gap',
   topEdge: 'top-edge',
   bottomEdge: 'bottom-edge',
   leftEdge: 'left-edge',

@@ -103,7 +103,7 @@ describe('window_sealer_list_settings', () => {
     });
     expect(settings.find((s) => s.path === 'edges.window')).toMatchObject({
       startsAt: 'slider',
-      choices: ['slider', 'hung', 'frame', 'shutter'],
+      choices: ['slider', 'hung', 'frame', 'shutter', 'tilt'],
     });
     expect(settings.find((s) => s.path === 'openingWidthMm')?.startsAt).toBeNull();
     expect(JSON.parse(r.text)).toEqual(r.data);
@@ -659,7 +659,7 @@ describe('behind a roller shutter (shutter-rails, #158)', () => {
     const plan = (await client.listTools()).tools.find((t) => t.name === 'window_sealer_plan_wall');
     if (!plan) throw new Error('window_sealer_plan_wall expected');
     const edges = (plan.inputSchema.properties as Record<string, any>)['settings'].properties.edges;
-    expect(edges.properties.window.enum).toEqual(['slider', 'hung', 'frame', 'shutter']);
+    expect(edges.properties.window.enum).toEqual(['slider', 'hung', 'frame', 'shutter', 'tilt']);
     const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, edges: { window: 'shutter' } } });
     expect(r.isError).toBeFalsy();
     expect(r.data['settings'].edges.track).toEqual({
@@ -668,5 +668,35 @@ describe('behind a roller shutter (shutter-rails, #158)', () => {
       depthMm: { top: 20, bottom: 20, left: 20, right: 20 },
     });
     expect(r.data['summary'].shutter).toEqual([expect.stringMatching(/^Behind a roller shutter: the side strips/)]);
+  });
+});
+
+describe('a tilted sash (sash-wedge, #159)', () => {
+  const TILTED = {
+    openingWidthMm: 800,
+    openingHeightMm: 1200,
+    edges: { window: 'tilt' },
+    tilt: { gapMm: 150 },
+    seal: { kind: 'tpu' },
+    ports: [{ hoseMm: 150 }],
+  };
+
+  it('the schema offers the gap; the summary is the wedge’s', async () => {
+    const { client, call } = await connect();
+    const plan = (await client.listTools()).tools.find((t) => t.name === 'window_sealer_plan_wall');
+    if (!plan) throw new Error('window_sealer_plan_wall expected');
+    const settings = (plan.inputSchema.properties as Record<string, any>)['settings'];
+    expect(settings.properties.tilt.properties.gapMm.type).toBe('number');
+    const r = await call('window_sealer_plan_wall', { settings: TILTED });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['summary'].headline).toBe('A wedge for a tilted sash: 59 parts and 32 TPU gaskets to print.');
+    expect(r.data['summary'].wedge[0]).toMatch(/^The sash leans 7\.2° in\./);
+  });
+
+  it('a wall’s fitting in a tilted sash is refused where it is set', async () => {
+    const { call } = await connect();
+    const r = await call('window_sealer_plan_wall', { settings: { ...TILTED, fans: [{ sizeMm: 120 }] } });
+    expect(r.isError).toBe(true);
+    expect(r.text).toContain('A tilted sash’s wedge has room for a hose port only.');
   });
 });

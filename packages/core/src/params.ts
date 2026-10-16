@@ -74,6 +74,8 @@ import { patternBorderMm } from './pattern.js';
 import type { ApplianceModel, ModelSetting } from './appliance-model.js';
 import type { InPiece } from './fittings/index.js';
 import { capitalised, hundredth, mm } from './words.js';
+import { EXAMPLE_TILT, refuseForTilt, tiltSetup } from './tilt.js';
+import type { TiltParams } from './tilt.js';
 
 export interface AxisChoice {
   mode: AxisMode;
@@ -110,6 +112,7 @@ export interface Params {
   material: MaterialParams; // what the parts are printed in, and whether the wall is in sun (#113)
   socket: SocketParams; // how the hose ports hold the hose, with caps and screens (#114)
   rail: RailParams; // the filler between the sashes (meeting-rail, #116); none to start with
+  tilt: TiltParams; // a tilted sash's gap at the top, for its wedge (sash-wedge, #159)
   rain: boolean; // weep holes in the strips and a drip groove under the edge strips (rain-face, #117)
   stop: StopParams; // a strut in the sash's track that lifts out by hand (sash-stop, #118); none to start with
   wall: WallKind; // single, or double with hollow pieces for winter (double-wall, #119)
@@ -153,6 +156,7 @@ export const EXAMPLE_PARAMS: Params = {
   stop: DEFAULT_STOP,
   wall: 'single',
   stiffen: true,
+  tilt: EXAMPLE_TILT,
 };
 
 // Every field of the page's form. The page reads and writes these by name; the settings list
@@ -192,6 +196,7 @@ export const FIELD_NAMES = [
   'pins',
   'coupon',
   'window',
+  'tiltGapMm',
   'topEdge',
   'bottomEdge',
   'leftEdge',
@@ -258,7 +263,7 @@ export type ReadResult = { ok: true; params: Params } | { ok: false; errors: Fie
 const MODES: readonly AxisMode[] = ['equal', 'full-plus-filler'];
 const FILLERS: readonly FillerPosition[] = ['start', 'end', 'middle', 'split'];
 const LEFTOVERS: readonly Leftover[] = ['spread', 'equal', 'shorten'];
-const WINDOWS: readonly WindowType[] = ['slider', 'hung', 'frame', 'shutter'];
+const WINDOWS: readonly WindowType[] = ['slider', 'hung', 'frame', 'shutter', 'tilt'];
 const ROLES: readonly EdgeRole[] = ['track', 'sash', 'sill', 'unit', 'frame'];
 const SEALS: readonly SealKind[] = ['none', 'tape', 'tpu'];
 const PRINTER_KINDS = ['default', 'custom', 'model'] as const;
@@ -408,6 +413,7 @@ function readPanel(r: FormReader): {
 
 const edgesForm = (p: Params): FormValues => ({
   window: p.edges.window,
+  tiltGapMm: String(p.tilt.gapMm),
   topEdge: p.edges.roles.top,
   bottomEdge: p.edges.roles.bottom,
   leftEdge: p.edges.roles.left,
@@ -935,6 +941,9 @@ export function readParams(values: FormValues): ReadResult {
   const { width, height } = readDivision(r);
   const { thicknessMm, joint, coupon, sheet, material, rain, stiffen } = readPanel(r);
   const edges = readEdges(r);
+  const tilt: TiltParams = {
+    gapMm: r.numberIfUsed('tiltGapMm', edges.window === 'tilt', EXAMPLE_TILT.gapMm, (n) => n > 0, SIZE_MESSAGE),
+  };
   const sealRead = readSeal(r);
   const { seal, fit } = sealRead;
   const rail = readRail(r, edges, seal);
@@ -1009,7 +1018,46 @@ export function readParams(values: FormValues): ReadResult {
     stop,
     wall,
     stiffen,
+    tilt,
   };
+  // A tilted sash has a wedge, not a wall: none of a wall's fittings or patterns, its one port in
+  // the top strip, and its own problems in place of the wall's plan's.
+  if (edges.window === 'tilt') {
+    refuseForTilt(r, {
+      joint,
+      wall,
+      pieceSource: sheet.source,
+      fill: fill.kind,
+      pieceFills: pieceFills.length,
+      ports: givenPorts.length,
+      cutouts: givenCutouts.length,
+      fans: givenFans.length,
+      clamps: givenClamps.length,
+      inserts: givenInserts.length,
+      model: modelRead !== undefined,
+      customPiece: customRead !== undefined,
+      roles: edges.roles,
+    });
+    const params: Params = {
+      ...base,
+      ports: givenPorts.slice(0, 1).map((p) => ({ hoseMm: p.hoseMm, column: 1, row: 1 })),
+      pieceFills: [],
+      cutouts: [],
+      rim,
+      fans: [],
+      clamps: [],
+      clamp,
+      inserts: [],
+      insert,
+      model: NO_MODEL,
+      customPiece: NO_CUSTOM_PIECE,
+    };
+    if (r.ok) {
+      const setup = tiltSetup(params);
+      if ('problem' in setup) r.fail(setup.field, setup.problem);
+    }
+    return r.ok ? { ok: true, params } : { ok: false, errors: r.errors };
+  }
   // Fittings and pieces' own patterns are placed against the plan they will be in: with any to
   // place, a printed piece keeps every piece to the printer's size, before they are placed.
   const given = [givenPorts, givenCutouts, givenFans, givenClamps, givenInserts];

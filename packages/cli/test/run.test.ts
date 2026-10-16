@@ -304,7 +304,7 @@ describe('usage', () => {
     expect(r.out).toMatch(/--slot <mm> +How deep a piece can go into a strip\. \(8\)/);
     // Wherever its lines break: the flag column is as wide as the longest flag.
     expect(r.out.replace(/\s+/g, ' ')).toMatch(
-      /--window <slider\|hung\|frame\|shutter> .*?as the page does\. \(slider\)/,
+      /--window <slider\|hung\|frame\|shutter\|tilt> .*?as the page does\. \(slider\)/,
     );
     expect(r.out).toContain('Exit status: 0 done, 1 could not write, 2 wrong options or settings.');
   });
@@ -1024,6 +1024,31 @@ describe('behind a roller shutter (shutter-rails, #158)', () => {
 
   it('--help offers it', async () => {
     const help = await cli(['--help']);
-    expect(help.out.replace(/\s+/g, ' ')).toMatch(/--window <slider\|hung\|frame\|shutter> /);
+    expect(help.out.replace(/\s+/g, ' ')).toMatch(/--window <slider\|hung\|frame\|shutter\|tilt> /);
+  });
+});
+
+describe('a tilted sash (sash-wedge, #159)', () => {
+  const TILTED = ['--width', '800', '--height', '1200', '--window', 'tilt', '--tilt-gap', '150', '--seal', 'tpu'];
+
+  it('--window tilt with the gap at the top plans a wedge, and lists its parts’ files', async () => {
+    const r = await cli([...TILTED, '--port', '150', '--dry-run']);
+    expect(r.code).toBe(0);
+    const out = r.out.replace(/\s+/g, ' ');
+    expect(out).toContain('A wedge for a tilted sash: 59 parts and 32 TPU gaskets to print.');
+    expect(out).toContain('The sash leans 7.2° in.');
+    expect(out).toContain('wedge-corner-print-2.stl');
+    expect(out).toContain('wedge-top-2-of-4-port-150-print-1.stl');
+  });
+
+  it('refuses what a wall has and the wedge has no place for, with the flag', async () => {
+    const r = await cli([...TILTED, '--fan', '120', '--dry-run']);
+    expect(r.code).not.toBe(0);
+    expect(r.err.replace(/\s+/g, ' ')).toContain('A tilted sash’s wedge has room for a hose port only.');
+  });
+
+  it('--help offers the gap', async () => {
+    const help = await cli(['--help']);
+    expect(help.out.replace(/\s+/g, ' ')).toMatch(/--tilt-gap <mm> For a tilted sash: the gap at the top/);
   });
 });

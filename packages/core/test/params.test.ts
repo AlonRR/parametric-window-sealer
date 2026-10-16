@@ -65,6 +65,7 @@ describe('the starting values', () => {
       stop: DEFAULT_STOP, // #118
       wall: 'single', // #119
       stiffen: true, // #111
+      tilt: { gapMm: 130 }, // #159
     });
   });
 
@@ -331,6 +332,7 @@ describe('describePlan', () => {
       double: [], // #119
       frame: [], // #120
       shutter: [], // #158
+      wedge: [], // #159
       printing:
         'Printing: the pieces’ corners are rounded 3 mm and their bed-side edges chamfered 1 mm against warping. ' +
         'In PETG, add a 5 mm brim if the corners lift.', // #122

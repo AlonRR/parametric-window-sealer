@@ -29,6 +29,7 @@ import { fillChoice } from './fill.js';
 import { patternBorderMm } from './pattern.js';
 import { fillFor } from './piece-fill.js';
 import { gasketShapes, gasketSolid, tpuJoint } from './tpu.js';
+import { plannedTiltFiles, tiltFiles } from './tilt.js';
 import type { FieldErrors, Params } from './params.js';
 import type { PlanText } from './plan-text.js';
 
@@ -165,6 +166,7 @@ export function buildExport(engine: Engine, params: Params): { pieces: ExportPie
 }
 
 export function makeFiles(engine: Engine, params: Params, choice: DownloadChoice): DownloadFile[] {
+  if (params.edges.window === 'tilt') return tiltFiles(engine, params, choice);
   const { pieces, parts } = buildExport(engine, params);
   return packageDownload(pieces, parts, choice, params.openingWidthMm, params.openingHeightMm);
 }
@@ -218,6 +220,7 @@ export function planFiles(params: Params, choice: DownloadChoice): PlannedFile[]
   const errors = validateParams(params);
   if (Object.keys(errors).length > 0) throw new ParamsError(errors);
   checkChoice(choice);
+  if (params.edges.window === 'tilt') return plannedTiltFiles(params, choice);
   const label = wallLabel(params.openingWidthMm, params.openingHeightMm);
   if (choice.packaging === 'single') return [{ name: `${label}.3mf`, type: MEDIA_TYPES['3mf'] }];
   if (choice.packaging === 'zip') return [{ name: `${label}-${choice.format}.zip`, type: MEDIA_TYPES.zip }];

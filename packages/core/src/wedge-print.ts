@@ -20,7 +20,7 @@ import { evenSegments } from './joint.js';
 import type { JointParams } from './joint.js';
 import type { TapeFit } from './tape.js';
 import { gasketSolid } from './tpu.js';
-import { tiltWedgeSolids } from './wedge-geometry.js';
+import { tiltWedgeSolids, wedgeCorner } from './wedge-geometry.js';
 import type { FlatPort } from './wedge-port.js';
 import type { TiltWedge } from './wedge.js';
 import { mm } from './words.js';
@@ -58,6 +58,72 @@ function onBed(m: Manifold): Manifold {
 }
 
 const tenth = (n: number) => Math.round(n * 10) / 10;
+
+// The gaskets' runs in pieces the printer makes, each length to a tenth of a mm and once, with how
+// many of it: up both legs of both sides and along the top, on both faces.
+function gasketPieces(
+  wedge: TiltWedge,
+  profile: EdgeProfile,
+  panelMm: number,
+  maxPieceMm: number,
+  gasket: WedgeGasket,
+): { name: string; lengthMm: number; count: number }[] {
+  const runs = wedgeGasketRuns(wedge, profile, panelMm);
+  const counts = new Map<number, number>();
+  const cut = (lengthMm: number, count: number) => {
+    for (const [, length] of evenSegments(0, lengthMm, maxPieceMm)) {
+      counts.set(tenth(length), (counts.get(tenth(length)) ?? 0) + count);
+    }
+  };
+  cut(runs.legMm, 4);
+  cut(runs.topMm, 2);
+  return [...counts].map(([lengthMm, count]) => {
+    const shape = {
+      kind: 'gasket' as const,
+      lengthMm,
+      widthMm: tenth(gasket.fit.grooveWidthMm),
+      heightMm: gasket.heightMm,
+      count,
+    };
+    return { name: partName(shape), lengthMm, count };
+  });
+}
+
+// The names and counts wedgePrintParts gives, in its order, found without building anything: what
+// a dry run lists.
+export function wedgePartNames(
+  wedge: TiltWedge,
+  profile: EdgeProfile,
+  joint: JointParams,
+  panelMm: number,
+  maxPieceMm: number,
+  port?: FlatPort,
+  gasket?: WedgeGasket,
+): { name: string; count: number }[] {
+  const corner = wedgeCorner(profile, joint, panelMm);
+  const cos = Math.cos(((wedge.tiltDeg / 2) * Math.PI) / 180);
+  const xCorner = wedge.side.axisMm - corner.belowTopMm;
+  const list: { name: string; count: number }[] = [];
+  const add = (name: string, count: number) => list.push({ name: `${name}-print-${count}`, count });
+  const each = (n: number, name: (i: number) => string, count: number) => {
+    for (let i = 0; i < n; i++) add(name(i), count);
+  };
+  const legs = evenSegments(0, (xCorner + 1) / cos, maxPieceMm).length;
+  each(legs, (i) => `wedge-leg-${i + 1}-of-${legs}`, 4);
+  const { side, top } = wedge;
+  each(side.chain.pieces.length, (i) => `wedge-side-${i + 1}-of-${side.chain.pieces.length}`, 2);
+  each(side.chain.jointsMm.length, (i) => `wedge-side-joint-${i + 1}-of-${side.chain.jointsMm.length}`, 2);
+  add('wedge-corner', 2);
+  const edges = evenSegments(corner.deepMm, top.lengthMm - 2 * corner.deepMm, maxPieceMm).length;
+  each(edges, (i) => `wedge-top-edge-${i + 1}-of-${edges}`, 2);
+  const pieces = top.chain.pieces.length;
+  each(pieces, (i) => `wedge-top-${i + 1}-of-${pieces}${port?.piece === i ? `-port-${mm(port.hoseMm)}` : ''}`, 1);
+  each(top.chain.jointsMm.length, (i) => `wedge-top-joint-${i + 1}-of-${top.chain.jointsMm.length}`, 1);
+  if (gasket !== undefined) {
+    for (const { name, count } of gasketPieces(wedge, profile, panelMm, maxPieceMm, gasket)) list.push({ name, count });
+  }
+  return list;
+}
 
 export function wedgePrintParts(
   engine: Engine,
@@ -120,24 +186,8 @@ export function wedgePrintParts(
     });
 
     if (gasket !== undefined) {
-      const runs = wedgeGasketRuns(wedge, profile, panelMm);
-      const counts = new Map<number, number>();
-      const cut = (lengthMm: number, count: number) => {
-        for (const [, length] of evenSegments(0, lengthMm, maxPieceMm)) {
-          counts.set(tenth(length), (counts.get(tenth(length)) ?? 0) + count);
-        }
-      };
-      cut(runs.legMm, 4); // up both legs of both sides, on both faces
-      cut(runs.topMm, 2); // along the top, on both faces
-      for (const [lengthMm, count] of counts) {
-        const shape = {
-          kind: 'gasket' as const,
-          lengthMm,
-          widthMm: tenth(gasket.fit.grooveWidthMm),
-          heightMm: gasket.heightMm,
-          count,
-        };
-        parts.push({ name: partName(shape), solid: gasketSolid(engine, lengthMm, gasket.fit, gasket.heightMm), count });
+      for (const { name, lengthMm, count } of gasketPieces(wedge, profile, panelMm, maxPieceMm, gasket)) {
+        parts.push({ name, solid: gasketSolid(engine, lengthMm, gasket.fit, gasket.heightMm), count });
       }
     }
     return parts;

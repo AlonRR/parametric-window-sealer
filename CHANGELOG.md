@@ -25,6 +25,15 @@ Unreleased.
   and 20 mm deep, to measure and change. The plan says how the strips sit in the rails, to lower the
   shutter only until it rests on the wall, and to take the wall out before a storm. How:
   `docs/shutter.md`. Not yet test printed.
+- A wedge for a sash tilted in at the top, as a tilt-and-turn window in tilt, the kip window or a
+  hopper leaves open: choose **Window type: A sash tilted in at the top** (`--window tilt`, or
+  `edges.window: "tilt"`) and give the gap at the top (`--tilt-gap`, `tilt.gapMm`). Two side
+  triangles and a top strip, joined by two corner pieces, every edge pressed against the frame or
+  the sash with a printed TPU gasket; the hose goes through a flattened port in the top strip, printed
+  as one with its piece, collar up. Each part is one file, lying as it prints, named for where it
+  goes and how many to print; the plan says how far the sash leans, the faces, the pieces, the
+  port's share of the hose's area and the gaskets' runs. A wall's fittings and patterns have no place
+  in it and are refused. How: `docs/wedge.md`. Not yet test printed.
 
 ## [0.6.0] - 2026-10-16
 

@@ -24,6 +24,7 @@ import {
   LineSegments,
   Mesh,
   MeshPhongMaterial,
+  Vector3,
 } from 'three';
 import type { Material, Object3D } from 'three';
 import type { Manifold } from 'manifold-3d';
@@ -36,6 +37,7 @@ import { buildPiecesWith, fittingSource, placedFittings } from 'parametric-windo
 import { tpuJoint } from 'parametric-window-sealer';
 import { fillChoice, fillFor } from 'parametric-window-sealer';
 import { isCut, planParts, slotPins } from 'parametric-window-sealer';
+import { requireTiltSetup, tiltWedgeSolids } from 'parametric-window-sealer';
 import type { Params } from 'parametric-window-sealer';
 
 export type PartKind = 'piece' | 'strip' | 'cross' | 'pin' | 'edge' | 'tape' | 'tpu';
@@ -71,7 +73,44 @@ function add(wall: Group, solid: Manifold, kind: PartKind, x: number, y: number,
   }
 }
 
+// A tilted sash's wedge (sash-wedge, #159), as it sits in the window. The library builds it in its
+// own frame, x up the triangles' axis, y across from the frame to the sash, z along the window; the
+// group turns it, a turn and not a mirror, so the window's width runs along x and its height up y as
+// a wall's do. Its gaskets are in the download, not here.
+function buildWedgeScene(engine: Engine, params: Params): Group {
+  const s = requireTiltSetup(params);
+  const parts = tiltWedgeSolids(engine, s.wedge, s.profile, s.joint, s.panelMm, s.maxPieceMm, s.port);
+  const wedge = new Group();
+  wedge.matrixAutoUpdate = false;
+  wedge.matrix.makeBasis(new Vector3(0, 1, 0), new Vector3(0, 0, 1), new Vector3(1, 0, 0));
+  const placed: [Manifold, PartKind, Material][] = [
+    ...parts.sides.flatMap((side) => [
+      ...side.legs.map((m) => [m, 'edge', JOINT] as [Manifold, PartKind, Material]),
+      ...side.panels.map((m) => [m, 'piece', PANEL] as [Manifold, PartKind, Material]),
+      ...side.joints.map((m) => [m, 'strip', JOINT] as [Manifold, PartKind, Material]),
+    ]),
+    ...parts.corners.map((m) => [m, 'cross', JOINT] as [Manifold, PartKind, Material]),
+    ...parts.top.edges.map((m) => [m, 'edge', JOINT] as [Manifold, PartKind, Material]),
+    ...parts.top.panels.map((m) => [m, 'piece', PANEL] as [Manifold, PartKind, Material]),
+    ...parts.top.joints.map((m) => [m, 'strip', JOINT] as [Manifold, PartKind, Material]),
+  ];
+  // add takes each solid's ownership; once one fails, the rest are deleted here.
+  let i = 0;
+  try {
+    for (; i < placed.length; i++) {
+      const [solid, kind, look] = placed[i] ?? [];
+      if (solid && kind && look) add(wedge, solid, kind, 0, 0, look);
+    }
+  } catch (error) {
+    for (const [solid] of placed.slice(i + 1)) solid.delete();
+    disposeWall(wedge);
+    throw error;
+  }
+  return wedge;
+}
+
 export function buildWallScene(engine: Engine, params: Params): Group {
+  if (params.edges.window === 'tilt') return buildWedgeScene(engine, params);
   const { plan, joints, edges } = planParts(params);
   const { joint, thicknessMm } = params;
   const wall = new Group();

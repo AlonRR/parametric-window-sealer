@@ -111,8 +111,9 @@ export function mountPreview(container: HTMLElement, getEngine: () => Promise<En
     }
     wall = buildWallScene(await getEngine(), params);
     scene.add(wall);
-    // Keep the user's view while they edit; frame again only when the opening changes.
-    const key = `${params.openingWidthMm}x${params.openingHeightMm}`;
+    // Keep the user's view while they edit; frame again only when the opening or the window type
+    // changes, a tilted sash's wedge standing out from where a wall lies.
+    const key = `${params.edges.window} ${params.openingWidthMm}x${params.openingHeightMm}`;
     if (key !== framedFor) {
       frame(wall);
       framedFor = key;
