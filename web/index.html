@@ -343,6 +343,7 @@
               <option value="turn">A sash turned part way: tilt-and-turn in turn, an inward casement</option>
               <option value="roof">A roof window opened out: top-hung</option>
               <option value="pivot">A pivot window: the sash turned on an axis across its middle</option>
+              <option value="louvre">A louvre window: glass blades in clips, the jalousie</option>
             </select>
           </label>
           <!-- A tilted sash (sash-wedge, #159): a wedge in place of a wall, its gap at the top. -->
@@ -422,8 +423,19 @@
             </p>
             <span class="error" data-testid="error-pivotPitchDeg"></span>
           </div>
+          <!-- A louvre window (louvre-frame, #163): the wall in place of the lowest blades. -->
+          <div data-show-when="window=louvre" hidden>
+            <p class="note">
+              In a louvre window, take the lowest blades out of their clips, as many as the wall
+              needs, and keep them safe. The wall goes in their place: it stands on the sill, its sides
+              pressed against the clips of the blades taken out, and the lowest blade left closes onto
+              its top gasket, as onto the window's own weatherstrip. Measure the opening between the
+              clips, and from the sill to the lowest blade left with the louvres closed. Its sides are
+              held by their printed TPU gaskets: choose printed TPU as the seal.
+            </p>
+          </div>
           <!-- Notches for the window's hardware (edge-notches, #161), in a frame's edges. -->
-          <div data-show-when="window=frame|roof|pivot" hidden>
+          <div data-show-when="window=frame|roof|pivot|louvre" hidden>
             <label>
               Notches for hardware
               <input name="notches" autocomplete="off" spellcheck="false" placeholder="40x25@bottom,300" />
@@ -1523,6 +1535,7 @@
         <ul data-testid="plan-notches" data-plan="notches"></ul>
         <ul data-testid="plan-wedge" data-plan="wedge"></ul>
         <ul data-testid="plan-pivot" data-plan="pivot"></ul>
+        <ul data-testid="plan-louvre" data-plan="louvre"></ul>
         <p data-testid="plan-printing" data-plan="printing"></p>
         <ul data-testid="plan-stiffeners" data-plan="stiffeners"></ul>
         <ul data-testid="plan-warnings" data-plan="warnings"></ul>

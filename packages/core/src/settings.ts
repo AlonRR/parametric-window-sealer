@@ -210,9 +210,10 @@ export const SETTINGS: readonly Setting[] = [
       'frame), a wall behind a roller shutter, in its guide rails, a sash tilted in at the top (tilt-and-turn in ' +
       'tilt, a hopper) or a sash turned part way on its side hinges (tilt-and-turn in turn, an inward casement), ' +
       'each closed by a wedge in place of a wall, a top-hung roof window opened out, its wall in the frame on ' +
-      'a slope, or a pivot window, its sash turned on an axis across its middle, with a wall below the pivot and ' +
-      "a wedge above it; sets the four edges, and for a shutter the rail's starting sizes, as the page does.",
-    values: ['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn', 'roof', 'pivot'],
+      'a slope, a pivot window, its sash turned on an axis across its middle, with a wall below the pivot and ' +
+      'a wedge above it, or a louvre window, the wall in place of its lowest blades; sets the four edges, and ' +
+      "for a shutter the rail's starting sizes, as the page does.",
+    values: ['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn', 'roof', 'pivot', 'louvre'],
   },
   {
     field: 'tiltGapMm',

@@ -103,7 +103,7 @@ describe('window_sealer_list_settings', () => {
     });
     expect(settings.find((s) => s.path === 'edges.window')).toMatchObject({
       startsAt: 'slider',
-      choices: ['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn', 'roof', 'pivot'],
+      choices: ['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn', 'roof', 'pivot', 'louvre'],
     });
     expect(settings.find((s) => s.path === 'openingWidthMm')?.startsAt).toBeNull();
     expect(JSON.parse(r.text)).toEqual(r.data);
@@ -668,6 +668,7 @@ describe('behind a roller shutter (shutter-rails, #158)', () => {
       'turn',
       'roof',
       'pivot',
+      'louvre',
     ]);
     const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, edges: { window: 'shutter' } } });
     expect(r.isError).toBeFalsy();
@@ -787,6 +788,18 @@ describe('a pivot window (pivot-window, #162)', () => {
     });
     expect(wrong.isError).toBe(true);
     expect(wrong.text).toContain('The pivot is 1300 mm up');
+  });
+});
+
+describe('a louvre window (louvre-frame, #163)', () => {
+  it('the schema offers it; the summary says which blades come out', async () => {
+    const { call } = await connect();
+    const r = await call('window_sealer_plan_wall', {
+      settings: { openingWidthMm: 600, openingHeightMm: 560, edges: { window: 'louvre' }, seal: { kind: 'tpu' } },
+    });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['settings'].edges.roles).toEqual({ top: 'sash', bottom: 'sill', left: 'frame', right: 'frame' });
+    expect(r.data['summary'].louvre[0]).toMatch(/^A louvre window: take the lowest blades out of their clips/);
   });
 });
 

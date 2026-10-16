@@ -31,8 +31,8 @@ With a window AC in a frame, the unit stands on the sill and the wall above it.
 ## Notches for hardware
 
 Where a casement's crank arm, a friction stay's arms or a lock's keep cross the frame, the wall can
-leave a notch for it in its edge. Under **The window**, with a frame with no track, a roof window or
-the wall below a pivot window's pivot, give each in **Notches for hardware** (the command: `--notch`, again for each; the library and the
+leave a notch for it in its edge. Under **The window**, with a frame with no track, a roof window, the
+wall below a pivot window's pivot or a louvre window, give each in **Notches for hardware** (the command: `--notch`, again for each; the library and the
 MCP server: `notches`): its width along the edge and its depth from the frame's face in mm, then
 `@` its edge and how far its middle is from the left corner, or for a side edge from the bottom
 one: `40x25@bottom,300` (C328). The notch is made 1 mm larger round the hardware each way.
@@ -58,7 +58,8 @@ awning opened outward, and a tilt-and-turn window turned fully open. A top-hung 
 out takes it too, on a slope, with the plan saying what holds it there ([`roof.md`](roof.md)). A
 sash tilted in or turned part way leaves a wedge-shaped gap, which a wedge closes
 ([`wedge.md`](wedge.md)); a pivot window takes a wall below its pivot and a wedge above it
-([`pivot.md`](pivot.md)). A window behind a roller shutter can
+([`pivot.md`](pivot.md)). In a louvre window the wall takes the place of the lowest blades, its
+sides pressed against their clips as against a frame ([`louvre.md`](louvre.md)). A window behind a roller shutter can
 instead take the wall in the shutter's guide rails ([`shutter.md`](shutter.md)).
 
 ## Not yet confirmed

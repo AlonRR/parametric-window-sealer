@@ -37,7 +37,7 @@ product for that gap was found, only 3D-printed hobby adapters for tilted window
 | Pivot windows (Schwingfenster, Wendefenster) | Turn on a centre axis, half out, half in | Sealed since `pivot-window` (#162) on a horizontal axis: a wall below the pivot, its top edge against the sash, and the tilted sash's wedge above it ([`pivot.md`](../pivot.md)) | The vertical axis, `pivot-vertical` (#179) |
 | Roof windows: top-hung (Velux GPL) | Hinged at the top, opens out to 45° | Partly: a frame with no track from inside, with nothing checking that the gasket holds the wall's weight on a slope (inferred) | A roof-pitch setting, that check, and rain on a sloped face |
 | Roof windows: centre-pivot (Velux GGL) | A pivot window in a roof | Sealed since `pivot-window` (#162): the pivot window with its pitch, the plan saying what pulls the wall out of the frame, as for a top-hung one | Nothing new |
-| Jalousie, louvre | Glass blades in clips, turned by a crank | Not sealed; no kits found | Side edges clear of the clip channels, a top edge tucked under the lowest blade |
+| Jalousie, louvre | Glass blades in clips, turned by a crank | Sealed since `louvre-frame` (#163): the wall in place of the lowest blades, its sides against their clips and the lowest blade left closing onto its top ([`louvre.md`](../louvre.md)) | Nothing new |
 | Bay and bow | Fixed panes with casements or hung windows | Each opening one of the above | Nothing new |
 | Any window behind a roller shutter (Germany, France, Italy, Israel's "trisol") | The shutter runs in guide rails outside the glass | Sealed since `shutter-rails` (#158): the wall in the shutter's guide rails, its top edge under the lowered shutter ([`shutter.md`](../shutter.md)) | Nothing new |
 

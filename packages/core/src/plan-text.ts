@@ -14,6 +14,7 @@ import { describeStop } from './stop.js';
 import { describeDouble } from './double.js';
 import { describeFrame } from './frame.js';
 import { describeShutter } from './shutter.js';
+import { describeLouvre } from './louvre.js';
 import { describeRoof } from './roof.js';
 import { PIVOT_WEDGE_WORDS, describePivot, pivotRoofLines, pivotWall, pivotWedge } from './pivot.js';
 import { describeNotches } from './notch.js';
@@ -84,6 +85,7 @@ export interface PlanText {
   notches: string[]; // notches along an edge for the window's hardware (#161)
   wedge: string[]; // a tilted sash's wedge, in place of a wall (#159), or above a pivot window's (#162)
   pivot: string[]; // where a pivot window's wall and wedge go, and its hinges (#162)
+  louvre: string[]; // which of a louvre window's blades come out, and the blade closing onto the wall (#163)
   printing: string; // what is done against warping, and brim advice for the material (#122)
   stiffeners: string[]; // the aluminium angle to buy, where it goes, and its clips (#111)
 }
@@ -234,6 +236,7 @@ function describeSashWedge(params: Params, own?: WedgeWords): PlanText {
     roof: [],
     notches: [],
     pivot: [],
+    louvre: [],
     wedge: describeWedge(
       wedge,
       port,
@@ -340,6 +343,7 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     roof: describeRoof(params),
     notches: describeNotches(params.notches, { edges: params.edges, joint: params.joint, tape: tapeFit(params.seal) }),
     pivot: [],
+    louvre: describeLouvre(params),
     wedge: [],
     printing: describePrinting(params.material.kind),
     stiffeners: describeStiffeners(params),

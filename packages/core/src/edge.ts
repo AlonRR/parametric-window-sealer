@@ -34,8 +34,9 @@ export type EdgeName = 'top' | 'bottom' | 'left' | 'right';
 export type EdgeRole = 'track' | 'sash' | 'sill' | 'unit' | 'frame';
 // A tilted sash (sash-wedge, #159) is closed by a wedge, not a wall: its edges are all pressed
 // against the frame or the sash, held by their gaskets' squeeze. A pivot window (#162) takes a wall
-// below its pivot and a wedge above it.
-export type WindowType = 'slider' | 'hung' | 'frame' | 'shutter' | 'tilt' | 'turn' | 'roof' | 'pivot';
+// below its pivot and a wedge above it. In a louvre window (#163) the wall takes the place of the
+// lowest blades: its sides against the clips, its top under the lowest blade left.
+export type WindowType = 'slider' | 'hung' | 'frame' | 'shutter' | 'tilt' | 'turn' | 'roof' | 'pivot' | 'louvre';
 
 export const EDGES: readonly EdgeName[] = ['top', 'bottom', 'left', 'right'];
 
@@ -48,6 +49,7 @@ export const WINDOW_PRESETS: Record<WindowType, Record<EdgeName, EdgeRole>> = {
   turn: { top: 'frame', bottom: 'frame', left: 'frame', right: 'frame' },
   roof: { top: 'frame', bottom: 'frame', left: 'frame', right: 'frame' },
   pivot: { top: 'sash', bottom: 'frame', left: 'frame', right: 'frame' },
+  louvre: { top: 'sash', bottom: 'sill', left: 'frame', right: 'frame' },
 };
 
 // Where a window AC is, seen from the room: the edge facing it meets it.

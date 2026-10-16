@@ -340,6 +340,7 @@ describe('describePlan', () => {
       notches: [], // #161
       wedge: [], // #159
       pivot: [], // #162
+      louvre: [], // #163
       printing:
         'Printing: the pieces’ corners are rounded 3 mm and their bed-side edges chamfered 1 mm against warping. ' +
         'In PETG, add a 5 mm brim if the corners lift.', // #122

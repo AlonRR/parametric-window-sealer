@@ -20,6 +20,12 @@ way (C299). Changes since the latest version are listed under Unreleased.
 
 ### Added
 
+- A wall in a louvre window: choose **Window type: A louvre window** (`--window louvre`, or
+  `edges.window: "louvre"`). The wall takes the place of the lowest blades, taken out of their
+  clips: it stands on the sill, its sides pressed against the clips by their TPU gaskets, and the
+  lowest blade left closes onto its top gasket, as onto the window's own weatherstrip. The plan says
+  which blades come out and to keep the louvres closed while the wall is in. How:
+  `docs/louvre.md`. Not yet test printed.
 - A pivot window: choose **Window type: A pivot window** (`--window pivot`, or
   `edges.window: "pivot"`), its sash turned on an axis across its middle, the top half in. Give the
   pivot's height (`--pivot-at`, `pivot.atMm`) and the gap at the top (`--pivot-gap`,

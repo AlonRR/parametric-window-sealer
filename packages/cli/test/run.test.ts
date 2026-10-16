@@ -303,8 +303,9 @@ describe('usage', () => {
     for (const f of SETTING_FLAGS) expect(r.out).toContain(`--${f.flag} `);
     expect(r.out).toMatch(/--slot <mm> +How deep a piece can go into a strip\. \(8\)/);
     // Wherever its lines break: the flag column is as wide as the longest flag.
+    // Nine window types make a long list, named after the help as the fills are.
     expect(r.out.replace(/\s+/g, ' ')).toMatch(
-      /--window <slider\|hung\|frame\|shutter\|tilt\|turn\|roof\|pivot> .*?as the page does\. \(slider\)/,
+      /--window <id> Window type: .*?as the page does\. One of: slider, hung, frame, shutter, tilt, turn, roof, pivot, louvre\. \(slider\)/,
     );
     expect(r.out).toContain('Exit status: 0 done, 1 could not write, 2 wrong options or settings.');
   });
@@ -1024,7 +1025,7 @@ describe('behind a roller shutter (shutter-rails, #158)', () => {
 
   it('--help offers it', async () => {
     const help = await cli(['--help']);
-    expect(help.out.replace(/\s+/g, ' ')).toMatch(/--window <slider\|hung\|frame\|shutter\|tilt\|turn\|roof\|pivot> /);
+    expect(help.out.replace(/\s+/g, ' ')).toMatch(/--window <id> .*? One of: slider, hung, frame, shutter, /);
   });
 });
 
@@ -1140,6 +1141,16 @@ describe('a pivot window (pivot-window, #162)', () => {
     expect(help).toMatch(/--pivot-at <mm> For a pivot window: how high the pivot is, .* \(500\)/);
     expect(help).toMatch(/--pivot-gap <mm> For a pivot window: the gap at the top, .* \(130\)/);
     expect(help).toMatch(/--pivot-pitch <deg> For a pivot window: its pitch, in degrees from level: .* \(90\)/);
+  });
+});
+
+describe('a louvre window (louvre-frame, #163)', () => {
+  it('--window louvre plans a wall in place of the lowest blades, and says to keep the louvres closed', async () => {
+    const r = await cli(['--width', '600', '--height', '560', '--window', 'louvre', '--seal', 'tpu', '--dry-run']);
+    expect(r.code).toBe(0);
+    const out = r.out.replace(/\s+/g, ' ');
+    expect(out).toContain('A louvre window: take the lowest blades out of their clips');
+    expect(out).toContain('the lowest blade left closes onto the wall’s top gasket');
   });
 });
 
