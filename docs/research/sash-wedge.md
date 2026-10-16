@@ -83,7 +83,8 @@ at the top**, **d**, from the frame to the tilted sash.
 2. The pieces' shapes: the strip's and the triangles' panels, their joints, their edges against
    the frame and the sash.
 3. The corners between the faces, and the flattened port.
-4. The setting on the page, the command and the MCP server; the plan's lines; the guide.
+4. The parts as files to print, and the plan's lines, in the library (C312, C313); then the setting
+   on the page, the command and the MCP server, and the guide.
 
 Then the turned form, on the same parts.
 
