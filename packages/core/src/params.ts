@@ -74,8 +74,8 @@ import { patternBorderMm } from './pattern.js';
 import type { ApplianceModel, ModelSetting } from './appliance-model.js';
 import type { InPiece } from './fittings/index.js';
 import { capitalised, hundredth, mm } from './words.js';
-import { EXAMPLE_TILT, refuseForTilt, tiltSetup } from './tilt.js';
-import type { TiltParams } from './tilt.js';
+import { EXAMPLE_TILT, refuseForWedge, wedgeSetup } from './wedge-window.js';
+import type { TiltParams } from './wedge-window.js';
 
 export interface AxisChoice {
   mode: AxisMode;
@@ -1023,7 +1023,7 @@ export function readParams(values: FormValues): ReadResult {
   // A tilted sash has a wedge, not a wall: none of a wall's fittings or patterns, its one port in
   // the top strip, and its own problems in place of the wall's plan's.
   if (edges.window === 'tilt') {
-    refuseForTilt(r, {
+    refuseForWedge(r, {
       joint,
       wall,
       pieceSource: sheet.source,
@@ -1053,7 +1053,7 @@ export function readParams(values: FormValues): ReadResult {
       customPiece: NO_CUSTOM_PIECE,
     };
     if (r.ok) {
-      const setup = tiltSetup(params);
+      const setup = wedgeSetup(params);
       if ('problem' in setup) r.fail(setup.field, setup.problem);
     }
     return r.ok ? { ok: true, params } : { ok: false, errors: r.errors };

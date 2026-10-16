@@ -16,8 +16,8 @@ import {
   loadEngine,
   stripWidthMm,
   tapeFit,
-  tiltWedge,
-  tiltWedgeSolids,
+  sashWedge,
+  sashWedgeSolids,
   wedgeCorner,
   wedgeGasketRuns,
   wedgePrintParts,
@@ -40,7 +40,7 @@ const PROFILE = edgeProfile('left', EDGES, DEFAULT_JOINT, FIT);
 const PLAIN: JointParams = { ...DEFAULT_JOINT, gripMm: 0 };
 const CORNER = wedgeCorner(PROFILE, PLAIN, PANEL);
 const wedgeOf = (widthMm: number) =>
-  tiltWedge(
+  sashWedge(
     { widthMm, heightMm: 1200, gapMm: 150 },
     { edgeStripMm: PROFILE.heightMm, maxPieceMm: MAX, jointMm: 5, minPieceMm: 20, corner: CORNER },
   );
@@ -85,7 +85,7 @@ describe('the wedge’s parts to print', () => {
   });
 
   it('as many printed as the assembled wedge has, and as much of each', () => {
-    const whole = tiltWedgeSolids(engine, WEDGE, PROFILE, PLAIN, PANEL, MAX, PORT);
+    const whole = sashWedgeSolids(engine, WEDGE, PROFILE, PLAIN, PANEL, MAX, PORT);
     const all = [
       ...whole.sides.flatMap((s) => [...s.legs, ...s.panels, ...s.joints]),
       ...whole.corners,

@@ -37,7 +37,7 @@ import { buildPiecesWith, fittingSource, placedFittings } from 'parametric-windo
 import { tpuJoint } from 'parametric-window-sealer';
 import { fillChoice, fillFor } from 'parametric-window-sealer';
 import { isCut, planParts, slotPins } from 'parametric-window-sealer';
-import { requireTiltSetup, tiltWedgeSolids } from 'parametric-window-sealer';
+import { requireWedgeSetup, sashWedgeSolids } from 'parametric-window-sealer';
 import type { Params } from 'parametric-window-sealer';
 
 export type PartKind = 'piece' | 'strip' | 'cross' | 'pin' | 'edge' | 'tape' | 'tpu';
@@ -78,8 +78,8 @@ function add(wall: Group, solid: Manifold, kind: PartKind, x: number, y: number,
 // group turns it, a turn and not a mirror, so the window's width runs along x and its height up y as
 // a wall's do. Its gaskets are in the download, not here.
 function buildWedgeScene(engine: Engine, params: Params): Group {
-  const s = requireTiltSetup(params);
-  const parts = tiltWedgeSolids(engine, s.wedge, s.profile, s.joint, s.panelMm, s.maxPieceMm, s.port);
+  const s = requireWedgeSetup(params);
+  const parts = sashWedgeSolids(engine, s.wedge, s.profile, s.joint, s.panelMm, s.maxPieceMm, s.port);
   const wedge = new Group();
   wedge.matrixAutoUpdate = false;
   wedge.matrix.makeBasis(new Vector3(0, 1, 0), new Vector3(0, 0, 1), new Vector3(1, 0, 0));

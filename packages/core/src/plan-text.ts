@@ -37,7 +37,7 @@ import {
 import type { WallParts } from './plan.js';
 import type { Params } from './params.js';
 import { hundredth, listed, mm, plural, sum } from './words.js';
-import { requireTiltSetup, tiltPartNames } from './tilt.js';
+import { requireWedgeSetup, sashPartNames } from './wedge-window.js';
 import { describeWedge, wedgeGasketRuns } from './wedge-print.js';
 
 export interface LeftoverText {
@@ -184,9 +184,9 @@ const small = (what: string) => (w: { index: number; lengthMm: number; minPieceM
 
 // A tilted sash's plan (sash-wedge, #159): the wedge's, in the places a wall's lines go; the grid's
 // widths and heights have none.
-function describeTilt(params: Params): PlanText {
-  const { wedge, port, profile, panelMm } = requireTiltSetup(params);
-  const names = tiltPartNames(params);
+function describeSashWedge(params: Params): PlanText {
+  const { wedge, port, profile, panelMm } = requireWedgeSetup(params);
+  const names = sashPartNames(params);
   const count = (pick: (name: string) => boolean) => names.filter((p) => pick(p.name)).reduce((n, p) => n + p.count, 0);
   const gaskets = count((name) => name.startsWith('gasket-'));
   const parts = count((name) => !name.startsWith('gasket-'));
@@ -238,7 +238,7 @@ function describeTilt(params: Params): PlanText {
 }
 
 export function describePlan(plan: GridLayout, params: Params): PlanText {
-  if (params.edges.window === 'tilt') return describeTilt(params);
+  if (params.edges.window === 'tilt') return describeSashWedge(params);
   const count = plan.pieces.length;
   const max = pieceLimit(params);
   const parts = planParts(params, plan);

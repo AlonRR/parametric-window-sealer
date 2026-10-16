@@ -20,9 +20,9 @@ import { evenSegments } from './joint.js';
 import type { JointParams } from './joint.js';
 import type { TapeFit } from './tape.js';
 import { gasketSolid } from './tpu.js';
-import { tiltWedgeSolids, wedgeCorner } from './wedge-geometry.js';
+import { sashWedgeSolids, wedgeCorner } from './wedge-geometry.js';
 import type { FlatPort } from './wedge-port.js';
-import type { TiltWedge } from './wedge.js';
+import type { SashWedge } from './wedge.js';
 import { mm } from './words.js';
 
 export interface WedgePrintPart {
@@ -41,7 +41,7 @@ export interface WedgeGasket {
 // half the groove past the top strip's mid-plane, where the groove turns along the top, and along
 // the top from the inner edge of one leg's groove to the other's.
 export function wedgeGasketRuns(
-  wedge: TiltWedge,
+  wedge: SashWedge,
   profile: EdgeProfile,
   panelMm: number,
 ): { legMm: number; topMm: number } {
@@ -62,7 +62,7 @@ const tenth = (n: number) => Math.round(n * 10) / 10;
 // The gaskets' runs in pieces the printer makes, each length to a tenth of a mm and once, with how
 // many of it: up both legs of both sides and along the top, on both faces.
 function gasketPieces(
-  wedge: TiltWedge,
+  wedge: SashWedge,
   profile: EdgeProfile,
   panelMm: number,
   maxPieceMm: number,
@@ -92,7 +92,7 @@ function gasketPieces(
 // The names and counts wedgePrintParts gives, in its order, found without building anything: what
 // a dry run lists.
 export function wedgePartNames(
-  wedge: TiltWedge,
+  wedge: SashWedge,
   profile: EdgeProfile,
   joint: JointParams,
   panelMm: number,
@@ -127,7 +127,7 @@ export function wedgePartNames(
 
 export function wedgePrintParts(
   engine: Engine,
-  wedge: TiltWedge,
+  wedge: SashWedge,
   profile: EdgeProfile,
   joint: JointParams,
   panelMm: number,
@@ -135,7 +135,7 @@ export function wedgePrintParts(
   port?: FlatPort,
   gasket?: WedgeGasket,
 ): WedgePrintPart[] {
-  const whole = tiltWedgeSolids(engine, wedge, profile, joint, panelMm, maxPieceMm, port);
+  const whole = sashWedgeSolids(engine, wedge, profile, joint, panelMm, maxPieceMm, port);
   const temporary: Manifold[] = [];
   const parts: WedgePrintPart[] = [];
   const add = (name: string, solid: Manifold, count: number) =>
@@ -206,7 +206,7 @@ export function wedgePrintParts(
 // The plan's lines for the wedge: the sash's tilt and the faces it leaves, the triangles' and the
 // top strip's pieces, the hose port and its share of the hose's area, and the gasket's runs.
 export function describeWedge(
-  wedge: TiltWedge,
+  wedge: SashWedge,
   port: FlatPort | undefined,
   runs: { legMm: number; topMm: number },
   seal: 'tape' | 'tpu',

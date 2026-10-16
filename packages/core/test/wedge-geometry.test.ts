@@ -9,7 +9,7 @@ import {
   edgeProfile,
   loadEngine,
   tapeFit,
-  tiltWedge,
+  sashWedge,
   wedgeCorner,
   wedgeSideSolids,
   EXAMPLE_TRACK,
@@ -33,7 +33,7 @@ const EDGES: EdgeParams = {
 };
 const PROFILE = edgeProfile('left', EDGES, DEFAULT_JOINT, FIT);
 const CORNER = wedgeCorner(PROFILE, DEFAULT_JOINT, PANEL);
-const WEDGE = tiltWedge(
+const WEDGE = sashWedge(
   { widthMm: 800, heightMm: 1200, gapMm: 150 },
   { edgeStripMm: PROFILE.heightMm, maxPieceMm: MAX, jointMm: 5, minPieceMm: 20, corner: CORNER },
 );

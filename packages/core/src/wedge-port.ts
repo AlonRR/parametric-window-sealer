@@ -17,7 +17,7 @@ import type { JointParams } from './joint.js';
 import { DEFAULT_COLLAR } from './port.js';
 import type { CollarParams } from './port.js';
 import { wedgeCorner } from './wedge-geometry.js';
-import type { TiltWedge } from './wedge.js';
+import type { SashWedge } from './wedge.js';
 import { mm } from './words.js';
 
 export const PORT_MARGIN_MM = 2; // clear of the edge strips, the joint strips over the piece's ends, and the frame's face
@@ -49,7 +49,7 @@ function largestStep(a: number, b: number, r: number, y: number): number {
 }
 
 export function flatPort(
-  wedge: TiltWedge,
+  wedge: SashWedge,
   profile: { widthMm: number; heightMm: number },
   joint: JointParams,
   panelMm: number,

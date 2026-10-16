@@ -14,7 +14,7 @@ import {
   planWall,
   readParams,
   readSettings,
-  tiltSetup,
+  wedgeSetup,
   toFormValues,
 } from '../src/index.js';
 import type { FormValues, Params } from '../src/index.js';
@@ -116,7 +116,7 @@ describe('the window type', () => {
 });
 
 describe('a tilted sash’s plan and files', () => {
-  const setup = tiltSetup(PARAMS);
+  const setup = wedgeSetup(PARAMS);
   if ('problem' in setup) throw new Error(setup.problem);
 
   it('the plan says what the wedge is, and the wall’s grid is not in it', () => {

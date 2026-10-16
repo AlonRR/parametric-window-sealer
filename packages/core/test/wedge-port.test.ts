@@ -14,8 +14,8 @@ import {
   flatPort,
   loadEngine,
   tapeFit,
-  tiltWedge,
-  tiltWedgeSolids,
+  sashWedge,
+  sashWedgeSolids,
   wedgeCorner,
 } from '../src/index.js';
 import type { EdgeParams, JointParams, SealParams } from '../src/index.js';
@@ -35,7 +35,7 @@ const PROFILE = edgeProfile('left', EDGES, DEFAULT_JOINT, tapeFit(SEAL));
 const PLAIN: JointParams = { ...DEFAULT_JOINT, gripMm: 0 };
 const CORNER = wedgeCorner(PROFILE, PLAIN, PANEL);
 const wedgeOf = (widthMm: number, gapMm: number) =>
-  tiltWedge(
+  sashWedge(
     { widthMm, heightMm: 1200, gapMm },
     { edgeStripMm: PROFILE.heightMm, maxPieceMm: MAX, jointMm: 5, minPieceMm: 20, corner: CORNER },
   );
@@ -112,7 +112,7 @@ describe('the flattened port as printed', () => {
   const tan = Math.tan(half);
   const { axisMm } = wedge.side;
   const xTop = axisMm - PROFILE.widthMm / 2;
-  const parts = tiltWedgeSolids(engine, wedge, PROFILE, PLAIN, PANEL, MAX, port);
+  const parts = sashWedgeSolids(engine, wedge, PROFILE, PLAIN, PANEL, MAX, port);
   const piece = parts.top.panels[port.piece];
   if (piece === undefined) throw new Error('no piece for the port');
   const others: Manifold[] = [

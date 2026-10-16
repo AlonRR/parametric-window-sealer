@@ -4,7 +4,7 @@
 // the wall's. Its edges are all pressed against the frame or the sash, as a wall's in a frame with
 // no track, so their profile is a frame edge's, held by its printed TPU gasket.
 //
-// What a wall has and the wedge has no place for is refused where it is set (refuseForTilt); a
+// What a wall has and the wedge has no place for is refused where it is set (refuseForWedge); a
 // wall's weep holes, stiffeners and test coupon, and a round port's lock rings, caps and screens,
 // are left out, as the page hides them.
 import { edgeProfile } from './edge.js';
@@ -23,8 +23,8 @@ import { flatPort } from './wedge-port.js';
 import type { FlatPort } from './wedge-port.js';
 import { wedgePartNames, wedgePrintParts } from './wedge-print.js';
 import type { WedgeGasket } from './wedge-print.js';
-import { tiltWedge, tiltWedgeProblem } from './wedge.js';
-import type { TiltWedge } from './wedge.js';
+import { sashWedge, sashWedgeProblem } from './wedge.js';
+import type { SashWedge } from './wedge.js';
 import { mm } from './words.js';
 
 export interface TiltParams {
@@ -34,8 +34,8 @@ export interface TiltParams {
 // The middle of the 100 to 160 mm the survey found tilt stays leave (docs/research/window-types.md).
 export const EXAMPLE_TILT: TiltParams = { gapMm: 130 };
 
-export interface TiltSetup {
-  wedge: TiltWedge;
+export interface WedgeSetup {
+  wedge: SashWedge;
   profile: ReturnType<typeof edgeProfile>;
   joint: JointParams;
   panelMm: number;
@@ -47,7 +47,7 @@ export interface TiltSetup {
 const FRAME_ALL_ROUND = { top: 'frame', bottom: 'frame', left: 'frame', right: 'frame' } as const;
 
 // The wedge the settings make, or what is wrong with them and where.
-export function tiltSetup(p: Params): TiltSetup | { field: FieldName; problem: string } {
+export function wedgeSetup(p: Params): WedgeSetup | { field: FieldName; problem: string } {
   const fit = tapeFit(p.seal);
   const edges: EdgeParams = { window: 'frame', roles: FRAME_ALL_ROUND, track: p.edges.track };
   const profile = edgeProfile('left', edges, p.joint, fit);
@@ -62,12 +62,12 @@ export function tiltSetup(p: Params): TiltSetup | { field: FieldName; problem: s
     minPieceMm: minPieceMm(p.joint),
     corner,
   };
-  const gap = tiltWedgeProblem(size, limits);
+  const gap = sashWedgeProblem(size, limits);
   if (gap !== undefined) return { field: 'tiltGapMm', problem: gap };
   if (!(p.openingWidthMm > 2 * corner.reachMm)) {
     return { field: 'openingWidthMm', problem: 'Too small for the wedge’s two corner pieces.' };
   }
-  const wedge = tiltWedge(size, limits);
+  const wedge = sashWedge(size, limits);
   if (wedge.top.depthMm > maxPieceMm) {
     return {
       field: 'tiltGapMm',
@@ -96,8 +96,8 @@ export function tiltSetup(p: Params): TiltSetup | { field: FieldName; problem: s
 }
 
 // The wedge of settings already read as sound.
-export function requireTiltSetup(p: Params): TiltSetup {
-  const s = tiltSetup(p);
+export function requireWedgeSetup(p: Params): WedgeSetup {
+  const s = wedgeSetup(p);
   if ('problem' in s) throw new RangeError(`The settings cannot make a wedge: ${s.problem}`);
   return s;
 }
@@ -106,7 +106,7 @@ const ONLY_A_PORT = 'A tilted sash’s wedge has room for a hose port only.';
 const NO_PATTERN = 'A tilted sash’s wedge takes no pattern: its pieces are sealed.';
 
 // What a wall has and a tilted sash's wedge has no place for, each refused where it is set.
-export function refuseForTilt(
+export function refuseForWedge(
   r: FormReader,
   p: {
     joint: JointParams;
@@ -149,23 +149,23 @@ export function refuseForTilt(
 }
 
 // The wedge's parts' names and counts, in the files' order, without building anything.
-export function tiltPartNames(p: Params): { name: string; count: number }[] {
-  const s = requireTiltSetup(p);
+export function sashPartNames(p: Params): { name: string; count: number }[] {
+  const s = requireWedgeSetup(p);
   return wedgePartNames(s.wedge, s.profile, s.joint, s.panelMm, s.maxPieceMm, s.port, s.gasket);
 }
 
 // The files a dry run lists for a tilted sash, as the wall's are listed.
-export function plannedTiltFiles(p: Params, choice: DownloadChoice): { name: string; type: string }[] {
+export function plannedWedgeFiles(p: Params, choice: DownloadChoice): { name: string; type: string }[] {
   checkChoice(choice);
   const label = wallLabel(p.openingWidthMm, p.openingHeightMm);
   if (choice.packaging === 'single') return [{ name: `${label}.3mf`, type: MEDIA_TYPES['3mf'] }];
   if (choice.packaging === 'zip') return [{ name: `${label}-${choice.format}.zip`, type: MEDIA_TYPES.zip }];
-  return tiltPartNames(p).map(({ name }) => ({ name: `${name}.${choice.format}`, type: MEDIA_TYPES[choice.format] }));
+  return sashPartNames(p).map(({ name }) => ({ name: `${name}.${choice.format}`, type: MEDIA_TYPES[choice.format] }));
 }
 
 // The wedge's files: each part once, lying as it prints, packed as chosen.
-export function tiltFiles(engine: Engine, p: Params, choice: DownloadChoice): DownloadFile[] {
-  const s = requireTiltSetup(p);
+export function wedgeFiles(engine: Engine, p: Params, choice: DownloadChoice): DownloadFile[] {
+  const s = requireWedgeSetup(p);
   const made = wedgePrintParts(engine, s.wedge, s.profile, s.joint, s.panelMm, s.maxPieceMm, s.port, s.gasket);
   try {
     const parts = made.map(({ name, solid, count }) => ({ name, mesh: meshOf(solid), count }));

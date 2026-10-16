@@ -27,7 +27,7 @@ import { PIN_SLOT_MM, evenSegments, pinSlotRangeMm, stripWidthMm } from './joint
 import type { JointParams } from './joint.js';
 import { stripSolid } from './joint-geometry.js';
 import type { FlatPort } from './wedge-port.js';
-import type { TiltWedge } from './wedge.js';
+import type { SashWedge } from './wedge.js';
 
 export interface WedgeSideSolids {
   legs: Manifold[]; // each leg's edge strip, in segments the printer makes
@@ -35,7 +35,7 @@ export interface WedgeSideSolids {
   joints: Manifold[]; // the joint strips between them
 }
 
-export interface TiltWedgeSolids {
+export interface SashWedgeSolids {
   sides: WedgeSideSolids[]; // the left triangle's, then the right's
   corners: Manifold[]; // the left one, then the right
   top: { edges: Manifold[]; panels: Manifold[]; joints: Manifold[] };
@@ -62,7 +62,7 @@ export function wedgeCorner(profile: { widthMm: number }, joint: JointParams, pa
 
 interface Frame {
   engine: Engine;
-  wedge: TiltWedge;
+  wedge: SashWedge;
   half: number;
   tan: number;
   sin: number;
@@ -318,7 +318,7 @@ function topSolids(
   return { edges, panels, joints };
 }
 
-const frameOf = (engine: Engine, wedge: TiltWedge, temporary: { delete(): void }[]): Frame => {
+const frameOf = (engine: Engine, wedge: SashWedge, temporary: { delete(): void }[]): Frame => {
   const half = ((wedge.tiltDeg / 2) * Math.PI) / 180;
   return {
     engine,
@@ -337,7 +337,7 @@ const frameOf = (engine: Engine, wedge: TiltWedge, temporary: { delete(): void }
 // One side triangle's parts, as the left one.
 export function wedgeSideSolids(
   engine: Engine,
-  wedge: TiltWedge,
+  wedge: SashWedge,
   profile: EdgeProfile,
   joint: JointParams,
   panelMm: number,
@@ -353,15 +353,15 @@ export function wedgeSideSolids(
 
 // The whole wedge's parts: the right triangle and corner are the left ones mirrored across the
 // opening's middle. With a port, the top strip's piece it is in carries it.
-export function tiltWedgeSolids(
+export function sashWedgeSolids(
   engine: Engine,
-  wedge: TiltWedge,
+  wedge: SashWedge,
   profile: EdgeProfile,
   joint: JointParams,
   panelMm: number,
   maxPieceMm: number,
   port?: FlatPort,
-): TiltWedgeSolids {
+): SashWedgeSolids {
   const temporary: { delete(): void }[] = [];
   try {
     const f = frameOf(engine, wedge, temporary);

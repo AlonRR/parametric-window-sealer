@@ -13,11 +13,11 @@ import {
   edgeProfile,
   loadEngine,
   tapeFit,
-  tiltWedge,
+  sashWedge,
   PIN_SLOT_MM,
   pinDepthMm,
   stripWidthMm,
-  tiltWedgeSolids,
+  sashWedgeSolids,
   wedgeCorner,
 } from '../src/index.js';
 import type { EdgeParams, JointParams, SealParams } from '../src/index.js';
@@ -37,14 +37,14 @@ const PROFILE = edgeProfile('left', EDGES, DEFAULT_JOINT, tapeFit(SEAL));
 // Without the ribs, which press into the panels on purpose, nothing may overlap.
 const PLAIN: JointParams = { ...DEFAULT_JOINT, gripMm: 0 };
 const CORNER = wedgeCorner(PROFILE, PLAIN, PANEL);
-const WEDGE = tiltWedge(
+const WEDGE = sashWedge(
   { widthMm: WIDTH, heightMm: 1200, gapMm: 150 },
   { edgeStripMm: PROFILE.heightMm, maxPieceMm: MAX, jointMm: 5, minPieceMm: 20, corner: CORNER },
 );
 const half = ((WEDGE.tiltDeg / 2) * Math.PI) / 180;
 const [tan, cos] = [Math.tan(half), Math.cos(half)];
 const { axisMm } = WEDGE.side;
-const parts = tiltWedgeSolids(engine, WEDGE, PROFILE, PLAIN, PANEL, MAX);
+const parts = sashWedgeSolids(engine, WEDGE, PROFILE, PLAIN, PANEL, MAX);
 const sides = parts.sides.flatMap((s) => [...s.legs, ...s.panels, ...s.joints]);
 const all: Manifold[] = [...sides, ...parts.corners, ...parts.top.edges, ...parts.top.panels, ...parts.top.joints];
 const union = M.union(all);

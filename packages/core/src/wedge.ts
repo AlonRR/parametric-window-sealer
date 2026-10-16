@@ -13,7 +13,7 @@ import { divideAxis } from './layout.js';
 import type { AxisLayout } from './layout.js';
 import { mm } from './words.js';
 
-export interface TiltWedgeSize {
+export interface SashWedgeSize {
   widthMm: number; // the opening seen inside the frame
   heightMm: number;
   gapMm: number; // at the top, from the frame to the tilted sash
@@ -39,13 +39,13 @@ export interface WedgeSide {
   chain: AxisLayout; // the pieces from there up, and the joints between them
 }
 
-export interface TiltWedge {
+export interface SashWedge {
   tiltDeg: number; // how far the sash leans in
   top: { lengthMm: number; depthMm: number; chain: AxisLayout }; // the strip across the top
   side: WedgeSide;
 }
 
-export function tiltWedge(size: TiltWedgeSize, limits: WedgeLimits): TiltWedge {
+export function sashWedge(size: SashWedgeSize, limits: WedgeLimits): SashWedge {
   const tilt = Math.asin(size.gapMm / size.heightMm);
   const half = tilt / 2;
   const baseMm = 2 * size.heightMm * Math.sin(half);
@@ -77,13 +77,13 @@ export function tiltWedge(size: TiltWedgeSize, limits: WedgeLimits): TiltWedge {
 
 // What is wrong with the gap, if anything: the top strip needs an edge strip each side and a piece
 // between them, and a sash's top tilts in less than the window is tall.
-export function tiltWedgeProblem(size: TiltWedgeSize, limits: WedgeLimits): string | undefined {
+export function sashWedgeProblem(size: SashWedgeSize, limits: WedgeLimits): string | undefined {
   const { gapMm, heightMm } = size;
   if (!(gapMm > 0)) return 'Enter the gap at the top, in mm, greater than 0.';
   if (gapMm >= heightMm) {
     return `The gap at the top is ${mm(gapMm)} mm: a tilted sash’s top moves in less than the window is tall.`;
   }
-  // The chord, as tiltWedge finds it; at least twice an edge strip, so the strips meet below the top.
+  // The chord, as sashWedge finds it; at least twice an edge strip, so the strips meet below the top.
   const least = 2 * limits.edgeStripMm + limits.minPieceMm;
   if (2 * heightMm * Math.sin(Math.asin(gapMm / heightMm) / 2) < least - 1e-9) {
     return (

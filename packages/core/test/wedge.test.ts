@@ -4,7 +4,7 @@
 // the edge strips along its legs meeting near the hinge, and a chain of pieces from there up to the
 // corner with the top strip; the top strip, a chain of pieces from one corner to the other.
 import { describe, expect, it } from 'vitest';
-import { tiltWedge, tiltWedgeProblem } from '../src/index.js';
+import { sashWedge, sashWedgeProblem } from '../src/index.js';
 
 const LIMITS = {
   edgeStripMm: 15,
@@ -17,7 +17,7 @@ const SASH = { widthMm: 800, heightMm: 1200, gapMm: 150 };
 
 describe('the tilted wedge', () => {
   it('the sash’s tilt and the strip across the top', () => {
-    const w = tiltWedge(SASH, LIMITS);
+    const w = sashWedge(SASH, LIMITS);
     expect(w.tiltDeg).toBeCloseTo((Math.asin(150 / 1200) * 180) / Math.PI, 9);
     expect(w.tiltDeg).toBeCloseTo(7.18, 2);
     // The chord from the frame head to the sash's top: 2H·sin(α/2).
@@ -26,7 +26,7 @@ describe('the tilted wedge', () => {
   });
 
   it('each side triangle: legs H, base the chord, its axis H·cos(α/2)', () => {
-    const { side, top } = tiltWedge(SASH, LIMITS);
+    const { side, top } = sashWedge(SASH, LIMITS);
     expect(side.legMm).toBe(1200);
     expect(side.baseMm).toBeCloseTo(top.depthMm, 9);
     expect(side.axisMm).toBeCloseTo(1197.6, 1);
@@ -36,7 +36,7 @@ describe('the tilted wedge', () => {
   });
 
   it('the leg strips meet near the hinge; a chain of pieces from there, the corner’s room short of the top', () => {
-    const { side } = tiltWedge(SASH, LIMITS);
+    const { side } = sashWedge(SASH, LIMITS);
     // Strips 15 mm wide square to the legs meet on the axis 15 / sin(α/2) from the hinge: 239.5 mm.
     expect(side.tipMm).toBeCloseTo(239.5, 1);
     expect(side.widthAtMm(side.tipMm)).toBeCloseTo(30 / Math.cos(Math.asin(150 / 1200) / 2), 9);
@@ -52,7 +52,7 @@ describe('the tilted wedge', () => {
   });
 
   it('the top strip: a chain of pieces from where one corner reaches to where the other does', () => {
-    const { top } = tiltWedge(SASH, LIMITS);
+    const { top } = sashWedge(SASH, LIMITS);
     const { pieces, jointsMm } = top.chain;
     const filled = pieces.reduce((a, b) => a + b, 0) + jointsMm.reduce((a, b) => a + b, 0);
     expect(filled).toBeCloseTo(800 - 2 * LIMITS.corner.reachMm, 6);
@@ -65,14 +65,14 @@ describe('the tilted wedge', () => {
 
 describe('what is wrong with a tilted wedge', () => {
   it('a gap too small for the top strip’s two edge strips, or as large as the opening is tall', () => {
-    expect(tiltWedgeProblem(SASH, LIMITS)).toBeUndefined();
-    expect(tiltWedgeProblem({ ...SASH, gapMm: 25 }, LIMITS)).toBe(
+    expect(sashWedgeProblem(SASH, LIMITS)).toBeUndefined();
+    expect(sashWedgeProblem({ ...SASH, gapMm: 25 }, LIMITS)).toBe(
       'The gap at the top is 25 mm; it needs at least 50 mm, for an edge strip each side of the top strip and ' +
         'a piece between them.',
     );
-    expect(tiltWedgeProblem({ ...SASH, gapMm: 1200 }, LIMITS)).toBe(
+    expect(sashWedgeProblem({ ...SASH, gapMm: 1200 }, LIMITS)).toBe(
       'The gap at the top is 1200 mm: a tilted sash’s top moves in less than the window is tall.',
     );
-    expect(tiltWedgeProblem({ ...SASH, gapMm: 0 }, LIMITS)).toBe('Enter the gap at the top, in mm, greater than 0.');
+    expect(sashWedgeProblem({ ...SASH, gapMm: 0 }, LIMITS)).toBe('Enter the gap at the top, in mm, greater than 0.');
   });
 });
