@@ -184,6 +184,9 @@ your own (`mesh-custom-piece`, #41) are built: every `v0.7.0` item. Nothing has 
 | Q156 | `PROJECT.yml` follows **the next minor version's release goal**: its `next` names `v0.5.0` and what it holds (C215), and its `state` is `active`, the value the owner's other projects use for work under way (C216). Asked: "156 the next minor version release goal" | 15 Oct 2026 |
 | Q157 | **Build the guided test print (`fit-test-print`, #63) next**, while the owner prints the joint's test coupon, **then keep working through the issues and completing them as before**: a branch, a pull request and a fast-forward merge for each, the choices logged (Q144). Asked: "157 yes", and "keep working thru issues and completing them like you had done before" | 15 Oct 2026 |
 | Q158 | **Issue #1 ("Adding API and MCP") is closed as completed**: the library, the command and the MCP server are built (#45 to #47), and the hosted API stays parked in #48. Asked: "158 yes" | 15 Oct 2026 |
+| Q159 | **Multiboard (`organiser-multiboard`, #36) is built with all its board's features, and hidden in the interface for now**, while its licence (the MultiBuild licence, against the files being the user's to sell, Q36) stays unsettled. Asked: "159 build it with all it's features but hide it in the interface for now" | 16 Oct 2026 |
+| Q160 | **One release, `v0.6.0`, cut from `main`** with everything built since `v0.5.0`: the organiser boards (Multiboard hidden, Q159), the drawn tile and the meshes; the next items become `v0.7.0`. The tag and the GitHub release go to the session on the owner's machine he names `ogpc` (Q123). Asked: "160 a make sure to ask ogpc for version tagging" | 16 Oct 2026 |
+| Q161 | **Look into other window types** (`other-windows`, #43): the windows people fit a window AC, a hose kit or a fan into, what the tool already seals and what it lacks. Asked: "161 look into other window types" | 16 Oct 2026 |
 | Q149 | P2 goes on with **`svg-tile`** (#27), an SVG tile of the user's own as a pattern, its SVG read with a parsing library the agent chooses and logs (C98), **then `clamps`** (#32), the second new fitting. Asked whether to go ahead: "149 yes" | 14 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
@@ -199,23 +202,7 @@ The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-- **Q159.** Multiboard (`organiser-multiboard`, #36): its licence (the MultiBuild licence,
-  updated 19 Dec 2025) allows personal use, and makes selling anything "derived from" its designs
-  need a paid tier, while the files this tool makes are the user's to sell (Q36). Its thread and
-  thickness are published only in community code, itself under that licence. Leave Multiboard out
-  (recommended), build it from the community's numbers with a warning about selling, or wait while
-  the owner asks MultiBuild? The other organisers do not wait on this.
-- **Q160.** The releases: every `v0.7.0` item is built and on `main`, on top of the `v0.6.0` items,
-  but `v0.6.0` was not cut, as it waits on Q159. Cut one release, `v0.6.0`, from `main` now with
-  everything built since `v0.5.0` (the organisers, the drawn tile and the meshes), Multiboard as
-  Q159 decides and the next items becoming `v0.7.0` (recommended, so the versions stay in order);
-  cut `v0.7.0` now with all of it and never tag `v0.6.0`; or keep the two releases apart, which
-  `main`'s order makes awkward?
-- **Q161.** Other windows (`other-windows`, #43) was never specified. Sliders and hung windows have
-  tracks, and since `compression-edge` (#120) any frame with a flat reveal takes a wall pressed into
-  it: a casement's screen opening, a tilt-and-turn frame, and so also an awning or a hopper window
-  opened in its frame. Close #43 as covered, saying so in `docs/frame.md` (recommended); name the
-  window types still missing; or keep it open for later?
+None at present.
 
 The next free ID is Q162.
 
