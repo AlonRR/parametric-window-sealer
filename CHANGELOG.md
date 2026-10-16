@@ -10,10 +10,14 @@ printer list, the tape and TPU seals, the patterns and per-piece fills, the meas
 window AC, the offline file and the measuring guide; `0.4.0` adds the exhaust fan, the SVG tile,
 the clamps and the sliding insert, and the thirteen changes from the design review against
 published work (Q153); `0.5.0` adds the guided test print and three more joint styles: puzzle
-dovetails, sliding dovetail rails and bolted flanges (C215). Changes since the latest version are
-listed under Unreleased.
+dovetails, sliding dovetail rails and bolted flanges (C215); `0.6.0` adds the drawn tile, three
+organiser boards (and Multiboard, built but not offered yet) and meshes of your own: a model of the
+appliance, 3D tiles and a whole piece (Q160). Changes since the latest version are listed under
+Unreleased.
 
 ## [Unreleased]
+
+## [0.6.0] - 2026-10-16
 
 ### Added
 

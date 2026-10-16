@@ -5,6 +5,6 @@ projects:
   - name:     Parametric window sealer
     kind:     build
     state:    active
-    next:     "v0.6.0 (C215): the organiser fills (#33, #34, #36, #37) and the drawn tile (#39)"
+    next:     "v0.7.0 (Q160): the window types the survey found missing (Q161, #43); Q162 on Multiboard"
     trackers: [docs/status.md, docs/backlog.md]
-    review:   2026-10-15
+    review:   2026-10-16

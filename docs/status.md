@@ -8,14 +8,14 @@ row; since then the code was made easy to extend (Q145) and P2 began (Q148, Q149
 (`fan-mount`, #28), the SVG tile (`svg-tile`, #27), the clamps (`clamps`, #32) and the sliding insert (`sliding-insert`, #38) are built. A design review against published work led to thirteen changes (Q153): a tighter joint that locks (`joint-lock`, #110), pieces cut from sheet (`sheet-pieces`, #112), material advice (`material-advice`, #113), a hose port that locks and closes (`hose-socket`, #114), seals that bend (`tpu-fin-seals`, #115), a filler between the sashes (`meeting-rail`, #116), weep holes against rain (`rain-face`, #117), a sash stop that lifts out by hand (`sash-stop`, #118), a double wall for winter (`double-wall`, #119), windows with no track (`compression-edge`, #120), the warnings before fitting (`safety-guidance`, #121) printing defaults against warping (`print-defaults`, #122) and stiffeners of bought aluminium angle on printed clips (`stiffener-strips`, #111, Q154) are built.
 All of it is released as `v0.4.0` (Q155). `v0.5.0` is the joint tuned and in its other forms
 (C215): the guided test print (`fit-test-print`, #63; Q157), puzzle dovetails, sliding dovetail
-rails and bolted flanges (#29 to #31). The next minor version, `v0.6.0`, is the organiser fills and
-the drawn tile (C215): the tile editor (`draw-tile`, #39), the Skådis board
-(`organiser-skadis`, #33), the openGrid board (`organiser-opengrid`, #34) and the Honeycomb
-Storage Wall board (`organiser-hsw`, #37) are built, and the Multiboard board
-(`organiser-multiboard`, #36) is built and not offered yet, while its licence is open (Q159, Q162). For `v0.7.0`, the
-mesh reader (`mesh-import`, #42), the wall cut round a model of the appliance
-(`mesh-appliance`, #35), 3D tiles of your own as the fill (`mesh-tiles`, #40) and a whole piece of
-your own (`mesh-custom-piece`, #41) are built: every `v0.7.0` item. Nothing has been test printed yet.
+rails and bolted flanges (#29 to #31). `v0.6.0` is everything built since, in one release (Q160):
+the tile editor (`draw-tile`, #39), the Skådis board (`organiser-skadis`, #33), the openGrid
+board (`organiser-opengrid`, #34), the Honeycomb Storage Wall board (`organiser-hsw`, #37), the
+Multiboard board (`organiser-multiboard`, #36), built and not offered yet while its licence is
+open (Q159, Q162), the mesh reader (`mesh-import`, #42), the wall cut round a model of the
+appliance (`mesh-appliance`, #35), 3D tiles of your own as the fill (`mesh-tiles`, #40) and a whole
+piece of your own (`mesh-custom-piece`, #41). The next minor version, `v0.7.0`, is the window
+types the survey found missing (Q161, #43). Nothing has been test printed yet.
 
 ## The brief (the owner's request, 5 Oct 2026)
 
@@ -215,6 +215,9 @@ The next free ID is Q163.
 
 ## Repository follow-ups
 
+- **Pending (Q160, Q123):** the `v0.6.0` tag on the release commit `chore(release): v0.6.0, the
+  organisers and the meshes` and its GitHub release, a pre-release (C63), asked of the session on
+  the owner's machine he names `ogpc` once the commit is on `main`; checked on GitHub afterwards.
 - **Done (C215, Q123):** the `v0.5.0` tag on the release commit `chore(release): v0.5.0, the
   joint` (`680224a`) and its GitHub release, made by the session on the owner's machine on 15 Oct
   2026 (verified: GitHub lists the annotated tag `v0.5.0` on `680224a`, signed by the owner's key
