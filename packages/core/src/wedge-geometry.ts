@@ -16,7 +16,9 @@
 // bevelled onto the frame's face and the sash's, and its panels and joint strips lie between them.
 // At each end a corner piece holds the triangle's top in a slot facing down its axis and the top
 // strip's end in a slot facing along it; the leg strips stop under it and the top strip's edge
-// strips start beside it, and the gasket's groove runs round it from the one to the other.
+// strips start beside it, and the gasket's groove runs round it from the one to the other. A
+// flattened hose port (wedge-port.ts), if there is one, is printed as one with the top strip's piece
+// it is in.
 import type { Manifold } from 'manifold-3d';
 import type { EdgeProfile } from './edge.js';
 import type { Engine } from './engine.js';
@@ -24,6 +26,7 @@ import { edgeStripSolid } from './edge-geometry.js';
 import { PIN_SLOT_MM, evenSegments, pinSlotRangeMm, stripWidthMm } from './joint.js';
 import type { JointParams } from './joint.js';
 import { stripSolid } from './joint-geometry.js';
+import type { FlatPort } from './wedge-port.js';
 import type { TiltWedge } from './wedge.js';
 
 export interface WedgeSideSolids {
@@ -210,9 +213,45 @@ function cornerSolid(f: Frame, profile: EdgeProfile, joint: JointParams, panelMm
   return body.subtract(f.keep(f.engine.Manifold.union([fromBelow, fromAlong, ...grooves])));
 }
 
+// The flattened port on the top strip's piece, its panel's room face at x0: what it adds, its walls
+// and collar, and what it takes away, the way through from under the panel to the collar's mouth.
+function portSolids(f: Frame, port: FlatPort, x0: number, panelMm: number): { walls: Manifold; way: Manifold } {
+  const M = f.engine.Manifold;
+  const { collar, slot, centreMm: zc, straightToMm: x1, collarFromMm: x2, collarAxisMm: yc } = port;
+  const e = 0.01;
+  const bore = port.hoseMm / 2 + collar.clearanceMm;
+  const outside = bore + collar.wallMm;
+  const lip = bore - collar.lipMm;
+  // A rectangle a either side of the axis and b either side of the slot's middle, from x for dx.
+  const slab = (x: number, dx: number, a: number, b: number) => box(f, [x, -a, zc - b], [dx, 2 * a, 2 * b]);
+  // A disc of radius r round the collar's axis, from x for dx.
+  const disc = (x: number, dx: number, r: number) =>
+    f.keep(f.keep(f.keep(M.cylinder(dx, r, r, 96)).rotate([0, 90, 0])).translate([x, yc, zc]));
+  const [a, b] = [slot.widthMm / 2, slot.lengthMm / 2];
+  const [aw, bw] = [a + collar.wallMm, b + collar.wallMm];
+  const walls = M.union([
+    slab(x0 - e, x1 - x0 + e, aw, bw),
+    f.keep(M.hull([slab(x1 - e, e, aw, bw), disc(x2 - e, e, outside)])),
+    disc(x2 - e, collar.depthMm + e, outside),
+  ]);
+  const way = M.union([
+    slab(x0 - panelMm - 1, x1 - x0 + panelMm + 1, a, b),
+    f.keep(M.hull([slab(x1 - e, e, a, b), disc(x2 - e, 2 * e, lip)])),
+    disc(x2, collar.depthMm + 1, bore),
+  ]);
+  return { walls: f.keep(walls), way: f.keep(way) };
+}
+
 // The top strip: its edge strips along it on the frame's face and the sash's, its panels between
 // them, and the joint strips between those, from the left corner to the right.
-function topSolids(f: Frame, profile: EdgeProfile, joint: JointParams, panelMm: number, maxPieceMm: number) {
+function topSolids(
+  f: Frame,
+  profile: EdgeProfile,
+  joint: JointParams,
+  panelMm: number,
+  maxPieceMm: number,
+  port?: FlatPort,
+) {
   const { engine, wedge, tan, cos, keep } = f;
   const { Manifold: M } = engine;
   const { axisMm } = wedge.side;
@@ -261,7 +300,12 @@ function topSolids(f: Frame, profile: EdgeProfile, joint: JointParams, panelMm: 
     const x = xTop - panelMm / 2 - 1;
     if (i > 0) slots.push([at + fromMm, at + toMm].map((z) => [x, 0, z]));
     if (i < pieces.length - 1) slots.push([at + length - fromMm, at + length - toMm].map((z) => [x, 0, z]));
-    panels.push(withPins(f, panel, joint, () => (slots.length > 0 ? pinCuts(f, panelMm, slots, 'x') : undefined)));
+    const pinned = withPins(f, panel, joint, () => (slots.length > 0 ? pinCuts(f, panelMm, slots, 'x') : undefined));
+    if (port?.piece !== i) panels.push(pinned);
+    else {
+      const { walls, way } = portSolids(f, port, xTop + panelMm / 2, panelMm);
+      panels.push(keep(keep(pinned).add(walls)).subtract(way));
+    }
     const gap = jointsMm[i];
     if (gap !== undefined) {
       const centre = at + length + gap / 2;
@@ -308,7 +352,7 @@ export function wedgeSideSolids(
 }
 
 // The whole wedge's parts: the right triangle and corner are the left ones mirrored across the
-// opening's middle.
+// opening's middle. With a port, the top strip's piece it is in carries it.
 export function tiltWedgeSolids(
   engine: Engine,
   wedge: TiltWedge,
@@ -316,6 +360,7 @@ export function tiltWedgeSolids(
   joint: JointParams,
   panelMm: number,
   maxPieceMm: number,
+  port?: FlatPort,
 ): TiltWedgeSolids {
   const temporary: { delete(): void }[] = [];
   try {
@@ -332,7 +377,7 @@ export function tiltWedgeSolids(
     return {
       sides: [left, right],
       corners: [corner, mirrored(corner)],
-      top: topSolids(f, profile, joint, panelMm, maxPieceMm),
+      top: topSolids(f, profile, joint, panelMm, maxPieceMm, port),
     };
   } finally {
     for (const m of temporary) m.delete();

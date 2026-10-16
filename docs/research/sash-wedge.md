@@ -67,7 +67,14 @@ at the top**, **d**, from the frame to the tilted sash.
   own faces, and carries the gasket's groove round the corner from the leg strip's to the top
   strip's. The leg strips stop under it, and the top strip's edge strips start beside it (C309).
 - **The hose** goes through a flattened port in the top strip: its flat slot through the strip, its
-  round collar on the room side.
+  round collar on the room side. The port is printed as one with the top strip's piece nearest its
+  middle, panel down and collar up. Its walls rise straight until clear of the edge strips, then a
+  hollow transition, leaning at most 40° off upright, leads to the collar. The collar is wider than
+  the gap, so it is moved toward the room, 2 mm off the frame's face (C310). The slot is as wide as
+  the room between the edge strips allows. It is as long as gives it the hose's own area, if the
+  piece is long enough; otherwise as long as the piece allows, and the share of the hose's area it
+  has is said (C311). A 150 mm hose in a 150 mm gap gets its full area on a piece longer than about
+  175 mm; a 100 mm gap needs a 265 mm slot, so about two thirds.
 
 ## Order of work
 
