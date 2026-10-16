@@ -11,8 +11,8 @@ test.beforeEach(async ({ page }) => {
   await page.getByLabel('Opening width (mm)').fill('800');
   await page.getByLabel('Opening height (mm)').fill('1200');
   await page.getByLabel('Window type').selectOption('pivot');
-  await page.getByLabel('Pivot height (mm)').fill('600');
-  await page.getByLabel('Gap at the top, above the pivot (mm)').fill('150');
+  await page.getByLabel('Pivot’s place (mm)').fill('600');
+  await page.getByLabel('Gap where it swings in (mm)').fill('150');
   await page.getByRole('radio', { name: 'Printed TPU' }).check();
 });
 
@@ -22,7 +22,7 @@ test('the pivot asked for, the top edge against the sash, the wall’s own setti
   await expect(page.getByText('Dividing the width')).toBeVisible();
   await expect(page.getByLabel('Notches for hardware')).toBeVisible();
   await page.getByLabel('Window type').selectOption('frame');
-  await expect(page.getByLabel('Pivot height (mm)')).toBeHidden();
+  await expect(page.getByLabel('Pivot’s place (mm)')).toBeHidden();
   await expect(page.getByTestId('plan-pivot').locator('li')).toHaveCount(0);
 });
 
@@ -55,8 +55,28 @@ test('the wall below takes a hose port, and a pivot outside the opening is refus
 }) => {
   await page.getByRole('radio', { name: 'Portable AC hose' }).check();
   await expect(page.getByTestId('plan-ports').locator('li')).toHaveCount(1);
-  await page.getByLabel('Pivot height (mm)').fill('1300');
+  await page.getByLabel('Pivot’s place (mm)').fill('1300');
   await expect(page.getByTestId('error-pivotAtMm')).toHaveText(
     'The pivot is 1300 mm up: give its height inside the opening, above 0 and below 1200 mm.',
   );
+});
+
+test('on an upright axis, the edge at the pivot is the sash’s, and the plan and preview say which side each goes', async ({
+  page,
+}) => {
+  await page.getByLabel('Half that swings in').selectOption('right');
+  await page.getByLabel('Pivot’s place (mm)').fill('400');
+  await expect(page.locator('select[name="topEdge"]')).toHaveValue('frame');
+  await expect(page.locator('select[name="rightEdge"]')).toHaveValue('sash');
+  await expect(page.getByLabel('Pitch, from level (°)')).toBeHidden();
+  await expect(page.getByTestId('plan-pivot')).toContainText(
+    'A pivot window on an upright axis: the wall goes left of the pivot, 400 mm from the left jamb',
+  );
+  await expect(page.getByTestId('plan-wedge').locator('li').first()).toContainText('a jamb strip 1200 mm long');
+  await expect(preview(page)).toHaveAttribute('data-state', 'ready', { timeout: 60_000 });
+  // The wall's 2 × 6 pieces and 5 cross pieces, and the turned wedge's 2 corner pieces.
+  await expect(preview(page)).toHaveAttribute('data-crosses', '7');
+  await page.getByLabel('Half that swings in').selectOption('top');
+  await expect(page.locator('select[name="topEdge"]')).toHaveValue('sash');
+  await expect(page.locator('select[name="rightEdge"]')).toHaveValue('frame');
 });

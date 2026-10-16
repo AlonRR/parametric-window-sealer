@@ -80,7 +80,7 @@ import { EXAMPLE_ROOF, ROOF_PITCH_DEG, ROOF_PITCH_MESSAGE } from './roof.js';
 import { formatNotches, parseNotches, placeNotch } from './notch.js';
 import type { NotchSetting, PlacedNotch } from './notch.js';
 import type { RoofParams } from './roof.js';
-import { EXAMPLE_PIVOT, PIVOT_PITCH_MESSAGE, pivotWedge } from './pivot.js';
+import { EXAMPLE_PIVOT, PIVOT_PITCH_MESSAGE, PIVOT_SWINGS, pivotGapWords, pivotWedge } from './pivot.js';
 import type { PivotParams } from './pivot.js';
 
 export interface AxisChoice {
@@ -216,6 +216,7 @@ export const FIELD_NAMES = [
   'pivotAtMm',
   'pivotGapMm',
   'pivotPitchDeg',
+  'pivotSwingsIn',
   'topEdge',
   'bottomEdge',
   'leftEdge',
@@ -301,6 +302,7 @@ const YES_NO = ['no', 'yes'] as const;
 
 const yesNo = (on: boolean): 'yes' | 'no' => (on ? 'yes' : 'no');
 const pitchFits = (n: number) => n >= ROOF_PITCH_DEG.least && n <= ROOF_PITCH_DEG.most;
+const same = (message: string) => message;
 const positive = (n: number) => n > 0;
 // A pattern's bar is no thinner than two lines from a 0.4 mm nozzle (Q143).
 const barFits = (n: number) => n >= MIN_BAR_MM - 1e-9;
@@ -450,6 +452,7 @@ const edgesForm = (p: Params): FormValues => ({
   pivotAtMm: String(p.pivot.atMm),
   pivotGapMm: String(p.pivot.gapMm),
   pivotPitchDeg: String(p.pivot.pitchDeg),
+  pivotSwingsIn: p.pivot.swingsIn,
   topEdge: p.edges.roles.top,
   bottomEdge: p.edges.roles.bottom,
   leftEdge: p.edges.roles.left,
@@ -999,6 +1002,7 @@ export function readParams(values: FormValues): ReadResult {
     atMm: r.numberIfUsed('pivotAtMm', false, EXAMPLE_PIVOT.atMm, positive, SIZE_MESSAGE),
     gapMm: r.numberIfUsed('pivotGapMm', false, EXAMPLE_PIVOT.gapMm, positive, SIZE_MESSAGE),
     pitchDeg: r.numberIfUsed('pivotPitchDeg', false, EXAMPLE_PIVOT.pitchDeg, pitchFits, PIVOT_PITCH_MESSAGE),
+    swingsIn: r.oneOfIfUsed('pivotSwingsIn', false, PIVOT_SWINGS, EXAMPLE_PIVOT.swingsIn),
   };
   const sealRead = readSeal(r);
   const { seal, fit } = sealRead;
@@ -1313,28 +1317,41 @@ function checkPieceFills(plan: GridLayout, fills: readonly PieceFill[]): string 
   return undefined;
 }
 
-// A pivot window (pivot-window, #162): the wall below the pivot is read as a wall in a frame with no
-// track, the opening's height up to the pivot, and then the wedge above it as a tilted sash's, the
-// rest of the height and the gap at the top. Each half's problems are said where they are set: the
-// wall's height on the pivot's height, and the wedge's gap on the pivot's gap.
+// A pivot window (pivot-window, #162; pivot-vertical, #179): the wall on the side that swings out is
+// read as a wall in a frame with no track, the opening up to the pivot, and then the wedge on the side
+// that swings in, a tilted sash's above a level pivot or a turned sash's beside an upright one, the
+// rest of the opening and the gap where it swings in. Each half's problems are said where they are
+// set: the wall's size on the pivot's place, and the wedge's gap on the pivot's gap.
 function readPivot(values: FormValues): ReadResult {
   const r = new FormReader(values);
+  const widthMm = r.size('openingWidthMm');
   const heightMm = r.size('openingHeightMm');
+  const swingsIn = r.oneOf('pivotSwingsIn', PIVOT_SWINGS);
+  const level = swingsIn === 'top';
+  const alongMm = level ? heightMm : widthMm;
   const atMm = r.number('pivotAtMm');
   if (!(atMm > 0)) r.fail('pivotAtMm', SIZE_MESSAGE);
-  else if (Number.isFinite(heightMm) && !(atMm < heightMm)) {
+  else if (Number.isFinite(alongMm) && !(atMm < alongMm)) {
     r.fail(
       'pivotAtMm',
-      `The pivot is ${mm(atMm)} mm up: give its height inside the opening, above 0 and below ${mm(heightMm)} mm.`,
+      level
+        ? `The pivot is ${mm(atMm)} mm up: give its height inside the opening, above 0 and below ${mm(alongMm)} mm.`
+        : `The pivot is ${mm(atMm)} mm from the left jamb: give its place inside the opening, above 0 and below ` +
+            `${mm(alongMm)} mm.`,
     );
   }
   const gapMm = r.size('pivotGapMm');
-  const pitchDeg = r.numberIfUsed('pivotPitchDeg', true, EXAMPLE_PIVOT.pitchDeg, pitchFits, PIVOT_PITCH_MESSAGE);
-  if (r.ok && !(gapMm < heightMm - atMm)) {
+  const pitchDeg = r.numberIfUsed('pivotPitchDeg', level, EXAMPLE_PIVOT.pitchDeg, pitchFits, PIVOT_PITCH_MESSAGE);
+  const wedgeMm = level ? heightMm - atMm : swingsIn === 'right' ? widthMm - atMm : atMm;
+  const wallMm = alongMm - wedgeMm;
+  if (r.ok && !(gapMm < wedgeMm)) {
     r.fail(
       'pivotGapMm',
-      `The gap at the top is ${mm(gapMm)} mm: the sash’s top moves in less than the ${mm(heightMm - atMm)} mm ` +
-        'from the pivot to the top.',
+      level
+        ? `The gap at the top is ${mm(gapMm)} mm: the sash’s top moves in less than the ${mm(wedgeMm)} mm ` +
+            'from the pivot to the top.'
+        : `The gap at the free side is ${mm(gapMm)} mm: the sash’s free side moves in less than the ` +
+            `${mm(wedgeMm)} mm from the pivot to it.`,
     );
   }
   if (!r.ok) {
@@ -1342,24 +1359,29 @@ function readPivot(values: FormValues): ReadResult {
     const rest = readParams({ ...values, window: 'frame' });
     return { ok: false, errors: { ...(rest.ok ? {} : rest.errors), ...r.errors } };
   }
-  const wall = readParams({ ...values, window: 'frame', openingHeightMm: String(atMm) });
+  const size: FieldName = level ? 'openingHeightMm' : 'openingWidthMm';
+  const wall = readParams({ ...values, window: 'frame', [size]: String(wallMm) });
   if (!wall.ok) {
-    const below = (m: string) => `The wall below the pivot is ${mm(atMm)} mm tall. ${m}`;
-    return { ok: false, errors: moved(wall.errors, { openingHeightMm: ['pivotAtMm', below] }) };
+    const said = (m: string) =>
+      level
+        ? `The wall below the pivot is ${mm(wallMm)} mm tall. ${m}`
+        : `The wall beside the pivot is ${mm(wallMm)} mm wide. ${m}`;
+    return { ok: false, errors: moved(wall.errors, { [size]: ['pivotAtMm', said] }) };
   }
   const params: Params = {
     ...wall.params,
+    openingWidthMm: widthMm,
     openingHeightMm: heightMm,
     edges: { ...wall.params.edges, window: 'pivot' },
-    pivot: { atMm, gapMm, pitchDeg },
+    pivot: { atMm, gapMm, pitchDeg, swingsIn },
   };
   const wedge = readParams(toFormValues(pivotWedge(params)));
   if (!wedge.ok) {
-    const moves = {
-      tiltGapMm: ['pivotGapMm', (m: string) => m],
-      openingWidthMm: ['openingWidthMm', (m: string) => m],
-    } as const;
-    return { ok: false, errors: moved(wedge.errors, moves, (m) => `The wedge above the pivot: ${m}`) };
+    const moves = level
+      ? ({ tiltGapMm: ['pivotGapMm', same], openingWidthMm: ['openingWidthMm', same] } as const)
+      : ({ turnGapMm: ['pivotGapMm', pivotGapWords], openingHeightMm: ['openingHeightMm', pivotGapWords] } as const);
+    const where = level ? 'The wedge above the pivot' : 'The wedge beside the pivot';
+    return { ok: false, errors: moved(wedge.errors, moves, (m) => `${where}: ${pivotGapWords(m)}`) };
   }
   return { ok: true, params };
 }

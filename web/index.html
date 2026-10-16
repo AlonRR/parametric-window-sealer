@@ -392,36 +392,49 @@
             </p>
             <span class="error" data-testid="error-roofPitchDeg"></span>
           </div>
-          <!-- A pivot window (pivot-window, #162): a wall below the pivot, a wedge above it. -->
+          <!-- A pivot window (#162, #179): a wall on the side that swings out, a wedge on the other. -->
           <div data-show-when="window=pivot" hidden>
             <label>
-              Pivot height (mm)
+              Half that swings in
+              <select name="pivotSwingsIn">
+                <option value="top">The top: a level pivot</option>
+                <option value="left">The left: an upright pivot</option>
+                <option value="right">The right: an upright pivot</option>
+              </select>
+            </label>
+            <span class="error" data-testid="error-pivotSwingsIn"></span>
+            <label>
+              Pivot’s place (mm)
               <input name="pivotAtMm" inputmode="decimal" autocomplete="off" />
             </label>
             <span class="error" data-testid="error-pivotAtMm"></span>
             <label>
-              Gap at the top, above the pivot (mm)
+              Gap where it swings in (mm)
               <input name="pivotGapMm" inputmode="decimal" autocomplete="off" />
             </label>
             <span class="error" data-testid="error-pivotGapMm"></span>
-            <label>
-              Pitch, from level (°)
-              <input name="pivotPitchDeg" inputmode="decimal" autocomplete="off" />
-            </label>
+            <div data-show-when="pivotSwingsIn=top">
+              <label>
+                Pitch, from level (°)
+                <input name="pivotPitchDeg" inputmode="decimal" autocomplete="off" />
+              </label>
+              <span class="error" data-testid="error-pivotPitchDeg"></span>
+            </div>
             <p class="note">
-              A sash turned on an axis across its middle swings its top half in and its bottom half
-              out. Below the pivot the frame is clear from inside: a wall goes in as in a frame with no
-              track, its top edge pressed by the sash where it crosses the frame. Above it, the sash
-              leaves the wedge a tilted sash leaves, its point at the pivot. Give the opening inside the
-              frame above; here how high the open sash's room face crosses the frame, from the
-              opening's bottom, and the gap at the top, from the frame to the sash's outer face. Hold
-              the sash at that gap with a restrictor before the wall and the wedge go in. Both are held
-              by their printed TPU gaskets: choose printed TPU as the seal. The wall below takes the
-              hose ports and every other fitting. An upright pivot window is at 90° from level; in a
-              centre-pivot roof window, give the roof's pitch, and the plan says how much of the wall's
-              weight pulls it out of the frame, and how to test that it holds.
+              A sash turned on an axis across its middle swings one half in and the other out. On the
+              side that swings out the frame is clear from inside: a wall goes in as in a frame with no
+              track, its edge at the pivot pressed by the sash where it crosses the frame. On the side
+              that swings in, the sash leaves the wedge a tilted sash leaves, above a level pivot, or a
+              turned sash's, beside an upright one, its point at the pivot. Give the opening inside the
+              frame above; here where the open sash's room face crosses the frame, how high from the
+              opening's bottom on a level pivot, or how far from its left side on an upright one, and
+              the gap where the sash swings in, from the frame to its outer face. Hold the sash at that
+              gap with a restrictor before the wall and the wedge go in. Both are held by their printed
+              TPU gaskets: choose printed TPU as the seal. The wall takes the hose ports and every other
+              fitting. A level pivot window upright in a wall is at 90° from level; in a centre-pivot
+              roof window, give the roof's pitch, and the plan says how much of the wall's weight pulls
+              it out of the frame, and how to test that it holds.
             </p>
-            <span class="error" data-testid="error-pivotPitchDeg"></span>
           </div>
           <!-- A louvre window (louvre-frame, #163): the wall in place of the lowest blades. -->
           <div data-show-when="window=louvre" hidden>

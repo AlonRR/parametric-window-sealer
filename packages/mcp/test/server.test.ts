@@ -770,6 +770,19 @@ describe('a pivot window (pivot-window, #162)', () => {
     const settings = (plan.inputSchema.properties as Record<string, any>)['settings'];
     expect(settings.properties.pivot.properties.atMm.type).toBe('number');
     expect(settings.properties.pivot.properties.gapMm.type).toBe('number');
+    expect(settings.properties.pivot.properties.swingsIn.enum).toEqual(['top', 'left', 'right']);
+    const upright = await call('window_sealer_plan_wall', {
+      settings: {
+        openingWidthMm: 800,
+        openingHeightMm: 1200,
+        edges: { window: 'pivot' },
+        pivot: { atMm: 400, gapMm: 150, swingsIn: 'left' },
+        seal: { kind: 'tpu' },
+      },
+    });
+    expect(upright.isError).toBeFalsy();
+    expect(upright.data['settings'].edges.roles.left).toBe('sash');
+    expect(upright.data['summary'].headline).toMatch(/, right of the pivot; left of it, a wedge of /);
     const r = await call('window_sealer_plan_wall', {
       settings: {
         openingWidthMm: 800,

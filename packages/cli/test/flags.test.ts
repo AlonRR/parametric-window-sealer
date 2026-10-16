@@ -72,6 +72,7 @@ describe('the setting flags (Q90)', () => {
       'pins',
       'coupon',
       'window',
+      'pivot-in', // which half of a pivot window swings in (#179)
       'top-edge',
       'bottom-edge',
       'left-edge',
@@ -107,6 +108,8 @@ describe('the setting flags (Q90)', () => {
       ...(f.field === 'window'
         ? { seal: 'tpu', topEdge: 'frame', bottomEdge: 'frame', leftEdge: 'frame', rightEdge: 'frame' }
         : {}),
+      // which half of a pivot window swings in, read with the pivot chosen, its place leaving room either side
+      ...(f.field === 'pivotSwingsIn' ? { window: 'pivot', pivotAtMm: '300', seal: 'tpu', topEdge: 'frame' } : {}),
       ...(f.path.startsWith('model.') ? { modelFile: boxFile() } : {}), // read only with a model
       ...(f.path.startsWith('customPiece.') ? { customPieceFile: boxFile(400, 400, 400) } : {}), // and a custom piece
       ...(f.path.startsWith('fill.') ? { fillMeshFile: boxFile() } : {}), // a 3D tile's, read only with it

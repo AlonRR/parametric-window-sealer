@@ -22,9 +22,9 @@ leaves (`sash-wedge`, #159) (C299), both its forms built, the tilted and the tur
 P3 rows: a wall in a roof window (`sloped-frame`, #160) is built ([`roof.md`](roof.md)), and notches
 along an edge for the window's hardware (`edge-notches`, #161; [`frame.md`](frame.md)), and pivot
 windows (`pivot-window`, #162; [`pivot.md`](pivot.md)), the horizontal pivot and the centre-pivot roof
-window, the vertical pivot split off as `pivot-vertical` (#179) (C336), and louvre windows
-(`louvre-frame`, #163; [`louvre.md`](louvre.md)), the wall in place of the lowest blades. The
-vertical pivot (#179) is next. Nothing has been test printed yet.
+window, and the upright pivot (`pivot-vertical`, #179), split off from it (C336), and louvre windows
+(`louvre-frame`, #163; [`louvre.md`](louvre.md)), the wall in place of the lowest blades. Every window
+type the survey found missing is now built. Nothing has been test printed yet.
 
 ## The brief (the owner's request, 5 Oct 2026)
 

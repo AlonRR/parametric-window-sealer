@@ -4,12 +4,22 @@
 // and to its right in a hung window or under a shutter. Leaving the AC puts the
 // window's edges back. These listeners sit on the controls themselves, so they run before the
 // form's own, which reads the result.
-import { EDGES, UNIT_PLACES, WINDOW_PRESETS, defaultUnitPlace, unitRoles, windowTrack } from 'parametric-window-sealer';
-import type { UnitPlace, WindowType } from 'parametric-window-sealer';
+import {
+  EDGES,
+  PIVOT_SWINGS,
+  UNIT_PLACES,
+  WINDOW_PRESETS,
+  defaultUnitPlace,
+  pivotRoles,
+  unitRoles,
+  windowTrack,
+} from 'parametric-window-sealer';
+import type { PivotSwing, UnitPlace, WindowType } from 'parametric-window-sealer';
 import { control, setValue, valueOf } from './form-fields';
 
 const isWindowType = (v: string | undefined): v is WindowType => v !== undefined && Object.hasOwn(WINDOW_PRESETS, v);
 const isUnitPlace = (v: string | undefined): v is UnitPlace => UNIT_PLACES.some((p) => p === v);
+const isSwing = (v: string | undefined): v is PivotSwing => PIVOT_SWINGS.some((s) => s === v);
 
 export function mountWindowRoles(form: HTMLFormElement): void {
   const windowType = control(form, 'window');
@@ -20,7 +30,10 @@ export function mountWindowRoles(form: HTMLFormElement): void {
     const kind = valueOf(form, 'window');
     if (!isWindowType(kind)) return;
     const place = acPlace?.value;
-    const roles = appliance() === 'ac' && isUnitPlace(place) ? unitRoles(kind, place) : WINDOW_PRESETS[kind];
+    // A pivot window's edge at the pivot is the sash's, on whichever side swings in (#179).
+    const swing = valueOf(form, 'pivotSwingsIn');
+    const own = kind === 'pivot' && isSwing(swing) ? pivotRoles(swing) : WINDOW_PRESETS[kind];
+    const roles = appliance() === 'ac' && isUnitPlace(place) ? unitRoles(kind, place) : own;
     for (const edge of EDGES) setValue(form, `${edge}Edge`, roles[edge]);
   };
   // The unit starts at the window type's own place.
@@ -55,4 +68,5 @@ export function mountWindowRoles(form: HTMLFormElement): void {
     });
   }
   acPlace?.addEventListener('change', presetRoles);
+  form.querySelector<HTMLSelectElement>('select[name="pivotSwingsIn"]')?.addEventListener('change', presetRoles);
 }

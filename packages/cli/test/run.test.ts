@@ -1119,6 +1119,27 @@ describe('a pivot window (pivot-window, #162)', () => {
     expect(out).toContain('wedge-gasket-');
   });
 
+  it('--pivot-in right puts the wall left of an upright pivot and the turned wedge right of it', async () => {
+    const r = await cli([
+      ...PIVOT.slice(0, -4),
+      '--pivot-at',
+      '400',
+      '--pivot-gap',
+      '150',
+      '--pivot-in',
+      'right',
+      '--seal',
+      'tpu',
+      '--dry-run',
+    ]);
+    expect(r.code).toBe(0);
+    const out = r.out.replace(/\s+/g, ' ');
+    expect(out).toContain(
+      'A pivot window on an upright axis: the wall goes left of the pivot, 400 mm from the left jamb',
+    );
+    expect(out).toContain('wedge-jamb-');
+  });
+
   it('refuses a pivot outside the opening, on its own flag', async () => {
     const r = await cli([
       ...PIVOT.slice(0, -4),
@@ -1138,9 +1159,16 @@ describe('a pivot window (pivot-window, #162)', () => {
 
   it('--help offers the pivot and its gap', async () => {
     const help = (await cli(['--help'])).out.replace(/\s+/g, ' ');
-    expect(help).toMatch(/--pivot-at <mm> For a pivot window: how high the pivot is, .* \(500\)/);
-    expect(help).toMatch(/--pivot-gap <mm> For a pivot window: the gap at the top, .* \(130\)/);
+    expect(help).toMatch(
+      /--pivot-at <mm> For a pivot window: where the open sash's room face crosses the frame: .* \(500\)/,
+    );
+    expect(help).toMatch(
+      /--pivot-gap <mm> For a pivot window: the gap where the half that swings in is free, .* \(130\)/,
+    );
     expect(help).toMatch(/--pivot-pitch <deg> For a pivot window: its pitch, in degrees from level: .* \(90\)/);
+    expect(help).toMatch(
+      /--pivot-in <top\|left\|right> For a pivot window: the half of the sash that swings .* \(top\)/,
+    );
   });
 });
 

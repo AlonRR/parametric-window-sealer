@@ -16,7 +16,7 @@ import { describeFrame } from './frame.js';
 import { describeShutter } from './shutter.js';
 import { describeLouvre } from './louvre.js';
 import { describeRoof } from './roof.js';
-import { PIVOT_WEDGE_WORDS, describePivot, pivotRoofLines, pivotWall, pivotWedge } from './pivot.js';
+import { describePivot, pivotRoofLines, pivotSides, pivotWall, pivotWedge, pivotWedgeWords } from './pivot.js';
 import { describeNotches } from './notch.js';
 import { describePrinting } from './piece-print.js';
 import { describeStiffeners } from './stiffener.js';
@@ -262,11 +262,12 @@ function wedgeParts(params: Params): string {
 // its own lines, and the pivot's.
 function describePivotPlan(plan: GridLayout, params: Params): PlanText {
   const wall = describePlan(plan, pivotWall(params));
-  const wedge = describeSashWedge(pivotWedge(params), PIVOT_WEDGE_WORDS);
+  const wedge = describeSashWedge(pivotWedge(params), pivotWedgeWords(params));
+  const sides = pivotSides(params);
   return {
     ...wall,
-    headline: `${wall.headline}, below the pivot; above it, a wedge of ${wedgeParts(pivotWedge(params))}`,
-    span: spanLine(pivotWall(params), 'opening below the pivot'),
+    headline: `${wall.headline}, ${sides.wall}; ${sides.wedge}, a wedge of ${wedgeParts(pivotWedge(params))}`,
+    span: spanLine(pivotWall(params), `opening ${sides.wall}`),
     warnings: [...wall.warnings, ...wedge.warnings.filter((w) => !wall.warnings.includes(w))],
     roof: pivotRoofLines(params),
     wedge: wedge.wedge,

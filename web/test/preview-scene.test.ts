@@ -334,13 +334,14 @@ describe('a pivot window (pivot-window, #162)', () => {
     if (!r.ok) throw new Error(JSON.stringify(r.problems));
     const scene = buildWallScene(engine, r.params);
     scene.updateMatrixWorld(true);
+    const wallGroup = scene.children.find((c) => c.userData.part === 'wall');
+    const wedge = scene.children.find((c) => c.userData.part === 'wedge');
+    if (wallGroup === undefined || wedge === undefined) throw new Error('no wall or wedge');
     const wall = new Box3();
-    for (const piece of solidsOf(scene, 'piece')) wall.expandByObject(piece);
-    expect(solidsOf(scene, 'piece')).toHaveLength(planWall(r.params).pieces.length);
+    for (const piece of solidsOf(wallGroup, 'piece')) wall.expandByObject(piece);
+    expect(solidsOf(wallGroup, 'piece')).toHaveLength(planWall(r.params).pieces.length);
     expect(wall.min.y).toBeGreaterThanOrEqual(0);
     expect(wall.max.y).toBeLessThanOrEqual(600);
-    const wedge = scene.children.find((c) => !(c instanceof Mesh) && !(c instanceof LineSegments));
-    if (wedge === undefined) throw new Error('no wedge');
     const box = new Box3().setFromObject(wedge);
     for (const [got, want] of [
       [box.min.x, 0],
@@ -350,7 +351,7 @@ describe('a pivot window (pivot-window, #162)', () => {
     ] as const) {
       expect(Math.abs(got - want), `${got} for ${want}`).toBeLessThan(20);
     }
-    // The wall's 3 × 2 cross pieces and the wedge's 2 corner pieces, the wedge's counted in its group.
+    // The wall's 3 × 2 cross pieces and the wedge's 2 corner pieces, each counted in its group.
     expect(countOf(scene, 'cross')).toBe(8);
     let built = 0;
     let freed = 0;
@@ -365,6 +366,47 @@ describe('a pivot window (pivot-window, #162)', () => {
     disposeWall(scene);
     expect(freed).toBe(built);
     expect(scene.children).toHaveLength(0);
+  });
+});
+
+describe('a pivot on an upright axis (pivot-vertical, #179)', () => {
+  it('draws the wall on the side that swings out and the turned wedge on the other, turned and not mirrored', async () => {
+    const engine = await loadEngine();
+    for (const [swingsIn, atMm, wall, wedge] of [
+      ['right', 400, [0, 400], [400, 800]],
+      ['left', 300, [300, 800], [0, 300]],
+    ] as const) {
+      const r = readSettings({
+        openingWidthMm: 800,
+        openingHeightMm: 1200,
+        edges: { window: 'pivot' },
+        pivot: { atMm, gapMm: 150, swingsIn },
+        seal: { kind: 'tpu' },
+        ports: [],
+      });
+      if (!r.ok) throw new Error(JSON.stringify(r.problems));
+      const scene = buildWallScene(engine, r.params);
+      scene.updateMatrixWorld(true);
+      const wallGroup = scene.children.find((c) => c.userData.part === 'wall');
+      const wedgeGroup = scene.children.find((c) => c.userData.part === 'wedge');
+      if (wallGroup === undefined || wedgeGroup === undefined) throw new Error('no wall or wedge');
+      const wallBox = new Box3();
+      for (const piece of solidsOf(wallGroup, 'piece')) wallBox.expandByObject(piece);
+      expect(wallBox.min.x, swingsIn).toBeGreaterThanOrEqual(wall[0] - 1e-6);
+      expect(wallBox.max.x, swingsIn).toBeLessThanOrEqual(wall[1] + 1e-6);
+      const box = new Box3().setFromObject(wedgeGroup);
+      for (const [got, want] of [
+        [box.min.x, wedge[0]],
+        [box.max.x, wedge[1]],
+        [box.min.y, 0],
+        [box.max.y, 1200],
+      ] as const) {
+        expect(Math.abs(got - want), `${swingsIn}: ${got} for ${want}`).toBeLessThan(20);
+      }
+      expect(wedgeGroup.matrixWorld.determinant(), swingsIn).toBeCloseTo(1, 9);
+      expect(box.max.z - box.min.z, swingsIn).toBeLessThan(200);
+      disposeWall(scene);
+    }
   });
 });
 

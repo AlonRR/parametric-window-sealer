@@ -69,7 +69,7 @@ describe('the starting values', () => {
       tilt: { gapMm: 130 }, // #159
       turn: { gapMm: 150 },
       roof: { pitchDeg: 35 },
-      pivot: { atMm: 500, gapMm: 130, pitchDeg: 90 },
+      pivot: { atMm: 500, gapMm: 130, pitchDeg: 90, swingsIn: 'top' },
     });
   });
 

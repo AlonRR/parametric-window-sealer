@@ -10,22 +10,26 @@ sash crosses the frame. Above the pivot, the sash leans in as a tilted one does 
 wedge, its point at the pivot rather than at a hinge at the bottom ([`wedge.md`](wedge.md)). The tool
 makes both from one set of settings, in one plan and one download (C335).
 
-A pivot on a vertical axis (a Wendefenster), one side in and the other out, is not covered yet: it
-is its own backlog item, `pivot-vertical` (#179) (C336).
+A pivot on an upright axis (a Wendefenster) swings one side in and the other out: the wall goes on
+the side that swings out and a turned sash's wedge on the side that swings in, as
+[An upright pivot](#an-upright-pivot) says (`pivot-vertical`, #179; C336, C348).
 
 ## The setting
 
 Under **The window**, choose **Window type: A pivot window** (the command: `--window pivot`; the
 library and the MCP server: `edges.window: "pivot"`), and give:
 
-- the **pivot height** (`--pivot-at`, `pivot.atMm`): from the opening's bottom to where the open
+- the **half that swings in** (`--pivot-in`, `pivot.swingsIn`): the top, for a level pivot, as here,
+  or the left or the right, for an upright one (C348);
+- the **pivot's place** (`--pivot-at`, `pivot.atMm`): from the opening's bottom to where the open
   sash's room face crosses the frame, which is about the pivot's own height; 500 mm to start with,
   the middle of the example opening (C337);
-- the **gap at the top, above the pivot** (`--pivot-gap`, `pivot.gapMm`): from the frame to the
-  sash's outer face, at the top of the sash, square to the frame, as for a tilted sash; 130 mm to
-  start with;
+- the **gap where it swings in** (`--pivot-gap`, `pivot.gapMm`): from the frame to the sash's
+  outer face, at the top of the sash, square to the frame, as for a tilted sash; 130 mm to start
+  with;
 - the **pitch**, from level (`--pivot-pitch`, `pivot.pitchDeg`): 90° for an upright window, the
-  roof's pitch, 15 to 90°, for a centre-pivot roof window (C342).
+  roof's pitch, 15 to 90°, for a centre-pivot roof window (C342); asked for a level pivot only
+  (C351).
 
 The wall's edges start as the bottom and the sides pressed into the frame and the top pressed by
 the sash; with them goes the printed TPU seal. Measure the opening inside the frame, square to it,
@@ -88,6 +92,29 @@ and the slope pulls on it too (inferred).
 As for the wedge ([`wedge.md`](wedge.md)): the wall and the wedge are held only by their gaskets'
 squeeze. Do not close the window on them, do not let the sash swing shut against them, take them
 out before a storm, and remember that a window with them in is not a locked window.
+
+## An upright pivot
+
+A sash turned on an upright axis swings one side into the room and the other out (C348). Choose
+the **half that swings in**, left or right; the wall's edges then start as the frame all round but
+the edge at the pivot, which the sash presses.
+
+- **The pivot's place** is measured from the opening's left side to where the open sash's room face
+  crosses the frame, whichever side swings in (C349).
+- **The wall** goes on the side that swings out, as wide as from there to the pivot, as tall as the
+  opening, and takes what any wall takes.
+- **The wedge** on the side that swings in is a turned sash's ([`wedge.md`](wedge.md)): a strip up the
+  free side, the jamb across from the pivot, the gap deep, and a triangle at the head and one at the
+  sill, their points at the pivot. Its plan says the jamb strip and the free side, and its files are
+  named `wedge-jamb-…` where a turned sash's say the latch side (C350).
+- **The gap where it swings in** is measured at the free side, from the frame to the sash's outer
+  face; it must be less than the wedge's side is wide.
+- **The hinges** are at the head and the sill; a notch in the wall's top or bottom edge makes room for
+  one that is in the way.
+
+The preview shows the wedge on its side of the pivot; on the pivot's left it is the right-hand one
+turned half round on the window's face, its head and sill triangles changing places, never mirrored
+(C352).
 
 ## Open until printed
 

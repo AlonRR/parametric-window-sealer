@@ -74,6 +74,8 @@ describe('SETTINGS: every setting on the page', () => {
         ...(s.field === 'window'
           ? { seal: 'tpu', topEdge: 'frame', bottomEdge: 'frame', leftEdge: 'frame', rightEdge: 'frame' }
           : {}),
+        // Which half of a pivot window swings in, read with the pivot chosen, its place leaving room either side (#179).
+        ...(s.field === 'pivotSwingsIn' ? { window: 'pivot', pivotAtMm: '300', seal: 'tpu', topEdge: 'frame' } : {}),
         ...(s.path.startsWith('model.') ? { modelFile: boxFile(120, 50, 80) } : {}), // read only with a model (#35)
         ...(s.path.startsWith('customPiece.') ? { customPieceFile: boxFile(400, 400, 400) } : {}), // and a custom piece (#41)
         // A 3D tile's file, read only with the tile (#40); the tile's own settings with it chosen.

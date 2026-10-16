@@ -17,6 +17,8 @@ import { PIECE_SOURCES } from './sheet.js';
 import { COLOURS, MATERIAL_KINDS } from './material.js';
 import { PORT_LOCKS } from './socket.js';
 import { MODEL_VIEWS } from './appliance-model.js';
+import { PIVOT_SWINGS, pivotRoles } from './pivot.js';
+import type { PivotSwing } from './pivot.js';
 import type { FieldName, FormValues, Params } from './params.js';
 
 export interface Setting {
@@ -210,8 +212,9 @@ export const SETTINGS: readonly Setting[] = [
       'frame), a wall behind a roller shutter, in its guide rails, a sash tilted in at the top (tilt-and-turn in ' +
       'tilt, a hopper) or a sash turned part way on its side hinges (tilt-and-turn in turn, an inward casement), ' +
       'each closed by a wedge in place of a wall, a top-hung roof window opened out, its wall in the frame on ' +
-      'a slope, a pivot window, its sash turned on an axis across its middle, with a wall below the pivot and ' +
-      'a wedge above it, or a louvre window, the wall in place of its lowest blades; sets the four edges, and ' +
+      'a slope, a pivot window, its sash turned on an axis across its middle, with a wall on the side that ' +
+      'swings out and a wedge on the side that swings in, or a louvre window, the wall in place of its lowest ' +
+      'blades; sets the four edges, and ' +
       "for a shutter the rail's starting sizes, as the page does.",
     values: ['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn', 'roof', 'pivot', 'louvre'],
   },
@@ -238,18 +241,30 @@ export const SETTINGS: readonly Setting[] = [
     field: 'pivotAtMm',
     path: 'pivot.atMm',
     help:
-      "For a pivot window: how high the pivot is, from the opening's bottom to where the open sash's room face " +
-      'crosses the frame. The wall goes below it and the wedge above it.',
+      "For a pivot window: where the open sash's room face crosses the frame: how high, from the opening's " +
+      'bottom, on a level axis, or how far from the left jamb on an upright one. The wall goes on the side ' +
+      'that swings out and the wedge on the side that swings in.',
   },
   {
     field: 'pivotGapMm',
     path: 'pivot.gapMm',
-    help: "For a pivot window: the gap at the top, from the frame to the sash's outer face, as it is held open.",
+    help:
+      'For a pivot window: the gap where the half that swings in is free, at the top or at the free side, from ' +
+      "the frame to the sash's outer face, as it is held open.",
   },
   {
     field: 'pivotPitchDeg',
     path: 'pivot.pitchDeg',
     help: 'For a pivot window: its pitch, in degrees from level: 90 for an upright one, 15 to 90 in a roof.',
+  },
+  {
+    field: 'pivotSwingsIn',
+    path: 'pivot.swingsIn',
+    help:
+      'For a pivot window: the half of the sash that swings into the room: the top, on a level axis, with the ' +
+      'wall below the pivot, or the left or the right half, on an upright axis, with the wall on the other side ' +
+      'and the pivot placed from the left jamb; sets the edges, as the page does.',
+    values: PIVOT_SWINGS,
   },
   edge('top'),
   edge('bottom'),
@@ -599,6 +614,8 @@ function merge(base: unknown, over: unknown): unknown {
 const isWindow = (value: unknown): value is WindowType =>
   typeof value === 'string' && Object.hasOwn(WINDOW_PRESETS, value);
 
+const isSwing = (value: unknown): value is PivotSwing => PIVOT_SWINGS.some((s) => s === value);
+
 const OPENING: { field: FieldName; what: string }[] = [
   { field: 'openingWidthMm', what: 'width' },
   { field: 'openingHeightMm', what: 'height' },
@@ -617,7 +634,10 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
   const window = settingAt(input, 'edges.window');
   if (isWindow(window)) {
     const roles = settingAt(input, 'edges.roles');
-    params.edges.roles = { ...WINDOW_PRESETS[window], ...(isObject(roles) ? roles : {}) };
+    // A pivot window's edge at the pivot is the sash's, on whichever side swings in (#179).
+    const swing = settingAt(input, 'pivot.swingsIn');
+    const preset = window === 'pivot' && isSwing(swing) ? pivotRoles(swing) : WINDOW_PRESETS[window];
+    params.edges.roles = { ...preset, ...(isObject(roles) ? roles : {}) };
     // The track starts at the window type's own, the sizes given changing it.
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- checkShape held the track's keys
     params.edges.track = merge(windowTrack(window), settingAt(input, 'edges.track') ?? {}) as TrackParams;

@@ -51,11 +51,11 @@ describe('the pivot window as a window type', () => {
     expect(SETTINGS.find((s) => s.field === 'pivotAtMm')?.path).toBe('pivot.atMm');
     expect(SETTINGS.find((s) => s.field === 'pivotGapMm')?.path).toBe('pivot.gapMm');
     expect(SETTINGS.find((s) => s.field === 'pivotPitchDeg')?.path).toBe('pivot.pitchDeg');
-    expect(PARAMS.pivot).toEqual({ atMm: 600, gapMm: 150, pitchDeg: 90 });
+    expect(PARAMS.pivot).toEqual({ atMm: 600, gapMm: 150, pitchDeg: 90, swingsIn: 'top' });
     expect(PARAMS.openingHeightMm).toBe(1200);
-    expect(EXAMPLE_PARAMS.pivot).toEqual({ atMm: 500, gapMm: 130, pitchDeg: 90 });
+    expect(EXAMPLE_PARAMS.pivot).toEqual({ atMm: 500, gapMm: 130, pitchDeg: 90, swingsIn: 'top' });
     const back = readParams({ ...FORM, pivotPitchDeg: '35' });
-    expect(back.ok && back.params.pivot).toEqual({ atMm: 600, gapMm: 150, pitchDeg: 35 });
+    expect(back.ok && back.params.pivot).toEqual({ atMm: 600, gapMm: 150, pitchDeg: 35, swingsIn: 'top' });
   });
 
   it('the wall below the axis and the wedge above it', () => {
@@ -157,5 +157,86 @@ describe('a pivot window’s plan and files', () => {
     expect(planFiles(PARAMS, { format: 'stl', packaging: 'zip' })).toEqual([
       { name: 'window-sealer-800x1200-stl.zip', type: 'application/zip' },
     ]);
+  });
+});
+
+// A vertical pivot (pivot-vertical, #179): one side of the sash in, the other out. The wall goes
+// on the side that swings out, its edge at the pivot pressed by the sash; the turned sash's wedge
+// on the side that swings in, its point at the pivot and its strip up the free side.
+describe('a pivot on an upright axis', () => {
+  const VERTICAL = { ...PIVOT, pivot: { atMm: 400, gapMm: 150, swingsIn: 'right' } };
+  const RIGHT = ok(VERTICAL);
+  const LEFT = ok({ ...VERTICAL, pivot: { atMm: 300, gapMm: 150, swingsIn: 'left' } });
+  const errorsOf = (p: Params, overrides: FormValues) => {
+    const r = readParams({ ...toFormValues(p), ...overrides });
+    return r.ok ? {} : r.errors;
+  };
+
+  it('a setting of its own for the half that swings in, the edge at the pivot preset to the sash', () => {
+    expect(SETTINGS.find((s) => s.field === 'pivotSwingsIn')).toMatchObject({
+      path: 'pivot.swingsIn',
+      values: ['top', 'left', 'right'],
+    });
+    expect(EXAMPLE_PARAMS.pivot.swingsIn).toBe('top');
+    expect(RIGHT.edges.roles).toEqual({ top: 'frame', bottom: 'frame', left: 'frame', right: 'sash' });
+    expect(LEFT.edges.roles).toEqual({ top: 'frame', bottom: 'frame', left: 'sash', right: 'frame' });
+    const back = readParams(toFormValues(RIGHT));
+    expect(back.ok && back.params.pivot).toEqual({ atMm: 400, gapMm: 150, pitchDeg: 90, swingsIn: 'right' });
+  });
+
+  it('the wall on the side that swings out, the turned sash’s wedge on the side that swings in', () => {
+    expect([pivotWall(RIGHT).openingWidthMm, pivotWall(RIGHT).openingHeightMm]).toEqual([400, 1200]);
+    expect([pivotWall(LEFT).openingWidthMm, pivotWall(LEFT).openingHeightMm]).toEqual([500, 1200]);
+    const wedge = pivotWedge(RIGHT);
+    expect([wedge.edges.window, wedge.openingWidthMm, wedge.openingHeightMm, wedge.turn.gapMm]).toEqual([
+      'turn',
+      400,
+      1200,
+      150,
+    ]);
+    expect(pivotWedge(LEFT).openingWidthMm).toBe(300);
+    expect(requireWedgeSetup(wedge).wedge.form).toBe('turn');
+  });
+
+  it('the pivot inside the width, the gap less than the side that swings in, the pitch not asked', () => {
+    expect(errorsOf(RIGHT, { pivotAtMm: '900' })).toEqual({
+      pivotAtMm: 'The pivot is 900 mm from the left jamb: give its place inside the opening, above 0 and below 800 mm.',
+    });
+    expect(errorsOf(RIGHT, { pivotAtMm: '10' })).toEqual({
+      pivotAtMm: 'The wall beside the pivot is 10 mm wide. Too small for the edge strips.',
+    });
+    expect(errorsOf(RIGHT, { pivotGapMm: '450' })).toEqual({
+      pivotGapMm:
+        'The gap at the free side is 450 mm: the sash’s free side moves in less than the 400 mm from the pivot to it.',
+    });
+    expect(errorsOf(RIGHT, { pivotGapMm: '40' }).pivotGapMm).toMatch(/^The gap at the free side is 40 mm; it needs/);
+    expect(errorsOf(RIGHT, { pivotPitchDeg: '10' })).toEqual({});
+    expect(errorsOf(RIGHT, { pivotSwingsIn: 'bottom' })).toHaveProperty('pivotSwingsIn');
+  });
+
+  it('the plan says which side each goes, the wedge’s strip up the free side', () => {
+    const text = describePlan(planWall(RIGHT), RIGHT);
+    expect(text.headline).toMatch(/, left of the pivot; right of it, a wedge of \d+ parts and \d+ TPU gaskets$/);
+    expect(text.span).toMatch(/for a 400 × 1200 mm opening left of the pivot\.$/);
+    expect(text.wedge[0]).toMatch(/^The sash turns [\d.]+° in\. The wedge it leaves: a jamb strip 1200 mm long/);
+    expect(text.wedge[1]).toMatch(/ mm out from the pivot; nearer the pivot its edge strips close it\./);
+    expect(text.pivot).toEqual([
+      'A pivot window on an upright axis: the wall goes left of the pivot, 400 mm from the left jamb, its right ' +
+        'edge pressed by the sash where it crosses the frame; the wedge goes right of it, its point at the pivot. ' +
+        'Check that the pivot’s hinges, at the head and the sill, clear the wall’s corners and the wedge’s points; ' +
+        'a notch in the top or bottom edge makes room for one that does not.',
+    ]);
+    expect(describePlan(planWall(LEFT), LEFT).headline).toMatch(/, right of the pivot; left of it, a wedge of /);
+    const pitched = ok({ ...VERTICAL, pivot: { ...VERTICAL.pivot, pitchDeg: 35 } });
+    expect(describePlan(planWall(pitched), pitched).roof).toEqual([]);
+  });
+
+  it('the files are the wall’s and the turned wedge’s, its strip named for the jamb', async () => {
+    const names = planFiles(RIGHT, CHOICE).map((f) => f.name);
+    expect(names.some((n) => n.startsWith('wedge-jamb-'))).toBe(true);
+    expect(names.some((n) => n.includes('latch'))).toBe(false);
+    expect(names.some((n) => n.startsWith('wedge-triangle-'))).toBe(true);
+    expect(new Set(names).size).toBe(names.length);
+    expect((await makeWall(RIGHT, CHOICE, { engine })).files.map((f) => f.name)).toEqual(names);
   });
 });

@@ -54,6 +54,7 @@ const FLAG_NAMES: Record<OwnField, string> = {
   pivotAtMm: 'pivot-at',
   pivotGapMm: 'pivot-gap',
   pivotPitchDeg: 'pivot-pitch',
+  pivotSwingsIn: 'pivot-in',
   topEdge: 'top-edge',
   bottomEdge: 'bottom-edge',
   leftEdge: 'left-edge',

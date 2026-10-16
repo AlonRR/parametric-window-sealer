@@ -5,6 +5,6 @@ projects:
   - name:     Parametric window sealer
     kind:     build
     state:    active
-    next:     "the owner makes the repo public (Q162); the P3 window type pivot-vertical (#179)"
+    next:     "the owner makes the repo public (Q162); every window type the survey found is built"
     trackers: [docs/status.md, docs/backlog.md]
     review:   2026-10-16

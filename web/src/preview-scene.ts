@@ -118,18 +118,34 @@ function buildWedgeScene(engine: Engine, params: Params): Group {
   return wedge;
 }
 
-// A pivot window (pivot-window, #162): its wall below the pivot and, raised to it, the wedge above.
+// A pivot window (pivot-window, #162): its wall on the side that swings out and its wedge on the
+// side that swings in, each in a group of its own, marked as such. Above a level pivot the tilted
+// wedge is raised to it; beside an upright one (pivot-vertical, #179) the turned wedge's hinge side
+// is moved to it, and on the pivot's left the wedge is turned half round on the window's face, its
+// head and sill triangles changing places, never mirrored, with the wall moved right of the pivot.
 function buildPivotScene(engine: Engine, params: Params): Group {
+  const scene = new Group();
   const wall = buildWallScene(engine, pivotWall(params));
+  wall.userData.part = 'wall';
+  scene.add(wall);
   try {
     const wedge = buildWedgeScene(engine, pivotWedge(params));
-    wedge.matrix.premultiply(new Matrix4().makeTranslation(0, params.pivot.atMm, 0));
-    wall.add(wedge);
+    wedge.userData.part = 'wedge';
+    const { atMm, swingsIn } = params.pivot;
+    const place = new Matrix4();
+    if (swingsIn === 'top') place.makeTranslation(0, atMm, 0);
+    else if (swingsIn === 'right') place.makeTranslation(atMm, 0, 0);
+    else {
+      place.makeTranslation(atMm, params.openingHeightMm, 0).multiply(new Matrix4().makeRotationZ(Math.PI));
+      wall.position.x = atMm;
+    }
+    wedge.matrix.premultiply(place);
+    scene.add(wedge);
   } catch (error) {
-    disposeWall(wall);
+    disposeWall(scene);
     throw error;
   }
-  return wall;
+  return scene;
 }
 
 export function buildWallScene(engine: Engine, params: Params): Group {
