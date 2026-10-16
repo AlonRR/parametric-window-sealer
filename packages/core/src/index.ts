@@ -22,6 +22,7 @@ export * from './stop.js';
 export * from './double.js';
 export * from './frame.js';
 export * from './shutter.js';
+export * from './wedge.js';
 export * from './piece-print.js';
 export * from './stiffener.js';
 export * from './layout.js';
