@@ -1,7 +1,7 @@
 // The wedge a tilted sash leaves (sash-wedge, #159; docs/research/sash-wedge.md): from the
 // opening W × H and the gap d at the top, the sash's tilt; the strip across the top, W by the chord
 // from the frame head to the sash's top; and each side triangle, its legs H, its base the chord,
-// a solid tip where it is narrower than its two edge strips, and a chain of pieces above the tip.
+// the edge strips along its legs meeting near the hinge, and a chain of pieces from there up.
 import { describe, expect, it } from 'vitest';
 import { tiltWedge, tiltWedgeProblem } from '../src/index.js';
 
@@ -28,27 +28,20 @@ describe('the tilted wedge', () => {
     expect(side.widthAtMm(side.axisMm)).toBeCloseTo(side.baseMm, 9);
   });
 
-  it('a solid tip where it is narrower than its two edge strips, then a chain of pieces to the top', () => {
+  it('the leg strips meet near the hinge; a chain of pieces from there, a joint short of the top', () => {
     const { side } = tiltWedge(SASH, LIMITS);
-    // 2 × 15 mm wide at 239.1 mm along the axis.
-    expect(side.tipMm).toBeCloseTo(239.1, 1);
-    expect(side.widthAtMm(side.tipMm)).toBeCloseTo(30, 9);
+    // Strips 15 mm wide square to the legs meet on the axis 15 / sin(α/2) from the hinge: 239.5 mm.
+    expect(side.tipMm).toBeCloseTo(239.5, 1);
+    expect(side.widthAtMm(side.tipMm)).toBeCloseTo(30 / Math.cos(Math.asin(150 / 1200) / 2), 9);
     const { pieces, jointsMm } = side.chain;
-    // The tip, a joint, then the pieces and their joints fill the axis.
+    // From the tip, the pieces and their joints, and a joint's room for the corner at the top.
     const filled =
-      side.tipMm + LIMITS.jointMm + pieces.reduce((a, b) => a + b, 0) + jointsMm.reduce((a, b) => a + b, 0);
+      side.tipMm + pieces.reduce((a, b) => a + b, 0) + jointsMm.reduce((a, b) => a + b, 0) + LIMITS.jointMm;
     expect(filled).toBeCloseTo(side.axisMm, 6);
-    // 953.6 mm in the fewest equal pieces no longer than 200 mm: 5.
+    // 953.1 mm in the fewest equal pieces no longer than 200 mm: 5.
     expect(pieces).toHaveLength(5);
     for (const p of pieces) expect(p).toBeLessThanOrEqual(200);
     expect(jointsMm).toEqual([5, 5, 5, 5]);
-  });
-
-  it('a tip longer than the printer makes is cut into segments that are not', () => {
-    const { side } = tiltWedge(SASH, { ...LIMITS, maxPieceMm: 150 });
-    expect(side.tipSegmentsMm.length).toBe(2);
-    expect(side.tipSegmentsMm.reduce((a, b) => a + b, 0)).toBeCloseTo(side.tipMm, 9);
-    for (const t of side.tipSegmentsMm) expect(t).toBeLessThanOrEqual(150);
   });
 });
 

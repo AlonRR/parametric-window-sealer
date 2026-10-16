@@ -53,8 +53,8 @@ at the top**, **d**, from the frame to the tilted sash.
 - **Each side triangle** stands in the plane of a jamb: H tall, d wide at the top, narrowing to
   nothing at the hinge. It is a chain of pieces, each no taller than the printer allows, each a
   trapezoid a few degrees off a rectangle (the sash's side meets the jamb at about asin(d/H), 5° to
-  8° (inferred)). Below the height where it is narrower than its two edge strips, it is one solid
-  printed tip.
+  8° (inferred)). Near the hinge, where it is narrower than its two edge strips, the strips close it
+  themselves: each runs on to the hinge, cut off along the axis, and the two meet there (C306).
 - **The edges** against the frame and against the sash are a flat face with the printed TPU
   gasket, as an edge pressed into a frame is; each face is sized so the gaskets are squeezed, which
   holds it.
@@ -68,7 +68,7 @@ at the top**, **d**, from the frame to the tilted sash.
 1. This note; the wedge's faces from W, H and d, and the side triangles' chain of pieces, in the
    library, with tests.
 2. The pieces' shapes: the strip's and the triangles' panels, their joints, their edges against
-   the frame and the sash, the solid tip.
+   the frame and the sash.
 3. The corners between the faces, and the flattened port.
 4. The setting on the page, the command and the MCP server; the plan's lines; the guide.
 

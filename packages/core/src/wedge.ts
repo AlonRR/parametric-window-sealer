@@ -4,10 +4,10 @@
 // gap d at the top, from the frame to the tilted sash.
 //
 // Each side triangle stands in the plane of a jamb, its apex at the hinge: its legs are the jamb and
-// the sash's side, both H long, and its base the chord from the frame head to the sash's top. It is
-// printed as a chain of pieces along its axis, joined end to end; near the hinge, where it is
-// narrower than the edge strips along its two legs, as one solid tip.
-import { evenSegments } from './joint.js';
+// the sash's side, both H long, and its base the chord from the frame head to the sash's top. An
+// edge strip runs along each leg, down to the hinge; near the hinge, where the two strips meet,
+// each is cut off at the axis and together they close it. From there up it is a chain of pieces
+// along its axis, joined end to end, a joint's room left at the top for the corner with the top strip.
 import { divideAxis } from './layout.js';
 import type { AxisLayout } from './layout.js';
 import { mm } from './words.js';
@@ -19,7 +19,7 @@ export interface TiltWedgeSize {
 }
 
 export interface WedgeLimits {
-  edgeStripMm: number; // how wide an edge strip is, across the face it closes
+  edgeStripMm: number; // how wide an edge strip is, square to its edge, across the face it closes
   maxPieceMm: number; // the longest piece the printer makes
   jointMm: number; // what a joint takes between two pieces
   minPieceMm: number; // the narrowest piece the joints hold
@@ -30,9 +30,8 @@ export interface WedgeSide {
   baseMm: number; // the chord from the frame head to the sash's top
   axisMm: number; // from the hinge to the middle of the base
   widthAtMm: (alongMm: number) => number; // across the triangle, that far along its axis
-  tipMm: number; // along the axis, where it is as wide as its two edge strips: solid below
-  tipSegmentsMm: number[]; // the tip in segments the printer makes, from the hinge
-  chain: AxisLayout; // the pieces above the tip, and the joints between them, from the tip up
+  tipMm: number; // along the axis, where the two legs' edge strips meet: they close it below
+  chain: AxisLayout; // the pieces from there up, and the joints between them
 }
 
 export interface TiltWedge {
@@ -46,7 +45,7 @@ export function tiltWedge(size: TiltWedgeSize, limits: WedgeLimits): TiltWedge {
   const half = tilt / 2;
   const baseMm = 2 * size.heightMm * Math.sin(half);
   const axisMm = size.heightMm * Math.cos(half);
-  const tipMm = limits.edgeStripMm / Math.tan(half);
+  const tipMm = limits.edgeStripMm / Math.sin(half);
   const chain = divideAxis({
     lengthMm: axisMm - tipMm - limits.jointMm,
     maxPieceMm: limits.maxPieceMm,
@@ -64,7 +63,6 @@ export function tiltWedge(size: TiltWedgeSize, limits: WedgeLimits): TiltWedge {
       axisMm,
       widthAtMm: (alongMm) => 2 * alongMm * Math.tan(half),
       tipMm,
-      tipSegmentsMm: evenSegments(0, tipMm, limits.maxPieceMm).map(([, length]) => length),
       chain,
     },
   };
@@ -78,7 +76,7 @@ export function tiltWedgeProblem(size: TiltWedgeSize, limits: WedgeLimits): stri
   if (gapMm >= heightMm) {
     return `The gap at the top is ${mm(gapMm)} mm: a tilted sash’s top moves in less than the window is tall.`;
   }
-  // The chord, as tiltWedge finds it; at least twice an edge strip, so the tip ends below the top.
+  // The chord, as tiltWedge finds it; at least twice an edge strip, so the strips meet below the top.
   const least = 2 * limits.edgeStripMm + limits.minPieceMm;
   if (2 * heightMm * Math.sin(Math.asin(gapMm / heightMm) / 2) < least - 1e-9) {
     return (
