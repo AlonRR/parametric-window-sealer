@@ -28,6 +28,13 @@ in tracks.
 
 With a window AC in a frame, the unit stands on the sill and the wall above it.
 
+## Which windows it covers
+
+A frame with no track seals any opening whose frame is clear from the room side: a casement or an
+awning opened outward, and a tilt-and-turn window turned fully open. A sash left part way open, a
+tilted window and a pivot window leave a wedge-shaped gap this does not close yet; the windows
+still to come are listed in [`research/window-types.md`](research/window-types.md).
+
 ## Not yet confirmed
 
 Several test prints, the owner's step: whether the squeeze holds the wall against wind, and how

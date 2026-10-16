@@ -15,7 +15,9 @@ Multiboard board (`organiser-multiboard`, #36), built and not offered yet while 
 open (Q159, Q162), the mesh reader (`mesh-import`, #42), the wall cut round a model of the
 appliance (`mesh-appliance`, #35), 3D tiles of your own as the fill (`mesh-tiles`, #40) and a whole
 piece of your own (`mesh-custom-piece`, #41). The next minor version, `v0.7.0`, is the window
-types the survey found missing (Q161, #43). Nothing has been test printed yet.
+types the survey found missing (Q161; [`research/window-types.md`](research/window-types.md)): a wall
+in a roller shutter's guide rails (`shutter-rails`, #158), then the wedge a sash opened part way
+leaves (`sash-wedge`, #159) (C299). Nothing has been test printed yet.
 
 ## The brief (the owner's request, 5 Oct 2026)
 
