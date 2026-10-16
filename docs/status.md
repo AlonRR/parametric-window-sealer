@@ -219,16 +219,12 @@ The next free ID is Q163.
   ([GitHub's steps](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/setting-repository-visibility#changing-a-repositorys-visibility)).
   The history was reviewed again first (`.repo-status`). Pending until the owner says it is done.
   Serving the page on GitHub Pages stays a separate switch of his (Q43; the README's steps).
-- **Pending (C299, Q123):** the `v0.7.0` tag on the release commit `chore(release): v0.7.0, the
-  roller shutter and the sash wedge` and its GitHub release, a pre-release (C63), asked of the
-  session on the owner's machine he names `ogpc` once the commit is on `main`; checked on GitHub
-  afterwards.
-- **Done (Q160, Q123):** the `v0.6.0` tag on the release commit `chore(release): v0.6.0, the
-  organisers and the meshes` (`9f4c248`) and its GitHub release, made by the session on the
-  owner's machine he names `ogpc` on 16 Oct 2026 (verified: GitHub lists the annotated tag `v0.6.0`
-  on `9f4c248`, signed by the owner's key and marked verified, and the release "v0.6.0, the
-  organisers and the meshes" with the CHANGELOG's 0.6.0 section as its notes). It is marked a
-  pre-release, as the earlier ones are (C63).
+- **Done (C299, Q123):** the `v0.7.0` tag on the release commit `chore(release): v0.7.0, the
+  roller shutter and the sash wedge` (`e93929e`) and its GitHub release, made by the session on the
+  owner's machine he names `ogpc` on 16 Oct 2026 (verified: GitHub lists the annotated tag `v0.7.0`
+  (`64de133`) on `e93929e`, signed by the owner's key and marked verified, and the release "v0.7.0,
+  the roller shutter and the sash wedge" with the CHANGELOG's 0.7.0 section as its notes). It is
+  marked a pre-release, as the earlier ones are (C63).
 - **Done (C215, Q123):** the `v0.5.0` tag on the release commit `chore(release): v0.5.0, the
   joint` (`680224a`) and its GitHub release, made by the session on the owner's machine on 15 Oct
   2026 (verified: GitHub lists the annotated tag `v0.5.0` on `680224a`, signed by the owner's key
