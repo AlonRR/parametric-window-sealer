@@ -19,6 +19,10 @@
 // docs/choices.md): an edge against the unit, its top or its side, is shaped as at a sash or a
 // sill, a flat face with the seal on it (C49). Where the unit is, seen from the room, sets which
 // edge meets it (C50): below the wall, as in a slider, or beside it, as in a hung window (C53).
+//
+// Behind a roller shutter (shutter-rails, #158) the wall's edges are a hung window's: its sides in
+// the shutter's guide rails, its top under the lowered shutter's end bar, its bottom on the sill.
+// Choosing it also sets the track to a guide rail's starting sizes (docs/shutter.md).
 
 import { evenSegments } from './joint.js';
 import type { JointParams } from './joint.js';
@@ -28,7 +32,7 @@ export type EdgeName = 'top' | 'bottom' | 'left' | 'right';
 // An edge pressed into a frame with no track (compression-edge, #120) is shaped as one against a
 // sash, a flat face with the seal on it; its printed TPU gasket, squeezed, is what holds the wall.
 export type EdgeRole = 'track' | 'sash' | 'sill' | 'unit' | 'frame';
-export type WindowType = 'slider' | 'hung' | 'frame';
+export type WindowType = 'slider' | 'hung' | 'frame' | 'shutter';
 
 export const EDGES: readonly EdgeName[] = ['top', 'bottom', 'left', 'right'];
 
@@ -36,6 +40,7 @@ export const WINDOW_PRESETS: Record<WindowType, Record<EdgeName, EdgeRole>> = {
   slider: { top: 'track', bottom: 'track', left: 'track', right: 'sash' },
   hung: { top: 'sash', bottom: 'sill', left: 'track', right: 'track' },
   frame: { top: 'frame', bottom: 'frame', left: 'frame', right: 'frame' },
+  shutter: { top: 'sash', bottom: 'sill', left: 'track', right: 'track' },
 };
 
 // Where a window AC is, seen from the room: the edge facing it meets it.
@@ -47,9 +52,11 @@ export function unitRoles(window: WindowType, place: UnitPlace): Record<EdgeName
   return { ...WINDOW_PRESETS[window], [FACING[place]]: 'unit' };
 }
 
-// In a slider the wall stands on the unit, and in a hung window the unit stands beside it, as each
-// is usually opened; in a frame with no track, the unit stands on the sill and the wall above it.
-export const defaultUnitPlace = (window: WindowType): UnitPlace => (window === 'hung' ? 'right' : 'below');
+// In a slider the wall stands on the unit, and in a hung window, or under a roller shutter, the unit
+// stands beside it, as each is usually opened; in a frame with no track, the unit stands on the sill
+// and the wall above it.
+export const defaultUnitPlace = (window: WindowType): UnitPlace =>
+  window === 'hung' || window === 'shutter' ? 'right' : 'below';
 
 export interface TrackParams {
   widthMm: number; // one width for every edge strip (Q72)
@@ -63,6 +70,18 @@ export const EXAMPLE_TRACK: TrackParams = {
   clearanceMm: 0.5,
   depthMm: { top: 10, bottom: 10, left: 10, right: 10 },
 };
+
+// A roller shutter's guide rail, to start with: strips 8 mm thick pass the brushes or rubber seals
+// at the rail's mouth, about 9 and 10 mm apart, and fill 20 mm of it, as far as the shutter's own
+// slats sit in, leaving a rail 25 mm deep its play (docs/shutter.md).
+export const SHUTTER_TRACK: TrackParams = {
+  widthMm: 9,
+  clearanceMm: 0.5,
+  depthMm: { top: 20, bottom: 20, left: 20, right: 20 },
+};
+
+// The track a window type starts with, as it presets the edges.
+export const windowTrack = (window: WindowType): TrackParams => (window === 'shutter' ? SHUTTER_TRACK : EXAMPLE_TRACK);
 
 export const EDGE_BASE_MM = 2; // under the slot (Q69)
 

@@ -13,6 +13,7 @@ import { describeRain } from './rain.js';
 import { describeStop } from './stop.js';
 import { describeDouble } from './double.js';
 import { describeFrame } from './frame.js';
+import { describeShutter } from './shutter.js';
 import { describePrinting } from './piece-print.js';
 import { describeStiffeners } from './stiffener.js';
 import { patternBorderMm } from './pattern.js';
@@ -71,6 +72,7 @@ export interface PlanText {
   stop: string[]; // the sash stop, if there is one (#118)
   double: string[]; // a double wall's skins, and what it gains (#119)
   frame: string[]; // what holds a wall pressed into a frame with no track (#120)
+  shutter: string[]; // how a wall behind a roller shutter sits in its rails, and the shutter on it (#158)
   printing: string; // what is done against warping, and brim advice for the material (#122)
   stiffeners: string[]; // the aluminium angle to buy, where it goes, and its clips (#111)
 }
@@ -237,6 +239,7 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
       cutFromSheet: params.sheet.source === 'sheet',
     }),
     frame: describeFrame(params),
+    shutter: describeShutter(params),
     printing: describePrinting(params.material.kind),
     stiffeners: describeStiffeners(params),
   };

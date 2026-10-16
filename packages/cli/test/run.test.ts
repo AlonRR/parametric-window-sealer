@@ -303,7 +303,9 @@ describe('usage', () => {
     for (const f of SETTING_FLAGS) expect(r.out).toContain(`--${f.flag} `);
     expect(r.out).toMatch(/--slot <mm> +How deep a piece can go into a strip\. \(8\)/);
     // Wherever its lines break: the flag column is as wide as the longest flag.
-    expect(r.out.replace(/\s+/g, ' ')).toMatch(/--window <slider\|hung\|frame> .*?as the page does\. \(slider\)/);
+    expect(r.out.replace(/\s+/g, ' ')).toMatch(
+      /--window <slider\|hung\|frame\|shutter> .*?as the page does\. \(slider\)/,
+    );
     expect(r.out).toContain('Exit status: 0 done, 1 could not write, 2 wrong options or settings.');
   });
 
@@ -1005,5 +1007,23 @@ describe('Multiboard, built but not offered for now (organiser-multiboard, #36)'
     const own = await cli([...OPENING, '--piece-fill', '2,1=multiboard', '--dry-run']);
     expect(own.code).toBe(0);
     expect(own.out).toContain('Column 2, row 1: a Multiboard board:');
+  });
+});
+
+describe('behind a roller shutter (shutter-rails, #158)', () => {
+  it('--window shutter sets the guide rail’s sizes, and the plan says how the wall sits in them', async () => {
+    const r = await cli([...OPENING, '--window', 'shutter', '--dry-run']);
+    expect(r.code).toBe(0);
+    expect(r.out.replace(/\s+/g, ' ')).toContain(
+      'Behind a roller shutter: the side strips are 8 mm thick, to pass the guide rails’ brushes or seals, and ' +
+        'sit 20 mm into the rails.',
+    );
+    const deeper = await cli([...OPENING, '--window', 'shutter', '--left-depth', '25', '--dry-run']);
+    expect(deeper.out).toContain('sit 25 and 20 mm into the rails');
+  });
+
+  it('--help offers it', async () => {
+    const help = await cli(['--help']);
+    expect(help.out.replace(/\s+/g, ' ')).toMatch(/--window <slider\|hung\|frame\|shutter> /);
   });
 });

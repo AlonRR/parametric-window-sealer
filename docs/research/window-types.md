@@ -39,7 +39,7 @@ product for that gap was found, only 3D-printed hobby adapters for tilted window
 | Roof windows: centre-pivot (Velux GGL) | A pivot window in a roof | Not sealed | As the pivot window |
 | Jalousie, louvre | Glass blades in clips, turned by a crank | Not sealed; no kits found | Side edges clear of the clip channels, a top edge tucked under the lowest blade |
 | Bay and bow | Fixed panes with casements or hung windows | Each opening one of the above | Nothing new |
-| Any window behind a roller shutter (Germany, France, Italy, Israel's "trisol") | The shutter runs in guide rails outside the glass | Not offered, though it is the hung window's shape | A wall in the shutter's guide rails, its top edge pressed by the lowered shutter, with the sash open inward |
+| Any window behind a roller shutter (Germany, France, Italy, Israel's "trisol") | The shutter runs in guide rails outside the glass | Sealed since `shutter-rails` (#158): the wall in the shutter's guide rails, its top edge under the lowered shutter ([`shutter.md`](../shutter.md)) | Nothing new |
 
 Sources for the table, beyond those above:
 
@@ -100,7 +100,8 @@ Nothing found contradicts [`frame.md`](../frame.md).
 Each is a backlog item ([`backlog.md`](../backlog.md)) with an issue of its own; `other-windows`
 (#43) is closed by this survey (C298):
 
-1. **`shutter-rails` (#158), a wall in a roller shutter's guide rails (S).** A window type whose side
+1. **`shutter-rails` (#158), a wall in a roller shutter's guide rails (S); built
+   ([`shutter.md`](../shutter.md)).** A window type whose side
    edges sit in the shutter's guide rails and whose top edge is pressed by the lowered shutter's
    bottom slat, with the wall outside the glass and the sash open inward. It is the hung window's
    shape with the shutter as the sash; one product shows it holds. It unlocks every window behind

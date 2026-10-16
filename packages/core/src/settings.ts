@@ -5,8 +5,8 @@
 // page's form values (the command's flags). Setting the window type presets the four edges
 // (Q66); edges given with it, or after it, change them. A printer size means a custom
 // printer, and a tape setting means tape, or the TPU seal when it is its joints in TPU. The opening has no starting value: it is required.
-import { EDGES, WINDOW_PRESETS } from './edge.js';
-import type { WindowType } from './edge.js';
+import { EDGES, WINDOW_PRESETS, windowTrack } from './edge.js';
+import type { TrackParams, WindowType } from './edge.js';
 import { EXAMPLE_PARAMS, readParams, toFormValues } from './params.js';
 import { PRINTER_IDS } from './printers.js';
 import { OFFERED_FILL_KINDS, PATTERN_STYLES } from './fill.js';
@@ -203,9 +203,10 @@ export const SETTINGS: readonly Setting[] = [
     field: 'window',
     path: 'edges.window',
     help:
-      'Window type: a slider, a hung window, or a frame with no track (a casement screen opening, a tilt-and-turn ' +
-      'frame); sets the four edges as the page does.',
-    values: ['slider', 'hung', 'frame'],
+      'Window type: a slider, a hung window, a frame with no track (a casement screen opening, a tilt-and-turn ' +
+      'frame), or a wall behind a roller shutter, in its guide rails; sets the four edges, and for a shutter the ' +
+      "rail's starting sizes, as the page does.",
+    values: ['slider', 'hung', 'frame', 'shutter'],
   },
   edge('top'),
   edge('bottom'),
@@ -563,6 +564,9 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
   if (isWindow(window)) {
     const roles = settingAt(input, 'edges.roles');
     params.edges.roles = { ...WINDOW_PRESETS[window], ...(isObject(roles) ? roles : {}) };
+    // The track starts at the window type's own, the sizes given changing it.
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- checkShape held the track's keys
+    params.edges.track = merge(windowTrack(window), settingAt(input, 'edges.track') ?? {}) as TrackParams;
   }
   // A printer size without a kind means a custom printer; a printer id, a listed one.
   const printer = input['printer'];
@@ -602,7 +606,13 @@ export function readSettings(input: unknown, overrides: FormValues = {}): Settin
   const values: FormValues = toFormValues(params);
   const presetWindow = overrides.window;
   if (isWindow(presetWindow)) {
-    for (const side of EDGES) values[`${side}Edge` as const] = WINDOW_PRESETS[presetWindow][side];
+    const track = windowTrack(presetWindow);
+    for (const side of EDGES) {
+      values[`${side}Edge` as const] = WINDOW_PRESETS[presetWindow][side];
+      values[`${side}DepthMm` as const] = String(track.depthMm[side]);
+    }
+    values.trackWidthMm = String(track.widthMm);
+    values.trackClearanceMm = String(track.clearanceMm);
   }
   if (overrides.printer === undefined && (overrides.customWidthMm ?? overrides.customHeightMm) !== undefined) {
     values.printer = 'custom';

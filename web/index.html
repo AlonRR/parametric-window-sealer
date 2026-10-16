@@ -338,13 +338,16 @@
               <option value="slider">Horizontal slider</option>
               <option value="hung">Single- or double-hung</option>
               <option value="frame">A frame with no track: casement, tilt-and-turn</option>
+              <option value="shutter">Behind a roller shutter</option>
             </select>
           </label>
           <p class="note">
             Sets what each edge of the wall does. Change any edge below if your window differs.
             Each edge gets an edge strip: in a track it fills the track; against the sash or on a
             sill it gives a flat face. Pressed into a frame with no track, it gives a flat face whose
-            printed TPU gasket, squeezed as the wall goes in, holds the wall.
+            printed TPU gasket, squeezed as the wall goes in, holds the wall. Behind a roller shutter,
+            the sides go in its guide rails and the lowered shutter rests on the top; the track's sizes
+            start at a typical guide rail's: measure the gap at the rail's mouth and how deep it is.
           </p>
           <label>
             Top edge
@@ -1411,6 +1414,7 @@
         <ul data-testid="plan-stop" data-plan="stop"></ul>
         <ul data-testid="plan-double" data-plan="double"></ul>
         <ul data-testid="plan-frame" data-plan="frame"></ul>
+        <ul data-testid="plan-shutter" data-plan="shutter"></ul>
         <p data-testid="plan-printing" data-plan="printing"></p>
         <ul data-testid="plan-stiffeners" data-plan="stiffeners"></ul>
         <ul data-testid="plan-warnings" data-plan="warnings"></ul>

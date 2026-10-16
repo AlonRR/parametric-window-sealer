@@ -103,7 +103,7 @@ describe('window_sealer_list_settings', () => {
     });
     expect(settings.find((s) => s.path === 'edges.window')).toMatchObject({
       startsAt: 'slider',
-      choices: ['slider', 'hung', 'frame'],
+      choices: ['slider', 'hung', 'frame', 'shutter'],
     });
     expect(settings.find((s) => s.path === 'openingWidthMm')?.startsAt).toBeNull();
     expect(JSON.parse(r.text)).toEqual(r.data);
@@ -650,5 +650,23 @@ describe('Multiboard, built but not offered for now (organiser-multiboard, #36)'
     const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, fill: { kind: 'multiboard' } } });
     expect(r.isError).toBe(true);
     expect(r.text).toContain('hsw');
+  });
+});
+
+describe('behind a roller shutter (shutter-rails, #158)', () => {
+  it('the schema offers it; it sets the guide rail’s sizes, and the summary says how the wall sits in them', async () => {
+    const { client, call } = await connect();
+    const plan = (await client.listTools()).tools.find((t) => t.name === 'window_sealer_plan_wall');
+    if (!plan) throw new Error('window_sealer_plan_wall expected');
+    const edges = (plan.inputSchema.properties as Record<string, any>)['settings'].properties.edges;
+    expect(edges.properties.window.enum).toEqual(['slider', 'hung', 'frame', 'shutter']);
+    const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, edges: { window: 'shutter' } } });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['settings'].edges.track).toEqual({
+      widthMm: 9,
+      clearanceMm: 0.5,
+      depthMm: { top: 20, bottom: 20, left: 20, right: 20 },
+    });
+    expect(r.data['summary'].shutter).toEqual([expect.stringMatching(/^Behind a roller shutter: the side strips/)]);
   });
 });

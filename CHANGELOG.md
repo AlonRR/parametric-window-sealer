@@ -17,6 +17,15 @@ Unreleased.
 
 ## [Unreleased]
 
+### Added
+
+- A wall behind a roller shutter: choose **Window type: Behind a roller shutter** (`--window shutter`, or
+  `edges.window: "shutter"`). Its sides stand in the shutter's guide rails and the lowered shutter rests
+  on its top, as a hung window's sash does; it sets the track to a typical guide rail's sizes, 9 mm wide
+  and 20 mm deep, to measure and change. The plan says how the strips sit in the rails, to lower the
+  shutter only until it rests on the wall, and to take the wall out before a storm. How:
+  `docs/shutter.md`. Not yet test printed.
+
 ## [0.6.0] - 2026-10-16
 
 ### Added
