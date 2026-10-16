@@ -95,6 +95,26 @@ const INSERT = z.strictObject({
   row: z.number().int().min(1).optional().describe('The row of its piece, from 1 at the bottom.'),
 });
 
+// A notch for the window's hardware (#161): its size and where it falls in an edge; its piece is
+// found from that, so a column and row given are found again.
+const NOTCH = z.strictObject({
+  widthMm: z.number().describe('Its width along the edge, in mm: the hardware and 1 mm a side is added.'),
+  depthMm: z.number().describe("Its depth from the frame's face into the opening, in mm."),
+  edge: z.enum(['top', 'bottom', 'left', 'right']).describe('The edge it is in, pressed into a frame.'),
+  atMm: z
+    .number()
+    .describe(
+      'Where its middle is, in mm: from the left corner along the top and the bottom, from the bottom up the sides.',
+    ),
+  column: z
+    .number()
+    .int()
+    .min(1)
+    .optional()
+    .describe('The column of its piece, as the plan gives it back; found again.'),
+  row: z.number().int().min(1).optional().describe('The row of its piece, as the plan gives it back; found again.'),
+});
+
 const ITEMS: Record<ListKind, z.ZodType> = {
   ports: PORT,
   pieceFills: PIECE_FILL,
@@ -102,6 +122,7 @@ const ITEMS: Record<ListKind, z.ZodType> = {
   fans: FAN,
   clamps: CLAMP,
   inserts: INSERT,
+  notches: NOTCH,
 };
 
 function leaf(

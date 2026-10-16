@@ -28,6 +28,29 @@ in tracks.
 
 With a window AC in a frame, the unit stands on the sill and the wall above it.
 
+## Notches for hardware
+
+Where a casement's crank arm, a friction stay's arms or a lock's keep cross the frame, the wall can
+leave a notch for it in its edge. Under **The window**, with a frame with no track or a roof window,
+give each in **Notches for hardware** (the command: `--notch`, again for each; the library and the
+MCP server: `notches`): its width along the edge and its depth from the frame's face in mm, then
+`@` its edge and how far its middle is from the left corner, or for a side edge from the bottom
+one: `40x25@bottom,300` (C328). The notch is made 1 mm larger round the hardware each way.
+
+- **The edge strip and its gasket** stop either side of the notch (C330).
+- **The piece behind** is cut where the notch reaches past the strip: about 5.5 mm in from the
+  frame's face with the starting sizes. A shallower notch leaves it whole.
+- A notch lies in **one piece**, with at least 10 mm of edge strip either side of it in that piece,
+  and leaves the piece at least as deep as the smallest piece the joints allow (34 mm to start
+  with). It is refused across a joint between pieces or at the wall's corner; dividing the width or
+  height as full pieces plus a filler moves the joints (C331). Its piece has no fitting, is printed
+  even when the others are cut from sheet, takes no pattern and is solid in a double wall; its file
+  name ends `-notch-40x25` (C329, C332).
+- **Seal round the hardware** by hand, once it is through: removable sealing putty, or a strip of
+  closed-cell foam (inferred) (C333). The plan says so for each notch.
+
+Only an edge pressed into a frame takes a notch.
+
 ## Which windows it covers
 
 A frame with no track seals any opening whose frame is clear from the room side: a casement or an

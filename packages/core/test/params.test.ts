@@ -48,6 +48,7 @@ describe('the starting values', () => {
       fill: SEALED, // Q141
       pieceFills: [], // #21
       cutouts: [], // #23
+      notches: [], // #161
       rim: DEFAULT_RIM, // C42
       fans: [], // #28
       clamps: [], // #32
@@ -335,6 +336,7 @@ describe('describePlan', () => {
       frame: [], // #120
       shutter: [], // #158
       roof: [], // #160
+      notches: [], // #161
       wedge: [], // #159
       printing:
         'Printing: the pieces’ corners are rounded 3 mm and their bed-side edges chamfered 1 mm against warping. ' +

@@ -19,9 +19,9 @@ types the survey found missing (Q161; [`research/window-types.md`](research/wind
 in a roller shutter's guide rails (`shutter-rails`, #158), built, then the wedge a sash opened part way
 leaves (`sash-wedge`, #159) (C299), both its forms built, the tilted and the turned
 ([`wedge.md`](wedge.md)): `v0.7.0`, on 16 Oct 2026, is the release of both. Since then, the survey's
-P3 rows: a wall in a roof window (`sloped-frame`, #160) is built ([`roof.md`](roof.md)); notches
-along an edge (#161), pivot windows (#162) and jalousie windows (#163) are next. Nothing has been
-test printed yet.
+P3 rows: a wall in a roof window (`sloped-frame`, #160) is built ([`roof.md`](roof.md)), and notches
+along an edge for the window's hardware (`edge-notches`, #161; [`frame.md`](frame.md)); pivot windows
+(#162) and jalousie windows (#163) are next. Nothing has been test printed yet.
 
 ## The brief (the owner's request, 5 Oct 2026)
 

@@ -25,6 +25,7 @@ import { readParams, toFormValues } from './params.js';
 import { longestStripMm, planParts, planWall } from './plan.js';
 import { describePlan } from './plan-text.js';
 import { tapeFit } from './tape.js';
+import { notchTag } from './notch.js';
 import { fillChoice } from './fill.js';
 import { patternBorderMm } from './pattern.js';
 import { fillFor } from './piece-fill.js';
@@ -134,6 +135,7 @@ export function buildExport(engine: Engine, params: Params): { pieces: ExportPie
     dovetails,
     rails,
     flanges,
+    { context: { edges: params.edges, joint: params.joint, tape: tapeFit(params.seal) }, notches: params.notches },
   );
   let pieces: ExportPiece[];
   try {
@@ -231,7 +233,8 @@ export function planFiles(params: Params, choice: DownloadChoice): PlannedFile[]
     ...plan.pieces
       .filter((cell) => !isCut(params, cell))
       .map((cell) => {
-        const tag = fittingIn(fittings, cell.column + 1, cell.row + 1)?.tag;
+        const notches = params.notches.filter((n) => n.column === cell.column + 1 && n.row === cell.row + 1);
+        const tag = fittingIn(fittings, cell.column + 1, cell.row + 1)?.tag ?? notches.map(notchTag).join('');
         return { name: taggedFileName(cell, choice.format, tag), type };
       }),
     ...wallParts(params, plan).map((part) => ({ name: `${part.name}.${choice.format}`, type })),

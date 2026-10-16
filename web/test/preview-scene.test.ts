@@ -8,7 +8,7 @@ import { Box3, LineSegments, Mesh, MeshPhongMaterial } from 'three';
 import type { Object3D } from 'three';
 import { describe, expect, it } from 'vitest';
 import { loadEngine } from 'parametric-window-sealer';
-import { EXAMPLE_PARAMS, buildExport, readSettings } from 'parametric-window-sealer';
+import { EXAMPLE_PARAMS, buildExport, planWall, readSettings } from 'parametric-window-sealer';
 import { SHEET_COLOUR, TPU_COLOUR, buildWallScene, disposeWall } from '../src/preview-scene';
 
 const solidsOf = (wall: Object3D, kind: string) =>
@@ -317,5 +317,36 @@ describe('a sash’s wedge (sash-wedge, #159)', () => {
       expect(box.max.z - box.min.z, window).toBeLessThan(200);
       disposeWall(wedge);
     }
+  });
+});
+
+describe('a notch for the hardware (edge-notches, #161)', () => {
+  it('draws its piece notched, as the download makes it', async () => {
+    const engine = await loadEngine();
+    const read = (notches: unknown[]) => {
+      const r = readSettings({
+        openingWidthMm: 800,
+        openingHeightMm: 1200,
+        edges: { window: 'frame' },
+        seal: { kind: 'tpu' },
+        ports: [],
+        notches,
+      });
+      if (!r.ok) throw new Error(JSON.stringify(r.problems));
+      return r.params;
+    };
+    const notched = read([{ widthMm: 40, depthMm: 25, edge: 'bottom', atMm: 300 }]);
+    const column = (notched.notches[0]?.column ?? 0) - 1;
+    const pieceBox = (p: typeof notched) => {
+      const wall = buildWallScene(engine, p);
+      wall.updateMatrixWorld(true);
+      const cell = planWall(p).pieces.findIndex((c) => c.column === column && c.row === 0);
+      const piece = solidsOf(wall, 'piece')[cell];
+      if (piece === undefined) throw new Error('no piece');
+      const vertices = piece.geometry.getAttribute('position').count;
+      disposeWall(wall);
+      return vertices;
+    };
+    expect(pieceBox(notched)).toBeGreaterThan(pieceBox(read([])));
   });
 });

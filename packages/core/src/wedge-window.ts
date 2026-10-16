@@ -148,6 +148,7 @@ export function refuseForWedge(
     inserts: number;
     model: boolean;
     customPiece: boolean;
+    notches: number;
     roles: Record<EdgeName, string>;
   },
 ): void {
@@ -166,6 +167,8 @@ export function refuseForWedge(
   if (p.inserts > 0) r.fail('inserts', onlyAPort);
   if (p.model) r.fail('modelFile', onlyAPort);
   if (p.customPiece) r.fail('customPieceFile', onlyAPort);
+  if (p.notches > 0)
+    r.fail('notches', `${wedge} takes no notch: its edges are pressed against the frame and the sash.`);
   for (const edge of ['top', 'bottom', 'left', 'right'] as const) {
     if (p.roles[edge] !== 'frame') {
       r.fail(

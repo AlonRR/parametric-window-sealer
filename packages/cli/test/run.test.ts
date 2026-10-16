@@ -1104,3 +1104,32 @@ describe('a roof window (sloped-frame, #160)', () => {
     );
   });
 });
+
+describe('notches for the hardware (edge-notches, #161)', () => {
+  const FRAME = ['--width', '800', '--height', '1200', '--window', 'frame', '--seal', 'tpu'];
+
+  it('--notch leaves a notch in a frame edge, and tags its piece’s file', async () => {
+    const r = await cli([...FRAME, '--notch', '40x25@bottom,300', '--dry-run']);
+    expect(r.code).toBe(0);
+    const out = r.out.replace(/\s+/g, ' ');
+    expect(out).toMatch(
+      /Notch 1: 40 × 25 mm in the bottom edge, its middle 300 mm from the left corner, in column \d, row 1/,
+    );
+    expect(out).toMatch(/piece-c\d-r1-[\d.]+x[\d.]+-notch-40x25\.stl/);
+  });
+
+  it('refuses a notch in an edge that is not in a frame', async () => {
+    const r = await cli(['--width', '800', '--height', '1200', '--notch', '40x25@bottom,300', '--dry-run']);
+    expect(r.code).toBe(2);
+    expect(r.err.replace(/\s+/g, ' ')).toContain(
+      'Notch 1 is in the bottom edge, which is in a track: a notch is for hardware crossing a frame edge.',
+    );
+  });
+
+  it('--help offers it', async () => {
+    const help = await cli(['--help']);
+    expect(help.out.replace(/\s+/g, ' ')).toMatch(
+      /--notch <width>x<depth>@edge,mm Notches along an edge for the window's hardware/,
+    );
+  });
+});

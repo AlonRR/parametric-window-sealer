@@ -390,6 +390,21 @@
             </p>
             <span class="error" data-testid="error-roofPitchDeg"></span>
           </div>
+          <!-- Notches for the window's hardware (edge-notches, #161), in a frame's edges. -->
+          <div data-show-when="window=frame|roof" hidden>
+            <label>
+              Notches for hardware
+              <input name="notches" autocomplete="off" spellcheck="false" placeholder="40x25@bottom,300" />
+            </label>
+            <p class="note">
+              Where a crank's arm, a friction stay's arms or a keep cross the frame, leave a notch:
+              its width along the edge and its depth from the frame in mm, then @ its edge (top,
+              bottom, left or right) and how far its middle is from the left corner, or for a side
+              from the bottom one, as 40x25@bottom,300. Several are separated by spaces. The edge
+              strip stops either side of each; fill the gap round the hardware with putty or foam.
+            </p>
+            <span class="error" data-testid="error-notches"></span>
+          </div>
           <div data-show-when="window!=tilt|turn">
           <p class="note">
             Sets what each edge of the wall does. Change any edge below if your window differs.
@@ -1473,6 +1488,7 @@
         <ul data-testid="plan-frame" data-plan="frame"></ul>
         <ul data-testid="plan-shutter" data-plan="shutter"></ul>
         <ul data-testid="plan-roof" data-plan="roof"></ul>
+        <ul data-testid="plan-notches" data-plan="notches"></ul>
         <ul data-testid="plan-wedge" data-plan="wedge"></ul>
         <p data-testid="plan-printing" data-plan="printing"></p>
         <ul data-testid="plan-stiffeners" data-plan="stiffeners"></ul>

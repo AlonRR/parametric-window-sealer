@@ -180,6 +180,7 @@ export function planEdges(
   joint: JointParams,
   maxLengthMm: number,
   tape?: TapeFit,
+  gaps: Partial<Record<EdgeName, readonly (readonly [number, number])[]>> = {}, // where each edge's strip stops, for its notches
 ): EdgeStripPlacement[] {
   const inSlot = inSlotMm(joint);
   const p = (e: EdgeName) => edgeProfile(e, edges, joint, tape);
@@ -196,8 +197,27 @@ export function planEdges(
   // One strip runs through each corner, by window type (Q71).
   const across = edges.window === 'slider' ? [outer.left, outer.right] : [mouth.left, mouth.right];
   const up = edges.window === 'slider' ? [mouth.bottom, mouth.top] : [outer.bottom, outer.top];
+  // An edge's run, less the gaps its notches leave in it.
+  const pieces = (edge: EdgeName, from: number, to: number): [number, number][] => {
+    const runs: [number, number][] = [];
+    let at = from;
+    for (const [gapFrom, gapTo] of gaps[edge] ?? []) {
+      if (gapFrom > at) runs.push([at, Math.min(gapFrom, to)]);
+      at = Math.max(at, gapTo);
+    }
+    if (to > at) runs.push([at, to]);
+    return runs.filter(([a, b]) => b - a > 1e-9);
+  };
   const run = (edge: EdgeName, profile: EdgeProfile, [from, to]: number[], place: (at: number) => [number, number]) =>
-    evenSegments(from ?? 0, (to ?? 0) - (from ?? 0), maxLengthMm).map(([at, lengthMm]) => {
+    pieces(edge, from ?? 0, to ?? 0).flatMap(([start, end]) => segments(edge, profile, start, end, place));
+  const segments = (
+    edge: EdgeName,
+    profile: EdgeProfile,
+    from: number,
+    to: number,
+    place: (at: number) => [number, number],
+  ) =>
+    evenSegments(from, to - from, maxLengthMm).map(([at, lengthMm]) => {
       const [xMm, yMm] = place(at);
       const strip: EdgeStripPlacement = {
         edge,

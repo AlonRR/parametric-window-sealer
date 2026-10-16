@@ -87,6 +87,7 @@ const FLAG_NAMES: Record<OwnField, string> = {
   fillMeshView: 'mesh-tile-view',
   pieceFills: 'piece-fill', // repeatable: one --piece-fill for each piece (C28)
   cutouts: 'cutout', // repeatable, as --port (C44)
+  notches: 'notch', // repeatable, as --port
   rimDepthMm: 'rim-depth',
   rimWallMm: 'rim-wall',
   rimClearanceMm: 'rim-clearance',

@@ -91,6 +91,7 @@ function help(): string {
       fans: '<mm[@column,row]>',
       clamps: '<width>x<height>[@column,row]',
       inserts: '<width>x<height>[@column,row]',
+      notches: '<width>x<depth>@edge,mm',
     };
     const each: Record<ListKind, string> = {
       ports: 'port',
@@ -99,6 +100,7 @@ function help(): string {
       fans: 'fan',
       clamps: 'clamp',
       inserts: 'insert',
+      notches: 'notch',
     };
     const value = f.list
       ? lists[f.list]

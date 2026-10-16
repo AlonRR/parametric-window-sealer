@@ -33,6 +33,7 @@ type SheetSource = Pick<
   | 'inserts'
   | 'model'
   | 'customPiece'
+  | 'notches'
   | 'joint'
   | 'collar'
   | 'socket'
@@ -58,6 +59,7 @@ const FITTING_WORDS: Record<string, string> = {
 export function printedFor(params: SheetSource, column: number, row: number): string | undefined {
   const fitting = fittingIn(placedFittings(fittingSource(params)), column, row);
   if (fitting !== undefined) return `its ${FITTING_WORDS[fitting.kind] ?? fitting.kind}`;
+  if (params.notches.some((n) => n.column === column && n.row === row)) return 'its notch';
   if (fillFor(params, column, row).kind !== 'sealed') return 'its pattern';
   return undefined;
 }
@@ -72,6 +74,7 @@ export const anyPrinted = (params: SheetSource): boolean =>
   [params.ports, params.cutouts, params.fans, params.clamps, params.inserts].some((list) => list.length > 0) ||
   params.model.file !== '' ||
   params.customPiece.file !== '' ||
+  params.notches.length > 0 ||
   params.fill.kind !== 'sealed' ||
   params.pieceFills.some((f) => f.kind !== 'sealed');
 

@@ -20,6 +20,12 @@ way (C299). Changes since the latest version are listed under Unreleased.
 
 ### Added
 
+- Notches along an edge for a window's hardware: in an edge pressed into a frame, give each as its
+  width x depth @ its edge, from mm (`--notch 40x25@bottom,300`, or `notches` in the library),
+  where a casement's crank arm, a friction stay's arms or a keep cross the frame. The edge strip and
+  its gasket stop either side of it, and the piece behind is cut where the notch reaches past the
+  strip; the plan says where each is and to fill the gap round the hardware with putty or foam.
+  How: `docs/frame.md`. Not yet test printed.
 - A wall in a roof window: choose **Window type: A roof window opened out** (`--window roof`, or
   `edges.window: "roof"`) and give the roof's pitch, 15 to 90° (`--roof-pitch`, `roof.pitchDeg`).
   A top-hung roof window opened out leaves its frame clear from inside, so the wall is a frame's,

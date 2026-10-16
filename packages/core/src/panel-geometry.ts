@@ -7,6 +7,8 @@
 
 import type { Manifold } from 'manifold-3d';
 import type { Engine } from './engine.js';
+import { notchCut, notchTag } from './notch.js';
+import type { NotchContext, PlacedNotch } from './notch.js';
 import type { GridLayout } from './layout.js';
 import { DEFAULT_COLLAR } from './port.js';
 import type { CollarParams, PortSetting } from './port.js';
@@ -80,6 +82,7 @@ export function buildPiecesWith(
   dovetails?: PieceDovetails, // puzzle dovetails (#29): tabs and sockets on the edges pieces share
   rails?: PieceRails, // sliding dovetail rails (#30): half rails on the edges pieces share
   flanges?: PieceFlanges, // bolted flanges (#31): a flange on each edge pieces share, with bolt holes
+  notched?: { context: NotchContext; notches: readonly PlacedNotch[] }, // notches for hardware (#161)
 ): BuiltPiece[] {
   const built: BuiltPiece[] = [];
   // The wall's centre, where the pattern's tiles are centred (Q135).
@@ -91,6 +94,7 @@ export function buildPiecesWith(
     for (const cell of plan.pieces) {
       const size = { widthMm: cell.widthMm, heightMm: cell.heightMm, thicknessMm };
       const fitting = fittingIn(fittings, cell.column + 1, cell.row + 1);
+      const notches = (notched?.notches ?? []).filter((n) => n.column === cell.column + 1 && n.row === cell.row + 1);
       let solid = fitting === undefined ? plainPanel(engine, size) : fitting.solid(engine, size);
       const slots = pins === undefined ? [] : pinSlotsIn(cell, pins.pins);
       if (pins !== undefined && slots.length > 0) {
@@ -100,8 +104,15 @@ export function buildPiecesWith(
         solid.delete();
         solid = slotted;
       }
-      const here = typeof pattern === 'function' ? pattern(cell) : pattern;
-      if (hollow !== undefined && fitting === undefined && here === undefined && printed(cell)) {
+      // A notched piece is sealed: no pattern, and not hollow.
+      const here = notches.length > 0 ? undefined : typeof pattern === 'function' ? pattern(cell) : pattern;
+      if (
+        hollow !== undefined &&
+        fitting === undefined &&
+        here === undefined &&
+        notches.length === 0 &&
+        printed(cell)
+      ) {
         const air = hollowCut(engine, size, hollow.borderMm);
         const hollowed = solid.subtract(air);
         air.delete();
@@ -125,6 +136,16 @@ export function buildPiecesWith(
           solid = patternedPanel(engine, solid, openings, thicknessMm, here.style, here.reliefPct);
         } finally {
           openings.delete();
+        }
+      }
+      if (notched !== undefined) {
+        for (const n of notches) {
+          const cut = notchCut(engine, n, notched.context, cell, thicknessMm);
+          if (cut === undefined) continue;
+          const notchedSolid = solid.subtract(cut);
+          cut.delete();
+          solid.delete();
+          solid = notchedSolid;
         }
       }
       // With puzzle dovetails, the tabs beyond its cell are added, and the piece is cut to its
@@ -171,6 +192,7 @@ export function buildPiecesWith(
         column: cell.column,
         row: cell.row,
         ...(fitting === undefined ? {} : { ...fitting.marks, tag: fitting.tag }),
+        ...(notches.length === 0 ? {} : { tag: notches.map(notchTag).join('') }),
         solid,
       });
     }

@@ -38,7 +38,7 @@ const ROLE = ['track', 'sash', 'sill', 'unit', 'frame'] as const;
 const YES_NO = ['no', 'yes'] as const;
 
 // The settings that are lists, and the shape of each item: what each field holds.
-export type ListKind = 'ports' | 'pieceFills' | 'cutouts' | 'fans' | 'clamps' | 'inserts';
+export type ListKind = 'ports' | 'pieceFills' | 'cutouts' | 'fans' | 'clamps' | 'inserts' | 'notches';
 export const LIST_ITEMS: Record<ListKind, Record<string, 'number' | 'text'>> = {
   ports: { hoseMm: 'number', column: 'number', row: 'number' },
   pieceFills: { column: 'number', row: 'number', kind: 'text', style: 'text' },
@@ -46,6 +46,9 @@ export const LIST_ITEMS: Record<ListKind, Record<string, 'number' | 'text'>> = {
   fans: { sizeMm: 'number', column: 'number', row: 'number' },
   clamps: { widthMm: 'number', heightMm: 'number', column: 'number', row: 'number' },
   inserts: { widthMm: 'number', heightMm: 'number', column: 'number', row: 'number' },
+  // The piece is found from where the notch falls; a column and row, as the plan gives them back, are
+  // read as anything else in the list and found again.
+  notches: { widthMm: 'number', depthMm: 'number', edge: 'text', atMm: 'number', column: 'number', row: 'number' },
 };
 
 const axis = (name: 'width' | 'height'): Setting[] => [
@@ -389,6 +392,17 @@ export const SETTINGS: readonly Setting[] = [
       "piece, by column and row from 1 at the bottom left. Without a piece, the bottom row's middle piece. A rim " +
       'stands round it on the room side, lined with the seal if there is one.',
     list: 'cutouts',
+  },
+  {
+    field: 'notches',
+    path: 'notches',
+    help:
+      "Notches along an edge for the window's hardware, a crank's arm, a friction stay's arms or a keep: for each, " +
+      'its width along the edge and its depth from the frame in mm, then its edge (top, bottom, left or right) and ' +
+      'how far its middle is from the left corner (top, bottom) or the bottom one (left, right). Only in an edge ' +
+      'pressed into a frame. The edge strip stops either side of each, and the piece behind is cut where it ' +
+      'reaches past the strip.',
+    list: 'notches',
   },
   {
     field: 'rimDepthMm',

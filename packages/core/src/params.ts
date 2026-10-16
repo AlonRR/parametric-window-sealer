@@ -77,6 +77,8 @@ import { capitalised, hundredth, mm } from './words.js';
 import { EXAMPLE_TILT, EXAMPLE_TURN, refuseForWedge, sashForm, wedgeSetup } from './wedge-window.js';
 import type { TiltParams, TurnParams } from './wedge-window.js';
 import { EXAMPLE_ROOF, ROOF_PITCH_DEG, ROOF_PITCH_MESSAGE } from './roof.js';
+import { formatNotches, parseNotches, placeNotch } from './notch.js';
+import type { NotchSetting, PlacedNotch } from './notch.js';
 import type { RoofParams } from './roof.js';
 
 export interface AxisChoice {
@@ -101,6 +103,7 @@ export interface Params {
   fill: FillParams; // sealed to start with (Q141)
   pieceFills: PieceFill[]; // pieces with a fill of their own (#21); none to start with
   cutouts: Required<CutoutSetting>[]; // measured cutouts (#23); none to start with
+  notches: PlacedNotch[]; // notches along an edge for the window's hardware (#161), each in its piece
   rim: RimParams; // round each cutout (C42)
   fans: Required<FanSetting>[]; // fans from the list (#28); none to start with
   clamps: Required<ClampSetting>[]; // appliances held by clamps (#32); none to start with
@@ -143,6 +146,7 @@ export const EXAMPLE_PARAMS: Params = {
   fill: SEALED,
   pieceFills: [],
   cutouts: [],
+  notches: [],
   rim: DEFAULT_RIM,
   fans: [],
   clamps: [],
@@ -241,6 +245,7 @@ export const FIELD_NAMES = [
   'fillMeshView',
   'pieceFills',
   'cutouts',
+  'notches',
   'rimDepthMm',
   'rimWallMm',
   'rimClearanceMm',
@@ -936,6 +941,7 @@ export function toFormValues(p: Params): FormValues {
     ...sealForm(p),
     ...fillForm(p),
     ...cutoutsForm(p),
+    notches: formatNotches(p.notches),
     ...fansForm(p),
     ...clampsForm(p),
     ...insertsForm(p),
@@ -982,6 +988,9 @@ export function readParams(values: FormValues): ReadResult {
   checkSealFits(r, edges, sealRead);
   const { collar, socket, given: givenPorts } = readPorts(r, fit);
   const { rim, given: givenCutouts } = readCutouts(r, fit);
+  const parsedNotches = parseNotches(r.values.notches ?? '');
+  if (!parsedNotches.ok) r.fail('notches', parsedNotches.message);
+  const givenNotches: NotchSetting[] = parsedNotches.ok ? parsedNotches.notches : [];
   const givenFans = readFans(r);
   const { clamp, given: givenClamps } = readClamps(r);
   const { insert, given: givenInserts } = readInserts(r);
@@ -1061,6 +1070,7 @@ export function readParams(values: FormValues): ReadResult {
       inserts: givenInserts.length,
       model: modelRead !== undefined,
       customPiece: customRead !== undefined,
+      notches: givenNotches.length,
       roles: edges.roles,
     });
     const params: Params = {
@@ -1068,6 +1078,7 @@ export function readParams(values: FormValues): ReadResult {
       ports: givenPorts.slice(0, 1).map((p) => ({ hoseMm: p.hoseMm, column: 1, row: 1 })),
       pieceFills: [],
       cutouts: [],
+      notches: [],
       rim,
       fans: [],
       clamps: [],
@@ -1088,6 +1099,7 @@ export function readParams(values: FormValues): ReadResult {
   const given = [givenPorts, givenCutouts, givenFans, givenClamps, givenInserts];
   const printedAnyway =
     given.some((g) => g.length > 0) ||
+    givenNotches.length > 0 ||
     modelRead !== undefined ||
     customRead !== undefined ||
     pieceFills.some((f) => f.kind !== 'sealed');
@@ -1096,6 +1108,7 @@ export function readParams(values: FormValues): ReadResult {
     ports: [],
     pieceFills: [],
     cutouts: [],
+    notches: [],
     rim,
     fans: [],
     clamps: [],
@@ -1197,15 +1210,62 @@ export function readParams(values: FormValues): ReadResult {
       insert,
       model,
       customPiece,
+      notches: [],
     };
     const problem = checkPieceFills(planWall({ ...toPlaceIn, ...fitted }), pieceFills);
     if (problem !== undefined) r.fail('pieceFills', problem);
   }
 
+  // The notches, each in the edge piece it falls in, which has no fitting.
+  let notches: PlacedNotch[] = [];
+  if (r.ok && plan !== undefined && givenNotches.length > 0) {
+    const context = { edges, joint, tape: fit };
+    for (const [i, n] of givenNotches.entries()) {
+      const placing = placeNotch(plan, n, context, `Notch ${i + 1}`);
+      if (!placing.ok) {
+        r.fail('notches', placing.problem);
+        break;
+      }
+      notches.push(placing.placed);
+    }
+    if (!r.ok) notches = [];
+    const fitted: [FieldName, string, readonly InPiece[]][] = [
+      ['ports', 'Port', ports],
+      ['cutouts', 'Cutout', cutouts],
+      ['fans', 'Fan', fans],
+      ['clamps', 'Clamp', clamps],
+      ['inserts', 'Insert', inserts],
+      ['modelFile', 'The model', model.file === '' ? [] : [model]],
+      ['customPieceFile', 'The custom piece', customPiece.file === '' ? [] : [customPiece]],
+    ];
+    for (const [field, label, placed] of fitted) {
+      for (const [i, f] of placed.entries()) {
+        const n = notches.findIndex((x) => x.column === f.column && x.row === f.row);
+        if (n < 0) continue;
+        const name = label.startsWith('The ') ? label : `${label} ${i + 1}`;
+        r.fail(field, `${name} is in column ${f.column}, row ${f.row}, with notch ${n + 1}: give it another piece.`);
+      }
+    }
+  }
+
   if (!r.ok) return { ok: false, errors: r.errors };
   return {
     ok: true,
-    params: { ...base, ports, pieceFills, cutouts, rim, fans, clamps, clamp, inserts, insert, model, customPiece },
+    params: {
+      ...base,
+      ports,
+      pieceFills,
+      cutouts,
+      notches,
+      rim,
+      fans,
+      clamps,
+      clamp,
+      inserts,
+      insert,
+      model,
+      customPiece,
+    },
   };
 }
 

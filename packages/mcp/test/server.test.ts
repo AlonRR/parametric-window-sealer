@@ -751,3 +751,24 @@ describe('a roof window (sloped-frame, #160)', () => {
     expect(r.data['summary'].roof[0]).toMatch(/^On a roof at 60°, 50% of the wall’s weight pulls it out of the frame/);
   });
 });
+
+describe('notches for the hardware (edge-notches, #161)', () => {
+  it('the schema takes a notch by its edge; the summary says where it is', async () => {
+    const { client, call } = await connect();
+    const plan = (await client.listTools()).tools.find((t) => t.name === 'window_sealer_plan_wall');
+    if (!plan) throw new Error('window_sealer_plan_wall expected');
+    const settings = (plan.inputSchema.properties as Record<string, any>)['settings'];
+    expect(settings.properties.notches.items.properties.edge.enum).toEqual(['top', 'bottom', 'left', 'right']);
+    const r = await call('window_sealer_plan_wall', {
+      settings: {
+        openingWidthMm: 800,
+        openingHeightMm: 1200,
+        edges: { window: 'frame' },
+        seal: { kind: 'tpu' },
+        notches: [{ widthMm: 40, depthMm: 25, edge: 'bottom', atMm: 300 }],
+      },
+    });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['summary'].notches[0]).toMatch(/^Notch 1: 40 × 25 mm in the bottom edge/);
+  });
+});

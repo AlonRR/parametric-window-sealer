@@ -36,7 +36,7 @@ import { crossSolid, pinSolid, planPins, stripSolid } from 'parametric-window-se
 import { buildPiecesWith, fittingSource, placedFittings } from 'parametric-window-sealer';
 import { tpuJoint } from 'parametric-window-sealer';
 import { fillChoice, fillFor } from 'parametric-window-sealer';
-import { isCut, planParts, slotPins } from 'parametric-window-sealer';
+import { isCut, planParts, slotPins, tapeFit } from 'parametric-window-sealer';
 import { requireWedgeSetup, sashForm, sashWedgeSolids } from 'parametric-window-sealer';
 import type { Params } from 'parametric-window-sealer';
 
@@ -145,6 +145,10 @@ export function buildWallScene(engine: Engine, params: Params): Group {
     { joint, pins: slotted },
     undefined,
     () => false,
+    undefined,
+    undefined,
+    undefined,
+    { context: { edges: params.edges, joint, tape: tapeFit(params.seal) }, notches: params.notches },
   );
   try {
     built.forEach((piece, i) => {

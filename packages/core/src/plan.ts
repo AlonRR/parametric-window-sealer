@@ -12,6 +12,7 @@ import { anyPrinted } from './sheet.js';
 import type { JointPlan } from './joint.js';
 import { layoutGrid } from './layout.js';
 import type { GridLayout } from './layout.js';
+import { notchGaps } from './notch.js';
 import { maxPieceSize } from './printer.js';
 import type { PieceSize } from './printer.js';
 import { tapeFit } from './tape.js';
@@ -90,6 +91,14 @@ export function planParts(p: Params, plan: GridLayout = planWall(p)): WallParts 
     joints: planJoints(plan, p.joint, jointStripInsetMm(p.joint), longest),
     sliders: planSliders(plan, p.joint, jointStripInsetMm(p.joint), longest),
     flanges: planFlanges(plan, p.joint, jointStripInsetMm(p.joint)),
-    edges: planEdges(span.widthMm, span.heightMm, p.edges, p.joint, longest, tape),
+    edges: planEdges(
+      span.widthMm,
+      span.heightMm,
+      p.edges,
+      p.joint,
+      longest,
+      tape,
+      notchGaps(p.notches, { edges: p.edges, joint: p.joint, tape }),
+    ),
   };
 }
