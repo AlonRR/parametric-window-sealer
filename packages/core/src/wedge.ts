@@ -7,7 +7,8 @@
 // the sash's side, both H long, and its base the chord from the frame head to the sash's top. An
 // edge strip runs along each leg, down to the hinge; near the hinge, where the two strips meet,
 // each is cut off at the axis and together they close it. From there up it is a chain of pieces
-// along its axis, joined end to end, a joint's room left at the top for the corner with the top strip.
+// along its axis, joined end to end, up to the corner with the top strip. The top strip is a chain
+// of pieces too, from where one corner reaches along it to where the other does.
 import { divideAxis } from './layout.js';
 import type { AxisLayout } from './layout.js';
 import { mm } from './words.js';
@@ -23,6 +24,10 @@ export interface WedgeLimits {
   maxPieceMm: number; // the longest piece the printer makes
   jointMm: number; // what a joint takes between two pieces
   minPieceMm: number; // the narrowest piece the joints hold
+  corner: {
+    roomMm: number; // along a triangle's axis, from the top of its chain to its top
+    reachMm: number; // along the top strip, from the triangle's outer face to where its pieces start
+  };
 }
 
 export interface WedgeSide {
@@ -36,7 +41,7 @@ export interface WedgeSide {
 
 export interface TiltWedge {
   tiltDeg: number; // how far the sash leans in
-  top: { lengthMm: number; depthMm: number }; // the strip across the top
+  top: { lengthMm: number; depthMm: number; chain: AxisLayout }; // the strip across the top
   side: WedgeSide;
 }
 
@@ -46,17 +51,19 @@ export function tiltWedge(size: TiltWedgeSize, limits: WedgeLimits): TiltWedge {
   const baseMm = 2 * size.heightMm * Math.sin(half);
   const axisMm = size.heightMm * Math.cos(half);
   const tipMm = limits.edgeStripMm / Math.sin(half);
-  const chain = divideAxis({
-    lengthMm: axisMm - tipMm - limits.jointMm,
-    maxPieceMm: limits.maxPieceMm,
-    mode: 'equal',
-    filler: 'end',
-    minPieceMm: limits.minPieceMm,
-    jointMm: limits.jointMm,
-  });
+  const along = (lengthMm: number): AxisLayout =>
+    divideAxis({
+      lengthMm,
+      maxPieceMm: limits.maxPieceMm,
+      mode: 'equal',
+      filler: 'end',
+      minPieceMm: limits.minPieceMm,
+      jointMm: limits.jointMm,
+    });
+  const chain = along(axisMm - tipMm - limits.corner.roomMm);
   return {
     tiltDeg: (tilt * 180) / Math.PI,
-    top: { lengthMm: size.widthMm, depthMm: baseMm },
+    top: { lengthMm: size.widthMm, depthMm: baseMm, chain: along(size.widthMm - 2 * limits.corner.reachMm) },
     side: {
       legMm: size.heightMm,
       baseMm,

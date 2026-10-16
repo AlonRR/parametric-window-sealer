@@ -10,6 +10,7 @@ import {
   loadEngine,
   tapeFit,
   tiltWedge,
+  wedgeCorner,
   wedgeSideSolids,
   EXAMPLE_TRACK,
   PIN_SLOT_MM,
@@ -31,16 +32,17 @@ const EDGES: EdgeParams = {
   track: EXAMPLE_TRACK,
 };
 const PROFILE = edgeProfile('left', EDGES, DEFAULT_JOINT, FIT);
+const CORNER = wedgeCorner(PROFILE, DEFAULT_JOINT, PANEL);
 const WEDGE = tiltWedge(
   { widthMm: 800, heightMm: 1200, gapMm: 150 },
-  { edgeStripMm: PROFILE.heightMm, maxPieceMm: MAX, jointMm: 5, minPieceMm: 20 },
+  { edgeStripMm: PROFILE.heightMm, maxPieceMm: MAX, jointMm: 5, minPieceMm: 20, corner: CORNER },
 );
 const half = ((WEDGE.tiltDeg / 2) * Math.PI) / 180;
 // Without the ribs, which press into the panels on purpose, nothing may overlap.
 const PLAIN: JointParams = { ...DEFAULT_JOINT, gripMm: 0 };
 const parts = wedgeSideSolids(engine, WEDGE, PROFILE, PLAIN, PANEL, MAX);
 const all: Manifold[] = [...parts.legs, ...parts.panels, ...parts.joints];
-const top = WEDGE.side.axisMm - 5; // the corner's room is left at the top
+const top = WEDGE.side.axisMm - CORNER.belowTopMm; // the corner piece's lower face, where the leg strips stop
 
 const volumeOf = (m: Manifold) => {
   const v = m.volume();
@@ -52,7 +54,7 @@ describe('the side triangle’s parts', () => {
   it('as many as the chain and the printer make', () => {
     expect(parts.panels).toHaveLength(WEDGE.side.chain.pieces.length);
     expect(parts.joints).toHaveLength(WEDGE.side.chain.pieces.length - 1);
-    // Each leg 1200 mm long, in the fewest segments of at most 200 mm: 6, two legs.
+    // Each leg up to the corner piece, 1190 mm, in the fewest segments of at most 200 mm: 6, two legs.
     expect(parts.legs).toHaveLength(12);
   });
 
@@ -67,7 +69,7 @@ describe('the side triangle’s parts', () => {
     }
   });
 
-  it('seen through the face, no hole from the hinge to the corner’s room at the top, but the gaskets’ along the legs', () => {
+  it('seen through the face, no hole from the hinge to the corner piece, but the gaskets’ along the legs', () => {
     const out = PROFILE.tape?.standOutMm ?? 0;
     const union = M.union(all);
     let probed = 0;
@@ -110,12 +112,11 @@ describe('the side triangle’s parts', () => {
   it('a pin through each joint strip’s middle, on the axis, through a slot in the panel either side', () => {
     const { pieces, jointsMm } = WEDGE.side.chain;
     const union = M.union(all);
-    const solidAt = (x: number, y: number) =>
-      volumeOf(
-        M.cube([0.1, 0.1, 0.1], true)
-          .translate([x, y, PANEL / 2])
-          .intersect(union),
-      );
+    const solidAt = (x: number, y: number, z: number) =>
+      volumeOf(M.cube([0.1, 0.1, 0.1], true).translate([x, y, z]).intersect(union));
+    // Through the strip's flange each side, the panel, and the slot in it.
+    const flange = PLAIN.fitMm + PLAIN.flangeMm / 2;
+    const throughStrip = [-flange, PANEL / 2, PANEL + flange];
     try {
       let at = WEDGE.side.tipMm;
       jointsMm.forEach((gap, i) => {
@@ -123,8 +124,10 @@ describe('the side triangle’s parts', () => {
         const centre = at - gap / 2;
         const inFromSide = stripWidthMm(PLAIN) / 2 - pinDepthMm(PLAIN);
         for (const x of [centre - inFromSide, centre + inFromSide]) {
-          expect(solidAt(x, 0), `joint ${i} at x ${x.toFixed(1)}`).toBe(0);
-          expect(solidAt(x, PIN_SLOT_MM), `joint ${i} beside its pin`).toBeGreaterThan(0);
+          for (const z of throughStrip) {
+            expect(solidAt(x, 0, z), `joint ${i} at x ${x.toFixed(1)}, z ${z}`).toBe(0);
+            expect(solidAt(x, PIN_SLOT_MM, z), `joint ${i} beside its pin`).toBeGreaterThan(0);
+          }
         }
       });
     } finally {

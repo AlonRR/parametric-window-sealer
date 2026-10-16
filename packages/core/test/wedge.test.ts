@@ -1,11 +1,18 @@
 // The wedge a tilted sash leaves (sash-wedge, #159; docs/research/sash-wedge.md): from the
 // opening W × H and the gap d at the top, the sash's tilt; the strip across the top, W by the chord
 // from the frame head to the sash's top; and each side triangle, its legs H, its base the chord,
-// the edge strips along its legs meeting near the hinge, and a chain of pieces from there up.
+// the edge strips along its legs meeting near the hinge, and a chain of pieces from there up to the
+// corner with the top strip; the top strip, a chain of pieces from one corner to the other.
 import { describe, expect, it } from 'vitest';
 import { tiltWedge, tiltWedgeProblem } from '../src/index.js';
 
-const LIMITS = { edgeStripMm: 15, maxPieceMm: 200, jointMm: 5, minPieceMm: 20 };
+const LIMITS = {
+  edgeStripMm: 15,
+  maxPieceMm: 200,
+  jointMm: 5,
+  minPieceMm: 20,
+  corner: { roomMm: 4.3, reachMm: 6.7 },
+};
 const SASH = { widthMm: 800, heightMm: 1200, gapMm: 150 };
 
 describe('the tilted wedge', () => {
@@ -28,20 +35,31 @@ describe('the tilted wedge', () => {
     expect(side.widthAtMm(side.axisMm)).toBeCloseTo(side.baseMm, 9);
   });
 
-  it('the leg strips meet near the hinge; a chain of pieces from there, a joint short of the top', () => {
+  it('the leg strips meet near the hinge; a chain of pieces from there, the corner’s room short of the top', () => {
     const { side } = tiltWedge(SASH, LIMITS);
     // Strips 15 mm wide square to the legs meet on the axis 15 / sin(α/2) from the hinge: 239.5 mm.
     expect(side.tipMm).toBeCloseTo(239.5, 1);
     expect(side.widthAtMm(side.tipMm)).toBeCloseTo(30 / Math.cos(Math.asin(150 / 1200) / 2), 9);
     const { pieces, jointsMm } = side.chain;
-    // From the tip, the pieces and their joints, and a joint's room for the corner at the top.
+    // From the tip, the pieces and their joints, and the corner's room at the top.
     const filled =
-      side.tipMm + pieces.reduce((a, b) => a + b, 0) + jointsMm.reduce((a, b) => a + b, 0) + LIMITS.jointMm;
+      side.tipMm + pieces.reduce((a, b) => a + b, 0) + jointsMm.reduce((a, b) => a + b, 0) + LIMITS.corner.roomMm;
     expect(filled).toBeCloseTo(side.axisMm, 6);
-    // 953.1 mm in the fewest equal pieces no longer than 200 mm: 5.
+    // 953.8 mm in the fewest equal pieces no longer than 200 mm: 5.
     expect(pieces).toHaveLength(5);
     for (const p of pieces) expect(p).toBeLessThanOrEqual(200);
     expect(jointsMm).toEqual([5, 5, 5, 5]);
+  });
+
+  it('the top strip: a chain of pieces from where one corner reaches to where the other does', () => {
+    const { top } = tiltWedge(SASH, LIMITS);
+    const { pieces, jointsMm } = top.chain;
+    const filled = pieces.reduce((a, b) => a + b, 0) + jointsMm.reduce((a, b) => a + b, 0);
+    expect(filled).toBeCloseTo(800 - 2 * LIMITS.corner.reachMm, 6);
+    // 786.6 mm in the fewest equal pieces no longer than 200 mm: 4, each 192.9 mm.
+    expect(pieces).toHaveLength(4);
+    for (const p of pieces) expect(p).toBeCloseTo(192.9, 1);
+    expect(jointsMm).toEqual([5, 5, 5]);
   });
 });
 

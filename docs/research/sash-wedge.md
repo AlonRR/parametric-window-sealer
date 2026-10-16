@@ -47,9 +47,12 @@ changed for this reason.
 Measured by the user: the opening seen inside the frame, **W** wide and **H** tall, and **the gap
 at the top**, **d**, from the frame to the tilted sash.
 
-- **The top strip** is a rectangle W long and about d wide, lying flat at the head, between the
-  frame head's room face and the sash's outer face. It is a wall of pieces as any other, one piece
-  deep, joined end to end.
+- **The top strip** is a rectangle W long and about d wide, between the frame head's room face and
+  the sash's outer face. It is a wall of pieces as any other, one piece deep, joined end to end. It
+  lies square to the triangles' axis, so it meets each triangle at 90°, half an edge strip below
+  their top, so its edge strip on the sash lies wholly on the sash. The frame's face and the sash's
+  are each half the tilt off square to it, so its edge strips' outer faces are bevelled onto them
+  (C308).
 - **Each side triangle** stands in the plane of a jamb: H tall, d wide at the top, narrowing to
   nothing at the hinge. It is a chain of pieces, each no taller than the printer allows, each a
   trapezoid a few degrees off a rectangle (the sash's side meets the jamb at about asin(d/H), 5° to
@@ -59,7 +62,10 @@ at the top**, **d**, from the frame to the tilted sash.
   gasket, as an edge pressed into a frame is; each face is sized so the gaskets are squeezed, which
   holds it.
 - **The corners** where the top strip meets each triangle are printed corner pieces holding both
-  faces' edges at 90°.
+  faces' edges at 90°: the triangle's top in a slot facing down its axis, the top strip's end in a
+  slot facing along it. A corner piece closes the corner against the frame and the sash with its
+  own faces, and carries the gasket's groove round the corner from the leg strip's to the top
+  strip's. The leg strips stop under it, and the top strip's edge strips start beside it (C309).
 - **The hose** goes through a flattened port in the top strip: its flat slot through the strip, its
   round collar on the room side.
 
