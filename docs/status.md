@@ -11,8 +11,8 @@ All of it is released as `v0.4.0` (Q155). `v0.5.0` is the joint tuned and in its
 rails and bolted flanges (#29 to #31). `v0.6.0` is everything built since, in one release (Q160):
 the tile editor (`draw-tile`, #39), the Skådis board (`organiser-skadis`, #33), the openGrid
 board (`organiser-opengrid`, #34), the Honeycomb Storage Wall board (`organiser-hsw`, #37), the
-Multiboard board (`organiser-multiboard`, #36), built and not offered yet while its licence is
-open (Q159, Q162), the mesh reader (`mesh-import`, #42), the wall cut round a model of the
+Multiboard board (`organiser-multiboard`, #36), built and kept hidden in the interface while its
+licence is unsettled (Q159, Q162), the mesh reader (`mesh-import`, #42), the wall cut round a model of the
 appliance (`mesh-appliance`, #35), 3D tiles of your own as the fill (`mesh-tiles`, #40) and a whole
 piece of your own (`mesh-custom-piece`, #41). The next minor version, `v0.7.0`, is the window
 types the survey found missing (Q161; [`research/window-types.md`](research/window-types.md)): a wall
@@ -190,6 +190,7 @@ leaves (`sash-wedge`, #159) (C299). Nothing has been test printed yet.
 | Q159 | **Multiboard (`organiser-multiboard`, #36) is built with all its board's features, and hidden in the interface for now**, while its licence (the MultiBuild licence, against the files being the user's to sell, Q36) stays unsettled. Asked: "159 build it with all it's features but hide it in the interface for now" | 16 Oct 2026 |
 | Q160 | **One release, `v0.6.0`, cut from `main`** with everything built since `v0.5.0`: the organiser boards (Multiboard hidden, Q159), the drawn tile and the meshes; the next items become `v0.7.0`. The tag and the GitHub release go to the session on the owner's machine he names `ogpc` (Q123). Asked: "160 a make sure to ask ogpc for version tagging" | 16 Oct 2026 |
 | Q161 | **Look into other window types** (`other-windows`, #43): the windows people fit a window AC, a hose kit or a fan into, what the tool already seals and what it lacks. Asked: "161 look into other window types" | 16 Oct 2026 |
+| Q162 | **Multiboard stays in the repository when it goes public, hidden in the interface as now** (Q159): the page, the command's help and the MCP server leave it out, the library and the command take it by name; and **the repository goes public**, the owner's own step (Q3). Asked: "162 stays hidden. Go public" | 16 Oct 2026 |
 | Q149 | P2 goes on with **`svg-tile`** (#27), an SVG tile of the user's own as a pattern, its SVG read with a parsing library the agent chooses and logs (C98), **then `clamps`** (#32), the second new fitting. Asked whether to go ahead: "149 yes" | 14 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
@@ -205,21 +206,23 @@ The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-- **Q162.** Multiboard (#36) is built and hidden in the interface (Q159), but its sizes are in the
-  code and in `docs/organisers.md`, so a public repository publishes them. MultiBuild's licence never
-  mentions dimensions, and the same sizes are already public under open licences (BSD-2-Clause,
-  CERN-OHL-W); but its "Designs" include "documentation", and it binds products "derived from a
-  Design". When the repository goes public: keep Multiboard in it, hidden as now (recommended; not
-  legal advice); take it out first, keeping it only on the owner's own forge until the licence is
-  settled; or offer it on the page too?
+None at present.
 
 The next free ID is Q163.
 
 ## Repository follow-ups
 
-- **Pending (Q160, Q123):** the `v0.6.0` tag on the release commit `chore(release): v0.6.0, the
-  organisers and the meshes` and its GitHub release, a pre-release (C63), asked of the session on
-  the owner's machine he names `ogpc` once the commit is on `main`; checked on GitHub afterwards.
+- **Owner's step (Q3, Q162):** make the repository public: **Settings → General → Danger Zone →
+  Change visibility → Change to public** on GitHub
+  ([GitHub's steps](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/setting-repository-visibility#changing-a-repositorys-visibility)).
+  The history was reviewed again first (`.repo-status`). Pending until the owner says it is done.
+  Serving the page on GitHub Pages stays a separate switch of his (Q43; the README's steps).
+- **Done (Q160, Q123):** the `v0.6.0` tag on the release commit `chore(release): v0.6.0, the
+  organisers and the meshes` (`9f4c248`) and its GitHub release, made by the session on the
+  owner's machine he names `ogpc` on 16 Oct 2026 (verified: GitHub lists the annotated tag `v0.6.0`
+  on `9f4c248`, signed by the owner's key and marked verified, and the release "v0.6.0, the
+  organisers and the meshes" with the CHANGELOG's 0.6.0 section as its notes). It is marked a
+  pre-release, as the earlier ones are (C63).
 - **Done (C215, Q123):** the `v0.5.0` tag on the release commit `chore(release): v0.5.0, the
   joint` (`680224a`) and its GitHub release, made by the session on the owner's machine on 15 Oct
   2026 (verified: GitHub lists the annotated tag `v0.5.0` on `680224a`, signed by the owner's key

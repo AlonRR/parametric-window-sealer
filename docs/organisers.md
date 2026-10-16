@@ -7,8 +7,8 @@ board's openings are cut through, every one of them whole.
 
 The owner chose four systems to offer (Q9): Skådis, openGrid, Multiboard and the Honeycomb Storage
 Wall. All four are built. Skådis, openGrid and the Honeycomb Storage Wall are offered; Multiboard is
-not offered yet, while a question about its licence is open (Q159): the page, the command's help
-and the MCP server leave it out, and the library and the command take it by name.
+kept hidden while a question about its licence is unsettled (Q159, Q162): the page, the command's
+help and the MCP server leave it out, and the library and the command take it by name.
 
 ## Using one
 
@@ -106,7 +106,7 @@ them where it expects. At the default 3 mm panel the board stands 5 mm proud.
 
 For the parts of [Multiboard](https://www.multiboard.io/), MultiBuild's modular wall system: its
 snaps, bolts, pegs and the bins and holders that hang on them, matching its tiles. It is built in
-full and **not offered yet** (Q159): the command takes `--fill multiboard`, a piece's own board
+full and **not offered yet** (Q159, Q162): the command takes `--fill multiboard`, a piece's own board
 `2,1=multiboard`, and the library `fill.kind: "multiboard"`; the page's lists, the command's help
 and the MCP server's schema leave it out until the question about its licence, below, is settled.
 
@@ -157,8 +157,9 @@ measurements or compatibility, so whether a board made to the same sizes, using 
 falls under it is not settled, nor how that sits with the statement that the files this tool makes
 are the user's to sell (Q36). Of the community models, one carries no licence, one follows
 Multiboard's, one is CC BY-NC-SA with its snap under Multiboard's, one is BSD-2-Clause with sizes
-matching the first's, and one carves its Multiboard sizes out of its MIT licence (relayed). This is
-the owner's question (Q159, Q162), not legal advice.
+matching the first's, and one carves its Multiboard sizes out of its MIT licence (relayed). The
+owner keeps the board in the repository and hidden in the interface while this is unsettled (Q159,
+Q162); none of this is legal advice.
 
 ## Not yet confirmed
 
