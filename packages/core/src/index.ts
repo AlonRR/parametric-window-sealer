@@ -23,6 +23,7 @@ export * from './double.js';
 export * from './frame.js';
 export * from './shutter.js';
 export * from './roof.js';
+export * from './pivot.js';
 export * from './notch.js';
 export * from './wedge.js';
 export * from './wedge-geometry.js';

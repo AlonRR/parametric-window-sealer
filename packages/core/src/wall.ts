@@ -30,7 +30,8 @@ import { fillChoice } from './fill.js';
 import { patternBorderMm } from './pattern.js';
 import { fillFor } from './piece-fill.js';
 import { gasketShapes, gasketSolid, tpuJoint } from './tpu.js';
-import { plannedWedgeFiles, sashForm, wedgeFiles } from './wedge-window.js';
+import { plannedWedgeFiles, sashForm, sashPartNames, wedgeExportParts, wedgeFiles } from './wedge-window.js';
+import { pivotWall, pivotWedge, pivotWedgeName } from './pivot.js';
 import type { FieldErrors, Params } from './params.js';
 import type { PlanText } from './plan-text.js';
 
@@ -167,10 +168,15 @@ export function buildExport(engine: Engine, params: Params): { pieces: ExportPie
   return { pieces, parts };
 }
 
+// A pivot window's download (#162) is its wall's, below the pivot, and the wedge's parts above it.
 export function makeFiles(engine: Engine, params: Params, choice: DownloadChoice): DownloadFile[] {
   if (sashForm(params.edges.window) !== undefined) return wedgeFiles(engine, params, choice);
-  const { pieces, parts } = buildExport(engine, params);
-  return packageDownload(pieces, parts, choice, params.openingWidthMm, params.openingHeightMm);
+  const { pieces, parts } = buildExport(engine, pivotWall(params));
+  const wedge =
+    params.edges.window === 'pivot'
+      ? wedgeExportParts(engine, pivotWedge(params)).map((part) => ({ ...part, name: pivotWedgeName(part.name) }))
+      : [];
+  return packageDownload(pieces, [...parts, ...wedge], choice, params.openingWidthMm, params.openingHeightMm);
 }
 
 // The page's own checks, for parameters given as numbers: each value is read back as the
@@ -226,17 +232,20 @@ export function planFiles(params: Params, choice: DownloadChoice): PlannedFile[]
   const label = wallLabel(params.openingWidthMm, params.openingHeightMm);
   if (choice.packaging === 'single') return [{ name: `${label}.3mf`, type: MEDIA_TYPES['3mf'] }];
   if (choice.packaging === 'zip') return [{ name: `${label}-${choice.format}.zip`, type: MEDIA_TYPES.zip }];
-  const plan = planWall(params);
+  const wall = pivotWall(params);
+  const plan = planWall(wall);
   const type = MEDIA_TYPES[choice.format];
-  const fittings = placedFittings(fittingSource(params));
+  const fittings = placedFittings(fittingSource(wall));
+  const wedge = params.edges.window === 'pivot' ? sashPartNames(pivotWedge(params)) : [];
   return [
     ...plan.pieces
-      .filter((cell) => !isCut(params, cell))
+      .filter((cell) => !isCut(wall, cell))
       .map((cell) => {
-        const notches = params.notches.filter((n) => n.column === cell.column + 1 && n.row === cell.row + 1);
+        const notches = wall.notches.filter((n) => n.column === cell.column + 1 && n.row === cell.row + 1);
         const tag = fittingIn(fittings, cell.column + 1, cell.row + 1)?.tag ?? notches.map(notchTag).join('');
         return { name: taggedFileName(cell, choice.format, tag), type };
       }),
-    ...wallParts(params, plan).map((part) => ({ name: `${part.name}.${choice.format}`, type })),
+    ...wallParts(wall, plan).map((part) => ({ name: `${part.name}.${choice.format}`, type })),
+    ...wedge.map(({ name }) => ({ name: `${pivotWedgeName(name)}.${choice.format}`, type })),
   ];
 }

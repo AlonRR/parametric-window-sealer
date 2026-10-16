@@ -80,6 +80,8 @@ import { EXAMPLE_ROOF, ROOF_PITCH_DEG, ROOF_PITCH_MESSAGE } from './roof.js';
 import { formatNotches, parseNotches, placeNotch } from './notch.js';
 import type { NotchSetting, PlacedNotch } from './notch.js';
 import type { RoofParams } from './roof.js';
+import { EXAMPLE_PIVOT, PIVOT_PITCH_MESSAGE, pivotWedge } from './pivot.js';
+import type { PivotParams } from './pivot.js';
 
 export interface AxisChoice {
   mode: AxisMode;
@@ -120,6 +122,7 @@ export interface Params {
   tilt: TiltParams; // a tilted sash's gap at the top, for its wedge (sash-wedge, #159)
   turn: TurnParams; // a turned sash's gap at the latch side, for its wedge
   roof: RoofParams; // a roof window's pitch (sloped-frame, #160)
+  pivot: PivotParams; // a pivot window's pivot height and gap at the top (pivot-window, #162)
   rain: boolean; // weep holes in the strips and a drip groove under the edge strips (rain-face, #117)
   stop: StopParams; // a strut in the sash's track that lifts out by hand (sash-stop, #118); none to start with
   wall: WallKind; // single, or double with hollow pieces for winter (double-wall, #119)
@@ -167,6 +170,7 @@ export const EXAMPLE_PARAMS: Params = {
   tilt: EXAMPLE_TILT,
   turn: EXAMPLE_TURN,
   roof: EXAMPLE_ROOF,
+  pivot: EXAMPLE_PIVOT,
 };
 
 // Every field of the page's form. The page reads and writes these by name; the settings list
@@ -209,6 +213,9 @@ export const FIELD_NAMES = [
   'tiltGapMm',
   'turnGapMm',
   'roofPitchDeg',
+  'pivotAtMm',
+  'pivotGapMm',
+  'pivotPitchDeg',
   'topEdge',
   'bottomEdge',
   'leftEdge',
@@ -276,13 +283,14 @@ export type ReadResult = { ok: true; params: Params } | { ok: false; errors: Fie
 const MODES: readonly AxisMode[] = ['equal', 'full-plus-filler'];
 const FILLERS: readonly FillerPosition[] = ['start', 'end', 'middle', 'split'];
 const LEFTOVERS: readonly Leftover[] = ['spread', 'equal', 'shorten'];
-const WINDOWS: readonly WindowType[] = ['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn', 'roof'];
+const WINDOWS: readonly WindowType[] = ['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn', 'roof', 'pivot'];
 const ROLES: readonly EdgeRole[] = ['track', 'sash', 'sill', 'unit', 'frame'];
 const SEALS: readonly SealKind[] = ['none', 'tape', 'tpu'];
 const PRINTER_KINDS = ['default', 'custom', 'model'] as const;
 const YES_NO = ['no', 'yes'] as const;
 
 const yesNo = (on: boolean): 'yes' | 'no' => (on ? 'yes' : 'no');
+const pitchFits = (n: number) => n >= ROOF_PITCH_DEG.least && n <= ROOF_PITCH_DEG.most;
 const positive = (n: number) => n > 0;
 // A pattern's bar is no thinner than two lines from a 0.4 mm nozzle (Q143).
 const barFits = (n: number) => n >= MIN_BAR_MM - 1e-9;
@@ -429,6 +437,9 @@ const edgesForm = (p: Params): FormValues => ({
   tiltGapMm: String(p.tilt.gapMm),
   turnGapMm: String(p.turn.gapMm),
   roofPitchDeg: String(p.roof.pitchDeg),
+  pivotAtMm: String(p.pivot.atMm),
+  pivotGapMm: String(p.pivot.gapMm),
+  pivotPitchDeg: String(p.pivot.pitchDeg),
   topEdge: p.edges.roles.top,
   bottomEdge: p.edges.roles.bottom,
   leftEdge: p.edges.roles.left,
@@ -951,6 +962,7 @@ export function toFormValues(p: Params): FormValues {
 }
 
 export function readParams(values: FormValues): ReadResult {
+  if (values.window === 'pivot') return readPivot(values);
   const r = new FormReader(values);
   const opening = readOpening(r);
   const { printer, bedMarginMm } = readPrinter(r);
@@ -968,9 +980,15 @@ export function readParams(values: FormValues): ReadResult {
       'roofPitchDeg',
       edges.window === 'roof',
       EXAMPLE_ROOF.pitchDeg,
-      (n) => n >= ROOF_PITCH_DEG.least && n <= ROOF_PITCH_DEG.most,
+      pitchFits,
       ROOF_PITCH_MESSAGE,
     ),
+  };
+  // A pivot window's are read by readPivot; elsewhere a value that fits is kept.
+  const pivot: PivotParams = {
+    atMm: r.numberIfUsed('pivotAtMm', false, EXAMPLE_PIVOT.atMm, positive, SIZE_MESSAGE),
+    gapMm: r.numberIfUsed('pivotGapMm', false, EXAMPLE_PIVOT.gapMm, positive, SIZE_MESSAGE),
+    pitchDeg: r.numberIfUsed('pivotPitchDeg', false, EXAMPLE_PIVOT.pitchDeg, pitchFits, PIVOT_PITCH_MESSAGE),
   };
   const sealRead = readSeal(r);
   const { seal, fit } = sealRead;
@@ -1052,6 +1070,7 @@ export function readParams(values: FormValues): ReadResult {
     tilt,
     turn,
     roof,
+    pivot,
   };
   // A tilted or turned sash has a wedge, not a wall: none of a wall's fittings or patterns, its one
   // port in the strip, and its own problems in place of the wall's plan's.
@@ -1282,4 +1301,72 @@ function checkPieceFills(plan: GridLayout, fills: readonly PieceFill[]): string 
     }
   }
   return undefined;
+}
+
+// A pivot window (pivot-window, #162): the wall below the pivot is read as a wall in a frame with no
+// track, the opening's height up to the pivot, and then the wedge above it as a tilted sash's, the
+// rest of the height and the gap at the top. Each half's problems are said where they are set: the
+// wall's height on the pivot's height, and the wedge's gap on the pivot's gap.
+function readPivot(values: FormValues): ReadResult {
+  const r = new FormReader(values);
+  const heightMm = r.size('openingHeightMm');
+  const atMm = r.number('pivotAtMm');
+  if (!(atMm > 0)) r.fail('pivotAtMm', SIZE_MESSAGE);
+  else if (Number.isFinite(heightMm) && !(atMm < heightMm)) {
+    r.fail(
+      'pivotAtMm',
+      `The pivot is ${mm(atMm)} mm up: give its height inside the opening, above 0 and below ${mm(heightMm)} mm.`,
+    );
+  }
+  const gapMm = r.size('pivotGapMm');
+  const pitchDeg = r.numberIfUsed('pivotPitchDeg', true, EXAMPLE_PIVOT.pitchDeg, pitchFits, PIVOT_PITCH_MESSAGE);
+  if (r.ok && !(gapMm < heightMm - atMm)) {
+    r.fail(
+      'pivotGapMm',
+      `The gap at the top is ${mm(gapMm)} mm: the sash’s top moves in less than the ${mm(heightMm - atMm)} mm ` +
+        'from the pivot to the top.',
+    );
+  }
+  if (!r.ok) {
+    // The rest is still checked, as the page marks every field at once.
+    const rest = readParams({ ...values, window: 'frame' });
+    return { ok: false, errors: { ...(rest.ok ? {} : rest.errors), ...r.errors } };
+  }
+  const wall = readParams({ ...values, window: 'frame', openingHeightMm: String(atMm) });
+  if (!wall.ok) {
+    const below = (m: string) => `The wall below the pivot is ${mm(atMm)} mm tall. ${m}`;
+    return { ok: false, errors: moved(wall.errors, { openingHeightMm: ['pivotAtMm', below] }) };
+  }
+  const params: Params = {
+    ...wall.params,
+    openingHeightMm: heightMm,
+    edges: { ...wall.params.edges, window: 'pivot' },
+    pivot: { atMm, gapMm, pitchDeg },
+  };
+  const wedge = readParams(toFormValues(pivotWedge(params)));
+  if (!wedge.ok) {
+    const moves = {
+      tiltGapMm: ['pivotGapMm', (m: string) => m],
+      openingWidthMm: ['openingWidthMm', (m: string) => m],
+    } as const;
+    return { ok: false, errors: moved(wedge.errors, moves, (m) => `The wedge above the pivot: ${m}`) };
+  }
+  return { ok: true, params };
+}
+
+// Errors moved to the fields they are given on, and reworded to say which half they are about.
+function moved(
+  errors: FieldErrors,
+  moves: Partial<Record<FieldName, readonly [FieldName, (message: string) => string]>>,
+  other: (message: string) => string = (m) => m,
+): FieldErrors {
+  const out: FieldErrors = {};
+  for (const field of FIELD_NAMES) {
+    const message = errors[field];
+    if (message === undefined) continue;
+    const move = moves[field];
+    if (move === undefined) out[field] = other(message);
+    else out[move[0]] = move[1](message);
+  }
+  return out;
 }

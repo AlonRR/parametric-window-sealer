@@ -17,6 +17,7 @@ import { maxPieceSize } from './printer.js';
 import type { PieceSize } from './printer.js';
 import { tapeFit } from './tape.js';
 import type { Params } from './params.js';
+import { pivotWall } from './pivot.js';
 
 // Puzzle dovetails (#29) reach this far beyond a piece's cell on its right and upper edges, so the
 // cells are planned that much smaller than the printer makes.
@@ -69,7 +70,9 @@ export function longestStripMm(p: Params): number {
 }
 
 export function planWall(p: Params): GridLayout {
-  return layoutFor(p, pieceLimit(p));
+  // A pivot window's grid is its wall's, below the pivot (#162).
+  const wall = pivotWall(p);
+  return layoutFor(wall, pieceLimit(wall));
 }
 
 export interface WallParts {

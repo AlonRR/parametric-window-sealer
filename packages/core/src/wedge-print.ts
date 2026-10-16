@@ -23,7 +23,7 @@ import { gasketSolid } from './tpu.js';
 import { sashWedgeSolids, wedgeCorner } from './wedge-geometry.js';
 import type { FlatPort } from './wedge-port.js';
 import { WEDGE_WORDS } from './wedge.js';
-import type { SashWedge } from './wedge.js';
+import type { SashWedge, WedgeWords } from './wedge.js';
 import { capitalised, mm } from './words.js';
 
 export interface WedgePrintPart {
@@ -213,9 +213,9 @@ export function describeWedge(
   port: FlatPort | undefined,
   runs: { legMm: number; topMm: number },
   seal: 'tape' | 'tpu',
+  w: WedgeWords = WEDGE_WORDS[wedge.form],
 ): string[] {
   const { side, top } = wedge;
-  const w = WEDGE_WORDS[wedge.form];
   const lines = [
     `The sash ${w.opens} ${mm(wedge.tiltDeg)}° in. The wedge it leaves: a ${w.strip} ${mm(top.lengthMm)} mm long ` +
       `and ${mm(top.depthMm)} mm deep, and ${w.triangles}, ${mm(side.legMm)} mm on its two long sides and ` +

@@ -342,6 +342,7 @@
               <option value="tilt">A sash tilted in at the top: tilt-and-turn in tilt, a hopper</option>
               <option value="turn">A sash turned part way: tilt-and-turn in turn, an inward casement</option>
               <option value="roof">A roof window opened out: top-hung</option>
+              <option value="pivot">A pivot window: the sash turned on an axis across its middle</option>
             </select>
           </label>
           <!-- A tilted sash (sash-wedge, #159): a wedge in place of a wall, its gap at the top. -->
@@ -390,8 +391,39 @@
             </p>
             <span class="error" data-testid="error-roofPitchDeg"></span>
           </div>
+          <!-- A pivot window (pivot-window, #162): a wall below the pivot, a wedge above it. -->
+          <div data-show-when="window=pivot" hidden>
+            <label>
+              Pivot height (mm)
+              <input name="pivotAtMm" inputmode="decimal" autocomplete="off" />
+            </label>
+            <span class="error" data-testid="error-pivotAtMm"></span>
+            <label>
+              Gap at the top, above the pivot (mm)
+              <input name="pivotGapMm" inputmode="decimal" autocomplete="off" />
+            </label>
+            <span class="error" data-testid="error-pivotGapMm"></span>
+            <label>
+              Pitch, from level (°)
+              <input name="pivotPitchDeg" inputmode="decimal" autocomplete="off" />
+            </label>
+            <p class="note">
+              A sash turned on an axis across its middle swings its top half in and its bottom half
+              out. Below the pivot the frame is clear from inside: a wall goes in as in a frame with no
+              track, its top edge pressed by the sash where it crosses the frame. Above it, the sash
+              leaves the wedge a tilted sash leaves, its point at the pivot. Give the opening inside the
+              frame above; here how high the open sash's room face crosses the frame, from the
+              opening's bottom, and the gap at the top, from the frame to the sash's outer face. Hold
+              the sash at that gap with a restrictor before the wall and the wedge go in. Both are held
+              by their printed TPU gaskets: choose printed TPU as the seal. The wall below takes the
+              hose ports and every other fitting. An upright pivot window is at 90° from level; in a
+              centre-pivot roof window, give the roof's pitch, and the plan says how much of the wall's
+              weight pulls it out of the frame, and how to test that it holds.
+            </p>
+            <span class="error" data-testid="error-pivotPitchDeg"></span>
+          </div>
           <!-- Notches for the window's hardware (edge-notches, #161), in a frame's edges. -->
-          <div data-show-when="window=frame|roof" hidden>
+          <div data-show-when="window=frame|roof|pivot" hidden>
             <label>
               Notches for hardware
               <input name="notches" autocomplete="off" spellcheck="false" placeholder="40x25@bottom,300" />
@@ -1490,6 +1522,7 @@
         <ul data-testid="plan-roof" data-plan="roof"></ul>
         <ul data-testid="plan-notches" data-plan="notches"></ul>
         <ul data-testid="plan-wedge" data-plan="wedge"></ul>
+        <ul data-testid="plan-pivot" data-plan="pivot"></ul>
         <p data-testid="plan-printing" data-plan="printing"></p>
         <ul data-testid="plan-stiffeners" data-plan="stiffeners"></ul>
         <ul data-testid="plan-warnings" data-plan="warnings"></ul>

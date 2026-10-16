@@ -304,7 +304,7 @@ describe('usage', () => {
     expect(r.out).toMatch(/--slot <mm> +How deep a piece can go into a strip\. \(8\)/);
     // Wherever its lines break: the flag column is as wide as the longest flag.
     expect(r.out.replace(/\s+/g, ' ')).toMatch(
-      /--window <slider\|hung\|frame\|shutter\|tilt\|turn\|roof> .*?as the page does\. \(slider\)/,
+      /--window <slider\|hung\|frame\|shutter\|tilt\|turn\|roof\|pivot> .*?as the page does\. \(slider\)/,
     );
     expect(r.out).toContain('Exit status: 0 done, 1 could not write, 2 wrong options or settings.');
   });
@@ -1024,7 +1024,7 @@ describe('behind a roller shutter (shutter-rails, #158)', () => {
 
   it('--help offers it', async () => {
     const help = await cli(['--help']);
-    expect(help.out.replace(/\s+/g, ' ')).toMatch(/--window <slider\|hung\|frame\|shutter\|tilt\|turn\|roof> /);
+    expect(help.out.replace(/\s+/g, ' ')).toMatch(/--window <slider\|hung\|frame\|shutter\|tilt\|turn\|roof\|pivot> /);
   });
 });
 
@@ -1102,6 +1102,44 @@ describe('a roof window (sloped-frame, #160)', () => {
     expect(help.out.replace(/\s+/g, ' ')).toMatch(
       /--roof-pitch <deg> For a roof window: the roof's pitch, in degrees from level, 15 to 90\. \(35\)/,
     );
+  });
+});
+
+describe('a pivot window (pivot-window, #162)', () => {
+  const PIVOT = ['--width', '800', '--height', '1200', '--window', 'pivot', '--pivot-at', '600', '--pivot-gap', '150'];
+
+  it('--window pivot plans the wall below the pivot and the wedge above it, in one list of files', async () => {
+    const r = await cli([...PIVOT, '--seal', 'tpu', '--dry-run']);
+    expect(r.code).toBe(0);
+    const out = r.out.replace(/\s+/g, ' ');
+    expect(out).toContain('below the pivot; above it, a wedge of');
+    expect(out).toContain('A pivot window: the wall goes below the pivot, 600 mm up');
+    expect(out).toContain('piece-c1-r1-');
+    expect(out).toContain('wedge-gasket-');
+  });
+
+  it('refuses a pivot outside the opening, on its own flag', async () => {
+    const r = await cli([
+      ...PIVOT.slice(0, -4),
+      '--pivot-at',
+      '1300',
+      '--pivot-gap',
+      '150',
+      '--seal',
+      'tpu',
+      '--dry-run',
+    ]);
+    expect(r.code).toBe(2);
+    expect(r.err.replace(/\s+/g, ' ')).toContain(
+      'The pivot is 1300 mm up: give its height inside the opening, above 0 and below 1200 mm.',
+    );
+  });
+
+  it('--help offers the pivot and its gap', async () => {
+    const help = (await cli(['--help'])).out.replace(/\s+/g, ' ');
+    expect(help).toMatch(/--pivot-at <mm> For a pivot window: how high the pivot is, .* \(500\)/);
+    expect(help).toMatch(/--pivot-gap <mm> For a pivot window: the gap at the top, .* \(130\)/);
+    expect(help).toMatch(/--pivot-pitch <deg> For a pivot window: its pitch, in degrees from level: .* \(90\)/);
   });
 });
 

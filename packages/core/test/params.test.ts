@@ -69,6 +69,7 @@ describe('the starting values', () => {
       tilt: { gapMm: 130 }, // #159
       turn: { gapMm: 150 },
       roof: { pitchDeg: 35 },
+      pivot: { atMm: 500, gapMm: 130, pitchDeg: 90 },
     });
   });
 
@@ -338,6 +339,7 @@ describe('describePlan', () => {
       roof: [], // #160
       notches: [], // #161
       wedge: [], // #159
+      pivot: [], // #162
       printing:
         'Printing: the pieces’ corners are rounded 3 mm and their bed-side edges chamfered 1 mm against warping. ' +
         'In PETG, add a 5 mm brim if the corners lift.', // #122

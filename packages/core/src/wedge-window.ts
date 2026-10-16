@@ -16,7 +16,7 @@ import { edgeProfile } from './edge.js';
 import type { EdgeName, EdgeParams } from './edge.js';
 import type { Engine } from './engine.js';
 import { MEDIA_TYPES, checkChoice, meshOf, packageDownload, wallLabel } from './export.js';
-import type { DownloadChoice, DownloadFile } from './export.js';
+import type { DownloadChoice, DownloadFile, ExportPart } from './export.js';
 import type { FormReader } from './form-reader.js';
 import { jointWidthMm, minPieceMm } from './joint.js';
 import type { JointParams } from './joint.js';
@@ -194,14 +194,18 @@ export function plannedWedgeFiles(p: Params, choice: DownloadChoice): { name: st
   return sashPartNames(p).map(({ name }) => ({ name: `${name}.${choice.format}`, type: MEDIA_TYPES[choice.format] }));
 }
 
-// The wedge's files: each part once, lying as it prints, packed as chosen.
-export function wedgeFiles(engine: Engine, p: Params, choice: DownloadChoice): DownloadFile[] {
+// The wedge's parts: each once, lying as it prints.
+export function wedgeExportParts(engine: Engine, p: Params): ExportPart[] {
   const s = requireWedgeSetup(p);
   const made = wedgePrintParts(engine, s.wedge, s.profile, s.joint, s.panelMm, s.maxPieceMm, s.port, s.gasket);
   try {
-    const parts = made.map(({ name, solid, count }) => ({ name, mesh: meshOf(solid), count }));
-    return packageDownload([], parts, choice, p.openingWidthMm, p.openingHeightMm);
+    return made.map(({ name, solid, count }) => ({ name, mesh: meshOf(solid), count }));
   } finally {
     for (const { solid } of made) solid.delete();
   }
+}
+
+// The wedge's files, packed as chosen.
+export function wedgeFiles(engine: Engine, p: Params, choice: DownloadChoice): DownloadFile[] {
+  return packageDownload([], wedgeExportParts(engine, p), choice, p.openingWidthMm, p.openingHeightMm);
 }

@@ -103,7 +103,7 @@ describe('window_sealer_list_settings', () => {
     });
     expect(settings.find((s) => s.path === 'edges.window')).toMatchObject({
       startsAt: 'slider',
-      choices: ['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn', 'roof'],
+      choices: ['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn', 'roof', 'pivot'],
     });
     expect(settings.find((s) => s.path === 'openingWidthMm')?.startsAt).toBeNull();
     expect(JSON.parse(r.text)).toEqual(r.data);
@@ -659,7 +659,16 @@ describe('behind a roller shutter (shutter-rails, #158)', () => {
     const plan = (await client.listTools()).tools.find((t) => t.name === 'window_sealer_plan_wall');
     if (!plan) throw new Error('window_sealer_plan_wall expected');
     const edges = (plan.inputSchema.properties as Record<string, any>)['settings'].properties.edges;
-    expect(edges.properties.window.enum).toEqual(['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn', 'roof']);
+    expect(edges.properties.window.enum).toEqual([
+      'slider',
+      'hung',
+      'frame',
+      'shutter',
+      'tilt',
+      'turn',
+      'roof',
+      'pivot',
+    ]);
     const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, edges: { window: 'shutter' } } });
     expect(r.isError).toBeFalsy();
     expect(r.data['settings'].edges.track).toEqual({
@@ -749,6 +758,35 @@ describe('a roof window (sloped-frame, #160)', () => {
     });
     expect(r.isError).toBeFalsy();
     expect(r.data['summary'].roof[0]).toMatch(/^On a roof at 60°, 50% of the wall’s weight pulls it out of the frame/);
+  });
+});
+
+describe('a pivot window (pivot-window, #162)', () => {
+  it('the schema offers the pivot; the summary has the wall below it, the wedge above and the pivot’s line', async () => {
+    const { client, call } = await connect();
+    const plan = (await client.listTools()).tools.find((t) => t.name === 'window_sealer_plan_wall');
+    if (!plan) throw new Error('window_sealer_plan_wall expected');
+    const settings = (plan.inputSchema.properties as Record<string, any>)['settings'];
+    expect(settings.properties.pivot.properties.atMm.type).toBe('number');
+    expect(settings.properties.pivot.properties.gapMm.type).toBe('number');
+    const r = await call('window_sealer_plan_wall', {
+      settings: {
+        openingWidthMm: 800,
+        openingHeightMm: 1200,
+        edges: { window: 'pivot' },
+        pivot: { atMm: 600, gapMm: 150 },
+        seal: { kind: 'tpu' },
+      },
+    });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['summary'].headline).toMatch(/, below the pivot; above it, a wedge of \d+ parts/);
+    expect(r.data['summary'].wedge[0]).toMatch(/^The sash leans 14\.5° in\./);
+    expect(r.data['summary'].pivot[0]).toMatch(/^A pivot window: the wall goes below the pivot, 600 mm up/);
+    const wrong = await call('window_sealer_plan_wall', {
+      settings: { openingWidthMm: 800, openingHeightMm: 1200, edges: { window: 'pivot' }, pivot: { atMm: 1300 } },
+    });
+    expect(wrong.isError).toBe(true);
+    expect(wrong.text).toContain('The pivot is 1300 mm up');
   });
 });
 

@@ -9,7 +9,7 @@ import type { Object3D } from 'three';
 import { describe, expect, it } from 'vitest';
 import { loadEngine } from 'parametric-window-sealer';
 import { EXAMPLE_PARAMS, buildExport, planWall, readSettings } from 'parametric-window-sealer';
-import { SHEET_COLOUR, TPU_COLOUR, buildWallScene, disposeWall } from '../src/preview-scene';
+import { SHEET_COLOUR, TPU_COLOUR, buildWallScene, countOf, disposeWall } from '../src/preview-scene';
 
 const solidsOf = (wall: Object3D, kind: string) =>
   wall.children.filter((c): c is Mesh => c instanceof Mesh && c.userData.kind === kind);
@@ -317,6 +317,54 @@ describe('a sash’s wedge (sash-wedge, #159)', () => {
       expect(box.max.z - box.min.z, window).toBeLessThan(200);
       disposeWall(wedge);
     }
+  });
+});
+
+describe('a pivot window (pivot-window, #162)', () => {
+  it('draws the wall below the pivot and the wedge above it, its point at the pivot, and frees them both', async () => {
+    const engine = await loadEngine();
+    const r = readSettings({
+      openingWidthMm: 800,
+      openingHeightMm: 1200,
+      edges: { window: 'pivot' },
+      pivot: { atMm: 600, gapMm: 150 },
+      seal: { kind: 'tpu' },
+      ports: [],
+    });
+    if (!r.ok) throw new Error(JSON.stringify(r.problems));
+    const scene = buildWallScene(engine, r.params);
+    scene.updateMatrixWorld(true);
+    const wall = new Box3();
+    for (const piece of solidsOf(scene, 'piece')) wall.expandByObject(piece);
+    expect(solidsOf(scene, 'piece')).toHaveLength(planWall(r.params).pieces.length);
+    expect(wall.min.y).toBeGreaterThanOrEqual(0);
+    expect(wall.max.y).toBeLessThanOrEqual(600);
+    const wedge = scene.children.find((c) => !(c instanceof Mesh) && !(c instanceof LineSegments));
+    if (wedge === undefined) throw new Error('no wedge');
+    const box = new Box3().setFromObject(wedge);
+    for (const [got, want] of [
+      [box.min.x, 0],
+      [box.max.x, 800],
+      [box.min.y, 600],
+      [box.max.y, 1200],
+    ] as const) {
+      expect(Math.abs(got - want), `${got} for ${want}`).toBeLessThan(20);
+    }
+    // The wall's 3 × 2 cross pieces and the wedge's 2 corner pieces, the wedge's counted in its group.
+    expect(countOf(scene, 'cross')).toBe(8);
+    let built = 0;
+    let freed = 0;
+    scene.traverse((o) => {
+      if (o instanceof Mesh || o instanceof LineSegments) {
+        built += 1;
+        o.geometry.addEventListener('dispose', () => {
+          freed += 1;
+        });
+      }
+    });
+    disposeWall(scene);
+    expect(freed).toBe(built);
+    expect(scene.children).toHaveLength(0);
   });
 });
 

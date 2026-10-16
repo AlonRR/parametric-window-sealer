@@ -23,7 +23,11 @@ export const pullShare = (pitchDeg: number): number => Math.cos((pitchDeg * Math
 // rain.
 export function describeRoof(p: Params): string[] {
   if (p.edges.window !== 'roof') return [];
-  const pitch = p.roof.pitchDeg;
+  return roofLines(p.roof.pitchDeg, p.ports.length > 0);
+}
+
+// The same for any wall on a slope: a pivot window's, below its pivot, in a roof (#162).
+export function roofLines(pitch: number, hose: boolean): string[] {
   const share = pullShare(pitch);
   const lines =
     Math.round(share * 100) === 0
@@ -35,7 +39,7 @@ export function describeRoof(p: Params): string[] {
             'times their weight: it must not move. Until it has, and over a bed or a seat, hold it up with a ' +
             'strap across its room face.',
         ];
-  if (p.ports.length > 0) {
+  if (hose) {
     lines.push('Hang the hose from a hook above the window, so its weight does not pull on the wall.');
   }
   lines.push(

@@ -6,12 +6,15 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
+const guide = (page: Page) => page.getByTestId('guide');
+
 test.beforeEach(async ({ page }) => {
   await page.goto('./');
   await page.getByText('Measuring guide: what to measure, with pictures').click();
+  // Opened, the guide copies the form's values into its fields; a field typed in before that has
+  // the copy land in the middle of the typing.
+  await expect(guide(page).getByLabel('Track depth (mm)')).toHaveValue('10');
 });
-
-const guide = (page: Page) => page.getByTestId('guide');
 
 test('five steps, the first four with a drawing, filling the form as you type', async ({ page }) => {
   await expect(guide(page).getByRole('heading')).toHaveText([

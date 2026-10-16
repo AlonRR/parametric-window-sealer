@@ -22,6 +22,7 @@ import {
   Group,
   LineBasicMaterial,
   LineSegments,
+  Matrix4,
   Mesh,
   MeshPhongMaterial,
   Vector3,
@@ -37,7 +38,7 @@ import { buildPiecesWith, fittingSource, placedFittings } from 'parametric-windo
 import { tpuJoint } from 'parametric-window-sealer';
 import { fillChoice, fillFor } from 'parametric-window-sealer';
 import { isCut, planParts, slotPins, tapeFit } from 'parametric-window-sealer';
-import { requireWedgeSetup, sashForm, sashWedgeSolids } from 'parametric-window-sealer';
+import { pivotWall, pivotWedge, requireWedgeSetup, sashForm, sashWedgeSolids } from 'parametric-window-sealer';
 import type { Params } from 'parametric-window-sealer';
 
 export type PartKind = 'piece' | 'strip' | 'cross' | 'pin' | 'edge' | 'tape' | 'tpu';
@@ -117,8 +118,23 @@ function buildWedgeScene(engine: Engine, params: Params): Group {
   return wedge;
 }
 
+// A pivot window (pivot-window, #162): its wall below the pivot and, raised to it, the wedge above.
+function buildPivotScene(engine: Engine, params: Params): Group {
+  const wall = buildWallScene(engine, pivotWall(params));
+  try {
+    const wedge = buildWedgeScene(engine, pivotWedge(params));
+    wedge.matrix.premultiply(new Matrix4().makeTranslation(0, params.pivot.atMm, 0));
+    wall.add(wedge);
+  } catch (error) {
+    disposeWall(wall);
+    throw error;
+  }
+  return wall;
+}
+
 export function buildWallScene(engine: Engine, params: Params): Group {
   if (sashForm(params.edges.window) !== undefined) return buildWedgeScene(engine, params);
+  if (params.edges.window === 'pivot') return buildPivotScene(engine, params);
   const { plan, joints, edges } = planParts(params);
   const { joint, thicknessMm } = params;
   const wall = new Group();
@@ -193,14 +209,21 @@ export function buildWallScene(engine: Engine, params: Params): Group {
   return wall;
 }
 
+// A pivot window's wedge is a group in its wall's: both are counted, and freed.
 export function countOf(wall: Group, kind: PartKind): number {
-  return wall.children.filter((c) => c instanceof Mesh && c.userData.kind === kind).length;
+  let n = 0;
+  wall.traverse((c) => {
+    if (c instanceof Mesh && c.userData.kind === kind) n += 1;
+  });
+  return n;
 }
 
 // Graphics memory is not freed by the garbage collector: each redraw frees the last wall.
 const hasGeometry = (o: Object3D): o is Mesh | LineSegments => o instanceof Mesh || o instanceof LineSegments;
 
 export function disposeWall(wall: Group): void {
-  for (const child of wall.children) if (hasGeometry(child)) child.geometry.dispose();
+  wall.traverse((o) => {
+    if (hasGeometry(o)) o.geometry.dispose();
+  });
   wall.clear();
 }

@@ -20,6 +20,15 @@ way (C299). Changes since the latest version are listed under Unreleased.
 
 ### Added
 
+- A pivot window: choose **Window type: A pivot window** (`--window pivot`, or
+  `edges.window: "pivot"`), its sash turned on an axis across its middle, the top half in. Give the
+  pivot's height (`--pivot-at`, `pivot.atMm`) and the gap at the top (`--pivot-gap`,
+  `pivot.gapMm`): below the pivot a wall goes in as in a frame with no track, its top edge pressed
+  by the sash, and takes every fitting; above it the tilted sash's wedge, its point at the pivot.
+  One plan, one preview and one download hold both, the wedge's files named `wedge-…`. In a
+  centre-pivot roof window, give its pitch (`--pivot-pitch`, `pivot.pitchDeg`, 90 for upright),
+  and the plan says what pulls the wall out of the frame, as for a roof window. A vertical pivot is
+  still to come (#179). How: `docs/pivot.md`. Not yet test printed.
 - Notches along an edge for a window's hardware: in an edge pressed into a frame, give each as its
   width x depth @ its edge, from mm (`--notch 40x25@bottom,300`, or `notches` in the library),
   where a casement's crank arm, a friction stay's arms or a keep cross the frame. The edge strip and

@@ -209,9 +209,10 @@ export const SETTINGS: readonly Setting[] = [
       'Window type: a slider, a hung window, a frame with no track (a casement screen opening, a tilt-and-turn ' +
       'frame), a wall behind a roller shutter, in its guide rails, a sash tilted in at the top (tilt-and-turn in ' +
       'tilt, a hopper) or a sash turned part way on its side hinges (tilt-and-turn in turn, an inward casement), ' +
-      'each closed by a wedge in place of a wall, or a top-hung roof window opened out, its wall in the frame on ' +
-      "a slope; sets the four edges, and for a shutter the rail's starting sizes, as the page does.",
-    values: ['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn', 'roof'],
+      'each closed by a wedge in place of a wall, a top-hung roof window opened out, its wall in the frame on ' +
+      'a slope, or a pivot window, its sash turned on an axis across its middle, with a wall below the pivot and ' +
+      "a wedge above it; sets the four edges, and for a shutter the rail's starting sizes, as the page does.",
+    values: ['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn', 'roof', 'pivot'],
   },
   {
     field: 'tiltGapMm',
@@ -231,6 +232,23 @@ export const SETTINGS: readonly Setting[] = [
     field: 'roofPitchDeg',
     path: 'roof.pitchDeg',
     help: "For a roof window: the roof's pitch, in degrees from level, 15 to 90.",
+  },
+  {
+    field: 'pivotAtMm',
+    path: 'pivot.atMm',
+    help:
+      "For a pivot window: how high the pivot is, from the opening's bottom to where the open sash's room face " +
+      'crosses the frame. The wall goes below it and the wedge above it.',
+  },
+  {
+    field: 'pivotGapMm',
+    path: 'pivot.gapMm',
+    help: "For a pivot window: the gap at the top, from the frame to the sash's outer face, as it is held open.",
+  },
+  {
+    field: 'pivotPitchDeg',
+    path: 'pivot.pitchDeg',
+    help: 'For a pivot window: its pitch, in degrees from level: 90 for an upright one, 15 to 90 in a roof.',
   },
   edge('top'),
   edge('bottom'),

@@ -15,6 +15,7 @@ import { describeDouble } from './double.js';
 import { describeFrame } from './frame.js';
 import { describeShutter } from './shutter.js';
 import { describeRoof } from './roof.js';
+import { PIVOT_WEDGE_WORDS, describePivot, pivotRoofLines, pivotWall, pivotWedge } from './pivot.js';
 import { describeNotches } from './notch.js';
 import { describePrinting } from './piece-print.js';
 import { describeStiffeners } from './stiffener.js';
@@ -41,6 +42,7 @@ import type { Params } from './params.js';
 import { hundredth, listed, mm, plural, sum } from './words.js';
 import { requireWedgeSetup, sashForm, sashPartNames } from './wedge-window.js';
 import { WEDGE_WORDS } from './wedge.js';
+import type { WedgeWords } from './wedge.js';
 import { describeWedge, wedgeGasketRuns } from './wedge-print.js';
 
 export interface LeftoverText {
@@ -80,7 +82,8 @@ export interface PlanText {
   shutter: string[]; // how a wall behind a roller shutter sits in its rails, and the shutter on it (#158)
   roof: string[]; // a roof window's wall on its slope: its weight's pull, the test, the rain (#160)
   notches: string[]; // notches along an edge for the window's hardware (#161)
-  wedge: string[]; // a tilted sash's wedge, in place of a wall (#159)
+  wedge: string[]; // a tilted sash's wedge, in place of a wall (#159), or above a pivot window's (#162)
+  pivot: string[]; // where a pivot window's wall and wedge go, and its hinges (#162)
   printing: string; // what is done against warping, and brim advice for the material (#122)
   stiffeners: string[]; // the aluminium angle to buy, where it goes, and its clips (#111)
 }
@@ -189,20 +192,15 @@ const small = (what: string) => (w: { index: number; lengthMm: number; minPieceM
 
 // A tilted or turned sash's plan (sash-wedge, #159): the wedge's, in the places a wall's lines go;
 // the grid's widths and heights have none.
-function describeSashWedge(params: Params): PlanText {
+function describeSashWedge(params: Params, own?: WedgeWords): PlanText {
   const { wedge, port, profile, panelMm } = requireWedgeSetup(params);
-  const words = WEDGE_WORDS[wedge.form];
+  const words = own ?? WEDGE_WORDS[wedge.form];
   const gapMm = wedge.form === 'tilt' ? params.tilt.gapMm : params.turn.gapMm;
   const names = sashPartNames(params);
   const count = (pick: (name: string) => boolean) => names.filter((p) => pick(p.name)).reduce((n, p) => n + p.count, 0);
-  const gaskets = count((name) => name.startsWith('gasket-'));
-  const parts = count((name) => !name.startsWith('gasket-'));
   const { side, top } = wedge;
   return {
-    headline:
-      gaskets > 0
-        ? `A wedge for ${words.sash}: ${parts} parts and ${gaskets} TPU gaskets to print.`
-        : `A wedge for ${words.sash}: ${parts} parts to print.`,
+    headline: `A wedge for ${words.sash}: ${wedgeParts(params)} to print.`,
     columns: '',
     rows: '',
     span: `For a ${mm(params.openingWidthMm)} × ${mm(params.openingHeightMm)} mm opening, the sash ${mm(gapMm)} mm in at the ${words.edge}.`,
@@ -235,35 +233,62 @@ function describeSashWedge(params: Params): PlanText {
     shutter: [],
     roof: [],
     notches: [],
+    pivot: [],
     wedge: describeWedge(
       wedge,
       port,
       wedgeGasketRuns(wedge, profile, panelMm),
       params.seal.kind === 'tpu' ? 'tpu' : 'tape',
+      words,
     ),
     printing: describePrinting(params.material.kind),
     stiffeners: [],
   };
 }
 
+// What a wedge has to print, in words.
+function wedgeParts(params: Params): string {
+  const names = sashPartNames(params);
+  const count = (gasket: boolean) =>
+    names.filter((p) => p.name.startsWith('gasket-') === gasket).reduce((n, p) => n + p.count, 0);
+  const gaskets = count(true);
+  return gaskets > 0 ? `${count(false)} parts and ${gaskets} TPU gaskets` : `${count(false)} parts`;
+}
+
+// A pivot window's plan (pivot-window, #162): its wall's below the pivot, the wedge's above it in
+// its own lines, and the pivot's.
+function describePivotPlan(plan: GridLayout, params: Params): PlanText {
+  const wall = describePlan(plan, pivotWall(params));
+  const wedge = describeSashWedge(pivotWedge(params), PIVOT_WEDGE_WORDS);
+  return {
+    ...wall,
+    headline: `${wall.headline}, below the pivot; above it, a wedge of ${wedgeParts(pivotWedge(params))}`,
+    span: spanLine(pivotWall(params), 'opening below the pivot'),
+    warnings: [...wall.warnings, ...wedge.warnings.filter((w) => !wall.warnings.includes(w))],
+    roof: pivotRoofLines(params),
+    wedge: wedge.wedge,
+    pivot: describePivot(params),
+  };
+}
+
+function spanLine(params: Params, where = 'opening'): string {
+  const { openingWidthMm: w, openingHeightMm: h, edges, joint, seal } = params;
+  const span = panelSpan(w, h, edges, joint, tapeFit(seal));
+  return `Pieces and joints: ${mm(span.widthMm)} × ${mm(span.heightMm)} mm, for a ${mm(w)} × ${mm(h)} mm ${where}.`;
+}
+
 export function describePlan(plan: GridLayout, params: Params): PlanText {
   if (sashForm(params.edges.window) !== undefined) return describeSashWedge(params);
+  if (params.edges.window === 'pivot') return describePivotPlan(plan, params);
   const count = plan.pieces.length;
   const max = pieceLimit(params);
   const parts = planParts(params, plan);
-  const span = panelSpan(
-    params.openingWidthMm,
-    params.openingHeightMm,
-    params.edges,
-    params.joint,
-    tapeFit(params.seal),
-  );
   const shapes = edgeShapes(parts.edges).length;
   return {
     headline: `${count} ${count === 1 ? 'piece' : 'pieces'}: ${plan.columns.length} across, ${plan.rows.length} up, ${mm(params.thicknessMm)} mm thick`,
     columns: `Widths: ${plan.columns.map(mm).join(', ')} mm`,
     rows: `Heights: ${plan.rows.map(mm).join(', ')} mm`,
-    span: `Pieces and joints: ${mm(span.widthMm)} × ${mm(span.heightMm)} mm, for a ${mm(params.openingWidthMm)} × ${mm(params.openingHeightMm)} mm opening.`,
+    span: spanLine(params),
     joints:
       params.joint.style === 'dovetails'
         ? describeDovetails(plan, params.joint)
@@ -314,6 +339,7 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     shutter: describeShutter(params),
     roof: describeRoof(params),
     notches: describeNotches(params.notches, { edges: params.edges, joint: params.joint, tape: tapeFit(params.seal) }),
+    pivot: [],
     wedge: [],
     printing: describePrinting(params.material.kind),
     stiffeners: describeStiffeners(params),

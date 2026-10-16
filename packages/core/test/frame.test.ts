@@ -43,6 +43,7 @@ describe('the role and the window', () => {
       'tilt',
       'turn',
       'roof',
+      'pivot',
     ]);
     expect(SETTINGS.find((s) => s.field === 'topEdge')?.values).toEqual(['track', 'sash', 'sill', 'unit', 'frame']);
     expect(defaultUnitPlace('frame')).toBe('below'); // a window AC on the sill, the wall above it
