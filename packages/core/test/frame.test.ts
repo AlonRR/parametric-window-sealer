@@ -35,7 +35,14 @@ const frame = { window: 'frame', topEdge: 'frame', bottomEdge: 'frame', leftEdge
 describe('the role and the window', () => {
   it('a window type with all four edges pressed into a frame, offered as the page offers it', () => {
     expect(WINDOW_PRESETS.frame).toEqual({ top: 'frame', bottom: 'frame', left: 'frame', right: 'frame' });
-    expect(SETTINGS.find((s) => s.field === 'window')?.values).toEqual(['slider', 'hung', 'frame', 'shutter', 'tilt']);
+    expect(SETTINGS.find((s) => s.field === 'window')?.values).toEqual([
+      'slider',
+      'hung',
+      'frame',
+      'shutter',
+      'tilt',
+      'turn',
+    ]);
     expect(SETTINGS.find((s) => s.field === 'topEdge')?.values).toEqual(['track', 'sash', 'sill', 'unit', 'frame']);
     expect(defaultUnitPlace('frame')).toBe('below'); // a window AC on the sill, the wall above it
   });

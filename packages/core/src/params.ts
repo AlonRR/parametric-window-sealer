@@ -74,8 +74,8 @@ import { patternBorderMm } from './pattern.js';
 import type { ApplianceModel, ModelSetting } from './appliance-model.js';
 import type { InPiece } from './fittings/index.js';
 import { capitalised, hundredth, mm } from './words.js';
-import { EXAMPLE_TILT, refuseForWedge, wedgeSetup } from './wedge-window.js';
-import type { TiltParams } from './wedge-window.js';
+import { EXAMPLE_TILT, EXAMPLE_TURN, refuseForWedge, sashForm, wedgeSetup } from './wedge-window.js';
+import type { TiltParams, TurnParams } from './wedge-window.js';
 
 export interface AxisChoice {
   mode: AxisMode;
@@ -113,6 +113,7 @@ export interface Params {
   socket: SocketParams; // how the hose ports hold the hose, with caps and screens (#114)
   rail: RailParams; // the filler between the sashes (meeting-rail, #116); none to start with
   tilt: TiltParams; // a tilted sash's gap at the top, for its wedge (sash-wedge, #159)
+  turn: TurnParams; // a turned sash's gap at the latch side, for its wedge
   rain: boolean; // weep holes in the strips and a drip groove under the edge strips (rain-face, #117)
   stop: StopParams; // a strut in the sash's track that lifts out by hand (sash-stop, #118); none to start with
   wall: WallKind; // single, or double with hollow pieces for winter (double-wall, #119)
@@ -157,6 +158,7 @@ export const EXAMPLE_PARAMS: Params = {
   wall: 'single',
   stiffen: true,
   tilt: EXAMPLE_TILT,
+  turn: EXAMPLE_TURN,
 };
 
 // Every field of the page's form. The page reads and writes these by name; the settings list
@@ -197,6 +199,7 @@ export const FIELD_NAMES = [
   'coupon',
   'window',
   'tiltGapMm',
+  'turnGapMm',
   'topEdge',
   'bottomEdge',
   'leftEdge',
@@ -263,7 +266,7 @@ export type ReadResult = { ok: true; params: Params } | { ok: false; errors: Fie
 const MODES: readonly AxisMode[] = ['equal', 'full-plus-filler'];
 const FILLERS: readonly FillerPosition[] = ['start', 'end', 'middle', 'split'];
 const LEFTOVERS: readonly Leftover[] = ['spread', 'equal', 'shorten'];
-const WINDOWS: readonly WindowType[] = ['slider', 'hung', 'frame', 'shutter', 'tilt'];
+const WINDOWS: readonly WindowType[] = ['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn'];
 const ROLES: readonly EdgeRole[] = ['track', 'sash', 'sill', 'unit', 'frame'];
 const SEALS: readonly SealKind[] = ['none', 'tape', 'tpu'];
 const PRINTER_KINDS = ['default', 'custom', 'model'] as const;
@@ -414,6 +417,7 @@ function readPanel(r: FormReader): {
 const edgesForm = (p: Params): FormValues => ({
   window: p.edges.window,
   tiltGapMm: String(p.tilt.gapMm),
+  turnGapMm: String(p.turn.gapMm),
   topEdge: p.edges.roles.top,
   bottomEdge: p.edges.roles.bottom,
   leftEdge: p.edges.roles.left,
@@ -944,6 +948,9 @@ export function readParams(values: FormValues): ReadResult {
   const tilt: TiltParams = {
     gapMm: r.numberIfUsed('tiltGapMm', edges.window === 'tilt', EXAMPLE_TILT.gapMm, (n) => n > 0, SIZE_MESSAGE),
   };
+  const turn: TurnParams = {
+    gapMm: r.numberIfUsed('turnGapMm', edges.window === 'turn', EXAMPLE_TURN.gapMm, (n) => n > 0, SIZE_MESSAGE),
+  };
   const sealRead = readSeal(r);
   const { seal, fit } = sealRead;
   const rail = readRail(r, edges, seal);
@@ -1019,11 +1026,13 @@ export function readParams(values: FormValues): ReadResult {
     wall,
     stiffen,
     tilt,
+    turn,
   };
-  // A tilted sash has a wedge, not a wall: none of a wall's fittings or patterns, its one port in
-  // the top strip, and its own problems in place of the wall's plan's.
-  if (edges.window === 'tilt') {
-    refuseForWedge(r, {
+  // A tilted or turned sash has a wedge, not a wall: none of a wall's fittings or patterns, its one
+  // port in the strip, and its own problems in place of the wall's plan's.
+  const form = sashForm(edges.window);
+  if (form !== undefined) {
+    refuseForWedge(r, form, {
       joint,
       wall,
       pieceSource: sheet.source,

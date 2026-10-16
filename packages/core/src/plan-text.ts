@@ -37,7 +37,8 @@ import {
 import type { WallParts } from './plan.js';
 import type { Params } from './params.js';
 import { hundredth, listed, mm, plural, sum } from './words.js';
-import { requireWedgeSetup, sashPartNames } from './wedge-window.js';
+import { requireWedgeSetup, sashForm, sashPartNames } from './wedge-window.js';
+import { WEDGE_WORDS } from './wedge.js';
 import { describeWedge, wedgeGasketRuns } from './wedge-print.js';
 
 export interface LeftoverText {
@@ -182,10 +183,12 @@ function describeSeal(params: Params, parts: WallParts): string {
 const small = (what: string) => (w: { index: number; lengthMm: number; minPieceMm: number }) =>
   `${what} piece ${w.index + 1} is ${mm(w.lengthMm)} mm long, under the ${mm(w.minPieceMm)} mm the joints need.`;
 
-// A tilted sash's plan (sash-wedge, #159): the wedge's, in the places a wall's lines go; the grid's
-// widths and heights have none.
+// A tilted or turned sash's plan (sash-wedge, #159): the wedge's, in the places a wall's lines go;
+// the grid's widths and heights have none.
 function describeSashWedge(params: Params): PlanText {
   const { wedge, port, profile, panelMm } = requireWedgeSetup(params);
+  const words = WEDGE_WORDS[wedge.form];
+  const gapMm = wedge.form === 'tilt' ? params.tilt.gapMm : params.turn.gapMm;
   const names = sashPartNames(params);
   const count = (pick: (name: string) => boolean) => names.filter((p) => pick(p.name)).reduce((n, p) => n + p.count, 0);
   const gaskets = count((name) => name.startsWith('gasket-'));
@@ -194,16 +197,16 @@ function describeSashWedge(params: Params): PlanText {
   return {
     headline:
       gaskets > 0
-        ? `A wedge for a tilted sash: ${parts} parts and ${gaskets} TPU gaskets to print.`
-        : `A wedge for a tilted sash: ${parts} parts to print.`,
+        ? `A wedge for ${words.sash}: ${parts} parts and ${gaskets} TPU gaskets to print.`
+        : `A wedge for ${words.sash}: ${parts} parts to print.`,
     columns: '',
     rows: '',
-    span: `For a ${mm(params.openingWidthMm)} × ${mm(params.openingHeightMm)} mm opening, the sash ${mm(params.tilt.gapMm)} mm in at the top.`,
+    span: `For a ${mm(params.openingWidthMm)} × ${mm(params.openingHeightMm)} mm opening, the sash ${mm(gapMm)} mm in at the ${words.edge}.`,
     joints: `Joints: ${2 * side.chain.jointsMm.length + top.chain.jointsMm.length} joint strips.`,
-    edges: `Edges: ${count((name) => /^wedge-(leg|top-edge)-/.test(name))} edge strips and 2 corner pieces.`,
+    edges: `Edges: ${count((name) => name.startsWith('wedge-leg-') || name.startsWith(`wedge-${words.stems.strip}-edge-`))} edge strips and 2 corner pieces.`,
     warnings: [
       ...side.chain.warnings.map(small('A triangle’s')),
-      ...top.chain.warnings.map(small('The top strip’s')),
+      ...top.chain.warnings.map(small(`The ${words.strip}’s`)),
       ...materialWarnings(params.material, params.ports.length > 0),
     ],
     leftovers: [],
@@ -238,7 +241,7 @@ function describeSashWedge(params: Params): PlanText {
 }
 
 export function describePlan(plan: GridLayout, params: Params): PlanText {
-  if (params.edges.window === 'tilt') return describeSashWedge(params);
+  if (sashForm(params.edges.window) !== undefined) return describeSashWedge(params);
   const count = plan.pieces.length;
   const max = pieceLimit(params);
   const parts = planParts(params, plan);

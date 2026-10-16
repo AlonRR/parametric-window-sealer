@@ -103,7 +103,7 @@ describe('the setting flags (Q90)', () => {
       ...(f.path.startsWith('fill.') && f.path !== 'fill.kind' ? { fill: 'grid' } : {}), // and with a pattern
       ...(f.field === 'wall' ? { thicknessMm: '10' } : {}), // a double wall needs panels thick enough
       ...(f.path.startsWith('edges.roles.') ? { seal: 'tpu' } : {}), // an edge in a frame, a TPU gasket
-      // a tilted sash's edges are all frame edges, as choosing it sets them, with their gaskets
+      // a tilted or turned sash's edges are all frame edges, as choosing it sets them, with their gaskets
       ...(f.field === 'window'
         ? { seal: 'tpu', topEdge: 'frame', bottomEdge: 'frame', leftEdge: 'frame', rightEdge: 'frame' }
         : {}),

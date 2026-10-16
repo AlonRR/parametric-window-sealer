@@ -204,10 +204,11 @@ export const SETTINGS: readonly Setting[] = [
     path: 'edges.window',
     help:
       'Window type: a slider, a hung window, a frame with no track (a casement screen opening, a tilt-and-turn ' +
-      'frame), a wall behind a roller shutter, in its guide rails, or a sash tilted in at the top (tilt-and-turn ' +
-      'in tilt, a hopper), closed by a wedge in place of a wall; sets the four edges, and for a shutter the ' +
-      "rail's starting sizes, as the page does.",
-    values: ['slider', 'hung', 'frame', 'shutter', 'tilt'],
+      'frame), a wall behind a roller shutter, in its guide rails, a sash tilted in at the top (tilt-and-turn in ' +
+      'tilt, a hopper) or a sash turned part way on its side hinges (tilt-and-turn in turn, an inward casement), ' +
+      "each closed by a wedge in place of a wall; sets the four edges, and for a shutter the rail's starting " +
+      'sizes, as the page does.',
+    values: ['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn'],
   },
   {
     field: 'tiltGapMm',
@@ -215,6 +216,13 @@ export const SETTINGS: readonly Setting[] = [
     help:
       "For a tilted sash: the gap at the top, from the frame to the sash's outer face, as its stays hold it. The " +
       "opening is the frame's, seen inside it.",
+  },
+  {
+    field: 'turnGapMm',
+    path: 'turn.gapMm',
+    help:
+      "For a turned sash: the gap at the latch side, from the frame to the sash's outer face, as a restrictor " +
+      "holds it. The opening is the frame's, seen inside it.",
   },
   edge('top'),
   edge('bottom'),

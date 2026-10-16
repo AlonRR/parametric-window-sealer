@@ -87,7 +87,8 @@ at the top**, **d**, from the frame to the tilted sash.
    on the page, the command and the MCP server (C314 to C316), and the guide
    ([`../wedge.md`](../wedge.md)).
 
-Then the turned form, on the same parts.
+Then the turned form, on the same parts: built as the tilted wedge turned on its side
+(C317 to C321).
 
 ## Open until printed
 

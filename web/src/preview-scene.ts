@@ -37,7 +37,7 @@ import { buildPiecesWith, fittingSource, placedFittings } from 'parametric-windo
 import { tpuJoint } from 'parametric-window-sealer';
 import { fillChoice, fillFor } from 'parametric-window-sealer';
 import { isCut, planParts, slotPins } from 'parametric-window-sealer';
-import { requireWedgeSetup, sashWedgeSolids } from 'parametric-window-sealer';
+import { requireWedgeSetup, sashForm, sashWedgeSolids } from 'parametric-window-sealer';
 import type { Params } from 'parametric-window-sealer';
 
 export type PartKind = 'piece' | 'strip' | 'cross' | 'pin' | 'edge' | 'tape' | 'tpu';
@@ -73,16 +73,24 @@ function add(wall: Group, solid: Manifold, kind: PartKind, x: number, y: number,
   }
 }
 
-// A tilted sash's wedge (sash-wedge, #159), as it sits in the window. The library builds it in its
-// own frame, x up the triangles' axis, y across from the frame to the sash, z along the window; the
-// group turns it, a turn and not a mirror, so the window's width runs along x and its height up y as
-// a wall's do. Its gaskets are in the download, not here.
+// A tilted or turned sash's wedge (sash-wedge, #159), as it sits in the window. The library builds
+// it in its own frame, x along the triangles' axis from the hinge, y across from the frame to the
+// sash, z along the strip; the group turns it, a turn and not a mirror, so the window's width runs
+// along x and its height up y as a wall's do: a tilted sash's axis up the height, a turned one's
+// along the width from its hinge at the left, its strip running down from the head. Its gaskets are
+// in the download, not here.
 function buildWedgeScene(engine: Engine, params: Params): Group {
   const s = requireWedgeSetup(params);
   const parts = sashWedgeSolids(engine, s.wedge, s.profile, s.joint, s.panelMm, s.maxPieceMm, s.port);
   const wedge = new Group();
   wedge.matrixAutoUpdate = false;
-  wedge.matrix.makeBasis(new Vector3(0, 1, 0), new Vector3(0, 0, 1), new Vector3(1, 0, 0));
+  if (s.wedge.form === 'tilt') {
+    wedge.matrix.makeBasis(new Vector3(0, 1, 0), new Vector3(0, 0, 1), new Vector3(1, 0, 0));
+  } else {
+    wedge.matrix
+      .makeBasis(new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(0, -1, 0))
+      .setPosition(0, params.openingHeightMm, 0);
+  }
   const placed: [Manifold, PartKind, Material][] = [
     ...parts.sides.flatMap((side) => [
       ...side.legs.map((m) => [m, 'edge', JOINT] as [Manifold, PartKind, Material]),
@@ -110,7 +118,7 @@ function buildWedgeScene(engine: Engine, params: Params): Group {
 }
 
 export function buildWallScene(engine: Engine, params: Params): Group {
-  if (params.edges.window === 'tilt') return buildWedgeScene(engine, params);
+  if (sashForm(params.edges.window) !== undefined) return buildWedgeScene(engine, params);
   const { plan, joints, edges } = planParts(params);
   const { joint, thicknessMm } = params;
   const wall = new Group();

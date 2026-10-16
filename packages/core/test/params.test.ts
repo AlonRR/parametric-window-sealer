@@ -66,6 +66,7 @@ describe('the starting values', () => {
       wall: 'single', // #119
       stiffen: true, // #111
       tilt: { gapMm: 130 }, // #159
+      turn: { gapMm: 150 },
     });
   });
 

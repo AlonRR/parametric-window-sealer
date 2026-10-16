@@ -304,7 +304,7 @@ describe('usage', () => {
     expect(r.out).toMatch(/--slot <mm> +How deep a piece can go into a strip\. \(8\)/);
     // Wherever its lines break: the flag column is as wide as the longest flag.
     expect(r.out.replace(/\s+/g, ' ')).toMatch(
-      /--window <slider\|hung\|frame\|shutter\|tilt> .*?as the page does\. \(slider\)/,
+      /--window <slider\|hung\|frame\|shutter\|tilt\|turn> .*?as the page does\. \(slider\)/,
     );
     expect(r.out).toContain('Exit status: 0 done, 1 could not write, 2 wrong options or settings.');
   });
@@ -1024,7 +1024,7 @@ describe('behind a roller shutter (shutter-rails, #158)', () => {
 
   it('--help offers it', async () => {
     const help = await cli(['--help']);
-    expect(help.out.replace(/\s+/g, ' ')).toMatch(/--window <slider\|hung\|frame\|shutter\|tilt> /);
+    expect(help.out.replace(/\s+/g, ' ')).toMatch(/--window <slider\|hung\|frame\|shutter\|tilt\|turn> /);
   });
 });
 
@@ -1050,5 +1050,30 @@ describe('a tilted sash (sash-wedge, #159)', () => {
   it('--help offers the gap', async () => {
     const help = await cli(['--help']);
     expect(help.out.replace(/\s+/g, ' ')).toMatch(/--tilt-gap <mm> For a tilted sash: the gap at the top/);
+  });
+});
+
+describe('a turned sash (sash-wedge, #159)', () => {
+  const TURNED = ['--width', '800', '--height', '1200', '--window', 'turn', '--turn-gap', '150', '--seal', 'tpu'];
+
+  it('--window turn with the gap at the latch side plans the wedge turned on its side', async () => {
+    const r = await cli([...TURNED, '--port', '150', '--dry-run']);
+    expect(r.code).toBe(0);
+    const out = r.out.replace(/\s+/g, ' ');
+    expect(out).toContain('A wedge for a turned sash: 55 parts and 28 TPU gaskets to print.');
+    expect(out).toContain('The sash turns 10.8° in.');
+    expect(out).toMatch(/wedge-latch-\d-of-6-port-150-print-1\.stl/);
+    expect(out).toContain('wedge-triangle-1-of-4-print-2.stl');
+  });
+
+  it('refuses what a wall has and the wedge has no place for, in the turned sash’s words', async () => {
+    const r = await cli([...TURNED, '--fan', '120', '--dry-run']);
+    expect(r.code).not.toBe(0);
+    expect(r.err.replace(/\s+/g, ' ')).toContain('A turned sash’s wedge has room for a hose port only.');
+  });
+
+  it('--help offers the gap', async () => {
+    const help = await cli(['--help']);
+    expect(help.out.replace(/\s+/g, ' ')).toMatch(/--turn-gap <mm> For a turned sash: the gap at the latch side/);
   });
 });

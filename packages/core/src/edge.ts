@@ -34,7 +34,7 @@ export type EdgeName = 'top' | 'bottom' | 'left' | 'right';
 export type EdgeRole = 'track' | 'sash' | 'sill' | 'unit' | 'frame';
 // A tilted sash (sash-wedge, #159) is closed by a wedge, not a wall: its edges are all pressed
 // against the frame or the sash, held by their gaskets' squeeze.
-export type WindowType = 'slider' | 'hung' | 'frame' | 'shutter' | 'tilt';
+export type WindowType = 'slider' | 'hung' | 'frame' | 'shutter' | 'tilt' | 'turn';
 
 export const EDGES: readonly EdgeName[] = ['top', 'bottom', 'left', 'right'];
 
@@ -44,6 +44,7 @@ export const WINDOW_PRESETS: Record<WindowType, Record<EdgeName, EdgeRole>> = {
   frame: { top: 'frame', bottom: 'frame', left: 'frame', right: 'frame' },
   shutter: { top: 'sash', bottom: 'sill', left: 'track', right: 'track' },
   tilt: { top: 'frame', bottom: 'frame', left: 'frame', right: 'frame' },
+  turn: { top: 'frame', bottom: 'frame', left: 'frame', right: 'frame' },
 };
 
 // Where a window AC is, seen from the room: the edge facing it meets it.

@@ -5,6 +5,6 @@ projects:
   - name:     Parametric window sealer
     kind:     build
     state:    active
-    next:     "the owner makes the repo public (Q162); v0.7.0 (C299): sash-wedge's turned form (#159)"
+    next:     "the owner makes the repo public (Q162); release v0.7.0 (C299): shutter-rails and sash-wedge built"
     trackers: [docs/status.md, docs/backlog.md]
     review:   2026-10-16

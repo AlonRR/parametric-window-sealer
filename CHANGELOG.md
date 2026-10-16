@@ -34,6 +34,12 @@ Unreleased.
   goes and how many to print; the plan says how far the sash leans, the faces, the pieces, the
   port's share of the hose's area and the gaskets' runs. A wall's fittings and patterns have no place
   in it and are refused. How: `docs/wedge.md`. Not yet test printed.
+- The same wedge for a sash turned part way on its side hinges, as a tilt-and-turn window in turn or
+  an inward casement leaves open: choose **Window type: A sash turned part way** (`--window turn`, or
+  `edges.window: "turn"`) and give the gap at the latch side (`--turn-gap`, `turn.gapMm`). Its strip
+  runs up the latch side and its triangles lie at the head and the sill; its files are named for
+  them. A turned sash swings freely: the guide says to hold it at the gap with a window restrictor.
+  How: `docs/wedge.md`. Not yet test printed.
 
 ## [0.6.0] - 2026-10-16
 

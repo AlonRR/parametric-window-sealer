@@ -1,4 +1,4 @@
-# A wedge for a sash tilted in at the top
+# A wedge for a tilted or turned sash
 
 A tilt-and-turn window in tilt, the "kip" window common in Israel and Germany, or a hopper, opens by
 tilting its sash in at the top, held by its own stays. The opening it leaves is a wedge: a strip
@@ -7,6 +7,11 @@ from nothing at the hinge to the gap at the top. A flat wall cannot close it. Th
 wedge instead: two side triangles and a top strip, joined at the top by two corner pieces, every
 edge pressed against the frame or the sash with a printed TPU gasket, the hose through a flattened
 port in the top strip. Its design: [`research/sash-wedge.md`](research/sash-wedge.md).
+
+A sash turned part way on its side hinges, a tilt-and-turn window in turn or an inward casement,
+leaves the same wedge turned on its side; the tool makes that too ([below](#a-sash-turned-part-way)).
+A sash that opens out, a casement, an awning, leaves the frame clear from inside: a wall in a frame
+with no track closes it ([`frame.md`](frame.md)), and needs no wedge (C322).
 
 ## The setting
 
@@ -73,8 +78,8 @@ plan counts them all.
 
 - The wedge is held only by the squeeze between the frame and the sash. Do not close the window on
   it, and take it out before a storm.
-- The sash's stays carry it. Do not lean on the sash, and do not let it swing shut against the
-  wedge.
+- The sash's stays carry it, or for a turned sash the restrictor. Do not lean on the sash, and do
+  not let it swing shut against the wedge.
 - A window with the wedge in is not a locked window.
 
 ## Open until printed
@@ -89,4 +94,33 @@ Nothing here has been printed yet. Open:
   takes the collar: it stands about 55 mm above the top strip at a 150 mm gap and 70 mm at 130 mm
   (inferred, from the port's measures for an 800 × 1200 mm window).
 
-The turned form, a sash hinged at the side and turned part way, comes next, on the same parts.
+## A sash turned part way
+
+A sash turned part way on its side hinges, a tilt-and-turn window in turn, an inward casement or a
+French door, leaves the tilted sash's wedge turned on its side: a strip up the latch side, the
+window's height long and the gap deep, and a thin triangle at the head and at the sill, the sash's
+width long. The tool makes it from the same parts (C317).
+
+- **The setting**: **Window type: A sash turned part way** (`--window turn`, or
+  `edges.window: "turn"`), and the **gap at the latch side** (`--turn-gap`, `turn.gapMm`). Every
+  edge is a frame edge, with the printed TPU seal; what a wall has and a wedge has not is hidden and
+  refused as for a tilted sash.
+- **Holding the sash**: a turned sash swings freely, where a tilted one rests on its stays. Fit a
+  window restrictor that holds it at the gap, so it opens no further, before the wedge goes in: the
+  restrictor keeps it from opening, the wedge from closing (C319). The tool does not print one.
+- **The gap**: as far as you open it, but no more than the corner pieces, which span it, can be
+  printed: up to the printer's shorter side (C318). The page starts at 150 mm, which gives a 150 mm
+  hose its own area through the port.
+- **The hinge side**: not asked. Hinged at the left or the right, the wedge's parts are the same,
+  the whole turned upside down; the preview shows the hinge at the left (C320).
+- **The parts**, named for the turned wedge (C321): `wedge-triangle-…`, a triangle's panels and
+  joint strips, printed twice, one for the head and one for the sill; `wedge-latch-…`, the strip's
+  panels, edge strips and joint strips, the hose port in one of its middle pieces; and as for a
+  tilted sash `wedge-leg-…` and `wedge-corner-…`. An 800 × 1200 mm window, turned 150 mm, takes 55
+  parts and 28 TPU gaskets.
+- **Putting it in**: as for a tilted sash, the sill's triangle first, then the head's, then the
+  strip up the latch side between their corner pieces, once the restrictor holds the sash.
+
+Open until printed, beyond the tilted sash's: whether the head's triangle, lying flat 800 mm or so
+from the hinge, stays up by its squeeze alone; whether the sill's fits the few mm under the sash's
+bottom rail (inferred, in the design note); and whether a restrictor takes the squeeze.

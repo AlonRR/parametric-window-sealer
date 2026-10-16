@@ -340,6 +340,7 @@
               <option value="frame">A frame with no track: casement, tilt-and-turn</option>
               <option value="shutter">Behind a roller shutter</option>
               <option value="tilt">A sash tilted in at the top: tilt-and-turn in tilt, a hopper</option>
+              <option value="turn">A sash turned part way: tilt-and-turn in turn, an inward casement</option>
             </select>
           </label>
           <!-- A tilted sash (sash-wedge, #159): a wedge in place of a wall, its gap at the top. -->
@@ -357,7 +358,24 @@
             </p>
             <span class="error" data-testid="error-tiltGapMm"></span>
           </div>
-          <div data-show-when="window!=tilt">
+          <!-- A turned sash (sash-wedge, #159): the same wedge on its side, its gap at the latch side. -->
+          <div data-show-when="window=turn" hidden>
+            <label>
+              Gap at the latch side (mm)
+              <input name="turnGapMm" inputmode="decimal" autocomplete="off" />
+            </label>
+            <p class="note">
+              A sash turned part way on its side hinges leaves a wedge open: a strip up the latch side
+              and a thin triangle at the head and at the sill. Give the opening inside the frame above,
+              and here the gap at the latch side, from the frame to the sash's outer face. A turned sash
+              swings freely: hold it at the gap with a window restrictor, so it opens no further, before
+              the wedge goes in. The wedge's pieces are pressed between the frame and the sash and held
+              by their printed TPU gaskets: choose printed TPU as the seal. Its one hose port goes in the
+              strip.
+            </p>
+            <span class="error" data-testid="error-turnGapMm"></span>
+          </div>
+          <div data-show-when="window!=tilt|turn">
           <p class="note">
             Sets what each edge of the wall does. Change any edge below if your window differs.
             Each edge gets an edge strip: in a track it fills the track; against the sash or on a
@@ -433,7 +451,7 @@
           </label>
           <p class="note">Example sizes: measure your own tracks. Every edge strip is this wide.</p>
           <span class="error" data-testid="error-trackWidthMm"></span>
-          <div data-show-when="window!=tilt">
+          <div data-show-when="window!=tilt|turn">
           <!-- The filler between the sashes (meeting-rail, #116): none to start with. -->
           <label>
             Gap between the sashes (mm)
@@ -752,7 +770,7 @@
           <span class="error" data-testid="error-customHeightMm"></span>
         </fieldset>
 
-        <fieldset data-show-when="window!=tilt">
+        <fieldset data-show-when="window!=tilt|turn">
           <legend>Dividing the width</legend>
           <label>
             Width division
@@ -772,7 +790,7 @@
           </label>
         </fieldset>
 
-        <fieldset data-show-when="window!=tilt">
+        <fieldset data-show-when="window!=tilt|turn">
           <legend>Dividing the height</legend>
           <label>
             Height division
@@ -800,7 +818,7 @@
           </label>
           <span class="error" data-testid="error-thicknessMm"></span>
           <!-- A double wall for winter (double-wall, #119): single to start with. -->
-          <div data-show-when="window!=tilt">
+          <div data-show-when="window!=tilt|turn">
           <label>
             Wall
             <select name="wall">
@@ -842,7 +860,7 @@
             and ASA in sun. The plan warns where the wall would get near what the material takes.
           </p>
           <span class="error" data-testid="error-sun"></span>
-          <div data-show-when="window!=tilt">
+          <div data-show-when="window!=tilt|turn">
           <!-- Rain on the outside face (rain-face, #117): on to start with. -->
           <label>
             <input type="checkbox" name="rain" value="yes" />
@@ -893,7 +911,7 @@
 
         <!-- The panel fill (pattern-grid, #16): sealed to start with, or a pattern from the
           list, in relief to start with or cut through (Q141, Q142). -->
-        <fieldset data-show-when="window!=tilt">
+        <fieldset data-show-when="window!=tilt|turn">
           <legend>Panel fill</legend>
           <label>
             Fill
@@ -1196,7 +1214,7 @@
           <p><button type="button" id="add-port" data-show-when="appliance=hose">Add another port</button></p>
         </details>
 
-        <details data-show-when="window!=tilt">
+        <details data-show-when="window!=tilt|turn">
           <summary>Advanced: the cutout’s rim</summary>
           <p class="note">
             The rim round a measured cutout, on the room side. These are starting values: a test
@@ -1220,7 +1238,7 @@
           <span class="error" data-testid="error-rimClearanceMm"></span>
         </details>
 
-        <details data-show-when="window!=tilt">
+        <details data-show-when="window!=tilt|turn">
           <summary>Advanced: the sliding insert</summary>
           <label>
             Shutter travel (mm)
@@ -1236,7 +1254,7 @@
           <span class="error" data-testid="error-insertClearanceMm"></span>
         </details>
 
-        <details data-show-when="window!=tilt">
+        <details data-show-when="window!=tilt|turn">
           <summary>Advanced: the clamps</summary>
           <p class="note">
             The jaws that grip an appliance held by clamps. These are starting values: a test print
@@ -1259,7 +1277,7 @@
           <span class="error" data-testid="error-clampDepthMm"></span>
         </details>
 
-        <details data-show-when="window!=tilt">
+        <details data-show-when="window!=tilt|turn">
           <summary>Advanced: the pattern</summary>
           <p class="note">Used when the fill is a pattern. It stays 2 mm further in than the strips reach.</p>
           <label>
@@ -1274,7 +1292,7 @@
 
         <!-- Per-piece fills (params-advanced, #21): a map of the pieces as seen from the room and a
           fill for the one chosen, written into the hidden pieceFills field (C28, C29). -->
-        <details data-show-when="window!=tilt">
+        <details data-show-when="window!=tilt|turn">
           <summary>Advanced: piece by piece</summary>
           <p class="note">
             Choose a piece to give it a fill of its own; the rest keep the wall's. A bold piece has
@@ -1290,7 +1308,7 @@
 
         <!-- A whole piece of your own (mesh-custom-piece, #41): its file read into the hidden
           customPieceFile field, trimmed into its piece inside a frame for the joints. -->
-        <details data-testid="custom-piece" data-show-when="window!=tilt">
+        <details data-testid="custom-piece" data-show-when="window!=tilt|turn">
           <summary>Advanced: a whole piece of your own</summary>
           <p class="note">
             One piece of the wall from an STL, OBJ or 3MF file drawn in mm: centred on its piece and

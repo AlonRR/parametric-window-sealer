@@ -8,7 +8,7 @@ import { Box3, LineSegments, Mesh, MeshPhongMaterial } from 'three';
 import type { Object3D } from 'three';
 import { describe, expect, it } from 'vitest';
 import { loadEngine } from 'parametric-window-sealer';
-import { EXAMPLE_PARAMS, buildExport } from 'parametric-window-sealer';
+import { EXAMPLE_PARAMS, buildExport, readSettings } from 'parametric-window-sealer';
 import { SHEET_COLOUR, TPU_COLOUR, buildWallScene, disposeWall } from '../src/preview-scene';
 
 const solidsOf = (wall: Object3D, kind: string) =>
@@ -280,5 +280,42 @@ describe('a measured cutout in the preview', () => {
     const tpu = buildWallScene(engine, { ...EXAMPLE_PARAMS, cutouts, seal: { kind: 'tpu' as const, tape } });
     expect(solidsOf(tpu, 'tpu')).toHaveLength(solidsOf(tpu, 'edge').length + 1);
     disposeWall(tpu);
+  });
+});
+
+describe('a sash’s wedge (sash-wedge, #159)', () => {
+  const sash = (window: 'tilt' | 'turn') => {
+    const r = readSettings({
+      openingWidthMm: 800,
+      openingHeightMm: 1200,
+      edges: { window },
+      [window]: { gapMm: 150 },
+      seal: { kind: 'tpu' },
+      ports: [],
+    });
+    if (!r.ok) throw new Error(JSON.stringify(r.problems));
+    return r.params;
+  };
+
+  it('stands in the opening, turned and not mirrored: a tilted one up the height, a turned one along the width', async () => {
+    const engine = await loadEngine();
+    for (const window of ['tilt', 'turn'] as const) {
+      const wedge = buildWallScene(engine, sash(window));
+      wedge.updateMatrixWorld(true);
+      expect(wedge.matrixWorld.determinant(), window).toBeCloseTo(1, 9);
+      const box = new Box3().setFromObject(wedge);
+      // From the hinge to the strip and across the opening, the edge strips a few mm past it.
+      for (const [got, want] of [
+        [box.min.x, 0],
+        [box.max.x, 800],
+        [box.min.y, 0],
+        [box.max.y, 1200],
+      ] as const) {
+        expect(Math.abs(got - want), `${window}: ${got} for ${want}`).toBeLessThan(20);
+      }
+      // Its thin side across the window, the sash's gap deep.
+      expect(box.max.z - box.min.z, window).toBeLessThan(200);
+      disposeWall(wedge);
+    }
   });
 });

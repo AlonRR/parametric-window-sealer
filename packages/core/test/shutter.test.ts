@@ -58,7 +58,7 @@ describe('the window type', () => {
 describe('the settings', () => {
   it('the window setting offers it and says what it is', () => {
     const window = SETTINGS.find((s) => s.field === 'window');
-    expect(window?.values).toEqual(['slider', 'hung', 'frame', 'shutter', 'tilt']);
+    expect(window?.values).toEqual(['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn']);
     expect(window?.help).toContain('behind a roller shutter');
   });
 

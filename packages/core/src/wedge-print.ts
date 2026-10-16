@@ -22,8 +22,9 @@ import type { TapeFit } from './tape.js';
 import { gasketSolid } from './tpu.js';
 import { sashWedgeSolids, wedgeCorner } from './wedge-geometry.js';
 import type { FlatPort } from './wedge-port.js';
+import { WEDGE_WORDS } from './wedge.js';
 import type { SashWedge } from './wedge.js';
-import { mm } from './words.js';
+import { capitalised, mm } from './words.js';
 
 export interface WedgePrintPart {
   name: string; // without the extension; it ends with how many to print
@@ -111,14 +112,15 @@ export function wedgePartNames(
   const legs = evenSegments(0, (xCorner + 1) / cos, maxPieceMm).length;
   each(legs, (i) => `wedge-leg-${i + 1}-of-${legs}`, 4);
   const { side, top } = wedge;
-  each(side.chain.pieces.length, (i) => `wedge-side-${i + 1}-of-${side.chain.pieces.length}`, 2);
-  each(side.chain.jointsMm.length, (i) => `wedge-side-joint-${i + 1}-of-${side.chain.jointsMm.length}`, 2);
+  const { triangle, strip } = WEDGE_WORDS[wedge.form].stems;
+  each(side.chain.pieces.length, (i) => `wedge-${triangle}-${i + 1}-of-${side.chain.pieces.length}`, 2);
+  each(side.chain.jointsMm.length, (i) => `wedge-${triangle}-joint-${i + 1}-of-${side.chain.jointsMm.length}`, 2);
   add('wedge-corner', 2);
   const edges = evenSegments(corner.deepMm, top.lengthMm - 2 * corner.deepMm, maxPieceMm).length;
-  each(edges, (i) => `wedge-top-edge-${i + 1}-of-${edges}`, 2);
+  each(edges, (i) => `wedge-${strip}-edge-${i + 1}-of-${edges}`, 2);
   const pieces = top.chain.pieces.length;
-  each(pieces, (i) => `wedge-top-${i + 1}-of-${pieces}${port?.piece === i ? `-port-${mm(port.hoseMm)}` : ''}`, 1);
-  each(top.chain.jointsMm.length, (i) => `wedge-top-joint-${i + 1}-of-${top.chain.jointsMm.length}`, 1);
+  each(pieces, (i) => `wedge-${strip}-${i + 1}-of-${pieces}${port?.piece === i ? `-port-${mm(port.hoseMm)}` : ''}`, 1);
+  each(top.chain.jointsMm.length, (i) => `wedge-${strip}-joint-${i + 1}-of-${top.chain.jointsMm.length}`, 1);
   if (gasket !== undefined) {
     for (const { name, count } of gasketPieces(wedge, profile, panelMm, maxPieceMm, gasket)) list.push({ name, count });
   }
@@ -150,6 +152,7 @@ export function wedgePrintParts(
     return onBed(solid);
   };
   const beta = wedge.tiltDeg / 2;
+  const { triangle, strip } = WEDGE_WORDS[wedge.form].stems;
   try {
     const [left] = whole.sides;
     if (left === undefined) throw new Error('No side triangle');
@@ -160,10 +163,10 @@ export function wedgePrintParts(
       add(`wedge-leg-${i + 1}-of-${legs}`, turned(leg, [0, 0, -beta], [-90, 0, 0]), 4);
     });
     const panels = left.panels.length;
-    left.panels.forEach((p, i) => add(`wedge-side-${i + 1}-of-${panels}`, onBed(p), 2));
+    left.panels.forEach((p, i) => add(`wedge-${triangle}-${i + 1}-of-${panels}`, onBed(p), 2));
     const joints = left.joints.length;
     left.joints.forEach((j, i) => {
-      add(`wedge-side-joint-${i + 1}-of-${joints}`, turned(j, [0, -90, 0]), 2);
+      add(`wedge-${triangle}-joint-${i + 1}-of-${joints}`, turned(j, [0, -90, 0]), 2);
     });
     const [corner] = whole.corners;
     if (corner === undefined) throw new Error('No corner');
@@ -173,16 +176,16 @@ export function wedgePrintParts(
     // sash's, turned flat on its bevel.
     const edges = whole.top.edges.length / 2;
     whole.top.edges.slice(0, edges).forEach((e, i) => {
-      add(`wedge-top-edge-${i + 1}-of-${edges}`, turned(e, [0, 0, -beta], [-90, 0, 0]), 2);
+      add(`wedge-${strip}-edge-${i + 1}-of-${edges}`, turned(e, [0, 0, -beta], [-90, 0, 0]), 2);
     });
     const pieces = whole.top.panels.length;
     whole.top.panels.forEach((p, i) => {
       const what = port?.piece === i ? `-port-${mm(port.hoseMm)}` : '';
-      add(`wedge-top-${i + 1}-of-${pieces}${what}`, turned(p, [0, -90, 0]), 1);
+      add(`wedge-${strip}-${i + 1}-of-${pieces}${what}`, turned(p, [0, -90, 0]), 1);
     });
     const topJoints = whole.top.joints.length;
     whole.top.joints.forEach((j, i) => {
-      add(`wedge-top-joint-${i + 1}-of-${topJoints}`, onBed(j), 1);
+      add(`wedge-${strip}-joint-${i + 1}-of-${topJoints}`, onBed(j), 1);
     });
 
     if (gasket !== undefined) {
@@ -203,8 +206,8 @@ export function wedgePrintParts(
   }
 }
 
-// The plan's lines for the wedge: the sash's tilt and the faces it leaves, the triangles' and the
-// top strip's pieces, the hose port and its share of the hose's area, and the gasket's runs.
+// The plan's lines for the wedge: the sash's tilt or turn and the faces it leaves, the triangles'
+// and the strip's pieces, the hose port and its share of the hose's area, and the gasket's runs.
 export function describeWedge(
   wedge: SashWedge,
   port: FlatPort | undefined,
@@ -212,15 +215,16 @@ export function describeWedge(
   seal: 'tape' | 'tpu',
 ): string[] {
   const { side, top } = wedge;
+  const w = WEDGE_WORDS[wedge.form];
   const lines = [
-    `The sash leans ${mm(wedge.tiltDeg)}° in. The wedge it leaves: a top strip ${mm(top.lengthMm)} mm long and ` +
-      `${mm(top.depthMm)} mm deep, and a triangle each side, ${mm(side.legMm)} mm on its two long sides and ` +
-      `${mm(side.baseMm)} mm across its top.`,
+    `The sash ${w.opens} ${mm(wedge.tiltDeg)}° in. The wedge it leaves: a ${w.strip} ${mm(top.lengthMm)} mm long ` +
+      `and ${mm(top.depthMm)} mm deep, and ${w.triangles}, ${mm(side.legMm)} mm on its two long sides and ` +
+      `${mm(side.baseMm)} mm across ${w.base}.`,
     `Each triangle: ${side.chain.pieces.length} pieces end to end with ${side.chain.jointsMm.length} joint strips, ` +
-      `from ${mm(side.tipMm)} mm above the hinge; below that its edge strips close it. A corner piece joins its top ` +
-      'to the top strip.',
-    `The top strip: ${top.chain.pieces.length} pieces with ${top.chain.jointsMm.length} joint strips, between the ` +
-      'two corner pieces.',
+      `from ${mm(side.tipMm)} mm ${w.out}; ${w.nearer} its edge strips close it. A corner piece joins its ${w.wide} ` +
+      `to the ${w.strip}.`,
+    `${capitalised(`the ${w.strip}`)}: ${top.chain.pieces.length} pieces with ${top.chain.jointsMm.length} joint ` +
+      'strips, between the two corner pieces.',
   ];
   if (port !== undefined) {
     const slot = `a ${mm(port.slot.widthMm)} × ${mm(port.slot.lengthMm)} mm slot`;
@@ -229,12 +233,12 @@ export function describeWedge(
         ? `the ${mm(port.hoseMm)} mm hose’s own area, leading to a collar the hose slides into.`
         : `${Math.round(port.areaShare * 100)}% of the ${mm(port.hoseMm)} mm hose’s area, as long as the piece ` +
           'allows: the air meets more resistance than in the hose.';
-    lines.push(`The hose port is in the top strip’s piece ${port.piece + 1}: ${slot}, ${area}`);
+    lines.push(`The hose port is in the ${w.strip}’s piece ${port.piece + 1}: ${slot}, ${area}`);
   }
   const what = seal === 'tpu' ? 'Gaskets in TPU' : 'Tape';
   lines.push(
-    `${what}, on the frame’s face and on the sash’s: ${mm(runs.legMm)} mm up each leg and round its corner, and ` +
-      `${mm(runs.topMm)} mm along the top; ${mm(4 * runs.legMm + 2 * runs.topMm)} mm in all.`,
+    `${what}, on the frame’s face and on the sash’s: ${mm(runs.legMm)} mm ${w.legs} and round its corner, and ` +
+      `${mm(runs.topMm)} mm ${w.along}; ${mm(4 * runs.legMm + 2 * runs.topMm)} mm in all.`,
   );
   return lines;
 }

@@ -17,8 +17,8 @@ appliance (`mesh-appliance`, #35), 3D tiles of your own as the fill (`mesh-tiles
 piece of your own (`mesh-custom-piece`, #41). The next minor version, `v0.7.0`, is the window
 types the survey found missing (Q161; [`research/window-types.md`](research/window-types.md)): a wall
 in a roller shutter's guide rails (`shutter-rails`, #158), built, then the wedge a sash opened part way
-leaves (`sash-wedge`, #159) (C299): its tilted form is built ([`wedge.md`](wedge.md)), the turned
-form next. Nothing has been test printed yet.
+leaves (`sash-wedge`, #159) (C299), both its forms built, the tilted and the turned
+([`wedge.md`](wedge.md)): `v0.7.0` is complete, its release next. Nothing has been test printed yet.
 
 ## The brief (the owner's request, 5 Oct 2026)
 
