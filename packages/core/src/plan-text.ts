@@ -14,6 +14,7 @@ import { describeStop } from './stop.js';
 import { describeDouble } from './double.js';
 import { describeFrame } from './frame.js';
 import { describeShutter } from './shutter.js';
+import { describeRoof } from './roof.js';
 import { describePrinting } from './piece-print.js';
 import { describeStiffeners } from './stiffener.js';
 import { patternBorderMm } from './pattern.js';
@@ -76,6 +77,7 @@ export interface PlanText {
   double: string[]; // a double wall's skins, and what it gains (#119)
   frame: string[]; // what holds a wall pressed into a frame with no track (#120)
   shutter: string[]; // how a wall behind a roller shutter sits in its rails, and the shutter on it (#158)
+  roof: string[]; // a roof window's wall on its slope: its weight's pull, the test, the rain (#160)
   wedge: string[]; // a tilted sash's wedge, in place of a wall (#159)
   printing: string; // what is done against warping, and brim advice for the material (#122)
   stiffeners: string[]; // the aluminium angle to buy, where it goes, and its clips (#111)
@@ -229,6 +231,7 @@ function describeSashWedge(params: Params): PlanText {
     double: [],
     frame: [],
     shutter: [],
+    roof: [],
     wedge: describeWedge(
       wedge,
       port,
@@ -306,6 +309,7 @@ export function describePlan(plan: GridLayout, params: Params): PlanText {
     }),
     frame: describeFrame(params),
     shutter: describeShutter(params),
+    roof: describeRoof(params),
     wedge: [],
     printing: describePrinting(params.material.kind),
     stiffeners: describeStiffeners(params),

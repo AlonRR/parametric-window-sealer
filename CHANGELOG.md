@@ -18,6 +18,15 @@ way (C299). Changes since the latest version are listed under Unreleased.
 
 ## [Unreleased]
 
+### Added
+
+- A wall in a roof window: choose **Window type: A roof window opened out** (`--window roof`, or
+  `edges.window: "roof"`) and give the roof's pitch, 15 to 90° (`--roof-pitch`, `roof.pitchDeg`).
+  A top-hung roof window opened out leaves its frame clear from inside, so the wall is a frame's,
+  every edge held by its TPU gasket; on a slope part of its weight pulls it out of the frame into
+  the room, and the plan says what share, how to test that the wall holds against it before you
+  leave it, and that rain gathers at its bottom edge. How: `docs/roof.md`. Not yet test printed.
+
 ## [0.7.0] - 2026-10-16
 
 ### Added

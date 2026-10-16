@@ -76,6 +76,8 @@ import type { InPiece } from './fittings/index.js';
 import { capitalised, hundredth, mm } from './words.js';
 import { EXAMPLE_TILT, EXAMPLE_TURN, refuseForWedge, sashForm, wedgeSetup } from './wedge-window.js';
 import type { TiltParams, TurnParams } from './wedge-window.js';
+import { EXAMPLE_ROOF, ROOF_PITCH_DEG, ROOF_PITCH_MESSAGE } from './roof.js';
+import type { RoofParams } from './roof.js';
 
 export interface AxisChoice {
   mode: AxisMode;
@@ -114,6 +116,7 @@ export interface Params {
   rail: RailParams; // the filler between the sashes (meeting-rail, #116); none to start with
   tilt: TiltParams; // a tilted sash's gap at the top, for its wedge (sash-wedge, #159)
   turn: TurnParams; // a turned sash's gap at the latch side, for its wedge
+  roof: RoofParams; // a roof window's pitch (sloped-frame, #160)
   rain: boolean; // weep holes in the strips and a drip groove under the edge strips (rain-face, #117)
   stop: StopParams; // a strut in the sash's track that lifts out by hand (sash-stop, #118); none to start with
   wall: WallKind; // single, or double with hollow pieces for winter (double-wall, #119)
@@ -159,6 +162,7 @@ export const EXAMPLE_PARAMS: Params = {
   stiffen: true,
   tilt: EXAMPLE_TILT,
   turn: EXAMPLE_TURN,
+  roof: EXAMPLE_ROOF,
 };
 
 // Every field of the page's form. The page reads and writes these by name; the settings list
@@ -200,6 +204,7 @@ export const FIELD_NAMES = [
   'window',
   'tiltGapMm',
   'turnGapMm',
+  'roofPitchDeg',
   'topEdge',
   'bottomEdge',
   'leftEdge',
@@ -266,7 +271,7 @@ export type ReadResult = { ok: true; params: Params } | { ok: false; errors: Fie
 const MODES: readonly AxisMode[] = ['equal', 'full-plus-filler'];
 const FILLERS: readonly FillerPosition[] = ['start', 'end', 'middle', 'split'];
 const LEFTOVERS: readonly Leftover[] = ['spread', 'equal', 'shorten'];
-const WINDOWS: readonly WindowType[] = ['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn'];
+const WINDOWS: readonly WindowType[] = ['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn', 'roof'];
 const ROLES: readonly EdgeRole[] = ['track', 'sash', 'sill', 'unit', 'frame'];
 const SEALS: readonly SealKind[] = ['none', 'tape', 'tpu'];
 const PRINTER_KINDS = ['default', 'custom', 'model'] as const;
@@ -418,6 +423,7 @@ const edgesForm = (p: Params): FormValues => ({
   window: p.edges.window,
   tiltGapMm: String(p.tilt.gapMm),
   turnGapMm: String(p.turn.gapMm),
+  roofPitchDeg: String(p.roof.pitchDeg),
   topEdge: p.edges.roles.top,
   bottomEdge: p.edges.roles.bottom,
   leftEdge: p.edges.roles.left,
@@ -951,6 +957,15 @@ export function readParams(values: FormValues): ReadResult {
   const turn: TurnParams = {
     gapMm: r.numberIfUsed('turnGapMm', edges.window === 'turn', EXAMPLE_TURN.gapMm, (n) => n > 0, SIZE_MESSAGE),
   };
+  const roof: RoofParams = {
+    pitchDeg: r.numberIfUsed(
+      'roofPitchDeg',
+      edges.window === 'roof',
+      EXAMPLE_ROOF.pitchDeg,
+      (n) => n >= ROOF_PITCH_DEG.least && n <= ROOF_PITCH_DEG.most,
+      ROOF_PITCH_MESSAGE,
+    ),
+  };
   const sealRead = readSeal(r);
   const { seal, fit } = sealRead;
   const rail = readRail(r, edges, seal);
@@ -1027,6 +1042,7 @@ export function readParams(values: FormValues): ReadResult {
     stiffen,
     tilt,
     turn,
+    roof,
   };
   // A tilted or turned sash has a wedge, not a wall: none of a wall's fittings or patterns, its one
   // port in the strip, and its own problems in place of the wall's plan's.

@@ -82,7 +82,8 @@ function help(): string {
   const settings: [string, string][] = SETTING_FLAGS.map((f) => {
     // A long list of choices (the printers) is named after the hint, so the table stays narrow.
     const long = (f.values?.length ?? 0) > 8;
-    const unit = f.field.endsWith('Pct') ? '<%>' : '<mm>'; // a percentage, such as the tape's squeeze
+    // a percentage, such as the tape's squeeze, or an angle, such as a roof's pitch
+    const unit = f.field.endsWith('Pct') ? '<%>' : f.field.endsWith('Deg') ? '<deg>' : '<mm>';
     const lists: Record<ListKind, string> = {
       ports: '<mm[@column,row]>',
       pieceFills: '<column,row=fill[:style]>',

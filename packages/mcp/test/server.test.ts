@@ -103,7 +103,7 @@ describe('window_sealer_list_settings', () => {
     });
     expect(settings.find((s) => s.path === 'edges.window')).toMatchObject({
       startsAt: 'slider',
-      choices: ['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn'],
+      choices: ['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn', 'roof'],
     });
     expect(settings.find((s) => s.path === 'openingWidthMm')?.startsAt).toBeNull();
     expect(JSON.parse(r.text)).toEqual(r.data);
@@ -659,7 +659,7 @@ describe('behind a roller shutter (shutter-rails, #158)', () => {
     const plan = (await client.listTools()).tools.find((t) => t.name === 'window_sealer_plan_wall');
     if (!plan) throw new Error('window_sealer_plan_wall expected');
     const edges = (plan.inputSchema.properties as Record<string, any>)['settings'].properties.edges;
-    expect(edges.properties.window.enum).toEqual(['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn']);
+    expect(edges.properties.window.enum).toEqual(['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn', 'roof']);
     const r = await call('window_sealer_plan_wall', { settings: { ...OPENING, edges: { window: 'shutter' } } });
     expect(r.isError).toBeFalsy();
     expect(r.data['settings'].edges.track).toEqual({
@@ -728,5 +728,26 @@ describe('a turned sash (sash-wedge, #159)', () => {
     const r = await call('window_sealer_plan_wall', { settings: { ...TURNED, fans: [{ sizeMm: 120 }] } });
     expect(r.isError).toBe(true);
     expect(r.text).toContain('A turned sash’s wedge has room for a hose port only.');
+  });
+});
+
+describe('a roof window (sloped-frame, #160)', () => {
+  it('the schema offers the pitch; the summary says what pulls the wall out of the frame', async () => {
+    const { client, call } = await connect();
+    const plan = (await client.listTools()).tools.find((t) => t.name === 'window_sealer_plan_wall');
+    if (!plan) throw new Error('window_sealer_plan_wall expected');
+    const settings = (plan.inputSchema.properties as Record<string, any>)['settings'];
+    expect(settings.properties.roof.properties.pitchDeg.type).toBe('number');
+    const r = await call('window_sealer_plan_wall', {
+      settings: {
+        openingWidthMm: 800,
+        openingHeightMm: 1200,
+        edges: { window: 'roof' },
+        roof: { pitchDeg: 60 },
+        seal: { kind: 'tpu' },
+      },
+    });
+    expect(r.isError).toBeFalsy();
+    expect(r.data['summary'].roof[0]).toMatch(/^On a roof at 60°, 50% of the wall’s weight pulls it out of the frame/);
   });
 });

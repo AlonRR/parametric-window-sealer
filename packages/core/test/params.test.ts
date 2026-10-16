@@ -67,6 +67,7 @@ describe('the starting values', () => {
       stiffen: true, // #111
       tilt: { gapMm: 130 }, // #159
       turn: { gapMm: 150 },
+      roof: { pitchDeg: 35 },
     });
   });
 
@@ -333,6 +334,7 @@ describe('describePlan', () => {
       double: [], // #119
       frame: [], // #120
       shutter: [], // #158
+      roof: [], // #160
       wedge: [], // #159
       printing:
         'Printing: the pieces’ corners are rounded 3 mm and their bed-side edges chamfered 1 mm against warping. ' +

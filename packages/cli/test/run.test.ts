@@ -304,7 +304,7 @@ describe('usage', () => {
     expect(r.out).toMatch(/--slot <mm> +How deep a piece can go into a strip\. \(8\)/);
     // Wherever its lines break: the flag column is as wide as the longest flag.
     expect(r.out.replace(/\s+/g, ' ')).toMatch(
-      /--window <slider\|hung\|frame\|shutter\|tilt\|turn> .*?as the page does\. \(slider\)/,
+      /--window <slider\|hung\|frame\|shutter\|tilt\|turn\|roof> .*?as the page does\. \(slider\)/,
     );
     expect(r.out).toContain('Exit status: 0 done, 1 could not write, 2 wrong options or settings.');
   });
@@ -1024,7 +1024,7 @@ describe('behind a roller shutter (shutter-rails, #158)', () => {
 
   it('--help offers it', async () => {
     const help = await cli(['--help']);
-    expect(help.out.replace(/\s+/g, ' ')).toMatch(/--window <slider\|hung\|frame\|shutter\|tilt\|turn> /);
+    expect(help.out.replace(/\s+/g, ' ')).toMatch(/--window <slider\|hung\|frame\|shutter\|tilt\|turn\|roof> /);
   });
 });
 
@@ -1075,5 +1075,32 @@ describe('a turned sash (sash-wedge, #159)', () => {
   it('--help offers the gap', async () => {
     const help = await cli(['--help']);
     expect(help.out.replace(/\s+/g, ' ')).toMatch(/--turn-gap <mm> For a turned sash: the gap at the latch side/);
+  });
+});
+
+describe('a roof window (sloped-frame, #160)', () => {
+  const ROOF = ['--width', '800', '--height', '1200', '--window', 'roof', '--roof-pitch', '30', '--seal', 'tpu'];
+
+  it('--window roof with its pitch plans a wall in the frame, and says what pulls it out', async () => {
+    const r = await cli([...ROOF, '--dry-run']);
+    expect(r.code).toBe(0);
+    const out = r.out.replace(/\s+/g, ' ');
+    expect(out).toContain('On a roof at 30°, 87% of the wall’s weight pulls it out of the frame into the room');
+    expect(out).toContain('up to 1.7 times their weight');
+  });
+
+  it('refuses a pitch a roof window does not have', async () => {
+    const r = await cli([...ROOF.slice(0, -4), '--roof-pitch', '10', '--seal', 'tpu', '--dry-run']);
+    expect(r.code).toBe(2);
+    expect(r.err.replace(/\s+/g, ' ')).toContain(
+      'A roof window lies at 15 to 90° from level: give its pitch in degrees.',
+    );
+  });
+
+  it('--help offers the pitch', async () => {
+    const help = await cli(['--help']);
+    expect(help.out.replace(/\s+/g, ' ')).toMatch(
+      /--roof-pitch <deg> For a roof window: the roof's pitch, in degrees from level, 15 to 90\. \(35\)/,
+    );
   });
 });

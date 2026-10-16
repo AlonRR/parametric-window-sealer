@@ -206,9 +206,9 @@ export const SETTINGS: readonly Setting[] = [
       'Window type: a slider, a hung window, a frame with no track (a casement screen opening, a tilt-and-turn ' +
       'frame), a wall behind a roller shutter, in its guide rails, a sash tilted in at the top (tilt-and-turn in ' +
       'tilt, a hopper) or a sash turned part way on its side hinges (tilt-and-turn in turn, an inward casement), ' +
-      "each closed by a wedge in place of a wall; sets the four edges, and for a shutter the rail's starting " +
-      'sizes, as the page does.',
-    values: ['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn'],
+      'each closed by a wedge in place of a wall, or a top-hung roof window opened out, its wall in the frame on ' +
+      "a slope; sets the four edges, and for a shutter the rail's starting sizes, as the page does.",
+    values: ['slider', 'hung', 'frame', 'shutter', 'tilt', 'turn', 'roof'],
   },
   {
     field: 'tiltGapMm',
@@ -223,6 +223,11 @@ export const SETTINGS: readonly Setting[] = [
     help:
       "For a turned sash: the gap at the latch side, from the frame to the sash's outer face, as a restrictor " +
       "holds it. The opening is the frame's, seen inside it.",
+  },
+  {
+    field: 'roofPitchDeg',
+    path: 'roof.pitchDeg',
+    help: "For a roof window: the roof's pitch, in degrees from level, 15 to 90.",
   },
   edge('top'),
   edge('bottom'),

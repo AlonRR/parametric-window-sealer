@@ -50,6 +50,7 @@ const FLAG_NAMES: Record<OwnField, string> = {
   window: 'window',
   tiltGapMm: 'tilt-gap',
   turnGapMm: 'turn-gap',
+  roofPitchDeg: 'roof-pitch',
   topEdge: 'top-edge',
   bottomEdge: 'bottom-edge',
   leftEdge: 'left-edge',

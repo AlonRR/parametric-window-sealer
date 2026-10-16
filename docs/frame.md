@@ -31,11 +31,12 @@ With a window AC in a frame, the unit stands on the sill and the wall above it.
 ## Which windows it covers
 
 A frame with no track seals any opening whose frame is clear from the room side: a casement or an
-awning opened outward, and a tilt-and-turn window turned fully open. A sash left part way open, a
-tilted window and a pivot window leave a wedge-shaped gap this does not close yet; the windows
-still to come are listed in [`research/window-types.md`](research/window-types.md). A window
-behind a roller shutter can instead take the wall in the shutter's guide rails
-([`shutter.md`](shutter.md)).
+awning opened outward, and a tilt-and-turn window turned fully open. A top-hung roof window opened
+out takes it too, on a slope, with the plan saying what holds it there ([`roof.md`](roof.md)). A
+sash tilted in or turned part way leaves a wedge-shaped gap, which a wedge closes
+([`wedge.md`](wedge.md)); a pivot window is still to come
+([`research/window-types.md`](research/window-types.md)). A window behind a roller shutter can
+instead take the wall in the shutter's guide rails ([`shutter.md`](shutter.md)).
 
 ## Not yet confirmed
 

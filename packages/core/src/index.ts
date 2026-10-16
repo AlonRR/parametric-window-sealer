@@ -22,6 +22,7 @@ export * from './stop.js';
 export * from './double.js';
 export * from './frame.js';
 export * from './shutter.js';
+export * from './roof.js';
 export * from './wedge.js';
 export * from './wedge-geometry.js';
 export * from './wedge-port.js';

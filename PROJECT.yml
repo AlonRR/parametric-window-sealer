@@ -5,6 +5,6 @@ projects:
   - name:     Parametric window sealer
     kind:     build
     state:    active
-    next:     "the owner makes the repo public (Q162); then the P3 window types (#160 to #163)"
+    next:     "the owner makes the repo public (Q162); the P3 window types: edge-notches (#161), then #162, #163"
     trackers: [docs/status.md, docs/backlog.md]
     review:   2026-10-16

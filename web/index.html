@@ -341,6 +341,7 @@
               <option value="shutter">Behind a roller shutter</option>
               <option value="tilt">A sash tilted in at the top: tilt-and-turn in tilt, a hopper</option>
               <option value="turn">A sash turned part way: tilt-and-turn in turn, an inward casement</option>
+              <option value="roof">A roof window opened out: top-hung</option>
             </select>
           </label>
           <!-- A tilted sash (sash-wedge, #159): a wedge in place of a wall, its gap at the top. -->
@@ -374,6 +375,20 @@
               strip.
             </p>
             <span class="error" data-testid="error-turnGapMm"></span>
+          </div>
+          <!-- A roof window (sloped-frame, #160): a frame with no track, on a slope. -->
+          <div data-show-when="window=roof" hidden>
+            <label>
+              Roof pitch (°)
+              <input name="roofPitchDeg" inputmode="decimal" autocomplete="off" />
+            </label>
+            <p class="note">
+              A top-hung roof window opened out leaves its frame clear from inside: the wall goes in as
+              in a frame with no track, held by its printed TPU gaskets. Give the roof's pitch, from
+              level: on a slope part of the wall's weight pulls it out of the frame into the room, and
+              the plan says how much, and how to test that it holds before you leave it.
+            </p>
+            <span class="error" data-testid="error-roofPitchDeg"></span>
           </div>
           <div data-show-when="window!=tilt|turn">
           <p class="note">
@@ -1457,6 +1472,7 @@
         <ul data-testid="plan-double" data-plan="double"></ul>
         <ul data-testid="plan-frame" data-plan="frame"></ul>
         <ul data-testid="plan-shutter" data-plan="shutter"></ul>
+        <ul data-testid="plan-roof" data-plan="roof"></ul>
         <ul data-testid="plan-wedge" data-plan="wedge"></ul>
         <p data-testid="plan-printing" data-plan="printing"></p>
         <ul data-testid="plan-stiffeners" data-plan="stiffeners"></ul>
