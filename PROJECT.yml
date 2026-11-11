@@ -5,6 +5,6 @@ projects:
   - name:     Parametric window sealer
     kind:     build
     state:    active
-    next:     "release v0.8.0, the window types (Q163); test prints, the owner's step"
+    next:     "the v0.8.0 tag and release, on the owner's machine (Q163); test prints, the owner's step"
     trackers: [docs/status.md, docs/backlog.md]
     review:   2026-11-11

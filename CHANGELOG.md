@@ -14,9 +14,13 @@ dovetails, sliding dovetail rails and bolted flanges (C215); `0.6.0` adds the dr
 organiser boards (and Multiboard, built but not offered yet) and meshes of your own: a model of the
 appliance, 3D tiles and a whole piece (Q160); `0.7.0` adds two window types from the survey of
 window types: a wall in a roller shutter's guide rails, and a wedge for a sash tilted or turned part
-way (C299). Changes since the latest version are listed under Unreleased.
+way (C299); `0.8.0` adds the rest of the window types the survey found missing: a wall in a roof
+window, notches for a window's hardware, pivot windows on a level or an upright axis, and louvre
+windows (Q163). Changes since the latest version are listed under Unreleased.
 
 ## [Unreleased]
+
+## [0.8.0] - 2026-11-11
 
 ### Added
 
@@ -52,7 +56,6 @@ way (C299). Changes since the latest version are listed under Unreleased.
   every edge held by its TPU gasket; on a slope part of its weight pulls it out of the frame into
   the room, and the plan says what share, how to test that the wall holds against it before you
   leave it, and that rain gathers at its bottom edge. How: `docs/roof.md`. Not yet test printed.
-
 
 ### Fixed
 

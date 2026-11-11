@@ -26,7 +26,8 @@ the joint tuned and in its other forms**: `fit-test-print` (Q157), `joint-doveta
 and `joint-bolts` (C215). **`v0.6.0`, on 16 Oct 2026, everything built since** (Q160): the
 drawn tile, the organiser boards (Multiboard built but not offered yet, Q159) and the meshes.
 **`v0.7.0`, the same day, two window types from the survey** (C299): `shutter-rails` and
-`sash-wedge`. Nothing in any of them
+`sash-wedge`. **`v0.8.0`, on 11 Nov 2026, the rest of the survey's window types** (Q163):
+`sloped-frame`, `edge-notches`, `pivot-window`, `pivot-vertical` and `louvre-frame`. Nothing in any of them
 has been test printed yet. After `v0.3.0`, four rows were added at P1, ahead of P2, to make the code easy to
 extend (Q145): `code-tooling`, `code-params-page`, `fill-registry` and `fitting-registry`. On
 14 Oct, `ci-triggers` was added at P1 so that CI checks each commit once (Q147). P2 began the

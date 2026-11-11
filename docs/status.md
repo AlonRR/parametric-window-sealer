@@ -24,7 +24,8 @@ along an edge for the window's hardware (`edge-notches`, #161; [`frame.md`](fram
 windows (`pivot-window`, #162; [`pivot.md`](pivot.md)), the horizontal pivot and the centre-pivot roof
 window, and the upright pivot (`pivot-vertical`, #179), split off from it (C336), and louvre windows
 (`louvre-frame`, #163; [`louvre.md`](louvre.md)), the wall in place of the lowest blades. Every window
-type the survey found missing is now built. Nothing has been test printed yet.
+type the survey found missing is now built: `v0.8.0`, on 11 Nov 2026, is their release (Q163).
+Nothing has been test printed yet.
 
 ## The brief (the owner's request, 5 Oct 2026)
 
@@ -229,13 +230,18 @@ The next free ID is 167, under any of the letters A, D, Q and T (one number pool
   the open items at the end of each reply, asking a changed item again (that session's A294),
   recording what was solved, and the skills to read. The startup hook says how to run it by hand,
   and `tests/test-session-start.sh` stops once when `ssh-keygen` is missing.
-
 - **Done (Q166 (11 Nov)):** the two tests that failed on Windows pass there: the whole suite,
   1,499 of 1,499, at `86f5f71` on `main` (relayed: measured by the session on the owner's machine,
   11 Nov 2026; the notch-pattern test took 981 ms, its file 13 of 13, the MCP options file 6 of 6).
+- **Done (Q164 (11 Nov)):** GitHub reads the root `LICENSE` and shows the repository's licence as
+  "Other", the split not being one licence (verified: GitHub's API reports `license.key: other`
+  once the file was on `main`, 11 Nov 2026).
 - **Done (Q3, Q162):** the repository is public, the owner's step ("162 I think so", 11 Nov 2026;
   verified: GitHub's API reports `"visibility": "public"` for it on 11 Nov 2026). Serving the page
   on GitHub Pages stays a separate switch of his (Q43; the README's steps).
+- **Pending (Q163, Q123):** the `v0.8.0` tag on the release commit `chore(release): v0.8.0, the
+  window types` and its GitHub release, a pre-release (C63), asked of the session on the owner's
+  machine he names `ogpc` once the commit is on `main`; checked on GitHub afterwards.
 - **Done (C299, Q123):** the `v0.7.0` tag on the release commit `chore(release): v0.7.0, the
   roller shutter and the sash wedge` (`e93929e`) and its GitHub release, made by the session on the
   owner's machine he names `ogpc` on 16 Oct 2026 (verified: GitHub lists the annotated tag `v0.7.0`
