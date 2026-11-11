@@ -109,9 +109,12 @@ jobs:
         run: npm run test:dist -w parametric-window-sealer-mcp
       - name: Build the page
         run: npm run build -w parametric-window-sealer-web
+      # Without --with-deps: the runner image already has the libraries Chromium needs, and
+      # --with-deps also fetched fonts with apt, so a runner that could not reach Ubuntu's
+      # package servers failed here before any test ran (three runs in a row, 11 Nov 2026).
       - name: Install the Chromium this Playwright version expects
         working-directory: web
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install chromium
       - name: Browser test
         run: npm run test:browser -w parametric-window-sealer-web
 
