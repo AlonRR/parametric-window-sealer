@@ -134,6 +134,11 @@ Skills to read from `AlonRR/engineering-practices` (on GitHub, from outside this
   committer and failed the check). If `main` has moved, merge it into the branch locally
   first, wait for CI on the new head, then fast-forward. GitHub then marks the pull request
   merged (verified on PR #44, 5 Oct 2026: `merged: true` once `main` reached its head).
+- **Dependabot's pull requests are remade, never merged (D167 (11 Nov)):** its commits carry
+  Dependabot as author and GitHub as committer, which the identity check refuses. Make the same
+  bump on a branch of your own (`npm install` with the same versions, the lockfile by npm), open
+  a pull request that names Dependabot's, land it as usual, then close Dependabot's with a link
+  to it.
 - **Backlog as GitHub issues** (Q29): each row of `docs/backlog.md` has an issue. The file is the
   ranked overview and the issue holds the work; when a priority or estimate changes, change both.
 - **Versions** (Q29): Semantic Versioning, first tag `v0.1.0` when the MVP is complete. Record
