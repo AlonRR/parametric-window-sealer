@@ -226,18 +226,19 @@ describe('a notched piece among the rest', () => {
     expect(named(ok({ ...FRAME, sheet: { source: 'sheet' } }))).toEqual([]);
   });
 
+  // Each wall built once: a patterned wall is the slowest thing this suite builds, 7.5 s on a
+  // Windows machine against 2 s on Linux, so it has a longer time limit than the default 5 s.
   it('is sealed: the wall’s pattern leaves it whole, round its notch', () => {
-    const piece = (p: Params) =>
-      buildExport(engine, p).pieces.find((x) => x.cell.column === column - 1 && x.cell.row === 0)?.mesh;
     const grid = ok({ ...FRAME, notches: [NOTCH], fill: { kind: 'grid' } });
-    const sealed = piece(PARAMS);
-    const patterned = piece(grid);
-    if (sealed === undefined || patterned === undefined) throw new Error('no piece');
-    expect(volumeOf(patterned)).toBeCloseTo(volumeOf(sealed), 3);
-    const other = (p: Params) =>
-      buildExport(engine, p).pieces.find((x) => x.cell.column !== column - 1 && x.cell.row === 0)?.mesh;
-    expect(volumeOf(other(grid) ?? sealed)).toBeLessThan(volumeOf(other(PARAMS) ?? sealed) - 1);
-  });
+    const [plain, patterned] = [PARAMS, grid].map((p) => buildExport(engine, p).pieces);
+    const notched = (pieces: typeof plain) =>
+      pieces?.find((x) => x.cell.column === column - 1 && x.cell.row === 0)?.mesh;
+    const other = (pieces: typeof plain) => pieces?.find((x) => x.cell.column !== column - 1 && x.cell.row === 0)?.mesh;
+    const [sealed, inPattern] = [notched(plain), notched(patterned)];
+    if (sealed === undefined || inPattern === undefined) throw new Error('no piece');
+    expect(volumeOf(inPattern)).toBeCloseTo(volumeOf(sealed), 3);
+    expect(volumeOf(other(patterned) ?? sealed)).toBeLessThan(volumeOf(other(plain) ?? sealed) - 1);
+  }, 30_000);
 });
 
 describe('the plan', () => {

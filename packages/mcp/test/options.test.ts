@@ -1,7 +1,7 @@
 // The server's own options (Q94, Q96): where it may write, given when it is added to an agent.
 import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { readOptions } from '../src/options.js';
 
@@ -10,8 +10,9 @@ const STATEMENT =
   'share or sell for any purpose, with no conditions from this project.';
 
 describe('readOptions', () => {
+  // resolve, not join: on Windows the absolute path takes the drive letter, C:\work\prints.
   it('--out-root, made absolute from the folder it starts in', () => {
-    expect(readOptions(['--out-root', 'prints'], '/work')).toEqual({ run: { outRoot: join('/work', 'prints') } });
+    expect(readOptions(['--out-root', 'prints'], '/work')).toEqual({ run: { outRoot: resolve('/work', 'prints') } });
     expect(readOptions(['--out-root=/data/prints'], '/work')).toEqual({ run: { outRoot: '/data/prints' } });
   });
 
