@@ -20,6 +20,9 @@ way (C299). Changes since the latest version are listed under Unreleased.
 
 ### Added
 
+- A `LICENSE` file at the repository's root, so GitHub shows its licence: it names the split,
+  MPL-2.0 for the code and CERN-OHL-S-2.0 for the documentation, and points to `LICENSES/` and
+  `REUSE.toml`.
 - A wall in a louvre window: choose **Window type: A louvre window** (`--window louvre`, or
   `edges.window: "louvre"`). The wall takes the place of the lowest blades, taken out of their
   clips: it stands on the sill, its sides pressed against the clips by their TPU gaskets, and the

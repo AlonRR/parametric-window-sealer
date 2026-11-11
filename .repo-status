@@ -1,11 +1,11 @@
 # .repo-status -- the publish decision, where tooling can read it.
 # Template: publish-status.example in repo-secret-scan. One of: never | not-yet | ready | public.
 
-publish: ready
+publish: public
 reason:  meant to be public so people can run the web customizer from GitHub Pages
-review:  2026-10-16
-blockers:
-  - the owner's step: changing the repository's visibility to public is his (Q3); he has decided to (Q162)
+review:  2026-11-11
+blockers: []
+# Made public by the owner (Q162; GitHub's API reports it public on 11 Nov 2026).
 # Reviewed again 16 Oct 2026 (Q162), as on 14 Oct (Q151): every stored file in history (1720 blobs)
 # and every commit message (184 commits, all branches and tags) was searched for private IPs, email
 # addresses, machine paths, private host names, MAC addresses, Wi-Fi details, prices and key

@@ -1,0 +1,16 @@
+Parametric window sealer: licensing
+
+This repository is under two licences, file by file, in the REUSE layout
+(https://reuse.software):
+
+- Code, including the code that defines the pieces' shapes, and the scripts,
+  hooks, tests, CI and tool configuration: Mozilla Public License 2.0
+  (MPL-2.0), in LICENSES/MPL-2.0.txt.
+- The documentation: CERN Open Hardware Licence Version 2 - Strongly
+  Reciprocal (CERN-OHL-S-2.0), in LICENSES/CERN-OHL-S-2.0.txt.
+
+Which licence covers which file is recorded in REUSE.toml.
+
+The STL and other files this tool generates, and anything you print from
+them, are yours to use, change, share or sell for any purpose, with no
+conditions from this project.

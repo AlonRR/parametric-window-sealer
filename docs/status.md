@@ -198,6 +198,8 @@ type the survey found missing is now built. Nothing has been test printed yet.
 | Q160 | **One release, `v0.6.0`, cut from `main`** with everything built since `v0.5.0`: the organiser boards (Multiboard hidden, Q159), the drawn tile and the meshes; the next items become `v0.7.0`. The tag and the GitHub release go to the session on the owner's machine he names `ogpc` (Q123). Asked: "160 a make sure to ask ogpc for version tagging" | 16 Oct 2026 |
 | Q161 | **Look into other window types** (`other-windows`, #43): the windows people fit a window AC, a hose kit or a fan into, what the tool already seals and what it lacks. Asked: "161 look into other window types" | 16 Oct 2026 |
 | Q162 | **Multiboard stays in the repository when it goes public, hidden in the interface as now** (Q159): the page, the command's help and the MCP server leave it out, the library and the command take it by name; and **the repository goes public**, the owner's own step (Q3). Asked: "162 stays hidden. Go public" | 16 Oct 2026 |
+| Q163 | **Release `v0.8.0`** with the window types built since `v0.7.0`: a wall in a roof window, notches for the hardware, pivot windows on a level or an upright axis, and louvre windows (#160 to #163, #179), every one the survey found missing. The library, the command and the MCP server go to 0.8.0; the tag and the GitHub release go to the session on the owner's machine (Q123, Q160), a pre-release as nothing is test printed (C63). Asked: "163 yes" | 11 Nov 2026 |
+| Q164 | **A root `LICENSE` file**, which GitHub reads to show a repository's licence: it names the split, MPL-2.0 for the code and CERN-OHL-S-2.0 for the documentation, points to `LICENSES/` and `REUSE.toml`, and says the generated files are the user's (C354). Raised by an audit of the public repository from the session on the owner's machine. Asked: "164 y" | 11 Nov 2026 |
 | Q149 | P2 goes on with **`svg-tile`** (#27), an SVG tile of the user's own as a pattern, its SVG read with a parsing library the agent chooses and logs (C98), **then `clamps`** (#32), the second new fitting. Asked whether to go ahead: "149 yes" | 14 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
@@ -215,15 +217,13 @@ The first four rows were answered before questions carried IDs.
 
 None at present.
 
-The next free ID is Q163.
+The next free ID is Q165.
 
 ## Repository follow-ups
 
-- **Owner's step (Q3, Q162):** make the repository public: **Settings → General → Danger Zone →
-  Change visibility → Change to public** on GitHub
-  ([GitHub's steps](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/setting-repository-visibility#changing-a-repositorys-visibility)).
-  The history was reviewed again first (`.repo-status`). Pending until the owner says it is done.
-  Serving the page on GitHub Pages stays a separate switch of his (Q43; the README's steps).
+- **Done (Q3, Q162):** the repository is public, the owner's step ("162 I think so", 11 Nov 2026;
+  verified: GitHub's API reports `"visibility": "public"` for it on 11 Nov 2026). Serving the page
+  on GitHub Pages stays a separate switch of his (Q43; the README's steps).
 - **Done (C299, Q123):** the `v0.7.0` tag on the release commit `chore(release): v0.7.0, the
   roller shutter and the sash wedge` (`e93929e`) and its GitHub release, made by the session on the
   owner's machine he names `ogpc` on 16 Oct 2026 (verified: GitHub lists the annotated tag `v0.7.0`

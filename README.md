@@ -112,6 +112,7 @@ The repository itself:
 - The documentation: [CERN-OHL-S-2.0](LICENSES/CERN-OHL-S-2.0.txt)
 
 Which licence covers which file is recorded in [`REUSE.toml`](REUSE.toml)
-([REUSE](https://reuse.software) layout).
+([REUSE](https://reuse.software) layout); [`LICENSE`](LICENSE) sums it up for tools that read only
+that file.
 
 _Parts of this repository were drafted with the help of an LLM agent; reviewed and verified locally._

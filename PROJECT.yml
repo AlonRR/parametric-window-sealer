@@ -5,6 +5,6 @@ projects:
   - name:     Parametric window sealer
     kind:     build
     state:    active
-    next:     "the owner makes the repo public (Q162); every window type the survey found is built"
+    next:     "release v0.8.0, the window types (Q163); test prints, the owner's step"
     trackers: [docs/status.md, docs/backlog.md]
-    review:   2026-10-16
+    review:   2026-11-11

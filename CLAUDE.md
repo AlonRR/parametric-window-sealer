@@ -146,7 +146,7 @@ outside this tree; do not vendor them in. The ones that bite most often here:
 
 ## Design every change for public release
 
-The repo is private today and built as if public from commit 1.
+The repo is public since November 2026 (Q162), and was built as if public from commit 1.
 
 - **Never in the repo:** real hostnames, internal DNS names or private IPs (use `192.0.2.0/24`
   and `example.com`); WiFi names or passwords; MAC addresses; machine paths such as a Windows
