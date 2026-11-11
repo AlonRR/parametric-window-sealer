@@ -200,6 +200,8 @@ type the survey found missing is now built. Nothing has been test printed yet.
 | Q162 | **Multiboard stays in the repository when it goes public, hidden in the interface as now** (Q159): the page, the command's help and the MCP server leave it out, the library and the command take it by name; and **the repository goes public**, the owner's own step (Q3). Asked: "162 stays hidden. Go public" | 16 Oct 2026 |
 | Q163 | **Release `v0.8.0`** with the window types built since `v0.7.0`: a wall in a roof window, notches for the hardware, pivot windows on a level or an upright axis, and louvre windows (#160 to #163, #179), every one the survey found missing. The library, the command and the MCP server go to 0.8.0; the tag and the GitHub release go to the session on the owner's machine (Q123, Q160), a pre-release as nothing is test printed (C63). Asked: "163 yes" | 11 Nov 2026 |
 | Q164 | **A root `LICENSE` file**, which GitHub reads to show a repository's licence: it names the split, MPL-2.0 for the code and CERN-OHL-S-2.0 for the documentation, points to `LICENSES/` and `REUSE.toml`, and says the generated files are the user's (C354). Raised by an audit of the public repository from the session on the owner's machine. Asked: "164 y" | 11 Nov 2026 |
+| Q165 | **The agent goes on pushing branches and fast-forwarding `main` on this repository's own `origin`**, public since Q162; CLAUDE.md now says to push only to `origin`, never to another remote, and never to change the repository's visibility. Asked: "165 yes" | 11 Nov 2026 |
+| Q166 | **The two test failures on Windows become a backlog item and are fixed** (`windows-tests`): the MCP server's `--out-root` test expects a path without a drive letter, which Windows adds, and core's notch-pattern test runs past its timeout there (measured by the session on the owner's machine, 11 Nov 2026: 1,497 of 1,499 tests passed). Asked: "166 yes" | 11 Nov 2026 |
 | Q149 | P2 goes on with **`svg-tile`** (#27), an SVG tile of the user's own as a pattern, its SVG read with a parsing library the agent chooses and logs (C98), **then `clamps`** (#32), the second new fitting. Asked whether to go ahead: "149 yes" | 14 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
@@ -217,7 +219,7 @@ The first four rows were answered before questions carried IDs.
 
 None at present.
 
-The next free ID is Q165.
+The next free ID is Q167.
 
 ## Repository follow-ups
 

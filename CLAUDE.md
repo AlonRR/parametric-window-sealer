@@ -28,7 +28,7 @@ hose. The design is still being worked out with the owner.
   (a setting, a web wizard, a purchase) stays pending until he confirms.
 - **Answer the question; only an action needs confirmation.** Asked for a view or a
   recommendation, give it. Still ask before changing state on a host, buying anything, pushing
-  to a public remote, deleting, or anything outward-facing.
+  to a remote other than this repository's own `origin`, deleting, or anything outward-facing.
 - **Give every question an ID** of the form `[A-Z][number]` (Q1, Q2 ...), written as a label
   (`- **Q3.** ...`), never as a Markdown ordered-list marker. An open question keeps its ID; a new
   one takes the next free ID (see `docs/status.md`); say when one is closed. If answer numbers do
@@ -127,8 +127,9 @@ outside this tree; do not vendor them in. The ones that bite most often here:
 - **Use `git commit -F <file>`, not `-m`.** Before an `--amend`, check `git status`; check
   `git show --stat` after.
 - **Fetch and check for divergence before working**, not only before pushing.
-- **Never push to a public remote and never change the repo's visibility.** Both are the
-  owner's actions. The canonical home of the owner's repos is a self-hosted forge that cloud
+- **Push only to this repository's own `origin`**, public since Q162 (Q165). Never push to any
+  other remote, never add one, and never change the repo's visibility: those are the owner's
+  actions. The canonical home of the owner's repos is a self-hosted forge that cloud
   sessions cannot reach; mirroring there is the owner's step.
 - **PR descriptions** end with exactly:
 
