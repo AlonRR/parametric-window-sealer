@@ -219,9 +219,16 @@ The first four rows were answered before questions carried IDs.
 
 None at present.
 
-The next free ID is Q167.
+The next free ID is 167, under any of the letters A, D, Q and T (one number pool, CLAUDE.md).
 
 ## Repository follow-ups
+
+- **Done (11 Nov 2026):** CLAUDE.md takes the owner's current house rules from
+  engineering-practices' cloud-session starter, at his request ("Send message to og-pc fixes for
+  updated claudemd files and skills"), as the session on his machine listed them: the ID letters,
+  the open items at the end of each reply, asking a changed item again (that session's A294),
+  recording what was solved, and the skills to read. The startup hook says how to run it by hand,
+  and `tests/test-session-start.sh` stops once when `ssh-keygen` is missing.
 
 - **Done (Q3, Q162):** the repository is public, the owner's step ("162 I think so", 11 Nov 2026;
   verified: GitHub's API reports `"visibility": "public"` for it on 11 Nov 2026). Serving the page

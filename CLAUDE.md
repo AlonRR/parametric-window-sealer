@@ -29,10 +29,47 @@ hose. The design is still being worked out with the owner.
 - **Answer the question; only an action needs confirmation.** Asked for a view or a
   recommendation, give it. Still ask before changing state on a host, buying anything, pushing
   to a remote other than this repository's own `origin`, deleting, or anything outward-facing.
-- **Give every question an ID** of the form `[A-Z][number]` (Q1, Q2 ...), written as a label
-  (`- **Q3.** ...`), never as a Markdown ordered-list marker. An open question keeps its ID; a new
-  one takes the next free ID (see `docs/status.md`); say when one is closed. If answer numbers do
-  not fit, assume they follow the numbering the owner saw, and state the mapping used.
+- **Give every question an ID** of the form `[A-Z][number]`, written as a label
+  (`- **Q3.** ...`), never as a Markdown ordered-list marker. The letter says what answer is
+  expected: `A` approval for an action, `D` a decision between options (with a recommendation),
+  `Q` a fact or preference only the owner has, `T` a manual step handed to him. One number pool
+  across the letters: a new item takes the next free number (see `docs/status.md`) whatever its
+  letter. An open item keeps its ID; say when one is closed. A closed number rests for the rest of
+  its closing day and all of the next. A record that cites an ID adds the date ("Q12 (8 Oct)").
+  What a question is about carries its own ID too (a commit SHA, a C-number). If answer numbers
+  do not fit, assume they follow the numbering the owner saw, and state the mapping used.
+- **Ask each new question in the reply's body first**, as a labelled item
+  (`- **Q7** — the question, its options, a recommendation`), then give its one plain line in the
+  open items.
+- **An item whose steps change is asked again** (A294 (11 Nov), relayed from the session on the
+  owner's machine), in the reply's body under its label, with a question mark ("Could you open …
+  and send a photo?"). The owner's open-items band shows an item's first text and replaces it
+  only when a later reply asks again (with a "?" or at least two lettered options). Steps
+  restated as plain instructions leave the old steps showing on his phone.
+- **End every reply with the open items**, even when nothing changed:
+  - a line `**Open:**`, then one bullet per item whose bold label opens with its ID
+    (`- **Q7:** what it is and what is needed`). `Open:` holds only what waits on the owner;
+    `Open: none` when nothing does. A `T` item stays there until he says he did it.
+  - an item he answered that is still being worked on goes under a line `**In progress:**`, one
+    plain line saying where the work is, and leaves the list once done (say so).
+  - items waiting on someone else go under a line starting `Waiting on`, each saying how to check
+    it and when it was last checked.
+  - an item's files go inline in its own line, each as a full repo-relative path in backticks.
+    The list holds only IDs the agent issued.
+- **A gap is a question until shown otherwise:** each gap, cost, risk, assumption or untested
+  point listed is either asked with an ID, logged as a choice (C-number), or marked as checked
+  fact or someone else's.
+- **Weigh an option on its merits, not on when it can be had:** a wait (to buy, print or
+  measure) never rules out an option or decides a recommendation. State each option's wait
+  beside its merits.
+- **A request that mixes a question and an action:** answer the question in full, and say
+  plainly what will not be touched until he decides.
+- **Solved it, record it:** before the final report, write down what was worked out (a root
+  cause, a trap, a procedure as a tested script) in this repo's docs. A lesson that transfers to
+  other repos, written de-identified, goes to engineering-practices as a skill. End every final
+  report with one line after the open items: `Recorded: <file>` or `Recorded: nothing new`.
+- **Recommend a new session when scope spreads**: into another repo, or into a sub-task with a
+  thread of its own.
 
 ## Units
 
@@ -51,6 +88,21 @@ outside this tree; do not vendor them in. The ones that bite most often here:
   22 passed", never just "passed"). A check you wrote that confirms exactly what you expected is
   not yet evidence.
 - **Verify before asserting.** Mark claims `(verified: <how>)`, `(inferred)` or `(relayed)`.
+- **Before every commit, run the lint and format checks too**, not only the tests, each gating
+  the commit by its own exit code, never through a pipe (`check | tail && git commit` commits on
+  a failure).
+- **Commands through more than one shell go as a script on stdin**, never as a nested quoted
+  command line.
+
+Skills to read from `AlonRR/engineering-practices` (on GitHub, from outside this tree):
+
+- **Always:** `cloud-session`, `run-existing-checks-first`, `verify-the-check-ran`,
+  `check-the-right-target`, `verify-before-asserting`, `never-type-an-identifier`,
+  `git-everyday-traps`.
+- **For this repo's work:** `printed-part-design` and `printed-part-engineering` (the panels),
+  `manifold-csg-speed` (the library builds on manifold-3d), `programmatic-interfaces` (the
+  command, the MCP server and the library's API), `interface-design`, `interface-engineering`
+  and `web-frontend` (the page in `web/`), and `prove-refactor-unchanged` (any refactor).
 
 ## Python
 
@@ -96,7 +148,7 @@ outside this tree; do not vendor them in. The ones that bite most often here:
   alone (Q23). A session that holds several repositories has a parent folder as its project
   directory, and there the hook did not fire (inferred cause);
   run it by hand with
-  `CLAUDE_CODE_REMOTE=true CLAUDE_PROJECT_DIR="$PWD" .claude/hooks/session-start.sh` from the
+  `CLAUDE_CODE_REMOTE=true CLAUDE_PROJECT_DIR="$PWD" bash .claude/hooks/session-start.sh` from the
   repo root. Anywhere else, before the first commit in a fresh clone:
 
   ```bash

@@ -7,6 +7,10 @@
 #
 # Cloud sessions only: on the owner's own machines it exits at once and changes nothing.
 # tests/test-session-start.sh holds it to both sides of that.
+#
+# The hook does NOT fire when the session's project folder is a parent of this repo (a
+# session holding several repos). Then run it by hand from the repo root:
+#   CLAUDE_CODE_REMOTE=true CLAUDE_PROJECT_DIR="$PWD" bash .claude/hooks/session-start.sh
 set -euo pipefail
 
 if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then

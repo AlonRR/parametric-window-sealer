@@ -11,6 +11,14 @@
 # Needs uv (the hook installs its tools with it) and ssh-keygen (to make a test signing
 # key), so it runs locally, not in CI.
 set -uo pipefail
+
+# The signing rows make their test keys with ssh-keygen. A fresh cloud container may not have it
+# until the hook installs it mid-run, and then those rows fail one by one for a reason that is not
+# the hook's. Stop before any row runs instead.
+if ! command -v ssh-keygen > /dev/null 2>&1; then
+  echo "ssh-keygen not found: install openssh-client, then run again" >&2
+  exit 1
+fi
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HOOK="$HERE/.claude/hooks/session-start.sh"
 NAME="Alon A. Rabinowitz"
