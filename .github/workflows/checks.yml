@@ -61,10 +61,11 @@ jobs:
         run: |
           bash scripts/check-history-identity.sh \
             "Alon A. Rabinowitz" "45129051+AlonRR@users.noreply.github.com"
-      - name: Hook and history-check tests
+      - name: Hook, history-check and release-notes tests
         run: |
           bash tests/test-hooks.sh
           bash tests/test-history-identity.sh
+          bash tests/test-release-notes.sh
 
   web:
     # The library, the command, the MCP server and the page (Q22, Q34, Q79, Q83, Q91): one

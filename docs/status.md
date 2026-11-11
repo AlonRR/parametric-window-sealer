@@ -218,9 +218,16 @@ The first four rows were answered before questions carried IDs.
 
 ## Open questions
 
-None at present.
+- **D167** (11 Nov 2026). How are Dependabot's pull requests handled? #183, vite 8.3.2 to 8.3.5
+  for a security alert, has been open since 21 Oct: its commit's author is Dependabot and its
+  committer GitHub, so the identity check refuses it, and a fast-forward would keep that commit.
+  (a) The agent makes the same bump under the owner's identity in a pull request of its own,
+  lands it as usual, and closes Dependabot's with a link to it; recommended, as the identity
+  check stays whole, at one more pull request per bump. (b) The identity check accepts
+  Dependabot's commits, giving up "author and committer are the owner" for them. (c) The owner
+  handles them.
 
-The next free ID is 167, under any of the letters A, D, Q and T (one number pool, CLAUDE.md).
+The next free ID is 168, under any of the letters A, D, Q and T (one number pool, CLAUDE.md).
 
 ## Repository follow-ups
 
@@ -239,9 +246,14 @@ The next free ID is 167, under any of the letters A, D, Q and T (one number pool
 - **Done (Q3, Q162):** the repository is public, the owner's step ("162 I think so", 11 Nov 2026;
   verified: GitHub's API reports `"visibility": "public"` for it on 11 Nov 2026). Serving the page
   on GitHub Pages stays a separate switch of his (Q43; the README's steps).
-- **Pending (Q163, Q123):** the `v0.8.0` tag on the release commit `chore(release): v0.8.0, the
-  window types` and its GitHub release, a pre-release (C63), asked of the session on the owner's
-  machine he names `ogpc` once the commit is on `main`; checked on GitHub afterwards.
+- **Done (Q163 (11 Nov), Q123):** the `v0.8.0` tag on the release commit `chore(release): v0.8.0,
+  the window types` (`f1c5227`) and its GitHub release, made by the session on the owner's machine
+  on 11 Nov 2026 (verified: GitHub's API shows the annotated tag `v0.8.0` (`ab477d8`) on `f1c5227`,
+  tagger the owner's no-reply identity, signature verified, and the release "v0.8.0, the window
+  types", a pre-release (C63)). Its first notes were mis-encoded, "…" as "â€¦" and "°" as "Â°":
+  that session built them from piped stdin, which Python on Windows decodes with the ANSI code
+  page, and its check read both sides the same way. It re-sent them from the bytes;
+  `bash scripts/check-release-notes.sh v0.8.0` now passes (C359), and refuses the first body.
 - **Done (C299, Q123):** the `v0.7.0` tag on the release commit `chore(release): v0.7.0, the
   roller shutter and the sash wedge` (`e93929e`) and its GitHub release, made by the session on the
   owner's machine he names `ogpc` on 16 Oct 2026 (verified: GitHub lists the annotated tag `v0.7.0`

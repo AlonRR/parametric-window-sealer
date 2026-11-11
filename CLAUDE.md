@@ -170,7 +170,10 @@ Skills to read from `AlonRR/engineering-practices` (on GitHub, from outside this
   machine (Q123):** once the release commit is on `main`, message the session on his machine
   that he names for it (by the remote-session `send_message` tool, with the commit, the tag
   command and the release notes), then check GitHub for the tag and the release. Its name is
-  not kept in the repo; ask him if it is not in the conversation.
+  not kept in the repo; ask him if it is not in the conversation. Check the notes with
+  `bash scripts/check-release-notes.sh vX.Y.Z`, which compares them with the CHANGELOG
+  section byte for byte: v0.8.0's first notes had "…" as "â€¦", UTF-8 read as Windows-1252
+  on the way, and a check that decoded both sides the same way called them equal.
 - **Subject: `type(scope): summary`. The scope is required; a bare `type: summary` is
   forbidden.** Lowercase type, at most 72 characters, line 2 blank, detail in the body.
   `.githooks/commit-msg` enforces this (tightened from the kit, which made the scope optional).
@@ -229,6 +232,7 @@ bash tests/test-hooks.sh          # the kit's controls for both hooks, end to en
 bash tests/test-history-identity.sh   # controls for the history check CI runs
 bash tests/test-yamllint.sh       # .yamllint.yaml passes this repo's YAML, refuses broken YAML
 bash tests/test-session-start.sh  # the cloud startup hook, in a fresh clone
+bash tests/test-release-notes.sh  # controls for the release-notes check, mojibake among them
 pre-commit run --all-files        # the hooks CI runs
 reuse lint                        # every file has a licence and a copyright notice
 bash scripts/check-history-identity.sh "Alon A. Rabinowitz" \
