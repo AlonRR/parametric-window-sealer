@@ -20,6 +20,15 @@ windows (Q163). Changes since the latest version are listed under Unreleased.
 
 ## [Unreleased]
 
+### Security
+
+- The page is built with vite 8.3.5, past three advisories on the dev server's open-in-editor
+  helper (launch-editor) in vite 8.3.0 to 8.3.2:
+  [GHSA-698v-4r3x-3vcv](https://github.com/advisories/GHSA-698v-4r3x-3vcv),
+  [GHSA-r825-w8mm-5pxw](https://github.com/advisories/GHSA-r825-w8mm-5pxw) and
+  [GHSA-587h-7wmj-h5pm](https://github.com/advisories/GHSA-587h-7wmj-h5pm). The built page and
+  the offline file never contained it. In place of Dependabot's #183.
+
 ## [0.8.0] - 2026-11-11
 
 ### Added

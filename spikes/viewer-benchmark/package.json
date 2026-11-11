@@ -12,7 +12,7 @@
   "devDependencies": {
     "manifold-3d": "3.5.4",
     "playwright-core": "1.56.1",
-    "vite": "8.3.2"
+    "vite": "8.3.3"
   },
   "dependencies": {
     "@babylonjs/core": "9.29.0",
