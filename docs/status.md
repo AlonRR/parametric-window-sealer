@@ -230,6 +230,9 @@ The next free ID is 167, under any of the letters A, D, Q and T (one number pool
   recording what was solved, and the skills to read. The startup hook says how to run it by hand,
   and `tests/test-session-start.sh` stops once when `ssh-keygen` is missing.
 
+- **Done (Q166 (11 Nov)):** the two tests that failed on Windows pass there: the whole suite,
+  1,499 of 1,499, at `86f5f71` on `main` (relayed: measured by the session on the owner's machine,
+  11 Nov 2026; the notch-pattern test took 981 ms, its file 13 of 13, the MCP options file 6 of 6).
 - **Done (Q3, Q162):** the repository is public, the owner's step ("162 I think so", 11 Nov 2026;
   verified: GitHub's API reports `"visibility": "public"` for it on 11 Nov 2026). Serving the page
   on GitHub Pages stays a separate switch of his (Q43; the README's steps).

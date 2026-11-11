@@ -246,6 +246,7 @@ npm run typecheck --workspaces    # tsc over all four: sources, tests and config
 npm run lint                      # oxlint over all four, type-checked rules (.oxlintrc.jsonc)
 npm run format:check              # Prettier over the TypeScript and JavaScript; `npm run format` fixes it
 npm test --workspaces             # unit tests (Vitest), in Node
+npm test -w parametric-window-sealer -- test/notch.test.ts   # one file: the path is the package's own
 npm run build -w parametric-window-sealer        # the library, into packages/core/dist
 npm run test:dist -w parametric-window-sealer    # that build, loaded by name; the README's example
 npm run build -w parametric-window-sealer-cli        # the command, after the library's build
@@ -255,6 +256,10 @@ npm run test:dist -w parametric-window-sealer-mcp    # installed with -g, starte
 npm run build -w parametric-window-sealer-web         # the static site and the offline file, into web/out/site
 npm run test:browser -w parametric-window-sealer-web  # the built page in Chromium (Playwright)
 ```
+
+To run one test file, give its path from the package's folder, as above. Each config's `include`
+is package-relative, so `npx vitest run -c packages/mcp/vitest.config.ts packages/mcp/test/…` from
+the repo root finds no test files and exits 1 (verified 11 Nov 2026, on Windows and here).
 
 The page's, the command's and the server's tests use the library's source (an alias in
 `web/vite.config.ts` and each package's `vitest.config.ts`), so they cannot drift apart; the

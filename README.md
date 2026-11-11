@@ -78,6 +78,7 @@ npm ci                                              # at the repo root
 npm run lint                                        # oxlint, with type-checked rules (.oxlintrc.jsonc)
 npm run format                                      # Prettier; CI runs npm run format:check
 npm test --workspaces                               # unit tests: library, command, server, page
+npm test -w parametric-window-sealer -- test/notch.test.ts   # one file, its path from the package's folder
 npm run dev -w parametric-window-sealer-web         # the page, reloading as you edit
 npm run build -w parametric-window-sealer-web       # the static site and the offline file, into web/out/site
 ```
