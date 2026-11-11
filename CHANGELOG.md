@@ -28,6 +28,14 @@ windows (Q163). Changes since the latest version are listed under Unreleased.
   [GHSA-r825-w8mm-5pxw](https://github.com/advisories/GHSA-r825-w8mm-5pxw) and
   [GHSA-587h-7wmj-h5pm](https://github.com/advisories/GHSA-587h-7wmj-h5pm). The built page and
   the offline file never contained it. In place of Dependabot's #183.
+- The MCP server takes zod 4.6.7, past
+  [GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5), and the locked
+  versions of what its MCP library brings move past four more advisories: body-parser 2.4.0
+  ([GHSA-27r3-jxmh-p828](https://github.com/advisories/GHSA-27r3-jxmh-p828)), qs 6.17.0
+  ([GHSA-6pq8-jhm2-2vcw](https://github.com/advisories/GHSA-6pq8-jhm2-2vcw)), fast-uri 3.1.9
+  (four advisories, among them
+  [GHSA-w74x-v6f9-j3xg](https://github.com/advisories/GHSA-w74x-v6f9-j3xg)) and ip-address
+  10.7.5 ([GHSA-rxp7-6hxx-x8q5](https://github.com/advisories/GHSA-rxp7-6hxx-x8q5)).
 
 ## [0.8.0] - 2026-11-11
 
