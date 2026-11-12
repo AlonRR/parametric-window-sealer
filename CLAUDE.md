@@ -41,6 +41,12 @@ hose. The design is still being worked out with the owner.
 - **Ask each new question in the reply's body first**, as a labelled item
   (`- **Q7** — the question, its options, a recommendation`), then give its one plain line in the
   open items.
+- **The label comes first, and everything about the item goes under it** (A168 (12 Nov)): its
+  context, options and recommendation as the item's own sub-bullets, nothing about it above the
+  label. Tools that show the open items take an item as its label and the lines that continue
+  it, so text above it is lost, and a reader can't tell what belongs to which item.
+- **A `D` item letters its options**, `(a)`, `(b)`, `(c)`, each under the item, the recommended
+  one marked, so a terse answer ("8 c") names one.
 - **An item whose steps change is asked again** (A294 (11 Nov), relayed from the session on the
   owner's machine), in the reply's body under its label, with a question mark ("Could you open …
   and send a photo?"). The owner's open-items band shows an item's first text and replaces it
