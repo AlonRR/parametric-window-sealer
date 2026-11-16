@@ -52,12 +52,25 @@ hose. The design is still being worked out with the owner.
   and send a photo?"). The owner's open-items band shows an item's first text and replaces it
   only when a later reply asks again (with a "?" or at least two lettered options). Steps
   restated as plain instructions leave the old steps showing on his phone.
+- **Ending a turn ends your work** (A169 (16 Nov)). A session runs only inside a turn: once the
+  reply ends, nothing it says happens until a message arrives. So the open items come last, after
+  one check: is any step of yours left that you can take now? Take it, in this turn, including
+  work the owner's request interrupted. Never end a reply with your own work called next,
+  starting, queued or not started.
+- **Stop only for a reason that is the owner's, asked under `Open:` with its letter**: an action
+  needing his confirmation (A), a choice (D), a fact or a device's state only he has (Q), a step
+  for him (T), or a usage checkpoint or a scope spread (A, "continue ...?"). The item says where
+  the work stopped. With no such reason, keep working: never ask "shall I continue?".
 - **End every reply with the open items**, even when nothing changed:
   - a line `**Open:**`, then one bullet per item whose bold label opens with its ID
     (`- **Q7:** what it is and what is needed`). `Open:` holds only what waits on the owner;
     `Open: none` when nothing does. A `T` item stays there until he says he did it.
-  - an item he answered that is still being worked on goes under a line `**In progress:**`, one
-    plain line saying where the work is, and leaves the list once done (say so).
+  - an item he answered goes under a line `**In progress:**`, after the open items and before
+    `Waiting on`, only while something other than this session moves it, and its line opens by
+    naming that: `running:` a job, agent or CI run, where to check it, and whether its end wakes
+    this session; or `after <ID>:` one of his open IDs it waits on. This session's own next step
+    is never in progress, and a line that asks him anything goes under `Open:`. An item leaves
+    the list, said closed, once done.
   - items waiting on someone else go under a line starting `Waiting on`, each saying how to check
     it and when it was last checked.
   - an item's files go inline in its own line, each as a full repo-relative path in backticks.
