@@ -113,6 +113,10 @@ outside this tree; do not vendor them in. The ones that bite most often here:
 - **Find and run the existing checks first**, unchanged, for a baseline; run them again before
   saying done. Confirm what a runner actually collects.
 - **A behaviour change gets a failing test first**: show it failing, then implement.
+- **Test-first is enforced at commit on the owner's machines** (A172 (17 Nov)): a `feat` or `fix`
+  commit that changes code needs a test change in the same commit, an inline test, or a body line
+  `Red: <test> failed: <what it said>` naming the test that failed first. A cloud clone has no such
+  check, so write commits that way here too; never skip a hook with `--no-verify`.
 - **Every gate needs a positive control**, and a result needs its denominator ("22 cases run,
   22 passed", never just "passed"). A check you wrote that confirms exactly what you expected is
   not yet evidence.

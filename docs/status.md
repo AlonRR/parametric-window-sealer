@@ -208,6 +208,7 @@ Nothing has been test printed yet.
 | A169 | **The turn-end rules in CLAUDE.md**, from engineering-practices' cloud-session starter (8930c18), relayed by the session on the owner's machine: ending a turn ends the work, so any step the agent can take is taken in that turn; it stops only for a reason of the owner's, asked under `Open:`; an `In progress:` line names what moves it, `running:` or `after <ID>:`. Asked: "169 y" | 16 Nov 2026 |
 | A170 | **The read-aloud rule in CLAUDE.md**, from engineering-practices' cloud-session starter (62a757b), relayed by the session on the owner's machine: an artifact meant to be read as a document gets a read-aloud control, started by a click, with pause, stop and speed; a mockup or visual design does not. Asked: "170 y" | 17 Nov 2026 |
 | A171 | **The artifact rules in CLAUDE.md**, from engineering-practices' cloud-session starter (7334ed6), relayed by the session on the owner's machine: what he will read or use beyond a short answer goes into an artifact, nothing private on a published page; a document for reading is a page with the read-aloud control, Docs only to edit together or export. Asked: "171 y" | 17 Nov 2026 |
+| A172 | **The test-first rule in CLAUDE.md**, from engineering-practices' cloud-session starter (ee6f6b9), relayed by the session on the owner's machine: a `feat` or `fix` commit that changes code carries a test change, an inline test, or a `Red:` line naming the test that failed first; never `--no-verify`. Asked: "172 y" | 17 Nov 2026 |
 | Q149 | P2 goes on with **`svg-tile`** (#27), an SVG tile of the user's own as a pattern, its SVG read with a parsing library the agent chooses and logs (C98), **then `clamps`** (#32), the second new fitting. Asked whether to go ahead: "149 yes" | 14 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
@@ -225,7 +226,7 @@ The first four rows were answered before questions carried IDs.
 
 None at present.
 
-The next free ID is 172, under any of the letters A, D, Q and T (one number pool, CLAUDE.md).
+The next free ID is 173, under any of the letters A, D, Q and T (one number pool, CLAUDE.md).
 
 ## Repository follow-ups
 
