@@ -89,6 +89,11 @@ hose. The design is still being worked out with the owner.
   report with one line after the open items: `Recorded: <file>` or `Recorded: nothing new`.
 - **Recommend a new session when scope spreads**: into another repo, or into a sub-task with a
   thread of its own.
+- **An artifact meant to be read as a document gets a read-aloud control** (A170 (17 Nov); the
+  `tts` capability), so the owner can listen to it as to a reply: read its headings, paragraphs,
+  list items and table rows in order, starting only from a click, with pause, stop and speed, and
+  say so on the page where a view can't play it. A mockup or visual design does not: its point is
+  the look, not the words.
 
 ## Units
 
