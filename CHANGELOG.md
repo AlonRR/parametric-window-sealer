@@ -22,6 +22,12 @@ windows (Q163). Changes since the latest version are listed under Unreleased.
 
 ### Security
 
+- The library's locked XML parser moves to fast-xml-parser 5.12.0, past
+  [GHSA-474x-hrwr-fgx4](https://github.com/advisories/GHSA-474x-hrwr-fgx4), and the MCP server's
+  locked web framework to hono 4.13.16 and @hono/node-server 2.1.6, past five and two advisories
+  (among them [GHSA-4m76-xfj5-7975](https://github.com/advisories/GHSA-4m76-xfj5-7975) and
+  [GHSA-jpvv-r467-5p4w](https://github.com/advisories/GHSA-jpvv-r467-5p4w)). `npm audit` reports
+  none.
 - The page is built with vite 8.3.5, past three advisories on the dev server's open-in-editor
   helper (launch-editor) in vite 8.3.0 to 8.3.2:
   [GHSA-698v-4r3x-3vcv](https://github.com/advisories/GHSA-698v-4r3x-3vcv),

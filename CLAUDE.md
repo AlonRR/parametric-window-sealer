@@ -303,6 +303,11 @@ To run one test file, give its path from the package's folder, as above. Each co
 is package-relative, so `npx vitest run -c packages/mcp/vitest.config.ts packages/mcp/test/…` from
 the repo root finds no test files and exits 1 (verified 11 Nov 2026, on Windows and here).
 
+A dist check that fails at its install with `ETARGET` ("No matching version found") for a version
+the registry has is npm's cache, not the packages: the check installs with `--prefer-offline`,
+which trusts a cached version list from before that release. One install with `--prefer-online`
+refreshes it (verified 17 Nov 2026: fast-xml-builder 1.3.2, out 13 Nov, unknown to the cache).
+
 The page's, the command's and the server's tests use the library's source (an alias in
 `web/vite.config.ts` and each package's `vitest.config.ts`), so they cannot drift apart; the
 dist checks run the builds.

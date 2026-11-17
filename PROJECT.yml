@@ -5,6 +5,6 @@ projects:
   - name:     Parametric window sealer
     kind:     build
     state:    active
-    next:     "vite 8.3.5 under the owner's identity, for Dependabot's #183 (D167); test prints, his step"
+    next:     "test prints, the owner's step; the hosted web API (#48) stays parked, Q32"
     trackers: [docs/status.md, docs/backlog.md]
-    review:   2026-11-11
+    review:   2026-11-17

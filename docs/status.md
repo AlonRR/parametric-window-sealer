@@ -245,10 +245,14 @@ The next free ID is 173, under any of the letters A, D, Q and T (one number pool
 - **Done (Q3, Q162):** the repository is public, the owner's step ("162 I think so", 11 Nov 2026;
   verified: GitHub's API reports `"visibility": "public"` for it on 11 Nov 2026). Serving the page
   on GitHub Pages stays a separate switch of his (Q43; the README's steps).
-- **Pending (C361):** fast-xml-parser 5.12.0, which manifold-3d's range takes, past
-  [GHSA-474x-hrwr-fgx4](https://github.com/advisories/GHSA-474x-hrwr-fgx4), a low advisory
-  (quadratic time on an unterminated tag). Released 3 Nov 2026, it is taken once two weeks old,
-  from 17 Nov, with `npm update fast-xml-parser`; `npm audit` shows it until then.
+- **Done (C361, 17 Nov 2026):** fast-xml-parser 5.12.0, which manifold-3d's range takes, past
+  [GHSA-474x-hrwr-fgx4](https://github.com/advisories/GHSA-474x-hrwr-fgx4), a low advisory, once
+  two weeks old; with it hono 4.13.16 and @hono/node-server 2.1.6, past advisories published
+  after 11 Nov, both brought by the MCP server's MCP library. All resolved with
+  `--before=2026-11-03T12:16:00Z`, which takes 5.12.0 and not 5.12.1 (13 Nov): a cutoff of a
+  date alone takes whatever came out before that day. `npm audit`: 0 advisories (verified, 17
+  Nov). The two reminders set for it failed to reach the session ("access denied"), so it was
+  taken when the next message arrived.
 - **Done (Q163 (11 Nov), Q123):** the `v0.8.0` tag on the release commit `chore(release): v0.8.0,
   the window types` (`f1c5227`) and its GitHub release, made by the session on the owner's machine
   on 11 Nov 2026 (verified: GitHub's API shows the annotated tag `v0.8.0` (`ab477d8`) on `f1c5227`,
