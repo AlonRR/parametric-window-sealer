@@ -75,6 +75,11 @@ hose. The design is still being worked out with the owner.
     it and when it was last checked.
   - an item's files go inline in its own line, each as a full repo-relative path in backticks.
     The list holds only IDs the agent issued.
+- **Push when a reply leaves the owner something** (A173 (17 Nov)): when a reply ends with a new
+  ID'd item under `Open:`, or finishes long work he asked for, call `PushNotification` once: the
+  session's name, the new IDs and what each needs, under 200 characters. The tool skips it while
+  he is watching that session, so don't judge whether he is. No push for routine progress, or for
+  an item already pushed.
 - **A gap is a question until shown otherwise:** each gap, cost, risk, assumption or untested
   point listed is either asked with an ID, logged as a choice (C-number), or marked as checked
   fact or someone else's.
