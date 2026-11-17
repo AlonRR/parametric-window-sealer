@@ -45,6 +45,9 @@ hose. The design is still being worked out with the owner.
   context, options and recommendation as the item's own sub-bullets, nothing about it above the
   label. Tools that show the open items take an item as its label and the lines that continue
   it, so text above it is lost, and a reader can't tell what belongs to which item.
+- **One question per ID** (A174 (17 Nov)): an ID asks one thing, so a terse answer settles
+  exactly one decision; two decisions get two IDs, even when they arrive together. A terse "yes"
+  to a compound question is recorded for every part, and a wrong part travels on as fact.
 - **A `D` item letters its options**, `(a)`, `(b)`, `(c)`, each under the item, the recommended
   one marked, so a terse answer ("8 c") names one.
 - **An item whose steps change is asked again** (A294 (11 Nov), relayed from the session on the
