@@ -94,6 +94,11 @@ hose. The design is still being worked out with the owner.
   list items and table rows in order, starting only from a click, with pause, stop and speed, and
   say so on the page where a view can't play it. A mockup or visual design does not: its point is
   the look, not the words.
+- **Anything the owner will read or use, rather than a short answer, goes into an artifact**
+  (A171 (17 Nov)): a report, an explainer, a plan, a comparison, a long finding. He reads sessions
+  on the go, and an artifact reads well in the app. Nothing private goes on a published page.
+  A document for reading is a page you write, not a Docs-type document, whose fixed page cannot
+  carry the control: use Docs only when the owner wants to edit it with you or export it.
 
 ## Units
 
