@@ -29,6 +29,9 @@ hose. The design is still being worked out with the owner.
 - **Answer the question; only an action needs confirmation.** Asked for a view or a
   recommendation, give it. Still ask before changing state on a host, buying anything, pushing
   to a remote other than this repository's own `origin`, deleting, or anything outward-facing.
+- **Reading any site the owner has access to is fine, in small numbers** (A175 (18 Nov)): pages
+  one at a time, as he would read them; never bulk downloads, scraping or a burst of requests. He
+  set this knowing most publishers' terms restrict putting article text into language-model tools.
 - **Give every question an ID** of the form `[A-Z][number]`, written as a label
   (`- **Q3.** ...`), never as a Markdown ordered-list marker. The letter says what answer is
   expected: `A` approval for an action, `D` a decision between options (with a recommendation),
