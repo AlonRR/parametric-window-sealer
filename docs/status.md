@@ -3,7 +3,7 @@
 Working document: the brief, every decision so far, and every open question. Keep it current;
 a fresh session resumes from here.
 
-Last updated: 15 Oct 2026. Phase: **P2** ([`backlog.md`](backlog.md)). `v0.3.0` holds every P1
+Last updated: 19 Nov 2026. Phase: **P2** ([`backlog.md`](backlog.md)). `v0.3.0` holds every P1
 row; since then the code was made easy to extend (Q145) and P2 began (Q148, Q149): the fan mount
 (`fan-mount`, #28), the SVG tile (`svg-tile`, #27), the clamps (`clamps`, #32) and the sliding insert (`sliding-insert`, #38) are built. A design review against published work led to thirteen changes (Q153): a tighter joint that locks (`joint-lock`, #110), pieces cut from sheet (`sheet-pieces`, #112), material advice (`material-advice`, #113), a hose port that locks and closes (`hose-socket`, #114), seals that bend (`tpu-fin-seals`, #115), a filler between the sashes (`meeting-rail`, #116), weep holes against rain (`rain-face`, #117), a sash stop that lifts out by hand (`sash-stop`, #118), a double wall for winter (`double-wall`, #119), windows with no track (`compression-edge`, #120), the warnings before fitting (`safety-guidance`, #121) printing defaults against warping (`print-defaults`, #122) and stiffeners of bought aluminium angle on printed clips (`stiffener-strips`, #111, Q154) are built.
 All of it is released as `v0.4.0` (Q155). `v0.5.0` is the joint tuned and in its other forms
