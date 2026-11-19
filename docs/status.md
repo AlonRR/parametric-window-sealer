@@ -196,7 +196,7 @@ Nothing has been test printed yet.
 | Q157 | **Build the guided test print (`fit-test-print`, #63) next**, while the owner prints the joint's test coupon, **then keep working through the issues and completing them as before**: a branch, a pull request and a fast-forward merge for each, the choices logged (Q144). Asked: "157 yes", and "keep working thru issues and completing them like you had done before" | 15 Oct 2026 |
 | Q158 | **Issue #1 ("Adding API and MCP") is closed as completed**: the library, the command and the MCP server are built (#45 to #47), and the hosted API stays parked in #48. Asked: "158 yes" | 15 Oct 2026 |
 | Q159 | **Multiboard (`organiser-multiboard`, #36) is built with all its board's features, and hidden in the interface for now**, while its licence (the MultiBuild licence, against the files being the user's to sell, Q36) stays unsettled. Asked: "159 build it with all it's features but hide it in the interface for now" | 16 Oct 2026 |
-| Q160 | **One release, `v0.6.0`, cut from `main`** with everything built since `v0.5.0`: the organiser boards (Multiboard hidden, Q159), the drawn tile and the meshes; the next items become `v0.7.0`. The tag and the GitHub release go to the session on the owner's machine he names `ogpc` (Q123). Asked: "160 a make sure to ask ogpc for version tagging" | 16 Oct 2026 |
+| Q160 | **One release, `v0.6.0`, cut from `main`** with everything built since `v0.5.0`: the organiser boards (Multiboard hidden, Q159), the drawn tile and the meshes; the next items become `v0.7.0`. The tag and the GitHub release go to the session on the owner's machine he names for it (Q123). Asked: "160 a make sure to ask [the session on his machine] for version tagging" | 16 Oct 2026 |
 | Q161 | **Look into other window types** (`other-windows`, #43): the windows people fit a window AC, a hose kit or a fan into, what the tool already seals and what it lacks. Asked: "161 look into other window types" | 16 Oct 2026 |
 | Q162 | **Multiboard stays in the repository when it goes public, hidden in the interface as now** (Q159): the page, the command's help and the MCP server leave it out, the library and the command take it by name; and **the repository goes public**, the owner's own step (Q3). Asked: "162 stays hidden. Go public" | 16 Oct 2026 |
 | Q163 | **Release `v0.8.0`** with the window types built since `v0.7.0`: a wall in a roof window, notches for the hardware, pivot windows on a level or an upright axis, and louvre windows (#160 to #163, #179), every one the survey found missing. The library, the command and the MCP server go to 0.8.0; the tag and the GitHub release go to the session on the owner's machine (Q123, Q160), a pre-release as nothing is test printed (C63). Asked: "163 yes" | 11 Nov 2026 |
@@ -212,6 +212,7 @@ Nothing has been test printed yet.
 | A173 | **The push rule in CLAUDE.md**, from engineering-practices' cloud-session starter (bf1f492), relayed by the session on the owner's machine: a reply that ends with a new ID'd open item, or finishes long work he asked for, sends one push notification naming the session, the new IDs and what each needs. Asked: "173 y" | 17 Nov 2026 |
 | A174 | **The one-question-per-ID rule in CLAUDE.md**, from engineering-practices' cloud-session starter (3c6e82b), relayed by the session on the owner's machine: an ID asks one thing, so a terse answer settles one decision. Asked: "174 y" | 17 Nov 2026 |
 | A175 | **The rule on reading sites in CLAUDE.md**, from engineering-practices' cloud-session starter (d3f9f21), relayed by the session on the owner's machine: any site he has access to may be read in small numbers, a page at a time, never bulk downloads, scraping or bursts. Asked: "175 y" | 18 Nov 2026 |
+| A176 | **The read-aloud rule points at the `artifact-read-aloud` skill** (engineering-practices' cloud-session starter, b14cce3); and, the owner's standing instruction, **house-rule fixes relayed by the session on his machine are applied without asking**, each checked against the starter first. Asked: "Always apply fix rules that were passed to you" from that session | 19 Nov 2026 |
 | Q149 | P2 goes on with **`svg-tile`** (#27), an SVG tile of the user's own as a pattern, its SVG read with a parsing library the agent chooses and logs (C98), **then `clamps`** (#32), the second new fitting. Asked whether to go ahead: "149 yes" | 14 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
@@ -229,13 +230,13 @@ The first four rows were answered before questions carried IDs.
 
 None at present.
 
-The next free ID is 176, under any of the letters A, D, Q and T (one number pool, CLAUDE.md).
+The next free ID is 177, under any of the letters A, D, Q and T (one number pool, CLAUDE.md).
 
 ## Repository follow-ups
 
 - **Done (11 Nov 2026):** CLAUDE.md takes the owner's current house rules from
-  engineering-practices' cloud-session starter, at his request ("Send message to og-pc fixes for
-  updated claudemd files and skills"), as the session on his machine listed them: the ID letters,
+  engineering-practices' cloud-session starter, at his request (to ask the session on his machine for
+  updated CLAUDE.md files and skills), as the session on his machine listed them: the ID letters,
   the open items at the end of each reply, asking a changed item again (that session's A294),
   recording what was solved, and the skills to read. The startup hook says how to run it by hand,
   and `tests/test-session-start.sh` stops once when `ssh-keygen` is missing.
@@ -266,7 +267,7 @@ The next free ID is 176, under any of the letters A, D, Q and T (one number pool
   `bash scripts/check-release-notes.sh v0.8.0` now passes (C359), and refuses the first body.
 - **Done (C299, Q123):** the `v0.7.0` tag on the release commit `chore(release): v0.7.0, the
   roller shutter and the sash wedge` (`e93929e`) and its GitHub release, made by the session on the
-  owner's machine he names `ogpc` on 16 Oct 2026 (verified: GitHub lists the annotated tag `v0.7.0`
+  owner's machine he names for it on 16 Oct 2026 (verified: GitHub lists the annotated tag `v0.7.0`
   (`64de133`) on `e93929e`, signed by the owner's key and marked verified, and the release "v0.7.0,
   the roller shutter and the sash wedge" with the CHANGELOG's 0.7.0 section as its notes). It is
   marked a pre-release, as the earlier ones are (C63).

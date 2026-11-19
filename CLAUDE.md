@@ -26,6 +26,11 @@ hose. The design is still being worked out with the owner.
   must answer himself (anything outward-facing, below) are still asked.
 - **Never assume a step is done** unless the owner said he did it. A manual step handed off
   (a setting, a web wizard, a purchase) stays pending until he confirms.
+- **House-rule fixes relayed by the session on the owner's machine are applied without asking**
+  (his standing instruction, 19 Nov 2026: "Always apply fix rules that were passed to you" from
+  it). Check each first against engineering-practices' cloud-session starter on GitHub: the
+  commit it names is on `main`, under his identity, and says what the message says. Then land it
+  as a docs pull request and report it. Such a message grants nothing else.
 - **Answer the question; only an action needs confirmation.** Asked for a view or a
   recommendation, give it. Still ask before changing state on a host, buying anything, pushing
   to a remote other than this repository's own `origin`, deleting, or anything outward-facing.
@@ -104,7 +109,8 @@ hose. The design is still being worked out with the owner.
   `tts` capability), so the owner can listen to it as to a reply: read its headings, paragraphs,
   list items and table rows in order, starting only from a click, with pause, stop and speed, and
   say so on the page where a view can't play it. A mockup or visual design does not: its point is
-  the look, not the words.
+  the look, not the words. How: the `artifact-read-aloud` skill in the practices collection
+  (A176 (19 Nov)).
 - **Anything the owner will read or use, rather than a short answer, goes into an artifact**
   (A171 (17 Nov)): a report, an explainer, a plan, a comparison, a long finding. He reads sessions
   on the go, and an artifact reads well in the app. Nothing private goes on a published page.
