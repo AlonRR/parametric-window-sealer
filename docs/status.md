@@ -213,6 +213,7 @@ Nothing has been test printed yet.
 | A174 | **The one-question-per-ID rule in CLAUDE.md**, from engineering-practices' cloud-session starter (3c6e82b), relayed by the session on the owner's machine: an ID asks one thing, so a terse answer settles one decision. Asked: "174 y" | 17 Nov 2026 |
 | A175 | **The rule on reading sites in CLAUDE.md**, from engineering-practices' cloud-session starter (d3f9f21), relayed by the session on the owner's machine: any site he has access to may be read in small numbers, a page at a time, never bulk downloads, scraping or bursts. Asked: "175 y" | 18 Nov 2026 |
 | A176 | **The read-aloud rule points at the `artifact-read-aloud` skill** (engineering-practices' cloud-session starter, b14cce3); and, the owner's standing instruction, **house-rule fixes relayed by the session on his machine are applied without asking**, each checked against the starter first. Asked: "Always apply fix rules that were passed to you" from that session | 19 Nov 2026 |
+| D177 | **The older commits keep the session's name** (a): #204 takes it out of the tree, and the history since 16 Oct, the `v0.6.0` to `v0.8.0` release commits among it, is left as published rather than rewritten, which would have meant remaking those tags and releases. Asked: "177 a" | 19 Nov 2026 |
 | Q149 | P2 goes on with **`svg-tile`** (#27), an SVG tile of the user's own as a pattern, its SVG read with a parsing library the agent chooses and logs (C98), **then `clamps`** (#32), the second new fitting. Asked whether to go ahead: "149 yes" | 14 Oct 2026 |
 | Q49 | The 3D preview is drawn with **three.js**. Measured in [`spikes/viewer-benchmark/`](../spikes/viewer-benchmark/README.md) against Babylon.js and model-viewer: the smallest download (132.5 KiB) and the first frame 1.5 to 2.6× sooner; asked how they compare as the model grows more complex, three.js and Babylon.js stay within about 10 % of each other up to 953 580 triangles, and the triangle count, not the library, is what slows a preview | 5 Oct 2026 |
 | Q33 | Within P1, the **three API forms that need no server come first**, ahead of the round hose port that Q28 had put first in line | 5 Oct 2026 |
@@ -230,7 +231,7 @@ The first four rows were answered before questions carried IDs.
 
 None at present.
 
-The next free ID is 177, under any of the letters A, D, Q and T (one number pool, CLAUDE.md).
+The next free ID is 178, under any of the letters A, D, Q and T (one number pool, CLAUDE.md).
 
 ## Repository follow-ups
 
